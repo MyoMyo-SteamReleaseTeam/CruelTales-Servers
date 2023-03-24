@@ -1,7 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<!-- 패킷을 정의합니다. -->
+<!-- Packet definition from the server -->
 
-<message>
-	
-</message>
+<Definition namespace="CT.Packets">
+	<struct name="NetworkId"/>
+	<struct name="Vec3">
+		<float name="X"/>
+		<float name="Y"/>
+		<float name="Z"/>
+	</struct>
+	<class name="NetworkObject">
+		<NetworkId name="Id"/>
+		<string name="Name"/>
+		<int name="Hp"/>
+		<Vec3 name="Position"/>
+	</class>
+	<packet-server name="SpawnPlayer">
+		<list type="NetworkObject" name="Players"/>
+	</packet-server>
+	<packet-server name="DespawnPlayer">
+		<list type="NetworkId"/>
+	</packet-server>
+	<packet-server name="TestServerPacket">
+		<class name="TestInnerClass">
+			<int name="IntField"/>
+			<string name="Name"/>
+		</class>
+		<TestInnerClass name="InnerClassField"/>
+	</packet-server>
+</Definition>

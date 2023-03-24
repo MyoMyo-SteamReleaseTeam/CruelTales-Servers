@@ -7,8 +7,6 @@
 		static void Main(string[] args)
 		{
 			// Read packet files
-			if (args.Contains("-"))
-
 		}
 	}
 }
