@@ -2,9 +2,13 @@
 {
 	public class Program
 	{
+		private string _packetDirectory = string.Empty;
+
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Hello, World!");
+			// Read packet files
+			if (args.Contains("-"))
+
 		}
 	}
 }
