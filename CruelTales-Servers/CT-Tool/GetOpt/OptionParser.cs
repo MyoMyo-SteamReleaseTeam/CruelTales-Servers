@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Text;
+﻿using System.Text;
 
 namespace CT.Tool.GetOpt
 {
@@ -11,72 +10,7 @@ namespace CT.Tool.GetOpt
 		/// <summary>옵션의 레벨을 나타냅니다. 하이픈의 개수입니다.</summary>
 		public int Level { get; set; }
 		/// <summary>해당 옵션이 입력되면 호출될 콜백입니다.</summary>
-		public Action<IList<string[]>>? OnOptionCallback;
-	}
-
-	internal class ProgramOption : IEnumerable<string>
-	{
-		public string Name { get; private set; } = string.Empty;
-		public int Level { get; private set; }
-		public readonly List<string> Parameters = new();
-
-		public void SetOption(string name, int optionLevel)
-		{
-			Name = name;
-			Level = optionLevel;
-		}
-
-		public void AddParameter(string parameter)
-		{
-			Parameters.Add(parameter);
-		}
-
-		public IEnumerator<string> GetEnumerator()
-		{
-			return Parameters.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return Parameters.GetEnumerator();
-		}
-
-		public string GetSignature()
-		{
-			StringBuilder sb = new StringBuilder(10);
-
-			for (int i = 0; i < Level; i++)
-			{
-				sb.Append('-');
-			}
-			sb.Append(Name);
-
-			return sb.ToString();
-		}
-
-		public override string ToString()
-		{
-			return OptionParser.GetSignature(Name, Level);
-		}
-
-		public string ToString(bool showParameters = false)
-		{
-			if (showParameters)
-			{
-				StringBuilder sb = new StringBuilder();
-				sb.Append(OptionParser.GetSignature(Name, Level));
-				foreach (string parameter in Parameters)
-				{
-					sb.Append(' ');
-					sb.Append(parameter);
-				}
-				return sb.ToString();
-			}
-			else
-			{
-				return OptionParser.GetSignature(Name, Level);
-			}
-		}
+		public Action<IList<string>>? OnOptionCallback;
 	}
 
 	public class OptionParser
@@ -88,13 +22,11 @@ namespace CT.Tool.GetOpt
 			_optionEvents = new List<OptionEvent>();
 		}
 
-		public void RegisterEvent(string name, int level, Action<IList<string[]>> onOptionCallback)
+		public void RegisterEvent(string name, int level, Action<IList<string>>? onOptionCallback)
 		{
-			int find = _optionEvents.FindIndex((e) => e.Name == name && e.Level == level);
-			if (find >= 0)
-			{
-				throw new ArgumentException($"There is same argument. {GetSignature(name, level)}");
-			}
+			if (onOptionCallback == null)
+				return;
+
 			_optionEvents.Add(new OptionEvent()
 			{
 				Name = name,
@@ -103,11 +35,23 @@ namespace CT.Tool.GetOpt
 			});
 		}
 
+		public void OnArguments(string arg)
+		{
+			OnArguments(new string[] { arg });
+		}
+
 		public void OnArguments(string[] args)
 		{
 			var programOption = parse(args);
 		
-			throw new NotImplementedException();
+			foreach (var e in _optionEvents)
+			{
+				var options = programOption.Where((p) => p.Name ==  e.Name && p.Level == e.Level);
+				foreach (var op in options)
+				{
+					e.OnOptionCallback?.Invoke(op.Parameters);
+				}
+			}
 		}
 
 		public static string GetSignature(string name, int level)
