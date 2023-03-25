@@ -3,11 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>CT.PacketGenerator</RootNamespace>
+    <RootNamespace>CTC.DummyClient</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <BaseOutputPath></BaseOutputPath>
-    <BaseIntermediateOutputPath></BaseIntermediateOutputPath>
   </PropertyGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿namespace CT.PacketGenerator
 {
-	public class Program
+	internal class Program
 	{
 		private string _packetDirectory = string.Empty;
 
