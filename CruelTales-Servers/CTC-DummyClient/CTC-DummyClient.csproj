@@ -8,4 +8,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
+    <ProjectReference Include="..\CT-Tool\CT-Tool.csproj" />
+  </ItemGroup>
+
 </Project>
