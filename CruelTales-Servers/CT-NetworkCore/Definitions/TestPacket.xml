@@ -1,15 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
-	<struct name="NetworkId">
-		
-	</struct>
+	<struct name="NetworkId"/>
 	<struct name="Vec3">
-		<float>X</float>
-		<float>Y</float>
-		<float>Z</float>
 		<float name="X"/>
 		<float name="Y"/>
 		<float name="Z"/>
