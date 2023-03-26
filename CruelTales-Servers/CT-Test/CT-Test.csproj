@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RootNamespace>CT.Test</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-PacketGenerator\CT-PacketGenerator.csproj" />
     <ProjectReference Include="..\CT-Tool\CT-Tool.csproj" />
+    <ProjectReference Include="..\CTS-GameplayCore\CTS-GameplayServer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace CT.Network.Serialization
+namespace CT.Network.Serialization.Rerference
 {
 	public class NetPacket : IManageable
 	{

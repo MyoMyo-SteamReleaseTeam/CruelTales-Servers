@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CT.Network.Serialization
+namespace CT.Network.Serialization.Rerference
 {
 	/// <summary>NetBuffer를 읽습니다.</summary>
 	public class NetBufferReader
@@ -251,7 +251,7 @@ namespace CT.Network.Serialization
 					data = Encoding.UTF8.GetString(rawData);
 					return true;
 				}
-				catch 
+				catch
 				{
 					data = string.Empty;
 					return false;

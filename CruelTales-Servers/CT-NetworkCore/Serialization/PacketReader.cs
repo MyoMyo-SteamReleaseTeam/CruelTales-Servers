@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace CT.Network.Serialization
 {
-	public interface IPacketSerializable
+	public class PacketReader
 	{
-		public int DataSize { get; }
-		public void Serialize(PacketWriter writer);
-		public void Deserialize(PacketReader reader);
+
 	}
 }

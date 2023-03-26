@@ -1,4 +1,4 @@
-﻿namespace CT.Network.Serialization
+﻿namespace CT.Network.Serialization.Rerference
 {
 	/// <summary>관리 가능한 객체 인터페이스입니다.</summary>
 	public interface IManageable

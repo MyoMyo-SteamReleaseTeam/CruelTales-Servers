@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace CT.Network.Serialization
+namespace CT.Network.Serialization.Rerference
 {
 	public class NetPacketReader
 	{

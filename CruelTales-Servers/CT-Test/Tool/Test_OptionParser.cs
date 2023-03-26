@@ -1,10 +1,11 @@
-﻿using CT.Tool.GetOpt;
+﻿using System.Linq;
+using CT.Tool.GetOpt;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ToolTest
+namespace CT.Test.Tool
 {
 	[TestClass]
-	public class OptionParserTester
+	public class Test_OptionParser
 	{
 		class ParameterTest
 		{
@@ -16,7 +17,7 @@ namespace ToolTest
 		}
 
 		[TestMethod]
-		public void Test_OptionParser_Single()
+		public void OptionParser_Single()
 		{
 			ParameterTest pt = new ParameterTest();
 			string argument = "-f-m -o path1 path2.abc path3/cc -c--level2 level2Param";
@@ -43,7 +44,7 @@ namespace ToolTest
 		}
 
 		[TestMethod]
-		public void Test_OptionParser_Multiple()
+		public void OptionParser_Multiple()
 		{
 			ParameterTest pt = new ParameterTest();
 			string[] args = new string[]
@@ -78,7 +79,7 @@ namespace ToolTest
 		}
 
 		[TestMethod]
-		public void Test_OptionParser_Miscellaneous()
+		public void OptionParser_Miscellaneous()
 		{
 			Assert.AreEqual("--f", OptionParser.GetSignature("f", 2));
 			Assert.AreEqual("-m", OptionParser.GetSignature("m", 1));

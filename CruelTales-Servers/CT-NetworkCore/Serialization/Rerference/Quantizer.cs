@@ -1,4 +1,4 @@
-﻿namespace CT.Network.Serialization
+﻿namespace CT.Network.Serialization.Rerference
 {
 	public static class Quantizer
 	{

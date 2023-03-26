@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace CT.Network.Serialization
+namespace CT.Network.Serialization.Rerference
 {
 	public class NetPacketWriter
 	{
@@ -206,7 +206,7 @@ namespace CT.Network.Serialization
 		}
 
 		public void WriteUInt16(ushort data, int offset)
-		{
+		{	
 			DataConverter.EncodeUInt16(_packetRawData, offset, data);
 		}
 
