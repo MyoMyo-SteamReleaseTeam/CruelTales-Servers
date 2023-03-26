@@ -13,7 +13,8 @@ namespace CT.Network.Serialization.Rerference
 
 		public static bool IsLittleEndian() => BitConverter.IsLittleEndian;
 
-		// Encoding
+		//
+		// 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int EncodeBool(in ArraySegment<byte> dest, int offset, bool data)
 		{

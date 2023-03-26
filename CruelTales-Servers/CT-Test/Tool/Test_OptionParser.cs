@@ -30,7 +30,6 @@ namespace CT.Test.Tool
 
 			options.OnArguments(argument);
 
-
 			Assert.AreEqual(10, pt.Param_f);
 			Assert.AreEqual(20, pt.Param_m);
 			Assert.AreEqual(30, pt.Param_c);

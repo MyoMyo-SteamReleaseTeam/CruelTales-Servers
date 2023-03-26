@@ -73,9 +73,9 @@ namespace CT.Network.Serialization.Rerference
 			data.Serialize(this);
 
 			_netPacket.Size = tempSize;
-			if (_netPacket.Size < index + data.DataSize)
+			if (_netPacket.Size < index + data.SerializeSize)
 			{
-				_netPacket.Size = index + data.DataSize;
+				_netPacket.Size = index + data.SerializeSize;
 			}
 		}
 

@@ -2,7 +2,7 @@
 {
 	public interface INetworkSerializable
 	{
-		public int DataSize { get; }
+		public int SerializeSize { get; }
 		public void Deserialize(NetPacketReader reader);
 		public void Serialize(NetPacketWriter writer);
 	}

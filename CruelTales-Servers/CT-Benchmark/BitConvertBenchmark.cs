@@ -4,14 +4,14 @@ using CT.Network.Legacy;
 namespace CT.Benchmark
 {
 	[MemoryDiagnoser]
-	public class DeserializationBenchmark
+	public class BitConvertBenchmark
 	{
 		private byte[] _buffer;
 		private ulong _data = 124174812;
 
 		private byte[] _writeBuffer;
 
-		public DeserializationBenchmark()
+		public BitConvertBenchmark()
 		{
 			_writeBuffer = new byte[8];
 			_buffer = new byte[8];

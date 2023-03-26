@@ -1,10 +1,26 @@
-﻿using LiteNetLib;
+﻿using CT.Network.Serialization;
+using LiteNetLib;
 
 namespace CT.Network
 {
 	internal class Program
 	{
 		static void Main(string[] args)
+		{
+			SerializationTest();
+		}
+
+		public static void SerializationTest()
+		{
+			byte[] buffer = new byte[16];
+
+			ArraySegment<byte> segment = new ArraySegment<byte>(buffer, 8, 4);
+
+			Console.WriteLine(segment.Count);
+			Console.WriteLine(segment.Offset);
+		}
+
+		public static void ClientTest()
 		{
 			Console.WriteLine("Hello, World!");
 

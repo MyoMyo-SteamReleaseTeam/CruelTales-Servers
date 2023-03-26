@@ -7,7 +7,7 @@ namespace CT.Benchmark
 		static void Main(string[] args)
 		{
 			//BenchmarkRunner.Run<StringSerializationBenchmark>();
-			BenchmarkRunner.Run<DeserializationBenchmark>();
+			BenchmarkRunner.Run<BitConvertBenchmark>();
 			//DeserializationBenchmark d = new DeserializationBenchmark();
 			//d.WriteViaPointer();
 		}

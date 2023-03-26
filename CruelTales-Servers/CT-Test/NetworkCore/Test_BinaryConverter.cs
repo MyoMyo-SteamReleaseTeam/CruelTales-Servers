@@ -80,13 +80,44 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(doubleValue, BinaryConverter.ReadDouble(buffer, pos)); pos += sizeof(double);
 
 			byte[] copyArray = new byte[byteCount];
-			pos += BinaryConverter.ReadBytes(buffer, pos, copyArray, 0);
+			BinaryConverter.ReadBytesCopy(buffer, pos, copyArray, 0);
+			var copyArray2 = BinaryConverter.ReadBytes(buffer, pos, out int arrayRead);
+			pos += arrayRead;
+
 			for (int i = 0; i < byteCount; i++)
 			{
 				Assert.AreEqual(byteArray[i], copyArray[i]);
+				Assert.AreEqual(byteArray[i], copyArray2[i]);
 			}
 
 			Assert.AreEqual(stringValue, BinaryConverter.ReadString(buffer, pos, out _));
+
+			// unsafe
+			byte[] unsafeBuffer = new byte[123];
+			ArraySegment<byte> unsafeBufferRef = new ArraySegment<byte>(unsafeBuffer);
+			string testString = "12341abac가나다";
+
+			int testBytesSize = 17;
+			byte[] testBytes = new byte[testBytesSize];
+			for (int i = 0; i <  testBytesSize; i++)
+			{
+				testBytes[i] = (byte)i;
+			}
+
+			int testStringSize = BinaryConverter.WriteStringUnsafe(unsafeBufferRef, 0, testString);
+			BinaryConverter.WriteBytesUnsafe(unsafeBufferRef, testStringSize, testBytes);
+
+			Assert.AreEqual(testString, BinaryConverter.ReadStringByLength(unsafeBufferRef, 0, testStringSize));
+			var resultBytes = BinaryConverter.ReadByteCopyByLength(unsafeBufferRef, testStringSize, testBytesSize);
+
+			byte[] resultBytes2 = new byte[123];
+			BinaryConverter.ReadBytesByLength(unsafeBufferRef, testStringSize, resultBytes2, 0, testBytesSize);
+
+			for (int i = 0; i < testBytesSize; i++)
+			{
+				Assert.AreEqual(testBytes[i], resultBytes[i]);
+				Assert.AreEqual(testBytes[i], resultBytes2[i]);
+			}
 		}
 	}
 }

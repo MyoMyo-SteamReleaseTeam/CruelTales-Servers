@@ -5,37 +5,10 @@ using System.Text;
 
 namespace CT.Network.Serialization
 {
-	[StructLayout(LayoutKind.Explicit)]
-	public readonly ref struct MemoryLayoutUInt32
-	{
-		[FieldOffset(0)]
-		public readonly uint LayoutValue;
-
-		[FieldOffset(0)]
-		public readonly float Value;
-
-		public MemoryLayoutUInt32(float value)
-		{
-			Value = value;
-		}
-	}
-
-	[StructLayout(LayoutKind.Explicit)]
-	public readonly ref struct MemoryLayoutUInt64
-	{
-		[FieldOffset(0)]
-		public readonly ulong LayoutValue;
-
-		[FieldOffset(0)]
-		public readonly double Value;
-
-		public MemoryLayoutUInt64(double value)
-		{
-			Value = value;
-		}
-	}
-
-	/// <summary>원시 타입을 byte 배열에 인코딩 하거나 디코딩합니다.</summary>
+	/// <summary>
+	/// 원시 타입을 byte 배열에 인코딩 하거나 디코딩합니다.
+	/// Unsafe 함수는 배열의 길이를 직렬화 하지 않고 배열의 데이터만 직렬화합니다.
+	/// </summary>
 	public static class BinaryConverter
 	{
 		static BinaryConverter()
@@ -47,6 +20,8 @@ namespace CT.Network.Serialization
 		}
 
 		public static bool IsLittleEndian() => BitConverter.IsLittleEndian;
+
+		private static readonly UTF8Encoding _utf8Encoding = new UTF8Encoding();
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void WriteBool(in ArraySegment<byte> dest, int offset, bool data)
@@ -146,7 +121,7 @@ namespace CT.Network.Serialization
 		public static int WriteString(in ArraySegment<byte> dest, int offset, string data)
 		{
 			Debug.Assert(dest.Array != null);
-			int byteSize = Encoding.UTF8.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset + 2);
+			int byteSize = _utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset + 2);
 			WriteUInt16(dest, offset, (ushort)byteSize);
 			return byteSize + 2;
 		}
@@ -159,6 +134,22 @@ namespace CT.Network.Serialization
 			WriteUInt16(dest, offset, (ushort)dataLength);
 			Buffer.BlockCopy(data, 0, dest.Array, dest.Offset + offset + 2, dataLength);
 			return dataLength + 2;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int WriteStringUnsafe(in ArraySegment<byte> dest, int offset, string data)
+		{
+			Debug.Assert(dest.Array != null);
+			return _utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int WriteBytesUnsafe(in ArraySegment<byte> dest, int offset, byte[] data)
+		{
+			Debug.Assert(dest.Array != null);
+			int dataLength = data.Length;
+			Buffer.BlockCopy(data, 0, dest.Array, dest.Offset + offset, dataLength);
+			return dataLength;
 		}
 
 		// Decoding
@@ -258,11 +249,11 @@ namespace CT.Network.Serialization
 			Debug.Assert(src.Array != null);
 			var byteLength = ReadUInt16(src, offset);
 			read = byteLength + 2;
-			return Encoding.UTF8.GetString(src.Array, src.Offset + offset + 2, byteLength);
+			return _utf8Encoding.GetString(src.Array, src.Offset + offset + 2, byteLength);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static byte[] ReadBytesCopy(in ArraySegment<byte> src, int offset, out int read)
+		public static byte[] ReadBytes(in ArraySegment<byte> src, int offset, out int read)
 		{
 			Debug.Assert(src.Array != null);
 			var byteLength = ReadUInt16(src, offset);
@@ -273,8 +264,8 @@ namespace CT.Network.Serialization
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int ReadBytes(in ArraySegment<byte> src, int srcOffset, 
-										   in ArraySegment<byte> dest, int destOffset)
+		public static int ReadBytesCopy(in ArraySegment<byte> src, int srcOffset, 
+									in ArraySegment<byte> dest, int destOffset)
 		{
 			Debug.Assert(src.Array != null);
 			Debug.Assert(dest.Array != null);
@@ -284,6 +275,35 @@ namespace CT.Network.Serialization
 							 dest.Array, dest.Offset + destOffset, byteLength);
 
 			return byteLength + 2;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static string ReadStringByLength(in ArraySegment<byte> src, int offset, int length)
+		{
+			Debug.Assert(src.Array != null);
+			return _utf8Encoding.GetString(src.Array, src.Offset + offset, length);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static byte[] ReadByteCopyByLength(in ArraySegment<byte> src, int offset, int length)
+		{
+			Debug.Assert(src.Array != null);
+			var buffer = new byte[length];
+			Buffer.BlockCopy(src.Array, src.Offset + offset, buffer, 0, length);
+			return buffer;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static int ReadBytesByLength(in ArraySegment<byte> src, int srcOffset,
+											in ArraySegment<byte> dest, int destOffset, int length)
+		{
+			Debug.Assert(src.Array != null);
+			Debug.Assert(dest.Array != null);
+
+			Buffer.BlockCopy(src.Array, src.Offset + srcOffset,
+							 dest.Array, dest.Offset + destOffset, length);
+
+			return length;
 		}
 	}
 }
