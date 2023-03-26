@@ -1,15 +1,29 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CT.Network.Serialization.Type
 {
 	/// <summary>65536이하 길이의 string 입니다.</summary>
-	public readonly struct NetString
+	public struct NetString : IPacketSerializable
 	{
-		public readonly string Value;
+		public string Value = "";
 		public const int MAX_BYTE_LENGTH = 65536;
 
-		public readonly int ByteSize = 0;
+		private int _byteSize;
+		public int ByteSize
+		{
+			get
+			{
+				if (Value.Length == 0)
+					return 0;
+
+				if (_byteSize == 0)
+					_byteSize = Encoding.UTF8.GetByteCount(Value);
+
+				return _byteSize;
+			}
+		}
 		public int SerializeSize => ByteSize + 2;
 
 		public static implicit operator string(NetString value) => value.Value;
@@ -17,9 +31,18 @@ namespace CT.Network.Serialization.Type
 
 		public NetString(string value)
 		{
-			ByteSize = Encoding.UTF8.GetByteCount(value);
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
 			Value = value;
+		}
+
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(this);
+		}
+
+		public void Deserialize(PacketReader reader)
+		{
+			Value = reader.ReadString();
 		}
 
 		public override string ToString() => Value;
@@ -50,15 +73,40 @@ namespace CT.Network.Serialization.Type
 		public static bool operator !=(string lhs, NetString rhs) => lhs != rhs.Value;
 		public static bool operator==(NetString lhs, NetString rhs) => lhs.Value == rhs.Value;
 		public static bool operator !=(NetString lhs, NetString rhs) => lhs.Value != rhs.Value;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Serialize(in NetString value, PacketWriter writer)
+		{
+			writer.Put(value);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Deserialize(ref NetString value, PacketReader reader)
+		{
+			value = reader.ReadString();
+		}
 	}
 
 	/// <summary>256이하 길이의 string 입니다.</summary>
-	public readonly struct NetStringShort
+	public struct NetStringShort : IPacketSerializable
 	{
-		public readonly string Value;
+		public string Value = "";
 		public const int MAX_BYTE_LENGTH = 256;
 
-		public readonly int ByteSize = 0;
+		private int _byteSize;
+		public int ByteSize
+		{
+			get
+			{
+				if (Value.Length == 0)
+					return 0;
+
+				if (_byteSize == 0)
+					_byteSize = Encoding.UTF8.GetByteCount(Value);
+
+				return _byteSize;
+			}
+		}
 		public int SerializeSize => ByteSize + 1;
 
 		public static implicit operator string(NetStringShort value) => value.Value;
@@ -66,9 +114,18 @@ namespace CT.Network.Serialization.Type
 
 		public NetStringShort(string value)
 		{
-			ByteSize = Encoding.UTF8.GetByteCount(value);
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
 			Value = value;
+		}
+
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(this);
+		}
+
+		public void Deserialize(PacketReader reader)
+		{
+			Value = reader.ReadStringShort();
 		}
 
 		public override string ToString() => Value;
@@ -99,5 +156,17 @@ namespace CT.Network.Serialization.Type
 		public static bool operator !=(string lhs, NetStringShort rhs) => lhs != rhs.Value;
 		public static bool operator ==(NetStringShort lhs, NetStringShort rhs) => lhs.Value == rhs.Value;
 		public static bool operator !=(NetStringShort lhs, NetStringShort rhs) => lhs.Value != rhs.Value;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Serialize(in NetStringShort value, PacketWriter writer)
+		{
+			writer.Put(value);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Deserialize(ref NetStringShort value, PacketReader reader)
+		{
+			value = reader.ReadStringShort();
+		}
 	}
 }

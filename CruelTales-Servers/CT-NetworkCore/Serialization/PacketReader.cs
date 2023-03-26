@@ -1,5 +1,4 @@
-﻿using CT.Network.Serialization.Rerference;
-using CT.Network.Serialization.Type;
+﻿using CT.Network.Serialization.Type;
 
 namespace CT.Network.Serialization
 {
@@ -35,14 +34,19 @@ namespace CT.Network.Serialization
 			return Position + readSize <= Capacity;
 		}
 
-		public bool CanRead(INetworkSerializable networkObject)
+		public bool CanRead<T>(T serializeObject) where T : IPacketSerializable
 		{
-			return CanRead(networkObject.SerializeSize);
+			return CanRead(serializeObject.SerializeSize);
 		}
 
 		public void SetPosition(int position)
 		{
 			Position = position;
+		}
+
+		public void Read<T>(T serializeObject) where T : IPacketSerializable
+		{
+			serializeObject.Deserialize(this);
 		}
 
 		public bool ReadBool()

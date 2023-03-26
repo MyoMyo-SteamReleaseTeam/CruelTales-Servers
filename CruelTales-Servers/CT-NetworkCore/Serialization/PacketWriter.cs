@@ -1,5 +1,4 @@
-﻿using CT.Network.Serialization.Rerference;
-using CT.Network.Serialization.Type;
+﻿using CT.Network.Serialization.Type;
 
 namespace CT.Network.Serialization
 {
@@ -35,9 +34,14 @@ namespace CT.Network.Serialization
 			return Position + putSize <= Capacity;
 		}
 
-		public bool CanPut(INetworkSerializable networkObject)
+		public bool CanPut<T>(T serializeObject) where T : IPacketSerializable
 		{
-			return CanPut(networkObject.SerializeSize);
+			return CanPut(serializeObject.SerializeSize);
+		}
+
+		public void Put<T>(T serializeObject) where T : IPacketSerializable
+		{
+			serializeObject.Serialize(this);
 		}
 
 		public void Put(bool value)
