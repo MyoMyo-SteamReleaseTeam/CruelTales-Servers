@@ -3,34 +3,26 @@
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
-	<struct name="NetworkId">
-		
-	</struct>
-	<struct name="Vec3">
-		<float>X</float>
-		<float>Y</float>
-		<float>Z</float>
-		<float name="X"/>
-		<float name="Y"/>
-		<float name="Z"/>
+	<struct name="NetworkID" fixed="true">
+		<UInt16 name="ID"/>
+		<TestType name="Type"/>
 	</struct>
 	<class name="NetworkObject">
-		<NetworkId name="Id"/>
-		<string name="Name"/>
-		<int name="Hp"/>
-		<Vec3 name="Position"/>
+		<NetworkId name="ID"/>
+		<NetStringShort name="Name"/>
+		<Int32 name="Hp"/>
 	</class>
 	<packet-server name="SpawnPlayer">
-		<list type="NetworkObject" name="Players"/>
+		<NetArray name="Players" type="NetworkObject"/>
 	</packet-server>
 	<packet-server name="DespawnPlayer">
-		<list type="NetworkId"/>
+		<NetFixedArray name="IDs" type="NetworkID"/>
 	</packet-server>
-	<packet-server name="TestServerPacket">
+	<packet-client name="TestClientPacket">
 		<class name="TestInnerClass">
-			<int name="IntField"/>
-			<string name="Name"/>
+			<Int32 name="IntField"/>
+			<NetStringShort name="Name"/>
 		</class>
 		<TestInnerClass name="InnerClassField"/>
-	</packet-server>
+	</packet-client>
 </Definition>

@@ -10,4 +10,8 @@
     <BaseIntermediateOutputPath></BaseIntermediateOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
+  </ItemGroup>
+
 </Project>
