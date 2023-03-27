@@ -14,7 +14,7 @@
 @"{0}
 namespace {1}
 {{
-	{2}
+{2}
 }}";
 
 		/// <summary>
@@ -31,25 +31,34 @@ namespace {1}
 		public static readonly string DataTypeDefinition =
 @"public {0} {1} : {2}
 {{
-	{3}
-}}
-
-";
+{3}
+}}";
 
 		/// <summary>
 		/// {0} Data Type<br/>
 		/// {1} Name<br/>
 		/// {2} Default value or constructor<br/>
 		/// </summary>
-		public static readonly string MemberDeclaration =
-			@"public {0} {1} = {2};";
+		public static readonly string MemberDeclaration = @"public {0} {1} = {2};";
+
+		/// <summary>
+		/// {0} Data Type<br/>
+		/// {1} Name<br/>
+		/// </summary>
+		public static readonly string MemberPrimitiveDeclaration = @"public {0} {1};";
+
+		/// <summary>
+		/// {0} Data Type<br/>
+		/// {1} Generic Type<br/>
+		/// {2} Name<br/>
+		/// </summary>
+		public static readonly string MemberDeclarationGeneric = @"public {0}<{1}> {2} = new {0}<{1}>();";
 
 		/// <summary>
 		/// {0} Size getter name<br/>
 		/// {1} Constant size or expression<br/>
 		/// </summary>
-		public static readonly string SerializeSize =
-			@"public int {0} => {1};";
+		public static readonly string SerializeSize = @"public int {0} => {1};";
 
 		/// <summary>
 		/// {0} Serialize function signature<br/>

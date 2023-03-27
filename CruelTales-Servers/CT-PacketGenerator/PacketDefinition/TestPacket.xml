@@ -24,5 +24,17 @@
 			<NetStringShort name="Name"/>
 		</class>
 		<TestInnerClass name="InnerClassField"/>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
 	</packet-client>
 </Definition>
