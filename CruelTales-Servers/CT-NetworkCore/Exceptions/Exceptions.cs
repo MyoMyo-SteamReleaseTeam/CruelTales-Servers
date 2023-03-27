@@ -1,4 +1,4 @@
-﻿namespace CT.Network
+﻿namespace CT.Network.Exceptions
 {
 	public class TooLongSteamDataException : Exception
 	{
