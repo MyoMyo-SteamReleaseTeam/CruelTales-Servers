@@ -3,7 +3,9 @@
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
-	<struct name="NetworkId"/>
+	<struct name="NetworkId">
+		<ulong name="ID"/>
+	</struct>
 	<struct name="Vec3">
 		<float name="X"/>
 		<float name="Y"/>

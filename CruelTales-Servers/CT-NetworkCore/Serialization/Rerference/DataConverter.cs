@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using CT.Network.Exceptions;
 
 namespace CT.Network.Serialization.Rerference
 {

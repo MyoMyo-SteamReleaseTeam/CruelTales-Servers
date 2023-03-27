@@ -54,7 +54,7 @@ namespace CT.Test.NetworkCore
 
 			BinaryConverter.WriteBool(bufferRef, pos, boolValue); pos += 1;
 
-			BinaryConverter.WriteFloat(bufferRef, pos, floatValue); pos += sizeof(float);
+			BinaryConverter.WriteSingle(bufferRef, pos, floatValue); pos += sizeof(float);
 			BinaryConverter.WriteDouble(bufferRef, pos, doubleValue); pos += sizeof(double);
 
 			pos += BinaryConverter.WriteBytes(bufferRef, pos, byteArray);

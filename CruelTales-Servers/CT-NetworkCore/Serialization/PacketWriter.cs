@@ -100,7 +100,7 @@ namespace CT.Network.Serialization
 
 		public void Put(float value)
 		{
-			BinaryConverter.WriteFloat(_buffer, Position, value);
+			BinaryConverter.WriteSingle(_buffer, Position, value);
 			Position += sizeof(float);
 		}
 

@@ -96,7 +96,7 @@ namespace CT.Network.Serialization
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static unsafe void WriteFloat(in ArraySegment<byte> dest, int offset, float data)
+		public static unsafe void WriteSingle(in ArraySegment<byte> dest, int offset, float data)
 		{
 			fixed (byte* ptr = dest.Array)
 			{

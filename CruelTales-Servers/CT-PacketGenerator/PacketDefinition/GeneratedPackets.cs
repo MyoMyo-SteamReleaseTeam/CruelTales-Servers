@@ -2,7 +2,7 @@
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
-namespace CT.Packets
+namespace CT.PacketGenerator
 {
 	public partial struct NetworkID : IPacketSerializable
 	{
