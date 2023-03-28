@@ -27,11 +27,20 @@ namespace {1}
 		/// {1} Name<br/>
 		/// {2} interface<br/>
 		/// {3} Content<br/>
+		/// {4} SerializeSize<br/>
+		/// {5} SerializeFunction<br/>
+		/// {6} DeserializeFuntion<br/>
 		/// </summary>
 		public static readonly string DataTypeDefinition =
 @"public {0} {1} : {2}
 {{
 {3}
+
+{4}
+
+{5}
+
+{6}
 }}";
 
 		/// <summary>
@@ -69,7 +78,7 @@ namespace {1}
 		public static readonly string SerializeFunction =
 @"public void {0}({1} {2})
 {{
-	{3}
+{3}
 }}";
 
 		/// <summary>
@@ -81,7 +90,7 @@ namespace {1}
 		public static readonly string DeserializeFunction =
 @"public void {0}({1} {2})
 {{
-	{3}
+{3}
 }}";
 
 		/// <summary>

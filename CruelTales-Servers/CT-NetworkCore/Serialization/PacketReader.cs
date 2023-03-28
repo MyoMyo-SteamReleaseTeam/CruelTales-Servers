@@ -112,7 +112,7 @@ namespace CT.Network.Serialization
 			return value;
 		}
 
-		public float ReadFloat()
+		public float ReadSingle()
 		{
 			var value = BinaryConverter.ReadFloat(_buffer, Position);
 			Position += sizeof(float);
@@ -126,14 +126,14 @@ namespace CT.Network.Serialization
 			return value;
 		}
 
-		public NetString ReadString()
+		public NetString ReadNetString()
 		{
 			NetString result = BinaryConverter.ReadString(_buffer, Position, out int read);
 			Position += read;
 			return result;
 		}
 
-		public NetStringShort ReadStringShort()
+		public NetStringShort ReadNetStringShort()
 		{
 			int stringSize = BinaryConverter.ReadByte(_buffer, Position);
 			Position ++;

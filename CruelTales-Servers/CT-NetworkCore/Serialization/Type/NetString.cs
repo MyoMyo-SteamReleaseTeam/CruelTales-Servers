@@ -42,7 +42,7 @@ namespace CT.Network.Serialization.Type
 
 		public void Deserialize(PacketReader reader)
 		{
-			Value = reader.ReadString();
+			Value = reader.ReadNetString();
 		}
 
 		public override string ToString() => Value;
@@ -83,7 +83,7 @@ namespace CT.Network.Serialization.Type
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Deserialize(ref NetString value, PacketReader reader)
 		{
-			value = reader.ReadString();
+			value = reader.ReadNetString();
 		}
 	}
 
@@ -125,7 +125,7 @@ namespace CT.Network.Serialization.Type
 
 		public void Deserialize(PacketReader reader)
 		{
-			Value = reader.ReadStringShort();
+			Value = reader.ReadNetStringShort();
 		}
 
 		public override string ToString() => Value;
@@ -166,7 +166,7 @@ namespace CT.Network.Serialization.Type
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Deserialize(ref NetStringShort value, PacketReader reader)
 		{
-			value = reader.ReadStringShort();
+			value = reader.ReadNetStringShort();
 		}
 	}
 }

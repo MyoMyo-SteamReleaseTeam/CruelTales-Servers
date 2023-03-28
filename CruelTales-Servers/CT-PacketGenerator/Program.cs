@@ -1,21 +1,42 @@
-﻿using System.IO;
-using CT.Network.Serialization.Type;
+﻿using System;
+using System.IO;
 using System.Reflection;
-using System;
+using CT.Network.Serialization.Type;
+using CT.Tool.Data;
 
 namespace CT.PacketGenerator
 {
+	internal struct PacketParseJob
+	{
+		public string SourcePath;
+		public string TargetPath;
+	}
+
 	internal class Program
 	{
-		private static string _packetDirectory = @"../../../PacketDefinition";
+		private static string _packetDirectory = @"..\..\..\PacketDefinition";
 
 		static void Main(string[] args)
 		{
-			var targetPath = Path.Combine(_packetDirectory, "TestPacket.xml");
+			//List<string> 
+
+			//OptionParser optionParser = new OptionParser();
+			//optionParser.RegisterEvent("xmlpath", 2, (argumentList) =>
+			//{
+			//	foreach (var arg in argumentList)
+			//	{
+
+			//	}
+			//});
+			//optionParser.RegisterEvent("targetpath", 2, (argumentList) =>
+			//{
+
+			//});
+
+			var sourcePath = Path.Combine(_packetDirectory, "TestPacket.xml");
 
 			// Read packet files
 			PacketParser parser = new PacketParser();
-
 			parser.NewLine = TextFormat.LF;
 			parser.Indent = TextFormat.Indent;
 			parser.UsingSegments = new()
@@ -29,9 +50,16 @@ namespace CT.PacketGenerator
 			{
 				parser.ReferenceAssemblys.Add(netcore);
 			}
-			var generatedCode = parser.ParseFromXml(targetPath);
+			parser.Initialize();
 
-			Console.WriteLine(generatedCode);
+			var generatedCode = parser.ParseFromXml(sourcePath);
+
+			var targetPath = Path.Combine(_packetDirectory, "TestPacket.cs");
+
+			Console.WriteLine($"Packet generacted : {targetPath}");
+
+			var result = FileHandler.TryWriteText(targetPath, generatedCode);
+			Console.WriteLine(result.Exception);
 		}
 	}
 }

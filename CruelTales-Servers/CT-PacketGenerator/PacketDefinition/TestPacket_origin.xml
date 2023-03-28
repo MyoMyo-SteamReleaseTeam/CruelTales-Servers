@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Packet definition from the server -->
+
+<Definition namespace="CT.Packets">
+	<struct name="NetworkID" fixed="true">
+		<UInt16 name="ID"/>
+		<TestType name="Type"/>
+	</struct>
+	<class name="NetworkObject">
+		<NetworkId name="ID"/>
+		<NetStringShort name="Name"/>
+		<Int32 name="Hp"/>
+	</class>
+	<packet-server name="SpawnPlayer">
+		<NetArray name="Players" type="NetworkObject"/>
+	</packet-server>
+	<packet-server name="DespawnPlayer">
+		<NetFixedArray name="IDs" type="NetworkID"/>
+	</packet-server>
+	<packet-client name="TestClientPacket">
+		<class name="TestInnerClass">
+			<Int32 name="IntField"/>
+			<NetStringShort name="Name"/>
+		</class>
+		<TestInnerClass name="InnerClassField"/>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
+		<class name="TestLateClass">
+			<UInt32 name="TestUInt32"/>
+			<NetStringShort name="TestString"/>
+		</class>
+	</packet-client>
+</Definition>

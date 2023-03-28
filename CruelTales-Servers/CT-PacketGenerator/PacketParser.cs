@@ -9,44 +9,56 @@ using CT.PacketGenerator.Exceptions;
 
 namespace CT.PacketGenerator
 {
-
+	/// <summary>XML 패킷 정의로 부터 C# 코드를 생성합니다.</summary>
 	internal class PacketParser
 	{
+		public string WriterName { get; set; } = "writer";
+		public string ReaderName { get; set; } = "reader";
 		public string NewLine { get; set; } = "\n";
 		public string Indent { get; set; } = "\t";
 		public List<string> UsingSegments { get; set; } = new List<string>();
 		public List<Assembly> ReferenceAssemblys { get; set; } = new List<Assembly>();
-		private List<string> _enumTypes = new List<string>();
+		private Dictionary<string, int> _enumSizeByTypeName = new Dictionary<string, int>();
 
-		public PacketParser()
+		public void Initialize()
 		{
+			// Find enums from assemblys
+			foreach (var a in ReferenceAssemblys)
+			{
+				var enumTypes = getTypeNamesBy(a, typeof(Enum));
 
+				foreach (var et in enumTypes)
+				{
+					var enumSizeTypeName = Enum.GetUnderlyingType(et).Name;
+					int enumSize = PacketHelper.GetByteSizeByTypeName(enumSizeTypeName);
+					_enumSizeByTypeName.Add(et.Name, enumSize);
+				}
+			}
 		}
 
 		public string ParseFromXml(string path)
 		{
-			foreach (var a in ReferenceAssemblys)
-			{
-				_enumTypes = getTypeNamesBy(a, typeof(Enum));
-			}
-
+			// Set XML parse option
 			XmlReaderSettings settings = new XmlReaderSettings()
 			{
 				IgnoreComments = true,
 				IgnoreWhitespace = true,
 			};
 
+			// XML parsing start
 			using (XmlReader r =  XmlReader.Create(path, settings))
 			{
-				string usingStatements = "";
+				string usingStatements = string.Empty;
+				string packetNamespace = string.Empty;
+				string content = string.Empty;
 
+				// Make using statements
 				foreach (var u in UsingSegments)
 				{
 					usingStatements += string.Format(PacketFormat.UsingFormat, u) + NewLine;
 				}
 
-				string packetNamespace = "";
-
+				// Check validation
 				r.MoveToContent();
 
 				if (PacketHelper.GetPacketDataType(r) != PacketDataType.Definition)
@@ -55,10 +67,8 @@ namespace CT.PacketGenerator
 				if (tryParse(r, PacketAttributeType.Namespace, out packetNamespace) == false)
 					throw new WrongDefinitionException();
 
-				string content = "";
-
+				// Parse XML packet definition to generate codes
 				r.Read();
-
 				while (!r.EOF)
 				{
 					if (isValidElement(r) == false)
@@ -78,18 +88,27 @@ namespace CT.PacketGenerator
 					}
 				}
 
+				// Remove extra new line
 				for (int i = 0; i < NewLine.Length * 2; i++)
 				{
 					content = content.Substring(0, content.Length - 1);
 				}
 
+				// Combine generated codes
 				content = addIndent(content);
 				return string.Format(PacketFormat.FileFormat,
 									 usingStatements, packetNamespace, content);
 			}
 		}
 
-		private bool parseDataType(XmlReader r, out string content)
+		/// <summary>
+		/// XML을 파싱하여 데이터 타입 코드를 생성합니다. class 및 struct 데이터 타입을 생성합니다.
+		/// </summary>
+		/// <exception cref="WrongElementException"></exception>
+		/// <exception cref="WrongDataTypeException"></exception>
+		/// <exception cref="WrongDeclarationException"></exception>
+		/// <exception cref="WrongAttributeException"></exception>
+		private void parseDataType(XmlReader r, out string content)
 		{
 			if (isValidElement(r) == false)
 				throw new WrongElementException(r);
@@ -102,7 +121,9 @@ namespace CT.PacketGenerator
 			string interfaceName = nameof(IPacketSerializable);
 			string dataTypeContent = string.Empty;
 			string memberContent = string.Empty;
+			List<MemberDefinitionToken> memberTokenList = new();
 
+			// Check parse validations
 			if (dataType == PacketDataType.Other)
 				throw new WrongDataTypeException(r);
 
@@ -112,6 +133,7 @@ namespace CT.PacketGenerator
 			if (!tryParse(r, PacketAttributeType.Name, out className))
 				throw new WrongAttributeException(r, PacketAttributeType.Name);
 
+			// Set class signature
 			if (dataType == PacketDataType.ServerPacket)
 			{
 				className = PacketFormat.ServerSidePacketPrefix + className;
@@ -121,6 +143,7 @@ namespace CT.PacketGenerator
 				className = PacketFormat.ClientSidePacketPrefix + className;
 			}
 
+			// Generate data type definition codes
 			r.Read();
 			while (true)
 			{
@@ -136,48 +159,172 @@ namespace CT.PacketGenerator
 				var nextDataType = PacketHelper.GetPacketDataType(r);
 				if (nextDataType == PacketDataType.Other)
 				{
-					ParseMembers(r, out string parseMemberContent);
+					// Parse members
+					parseMembers(r, out string parseMemberContent, out var memberTokens);
+					memberTokenList.AddRange(memberTokens);
 					memberContent += parseMemberContent;
 				}
 				else
 				{
+					// Parse data type recursively
 					parseDataType(r, out string dataContent);
 					dataTypeContent += addIndentWithNewLine(dataContent) + NewLine;
 				}
 
+				// If read all current context in this depth, break the loop
 				if (r.Depth <= currentDepth)
 					break;
 			}
 
+			// Generate serialize size code
+			int calcSerializeSize = 0;
+			string sizeExpression = string.Empty;
+
+			foreach (var m in memberTokenList)
+			{
+				string typeName = m.Type;
+
+				if (PacketHelper.CanGetByteSizeByTypeName(typeName))
+				{
+					calcSerializeSize += PacketHelper.GetByteSizeByTypeName(typeName);
+				}
+				else if (_enumSizeByTypeName.TryGetValue(typeName, out var size))
+				{
+					calcSerializeSize += size;
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(sizeExpression))
+					{
+						sizeExpression += " + ";
+					}
+					sizeExpression += $"{m.MemeberName}.{nameof(IPacketSerializable.SerializeSize)}";
+				}
+			}
+
+			if (calcSerializeSize > 0)
+			{
+				sizeExpression += $" + {calcSerializeSize}";
+			}
+
+			sizeExpression = string.Format(PacketFormat.SerializeSize, 
+										   nameof(IPacketSerializable.SerializeSize),
+										   sizeExpression);
+
+			// Generate serialization codes
+			string serializeFunction = string.Empty;
+			string deserializeFunction = string.Empty;
+
+			string serializeContent = string.Empty;
+			string deserializeContent = string.Empty;
+
+			for (int i = 0; i < memberTokenList.Count; i++)
+			{
+				var m = memberTokenList[i];
+
+				if (m.Type == nameof(NetString) || m.Type == nameof(NetStringShort))
+				{
+					m.IsNative = true;
+				}
+
+				if (m.IsNative)
+				{
+					// use writer.Put()
+					serializeContent += string.Format(PacketFormat.MemberSerializeByWriter, m.MemeberName);
+
+					// use reader.ReadTypeName()
+					string typeName = string.Empty;
+
+					// Check enum
+					if (_enumSizeByTypeName.ContainsKey(m.Type))
+					{
+						typeName = m.Type;
+					}
+					// Check CLR type name
+					else if (PacketHelper.TryGetCLRTypeByPrimitive(m.Type, out string clrType))
+					{
+						typeName = clrType;
+					}
+
+					deserializeContent += string.Format(PacketFormat.MemberDeserializeByReader, m.MemeberName, typeName);
+				}
+				else
+				{
+					serializeContent += string.Format(PacketFormat.MemberSerializeBySelf, m.MemeberName);
+					deserializeContent += string.Format(PacketFormat.MemberDeserializeBySelf, m.MemeberName);
+				}
+
+				if (i < memberTokenList.Count - 1)
+				{
+					serializeContent += NewLine;
+					deserializeContent += NewLine;
+				}
+			}
+
+			serializeContent = addIndent(serializeContent);
+			deserializeContent = addIndent(deserializeContent);
+
+			serializeFunction = string.Format(PacketFormat.SerializeFunction,
+											  nameof(IPacketSerializable.Serialize),
+											  nameof(PacketWriter),
+											  this.WriterName,
+											  serializeContent);
+
+			deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
+											  nameof(IPacketSerializable.Deserialize),
+											  nameof(PacketReader),
+											  this.ReaderName,
+											  deserializeContent);
+
+			// Combine generated codes
 			var combineContent = dataTypeContent;
 			if (!string.IsNullOrEmpty(memberContent))
 			{
 				combineContent += memberContent;
 			}
 
-			content = string.Format(PacketFormat.DataTypeDefinition,
-									declaration, className,
-									interfaceName, combineContent);
+			sizeExpression = addIndent(sizeExpression);
+			serializeFunction = addIndent(serializeFunction);
+			deserializeFunction = addIndent(deserializeFunction);
 
-			return true;
+			content = string.Format(PacketFormat.DataTypeDefinition,
+									declaration,
+									className,
+									interfaceName,
+									combineContent,
+									sizeExpression,
+									serializeFunction,
+									deserializeFunction);
 		}
 
-		private struct MemberDefinition
+		/// <summary>
+		/// 코드 생성을 위한 멤버 정의 토큰입니다. 구문 분석을 통해 생성됩니다.
+		/// </summary>
+		private struct MemberDefinitionToken
 		{
+			/// <summary>멤버의 타입 이름입니다.</summary>
 			public string Type;
+			/// <summary>멤버 변수의 이름입니다.</summary>
 			public string MemeberName;
+			/// <summary>원시 타입이거나 enum 타입인지 여부입니다.</summary>
 			public bool IsNative;
+			/// <summary>제너릭 타입 이름입니다. 없다면 공백입니다.</summary>
 			public string GenericType;
-
+			/// <summary>제너릭 타입 여부입니다.</summary>
 			public bool HasGeneric => !string.IsNullOrEmpty(GenericType);
 		}
 
-		public bool ParseMembers(XmlReader r, out string content)
+		/// <summary>
+		/// XML을 파싱하여 멤버 변수 선언 코드를 생성합니다.
+		/// </summary>
+		/// <exception cref="WrongElementException"></exception>
+		/// <exception cref="WrongAttributeException"></exception>
+		private void parseMembers(XmlReader r, out string content, 
+								  out List<MemberDefinitionToken> members)
 		{
 			int currentDepth = r.Depth;
 			content = string.Empty;
-
-			List<MemberDefinition> members = new();
+			members = new();
 
 			do
 			{
@@ -192,17 +339,15 @@ namespace CT.PacketGenerator
 
 				if (PacketHelper.GetPacketDataType(r) != PacketDataType.Other)
 				{
-					if (parseDataType(r, out string dataContent))
-					{
-						content += addIndentWithNewLine(dataContent) + NewLine;
-					}
+					parseDataType(r, out string dataContent);
+					content += addIndentWithNewLine(dataContent) + NewLine;
 					continue;
 				}
 
-				MemberDefinition member = new MemberDefinition();
+				MemberDefinitionToken member = new MemberDefinitionToken();
 
 				string dataTypeName = r.Name;
-				if (_enumTypes.Contains(dataTypeName))
+				if (_enumSizeByTypeName.ContainsKey(dataTypeName))
 				{
 					member.IsNative = true;
 					member.Type = dataTypeName;
@@ -250,9 +395,13 @@ namespace CT.PacketGenerator
 			}
 
 			content += addIndent(memberContent);
-			return true;
 		}
 
+		/// <summary>
+		/// 현재 XML 요소에서 해당되는 패킷 속성의 내용을 반환합니다.
+		/// </summary>
+		/// <param name="type">패킷 속성입니다.</param>
+		/// <param name="token">속성의 내용입니다.</param>
 		private bool tryParse(XmlReader r, PacketAttributeType type, out string token)
 		{
 			var tokenType = type.ToString().ToLower();
@@ -260,27 +409,37 @@ namespace CT.PacketGenerator
 			return !string.IsNullOrEmpty(token);
 		}
 
+		/// <summary>
+		/// 현재 XML 요소가 파싱 가능한 유효한 요소인지 여부를 반환합니다.
+		/// XML 요소가 Element인지, Depth가 0보다 크다면 파싱 가능한 요소입니다.
+		/// </summary>
 		private bool isValidElement(XmlReader r)
 		{
 			return r.Depth > 0 && r.NodeType == XmlNodeType.Element;
 		}
 
+		/// <summary>입력된 문자열에 들여쓰기를 합니다.</summary>
 		private string addIndent(string content)
 		{
 			return Indent + content.Replace(NewLine, $"{NewLine}{Indent}");
 		}
 
+		/// <summary>입력된 문자열에 들여쓰기 후 개행을 합니다.</summary>
 		private string addIndentWithNewLine(string content)
 		{
 			return Indent + content.Replace(NewLine, $"{NewLine + Indent}") + NewLine;
 		}
 
-		private List<string> getTypeNamesBy(Assembly targetAssembly, Type baseType)
+		/// <summary>해당 어셈블리에 해당하는 타입을 상속받는 타입들의 이름 문자열들을 반환합니다.</summary>
+		/// <param name="referenceAssembly">참조 어셈블리</param>
+		/// <param name="baseType">찾는 타입</param>
+		/// <returns>baseType을 상속받는 타입들의 이름 문자열 리스트입니다.</returns>
+		private List<Type> getTypeNamesBy(Assembly referenceAssembly, Type baseType)
 		{
-			return targetAssembly
+			return referenceAssembly
 				.GetTypes()
 				.Where(t => t.BaseType == baseType)
-				.Select(t => t.Name).ToList();
+				.ToList();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,8 +75,8 @@ namespace CT.PacketGenerator
 			{ "ulong", "UInt64" },
 			{ "float", "Single" },
 			{ "double", "Double" },
-			{ "string", "NetString" },
-			{ "stringShort", "NetStringShort" },
+			{ "NetString", "NetString" },
+			{ "NetStringShort", "NetStringShort" },
 		};
 
 		public static bool TryGetCLRTypeByPrimitive(string primitiveType, out string CLRtype)
@@ -90,6 +91,41 @@ namespace CT.PacketGenerator
 			bool result = _primitiyTypeByCLR.TryGetReverse(CLRtype, out var value);
 			primitiveType = value ?? "";
 			return result;
+		}
+
+		public static readonly Dictionary<string, int> _dataSizeByTypeName = new()
+		{
+			{ "byte",	sizeof(byte) },
+			{ "sbyte",	sizeof(sbyte) },
+			{ "short",	sizeof(short) },
+			{ "ushort",	sizeof(ushort) },
+			{ "int",	sizeof(int) },
+			{ "uint",	sizeof(uint) },
+			{ "long",	sizeof(long) },
+			{ "ulong",	sizeof(ulong) },
+			{ "float",	sizeof(float) },
+			{ "double",	sizeof(double) },
+
+			{ "Byte",	sizeof(byte) },
+			{ "SByte",  sizeof(sbyte) },
+			{ "Int16",  sizeof(short) },
+			{ "UInt16", sizeof(ushort) },
+			{ "Int32",  sizeof(int) },
+			{ "UInt32", sizeof(uint) },
+			{ "Int64",  sizeof(long) },
+			{ "UInt64", sizeof(ulong) },
+			{ "Single", sizeof(float) },
+			{ "Double", sizeof(double) },
+		};
+
+		public static int GetByteSizeByTypeName(string typeName)
+		{
+			return _dataSizeByTypeName[typeName];
+		}
+
+		public static bool CanGetByteSizeByTypeName(string type)
+		{
+			return _dataSizeByTypeName.ContainsKey(type);
 		}
 	}
 }

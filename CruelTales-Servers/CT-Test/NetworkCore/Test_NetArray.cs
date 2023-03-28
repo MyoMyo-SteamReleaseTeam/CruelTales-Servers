@@ -56,7 +56,7 @@ namespace CT.Test.NetworkCore
 
 			public void Deserialize(PacketReader reader)
 			{
-				Name = reader.ReadString();
+				Name = reader.ReadNetString();
 				Age = reader.ReadInt32();
 			}
 		}

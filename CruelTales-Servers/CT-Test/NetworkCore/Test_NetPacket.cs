@@ -64,10 +64,10 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(longValue, reader.ReadInt64());
 
 			Assert.AreEqual(boolValue, reader.ReadBool());
-			Assert.AreEqual(floatValue, reader.ReadFloat());
+			Assert.AreEqual(floatValue, reader.ReadSingle());
 			Assert.AreEqual(doubleValue, reader.ReadDouble());
-			Assert.IsTrue(stringValue == reader.ReadString());
-			Assert.IsTrue(shortStringValue == reader.ReadStringShort());
+			Assert.IsTrue(stringValue == reader.ReadNetString());
+			Assert.IsTrue(shortStringValue == reader.ReadNetStringShort());
 
 			int bytesPosition = reader.Position;
 			var readBytes = reader.ReadBytes();
