@@ -24,15 +24,15 @@
 			<NetStringShort name="Name"/>
 		</class>
 		<TestInnerClass name="InnerClassField"/>
-		<class name="TestLateClass">
+		<class name="TestLateClass1">
 			<UInt32 name="TestUInt32"/>
 			<NetStringShort name="TestString"/>
 		</class>
-		<class name="TestLateClass">
+		<class name="TestLateClass2">
 			<UInt32 name="TestUInt32"/>
 			<NetStringShort name="TestString"/>
 		</class>
-		<class name="TestLateClass">
+		<class name="TestLateClass3">
 			<UInt32 name="TestUInt32"/>
 			<NetStringShort name="TestString"/>
 		</class>

@@ -4,6 +4,23 @@ using CT.Network.Serialization.Type;
 
 namespace CT.Packets
 {
+	public partial struct NetworkId : IPacketSerializable
+	{
+		public ulong Id;
+	
+		public int SerializeSize =>  + 8;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Id);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			Id = reader.ReadUInt64();
+		}
+	}
+	
 	public partial struct Position3D : IPacketSerializable
 	{
 		public float X;
