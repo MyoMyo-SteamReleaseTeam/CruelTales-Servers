@@ -23,6 +23,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gameplay", "Gameplay", "{6A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CT-Benchmark", "CT-Benchmark\CT-Benchmark.csproj", "{58CE97ED-5421-4FB9-AFFC-762E420A2023}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{2A7640E0-7FD8-44F4-A2F3-C17967E6476A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LiteNetLib", "LiteNetLib\LiteNetLib.csproj", "{8EC81672-F537-4877-AEDC-D1C79D98F2F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,10 @@ Global
 		{58CE97ED-5421-4FB9-AFFC-762E420A2023}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58CE97ED-5421-4FB9-AFFC-762E420A2023}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58CE97ED-5421-4FB9-AFFC-762E420A2023}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC81672-F537-4877-AEDC-D1C79D98F2F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC81672-F537-4877-AEDC-D1C79D98F2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC81672-F537-4877-AEDC-D1C79D98F2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC81672-F537-4877-AEDC-D1C79D98F2F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +77,7 @@ Global
 		{A1421471-DCEB-4F96-AF3E-5C2DC1F7CF86} = {6A2B8EA8-42E9-4476-90FC-73516807EC5E}
 		{025037AA-D3CC-41B7-9B3D-BBE9DF75AD0E} = {6A2B8EA8-42E9-4476-90FC-73516807EC5E}
 		{58CE97ED-5421-4FB9-AFFC-762E420A2023} = {A88AA86F-146F-44EB-A283-28DF25A670B6}
+		{8EC81672-F537-4877-AEDC-D1C79D98F2F0} = {2A7640E0-7FD8-44F4-A2F3-C17967E6476A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FACAAD2D-A975-498F-97B8-D8A75C94F89A}

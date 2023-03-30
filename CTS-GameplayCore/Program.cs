@@ -12,7 +12,7 @@ namespace CTS.Gameplay
 	{
 		static void Main(string[] args)
 		{
-			string startOption = "-maxuser 500 -thread 4";
+			string startOption = "-maxuser 500";
 
 			ServerOption serverOption = new ServerOption();
 
