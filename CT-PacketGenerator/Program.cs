@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using CT.Network.Serialization.Type;
+using CT.PacketGenerator.Exceptions;
 using CT.Tool.Data;
 using CT.Tool.GetOpt;
 
@@ -11,7 +12,7 @@ namespace CT.PacketGenerator
 	public class JobOption
 	{
 		public string XmlSourcePath = string.Empty;
-		public string TargetPath = string.Empty;
+		public string OutputPath = string.Empty;
 
 		public string GetFileNameWithExtension()
 		{
@@ -20,56 +21,82 @@ namespace CT.PacketGenerator
 
 		public string GetTargetPath()
 		{
-			return Path.Combine(TargetPath, GetFileNameWithExtension());
+			return Path.Combine(OutputPath, GetFileNameWithExtension());
 		}
 	}
 
 	internal class Program
 	{
 		private static string _testPacketDirectory = @"../../../PacketDefinition";
+		private static string _xmlPathArgument = @$"xmlpath";
+		private static string _outputArgument = @$"xmlpath";
 
 		static void Main(string[] args)
 		{
+			string xmlPath = string.Empty;
+			string outputPath = string.Empty;
+
 			args = new string[]
 			{
-				@$"--xmlpath ../../../PacketDefinition/TestPacket.xml",
-				@$" ../../../PacketDefinition/TestPacket_origin.xml",
-				$@"--output ../../../PacketDefinition/",
+				@$"--{_xmlPathArgument} ../../../PacketDefinition/",
+				$@"--{_outputArgument} ../../../PacketDefinition/",
 			};
 
-			List<JobOption> jobList = new();
-
 			OptionParser optionParser = new OptionParser();
-			optionParser.RegisterEvent("xmlpath", 2, (options) =>
+			optionParser.RegisterEvent(_xmlPathArgument, 2, (options) =>
 			{
-				for (int i = 0; i < options.Count; i++)
+				try
 				{
-					string op = options[i];
-
-					if (jobList.Count <= i)
-						jobList.Add(new JobOption() { XmlSourcePath = op });
-					else
-						jobList[i].XmlSourcePath = op;
+					xmlPath = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(_xmlPathArgument);
 				}
 			});
-			optionParser.RegisterEvent("output", 2, (options) =>
+			optionParser.RegisterEvent(_outputArgument, 2, (options) =>
 			{
-				for (int i = 0; i < jobList.Count; i++)
+				try
 				{
-					string op = options[0];
-
-					if (jobList.Count <= i)
-						jobList.Add(new JobOption() { TargetPath = op });
-					else
-						jobList[i].TargetPath = op;
+					outputPath = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(_outputArgument);
 				}
 			});
+
 			optionParser.OnArguments(args);
-			GeneratePacket(jobList);
+			GeneratePacket(xmlPath, outputPath);
 		}
 
-		public static void GeneratePacket(List<JobOption> jobOptionList)
+		public static void GeneratePacket(string xmlPath, string outputPath)
 		{
+			List<JobOption> jobOptionList = new List<JobOption>();
+
+			Queue<string> retrieve = new Queue<string>();
+			retrieve.Enqueue(xmlPath);
+
+			while (retrieve.Count > 0)
+			{
+				string path = retrieve.Dequeue();
+				foreach (var d in Directory.GetDirectories(path))
+				{
+					retrieve.Enqueue(d);
+				}
+
+				foreach (var f in Directory.GetFiles(path))
+				{
+					if (Path.GetExtension(f).ToLower() == ".xml")
+					{
+						JobOption op = new JobOption();
+						op.XmlSourcePath = f;
+						op.OutputPath = outputPath;
+						jobOptionList.Add(op);
+					}
+				}
+			}
+
 			foreach (var job in jobOptionList)
 			{
 				// Read packet files
@@ -77,12 +104,6 @@ namespace CT.PacketGenerator
 
 				parser.NewLine = TextFormat.LF;
 				parser.Indent = TextFormat.Indent;
-				parser.UsingSegments = new()
-				{
-					$"{nameof(CT)}.{nameof(CT.Network)}.{nameof(CT.Network.Packet)}",
-					$"{nameof(CT)}.{nameof(CT.Network)}.{nameof(CT.Network.Serialization)}",
-					$"{nameof(CT)}.{nameof(CT.Network)}.{nameof(CT.Network.Serialization)}.{nameof(CT.Network.Serialization.Type)}",
-				};
 				var netcore = Assembly.GetAssembly(typeof(NetString));
 				if (netcore != null)
 				{
@@ -97,10 +118,10 @@ namespace CT.PacketGenerator
 					var result = FileHandler.TryWriteText(targetPath, generatedCode, true);
 					if (result.ResultType == JobResultType.Success)
 					{
-						Console.WriteLine($"============================================");
+						//Console.WriteLine($"==================================================");
 						Console.WriteLine($"   Generate completed : {job.GetFileNameWithExtension()}");
-						Console.WriteLine($"============================================");
-						Console.WriteLine(generatedCode);
+						Console.WriteLine($"==================================================");
+						//Console.WriteLine(generatedCode);
 					}
 					else
 					{
@@ -109,9 +130,9 @@ namespace CT.PacketGenerator
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine($"============================================");
+					//Console.WriteLine($"==================================================");
 					Console.WriteLine($"   Generate failed!! : {job.GetFileNameWithExtension()}");
-					Console.WriteLine($"============================================");
+					Console.WriteLine($"==================================================");
 					Console.WriteLine($"File save failed!");
 					Console.WriteLine($"");
 					Console.WriteLine($"# {e.GetType().Name} #");

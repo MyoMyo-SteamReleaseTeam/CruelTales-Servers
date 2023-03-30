@@ -33,6 +33,12 @@ namespace CT.PacketGenerator.Exceptions
 			: base($"Wrong declaration in : {XmlExceptionHelper.GetNodeInfo(r)}") { }
 	}
 
+	internal class NoProcessArgumentsException : Exception
+	{
+		internal NoProcessArgumentsException(string argumentsName)
+			: base($"There is no process arguments. Needed arguments : {argumentsName}") { }
+	}
+
 	internal static class XmlExceptionHelper
 	{
 		public static string GetNodeInfo(XmlReader r)

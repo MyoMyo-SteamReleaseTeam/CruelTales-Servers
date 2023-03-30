@@ -25,6 +25,7 @@ namespace CT.PacketGenerator
 		ClientPacket,
 		Class,
 		Struct,
+		Using,
 	}
 
 	internal static class PacketHelper
@@ -36,6 +37,7 @@ namespace CT.PacketGenerator
 			{ PacketDataType.ClientPacket, "packet-client" },
 			{ PacketDataType.Struct, "struct" },
 			{ PacketDataType.Class, "class" },
+			{ PacketDataType.Using, "using" },
 		};
 
 		public static PacketDataType GetPacketDataType(XmlReader r)
@@ -65,6 +67,7 @@ namespace CT.PacketGenerator
 
 		private static readonly BidirectionalMap<string, string> _primitiyTypeByCLR = new()
 		{
+			{ "bool", "Bool" },
 			{ "byte", "Byte" },
 			{ "sbyte", "SByte" },
 			{ "short", "Int16" },
@@ -95,6 +98,7 @@ namespace CT.PacketGenerator
 
 		public static readonly Dictionary<string, int> _dataSizeByTypeName = new()
 		{
+			{ "bool",	sizeof(byte) },
 			{ "byte",	sizeof(byte) },
 			{ "sbyte",	sizeof(sbyte) },
 			{ "short",	sizeof(short) },
@@ -106,6 +110,7 @@ namespace CT.PacketGenerator
 			{ "float",	sizeof(float) },
 			{ "double",	sizeof(double) },
 
+			{ "Bool",	sizeof(byte) },
 			{ "Byte",	sizeof(byte) },
 			{ "SByte",  sizeof(sbyte) },
 			{ "Int16",  sizeof(short) },

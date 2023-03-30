@@ -1,8 +1,8 @@
-using CT.Network.Packet;
+using CT.Network.Packets;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
-namespace CT.Packets
+namespace CT.Packets.Connection
 {
 	public partial struct NetworkId : IPacketSerializable
 	{
@@ -99,6 +99,43 @@ namespace CT.Packets
 			Hp = reader.ReadInt32();
 			Level = reader.ReadInt32();
 			Data.Deserialize(reader);
+		}
+	}
+	
+	public sealed class Server_Okay : IPacketSerializable
+	{
+		public bool IsOkay;
+		public NetStringShort WelcomeMeesage;
+	
+		public int SerializeSize => WelcomeMeesage.SerializeSize + 1;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(IsOkay);
+			writer.Put(WelcomeMeesage);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			IsOkay = reader.ReadBool();
+			WelcomeMeesage = reader.ReadNetStringShort();
+		}
+	}
+	
+	public sealed class Client_TryConnect : IPacketSerializable
+	{
+		public NetStringShort Username;
+	
+		public int SerializeSize => Username.SerializeSize;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Username);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			Username = reader.ReadNetStringShort();
 		}
 	}
 }

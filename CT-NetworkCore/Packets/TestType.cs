@@ -1,6 +1,6 @@
 ﻿using CT.Network.Serialization;
 
-namespace CT.Network.Packet
+namespace CT.Network.Packets
 {
 	public enum TestType : byte
 	{

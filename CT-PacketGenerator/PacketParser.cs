@@ -16,7 +16,6 @@ namespace CT.PacketGenerator
 		public string ReaderName { get; set; } = "reader";
 		public string NewLine { get; set; } = "\n";
 		public string Indent { get; set; } = "\t";
-		public List<string> UsingSegments { get; set; } = new List<string>();
 		public List<Assembly> ReferenceAssemblys { get; set; } = new List<Assembly>();
 		private Dictionary<string, int> _enumSizeByTypeName = new Dictionary<string, int>();
 
@@ -46,59 +45,66 @@ namespace CT.PacketGenerator
 			};
 
 			// XML parsing start
-			using (XmlReader r =  XmlReader.Create(path, settings))
-			{
-				string usingStatements = string.Empty;
-				string packetNamespace = string.Empty;
-				string content = string.Empty;
+			using XmlReader r =  XmlReader.Create(path, settings);
 
-				// Make using statements
-				foreach (var u in UsingSegments)
+			string usingStatements = string.Empty;
+			string packetNamespace = string.Empty;
+			string content = string.Empty;
+
+			// Check validation
+			r.MoveToContent();
+
+			if (PacketHelper.GetPacketDataType(r) != PacketDataType.Definition)
+				throw new WrongDefinitionException();
+
+			if (tryParse(r, PacketAttributeType.Namespace, out packetNamespace) == false)
+				throw new WrongDefinitionException();
+
+			// Parse XML packet definition to generate codes
+			r.Read();
+			while (!r.EOF)
+			{
+				if (isValidElement(r) == false)
 				{
-					usingStatements += string.Format(PacketFormat.UsingFormat, u) + NewLine;
+					r.Read();
+					continue;
 				}
 
-				// Check validation
-				r.MoveToContent();
-
-				if (PacketHelper.GetPacketDataType(r) != PacketDataType.Definition)
-					throw new WrongDefinitionException();
-
-				if (tryParse(r, PacketAttributeType.Namespace, out packetNamespace) == false)
-					throw new WrongDefinitionException();
-
-				// Parse XML packet definition to generate codes
-				r.Read();
-				while (!r.EOF)
+				var type = PacketHelper.GetPacketDataType(r);
+				if (type == PacketDataType.Using)
 				{
-					if (isValidElement(r) == false)
+					r.Read();
+					string u = r.Value;
+					if (string.Equals(packetNamespace, u))
 					{
-						r.Read();
 						continue;
 					}
+					usingStatements += string.Format(PacketFormat.UsingFormat, u) + NewLine;
+					continue;
+				}
 
-					if (PacketHelper.GetPacketDataType(r) != PacketDataType.Other)
+				if (type != PacketDataType.Other)
+				{
+
+					parseDataType(r, out string parseContent);
+					content += parseContent;
+					if (!r.EOF)
 					{
-						parseDataType(r, out string parseContent);
-						content += parseContent;
-						if (!r.EOF)
-						{
-							content += NewLine + NewLine;
-						}
+						content += NewLine + NewLine;
 					}
 				}
-
-				// Remove extra new line
-				for (int i = 0; i < NewLine.Length * 2; i++)
-				{
-					content = content.Substring(0, content.Length - 1);
-				}
-
-				// Combine generated codes
-				content = addIndent(content);
-				return string.Format(PacketFormat.FileFormat,
-									 usingStatements, packetNamespace, content);
 			}
+
+			// Remove extra new line
+			for (int i = 0; i < NewLine.Length * 2; i++)
+			{
+				content = content.Substring(0, content.Length - 1);
+			}
+
+			// Combine generated codes
+			content = addIndent(content);
+			return string.Format(PacketFormat.FileFormat,
+									usingStatements, packetNamespace, content);
 		}
 
 		/// <summary>

@@ -3,6 +3,12 @@
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
+	<!-- Using Segments -->>
+	<using>CT.Packets.Connection</using>>
+	<using>CT.Network.Packets</using>>
+	<using>CT.Network.Serialization</using>>
+	<using>CT.Network.Serialization.Type</using>>
+	
 	<struct name="NetworkID" fixed="true">
 		<UInt16 name="ID"/>
 		<TestType name="Type"/>

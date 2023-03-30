@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Packet definition from the server -->
+
+<Definition namespace="CT.Packets">
+	<!-- Using Segments -->>
+	<using>CT.Packets.Connection</using>>
+	<using>CT.Network.Packets</using>>
+	<using>CT.Network.Serialization</using>>
+	<using>CT.Network.Serialization.Type</using>>
+	
+	<struct name="NetworkId">
+		<UInt64 name="Id"/>
+	</struct>
+	<struct name="Position3D">
+		<Single name="X"/>
+		<Single name="Y"/>
+		<Single name="Z"/>
+	</struct>
+	<struct name="CoordInt">
+		<Int32 name="X"/>
+		<Int32 name="Y"/>
+		<Int32 name="Z"/>
+	</struct>
+	<class name="Entity">
+		<EntityType name="Type"/>
+		<Position3D name="Position3D"/>
+		<NetStringShort name="Name"/>
+		<CoordInt name="Coord"/>
+		<Int32 name="Hp"/>
+		<Int32 name="Level"/>
+		<NetIntArray name="Data"/>
+	</class>
+</Definition>

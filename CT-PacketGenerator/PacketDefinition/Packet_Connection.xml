@@ -2,7 +2,14 @@
 
 <!-- Packet definition from the server -->
 
-<Definition namespace="CT.Packets">
+<Definition namespace="CT.Packets.Connection">
+	<!-- Using Segments -->>
+	<using>CT.Packets.Connection</using>>
+	<using>CT.Network.Packets</using>>
+	<using>CT.Network.Serialization</using>>
+	<using>CT.Network.Serialization.Type</using>>
+	
+	<!-- Declare Data Types -->>
 	<struct name="NetworkId">
 		<UInt64 name="Id"/>
 	</struct>
@@ -25,4 +32,13 @@
 		<Int32 name="Level"/>
 		<NetIntArray name="Data"/>
 	</class>
+	
+	<!-- Declare Packets -->>
+	<packet-server name="Okay">
+		<Bool name="IsOkay"/>
+		<NetStringShort name="WelcomeMeesage"/>
+	</packet-server>
+	<packet-client name="TryConnect">
+		<NetStringShort name="Username"/>
+	</packet-client>
 </Definition>
