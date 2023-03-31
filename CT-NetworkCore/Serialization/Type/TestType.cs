@@ -1,6 +1,8 @@
-﻿using CT.Network.Serialization;
+﻿using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using CT.Network.Serialization;
 
-namespace CT.Network.Packets
+namespace CT.Network.Serialization.Type
 {
 	public enum TestType : byte
 	{
@@ -18,13 +20,6 @@ namespace CT.Network.Packets
 		{
 			return (TestType)reader.ReadByte();
 		}
-	}
-
-	public enum PacketType : byte
-	{
-		PACKET_NONE = 0,
-		PACKET_MOVE = 1,
-		PACKET_SYNC = 2,
 	}
 
 	public enum EntityType : byte

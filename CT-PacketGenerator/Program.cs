@@ -4,6 +4,8 @@ using System.IO;
 using System.Reflection;
 using CT.Network.Serialization.Type;
 using CT.PacketGenerator.Exceptions;
+using CT.Tool.CodeGen;
+using CT.Tool.ConsoleHelper;
 using CT.Tool.Data;
 using CT.Tool.GetOpt;
 
@@ -27,19 +29,24 @@ namespace CT.PacketGenerator
 
 	internal class Program
 	{
-		private static string _testPacketDirectory = @"../../../PacketDefinition";
+		private static string _baseNamespace = $@"baseNamespace";
+		private static string _packetTypeName = $@"packetTypeName";
 		private static string _xmlPathArgument = @$"xmlpath";
-		private static string _outputArgument = @$"xmlpath";
+		private static string _outputArgument = @$"outputPath";
 
 		static void Main(string[] args)
 		{
+			string baseNamespace = string.Empty;
+			string packetTypeName = string.Empty;
 			string xmlPath = string.Empty;
 			string outputPath = string.Empty;
 
 			args = new string[]
 			{
-				@$"--{_xmlPathArgument} ../../../PacketDefinition/",
-				$@"--{_outputArgument} ../../../PacketDefinition/",
+				$"--{_xmlPathArgument} \"../../../../CT-NetworkCore/PacketDefinition/\"",
+				$"--{_outputArgument} \"../../../../CT-NetworkCore/Packets/\"",
+				$"-{_packetTypeName} PacketType",
+				$"-{_baseNamespace} CT.Packets",
 			};
 
 			OptionParser optionParser = new OptionParser();
@@ -65,12 +72,71 @@ namespace CT.PacketGenerator
 					throw new NoProcessArgumentsException(_outputArgument);
 				}
 			});
-
+			optionParser.RegisterEvent(_packetTypeName, 1, (options) =>
+			{
+				try
+				{
+					packetTypeName = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(_packetTypeName);
+				}
+			});
+			optionParser.RegisterEvent(_baseNamespace, 1, (options) =>
+			{
+				try
+				{
+					baseNamespace = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(_baseNamespace);
+				}
+			});
 			optionParser.OnArguments(args);
-			GeneratePacket(xmlPath, outputPath);
+
+			if (string.IsNullOrEmpty(xmlPath))
+			{
+				PrintError($"There is no XML path.");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(outputPath))
+			{
+				PrintError($"There is no output path.");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(packetTypeName))
+			{
+				PrintError($"There is no packet type name.");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(baseNamespace))
+			{
+				PrintError($"There is no base namespace.");
+				return;
+			}
+
+			Console.WriteLine($"Start generate packets...");
+			Console.WriteLine($"");
+			Console.Write($"XML path : ");
+			ConsoleHelper.WriteLine(xmlPath, ConsoleColor.White, ConsoleColor.DarkBlue);
+			Console.Write($"Output path : ");
+			ConsoleHelper.WriteLine(outputPath, ConsoleColor.White, ConsoleColor.DarkBlue);
+			Console.WriteLine($"Packet Type Name : {packetTypeName}");
+			Console.WriteLine($"Base Namespace: {baseNamespace}");
+			PrintSeparator();
+
+			GeneratePacket(xmlPath, outputPath, packetTypeName, baseNamespace);
 		}
 
-		public static void GeneratePacket(string xmlPath, string outputPath)
+		public static void GeneratePacket(string xmlPath,
+										  string outputPath, 
+										  string packetTypeName,
+										  string baseNamespace)
 		{
 			List<JobOption> jobOptionList = new List<JobOption>();
 
@@ -111,17 +177,18 @@ namespace CT.PacketGenerator
 				}
 				parser.Initialize();
 
+				List<string> packetEnumNames = new List<string>();
+
+				// Save generated packet schema code
 				try
 				{
-					var generatedCode = parser.ParseFromXml(job.XmlSourcePath);
+					parser.ParseFromXml(job.XmlSourcePath, out var generatedCode, out var pakcetNames);
+					packetEnumNames.AddRange(pakcetNames);
 					var targetPath = job.GetTargetPath();
 					var result = FileHandler.TryWriteText(targetPath, generatedCode, true);
 					if (result.ResultType == JobResultType.Success)
 					{
-						//Console.WriteLine($"==================================================");
-						Console.WriteLine($"   Generate completed : {job.GetFileNameWithExtension()}");
-						Console.WriteLine($"==================================================");
-						//Console.WriteLine(generatedCode);
+						PrintSaveResult(job.GetFileNameWithExtension(), targetPath);
 					}
 					else
 					{
@@ -130,16 +197,64 @@ namespace CT.PacketGenerator
 				}
 				catch (Exception e)
 				{
-					//Console.WriteLine($"==================================================");
-					Console.WriteLine($"   Generate failed!! : {job.GetFileNameWithExtension()}");
-					Console.WriteLine($"==================================================");
-					Console.WriteLine($"File save failed!");
-					Console.WriteLine($"");
-					Console.WriteLine($"# {e.GetType().Name} #");
-					Console.WriteLine($"");
-					Console.WriteLine($"{e.Message}");
+					PrintError(job.GetFileNameWithExtension(), e);
+				}
+
+				// Save packet enum code
+				string enumFileName = packetTypeName + ".cs";
+				try
+				{
+					var enumCode = CodeGenerator_Enumerate
+						.Generate(packetTypeName,
+								  baseNamespace,
+								  true, true, 
+								  new List<string>(),
+								  packetEnumNames);
+
+					var enumCodePath = Path.Combine(outputPath, enumFileName);
+					FileHandler.TryWriteText(enumCodePath, enumCode, true);
+					PrintSaveResult(enumFileName, enumCodePath);
+				}
+				catch (Exception e )
+				{
+					PrintError(enumFileName, e);
 				}
 			}
+		}
+
+		public static void PrintSaveResult(string fileName, string targetPath)
+		{
+			Console.Write("[");
+			ConsoleHelper.Write("Success", ConsoleColor.Green);
+			Console.Write($"] Generate completed : ");
+			ConsoleHelper.WriteLine(fileName, ConsoleColor.White, ConsoleColor.DarkBlue);
+			Console.Write($"Greate file at : ");
+			ConsoleHelper.WriteLine(targetPath, ConsoleColor.Green);
+			PrintSeparator();
+		}
+
+		public static void PrintError(string fileName, Exception e)
+		{
+			PrintError($"Generate failed!! : {fileName}");
+			PrintSeparator();
+			Console.WriteLine($"File save failed!");
+			Console.WriteLine($"");
+			Console.WriteLine($"# {e.GetType().Name} #");
+			Console.WriteLine($"");
+			Console.WriteLine($"{e.Message}");
+			PrintSeparator();
+		}
+
+		public static void PrintError(string errorMessage)
+		{
+			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.Red);
+			Console.WriteLine(errorMessage);
+			Console.ResetColor();
+		}
+
+		public static void PrintSeparator()
+		{
+			Console.WriteLine(new string('=', 80));
 		}
 	}
 }

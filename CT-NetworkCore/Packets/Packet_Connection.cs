@@ -1,9 +1,25 @@
-using CT.Network.Packets;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
 namespace CT.Packets.Connection
 {
+	public partial class MatchInfo : IPacketSerializable
+	{
+		public ulong RoomNumber;
+	
+		public int SerializeSize =>  + 8;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(RoomNumber);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			RoomNumber = reader.ReadUInt64();
+		}
+	}
+	
 	public partial struct NetworkId : IPacketSerializable
 	{
 		public ulong Id;

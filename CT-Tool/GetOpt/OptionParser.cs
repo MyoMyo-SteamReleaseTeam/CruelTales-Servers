@@ -122,9 +122,29 @@ namespace CT.Tool.GetOpt
 
 			StringBuilder sb = new StringBuilder(16);
 			int level = 0;
+			StringBuilder stringArgu = new StringBuilder(16);
+			int hasStringArgu = 0;
 			for (int i = 0; i < segment.Length; i++)
 			{
 				char c = segment[i];
+				if (c == '"')
+				{
+					hasStringArgu++;
+					continue;
+				}
+
+				if (hasStringArgu == 1)
+				{
+					stringArgu.Append(c);
+					continue;
+				}
+				else if (hasStringArgu == 2)
+				{
+					result.Add(new ValueTuple<string, int>(stringArgu.ToString(), level));
+					stringArgu.Clear();
+					hasStringArgu = 0;
+				}
+
 				if (c == '-')
 				{
 					if (sb.Length != 0)
@@ -149,6 +169,12 @@ namespace CT.Tool.GetOpt
 					sb.Append(c);
 				}
 			}
+
+			if (stringArgu.Length != 0)
+			{
+				result.Add(new ValueTuple<string, int>(stringArgu.ToString(), level));
+			}
+
 			if (sb.Length != 0)
 			{
 				result.Add(new ValueTuple<string, int>(sb.ToString(), level));

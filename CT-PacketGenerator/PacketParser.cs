@@ -35,7 +35,7 @@ namespace CT.PacketGenerator
 			}
 		}
 
-		public string ParseFromXml(string path)
+		public void ParseFromXml(string path, out string code, out List<string> packetNames)
 		{
 			// Set XML parse option
 			XmlReaderSettings settings = new XmlReaderSettings()
@@ -61,6 +61,7 @@ namespace CT.PacketGenerator
 				throw new WrongDefinitionException();
 
 			// Parse XML packet definition to generate codes
+			packetNames = new List<string>();
 			r.Read();
 			while (!r.EOF)
 			{
@@ -85,8 +86,12 @@ namespace CT.PacketGenerator
 
 				if (type != PacketDataType.Other)
 				{
+					var dataTypeName = parseDataType(r, out string parseContent);
+					if (dataTypeName.Contains("Server") || dataTypeName.Contains("Client"))
+					{
+						packetNames.Add(dataTypeName);
+					}
 
-					parseDataType(r, out string parseContent);
 					content += parseContent;
 					if (!r.EOF)
 					{
@@ -103,18 +108,21 @@ namespace CT.PacketGenerator
 
 			// Combine generated codes
 			content = addIndent(content);
-			return string.Format(PacketFormat.FileFormat,
-									usingStatements, packetNamespace, content);
+			code = string.Format(PacketFormat.FileFormat,
+								 usingStatements, packetNamespace, content);
 		}
 
 		/// <summary>
 		/// XML을 파싱하여 데이터 타입 코드를 생성합니다. class 및 struct 데이터 타입을 생성합니다.
 		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="content"></param>
+		/// <returns>Data Type의 이름입니다.</returns>
 		/// <exception cref="WrongElementException"></exception>
 		/// <exception cref="WrongDataTypeException"></exception>
 		/// <exception cref="WrongDeclarationException"></exception>
 		/// <exception cref="WrongAttributeException"></exception>
-		private void parseDataType(XmlReader r, out string content)
+		private string parseDataType(XmlReader r, out string content)
 		{
 			if (isValidElement(r) == false)
 				throw new WrongElementException(r);
@@ -301,6 +309,8 @@ namespace CT.PacketGenerator
 									sizeExpression,
 									serializeFunction,
 									deserializeFunction);
+
+			return className;
 		}
 
 		/// <summary>

@@ -15,4 +15,8 @@
     <ProjectReference Include="..\CT-Tool\CT-Tool.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PacketDefinition\" />
+  </ItemGroup>
+
 </Project>
