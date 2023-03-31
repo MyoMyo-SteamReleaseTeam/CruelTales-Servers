@@ -14,16 +14,22 @@ namespace CT.PacketGenerator
 	public class JobOption
 	{
 		public string XmlSourcePath = string.Empty;
-		public string OutputPath = string.Empty;
+		public string OutputServerPath = string.Empty;
+		public string OutputClientPath = string.Empty;
 
 		public string GetFileNameWithExtension()
 		{
 			return Path.GetFileNameWithoutExtension(XmlSourcePath) + ".cs";
 		}
 
-		public string GetTargetPath()
+		public string GetServerTargetPath()
 		{
-			return Path.Combine(OutputPath, GetFileNameWithExtension());
+			return Path.Combine(OutputServerPath, GetFileNameWithExtension());
+		}
+
+		public string GetClientTargetPath()
+		{
+			return Path.Combine(OutputClientPath, GetFileNameWithExtension());
 		}
 	}
 
@@ -31,26 +37,29 @@ namespace CT.PacketGenerator
 	{
 		private static string _baseNamespace = $@"baseNamespace";
 		private static string _packetTypeName = $@"packetTypeName";
-		private static string _xmlPathArgument = @$"xmlpath";
-		private static string _outputArgument = @$"outputPath";
+		private static string _xmlPath = @$"xmlpath";
+		private static string _outputServer = @$"outputServer";
+		private static string _outputClient = @$"outputClient";
 
 		static void Main(string[] args)
 		{
 			string baseNamespace = string.Empty;
 			string packetTypeName = string.Empty;
 			string xmlPath = string.Empty;
-			string outputPath = string.Empty;
+			string outputServer = string.Empty;
+			string outputClient = string.Empty;
 
 			args = new string[]
 			{
-				$"--{_xmlPathArgument} \"../../../../CT-NetworkCore/PacketDefinition/\"",
-				$"--{_outputArgument} \"../../../../CT-NetworkCore/Packets/\"",
+				$"--{_xmlPath} \"../../../../CT-NetworkCore/PacketDefinition/\"",
+				$"--{_outputServer} \"../../../../CT-NetworkCore/Packets/\"",
+				$"--{_outputClient} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Scripts/Network/Packets/\"",
 				$"-{_packetTypeName} PacketType",
 				$"-{_baseNamespace} CT.Packets",
 			};
 
 			OptionParser optionParser = new OptionParser();
-			optionParser.RegisterEvent(_xmlPathArgument, 2, (options) =>
+			optionParser.RegisterEvent(_xmlPath, 2, (options) =>
 			{
 				try
 				{
@@ -58,18 +67,29 @@ namespace CT.PacketGenerator
 				}
 				catch
 				{
-					throw new NoProcessArgumentsException(_xmlPathArgument);
+					throw new NoProcessArgumentsException(_xmlPath);
 				}
 			});
-			optionParser.RegisterEvent(_outputArgument, 2, (options) =>
+			optionParser.RegisterEvent(_outputServer, 2, (options) =>
 			{
 				try
 				{
-					outputPath = options[0];
+					outputServer = options[0];
 				}
 				catch
 				{
-					throw new NoProcessArgumentsException(_outputArgument);
+					throw new NoProcessArgumentsException(_outputServer);
+				}
+			});
+			optionParser.RegisterEvent(_outputClient, 2, (options) =>
+			{
+				try
+				{
+					outputClient = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(_outputClient);
 				}
 			});
 			optionParser.RegisterEvent(_packetTypeName, 1, (options) =>
@@ -102,9 +122,15 @@ namespace CT.PacketGenerator
 				return;
 			}
 
-			if (string.IsNullOrEmpty(outputPath))
+			if (string.IsNullOrEmpty(outputServer))
 			{
-				PrintError($"There is no output path.");
+				PrintError($"There is no server output path.");
+				return;
+			}
+
+			if (string.IsNullOrEmpty(outputClient))
+			{
+				PrintError($"There is no client output path.");
 				return;
 			}
 
@@ -125,16 +151,18 @@ namespace CT.PacketGenerator
 			Console.Write($"XML path : ");
 			ConsoleHelper.WriteLine(xmlPath, ConsoleColor.White, ConsoleColor.DarkBlue);
 			Console.Write($"Output path : ");
-			ConsoleHelper.WriteLine(outputPath, ConsoleColor.White, ConsoleColor.DarkBlue);
+			ConsoleHelper.WriteLine(outputServer, ConsoleColor.White, ConsoleColor.DarkBlue);
 			Console.WriteLine($"Packet Type Name : {packetTypeName}");
 			Console.WriteLine($"Base Namespace: {baseNamespace}");
 			PrintSeparator();
 
-			GeneratePacket(xmlPath, outputPath, packetTypeName, baseNamespace);
+			GeneratePacket(xmlPath, outputServer, outputClient, 
+						   packetTypeName, baseNamespace);
 		}
 
 		public static void GeneratePacket(string xmlPath,
-										  string outputPath, 
+										  string outputServer, 
+										  string outputClient, 
 										  string packetTypeName,
 										  string baseNamespace)
 		{
@@ -157,7 +185,8 @@ namespace CT.PacketGenerator
 					{
 						JobOption op = new JobOption();
 						op.XmlSourcePath = f;
-						op.OutputPath = outputPath;
+						op.OutputServerPath = outputServer;
+						op.OutputClientPath = outputClient;
 						jobOptionList.Add(op);
 					}
 				}
@@ -184,15 +213,26 @@ namespace CT.PacketGenerator
 				{
 					parser.ParseFromXml(job.XmlSourcePath, out var generatedCode, out var pakcetNames);
 					packetEnumNames.AddRange(pakcetNames);
-					var targetPath = job.GetTargetPath();
-					var result = FileHandler.TryWriteText(targetPath, generatedCode, true);
-					if (result.ResultType == JobResultType.Success)
+					var serverPath = job.GetServerTargetPath();
+					var serverResult = FileHandler.TryWriteText(serverPath, generatedCode, true);
+					if (serverResult.ResultType == JobResultType.Success)
 					{
-						PrintSaveResult(job.GetFileNameWithExtension(), targetPath);
+						PrintSaveResult(job.GetFileNameWithExtension(), serverPath);
 					}
 					else
 					{
-						throw result.Exception;
+						throw serverResult.Exception;
+					}
+
+					var clientPath = job.GetClientTargetPath();
+					var clientResult = FileHandler.TryWriteText(clientPath, generatedCode, true);
+					if (clientResult.ResultType == JobResultType.Success)
+					{
+						PrintSaveResult(job.GetFileNameWithExtension(), clientPath);
+					}
+					else
+					{
+						throw clientResult.Exception;
 					}
 				}
 				catch (Exception e)
@@ -211,9 +251,12 @@ namespace CT.PacketGenerator
 								  new List<string>(),
 								  packetEnumNames);
 
-					var enumCodePath = Path.Combine(outputPath, enumFileName);
-					FileHandler.TryWriteText(enumCodePath, enumCode, true);
-					PrintSaveResult(enumFileName, enumCodePath);
+					var enumServer = Path.Combine(outputServer, enumFileName);
+					FileHandler.TryWriteText(enumServer, enumCode, true);
+					PrintSaveResult(enumFileName, enumServer);
+					var enumClient = Path.Combine(outputClient, enumFileName);
+					FileHandler.TryWriteText(enumClient, enumCode, true);
+					PrintSaveResult(enumClient, enumServer);
 				}
 				catch (Exception e )
 				{
