@@ -1,4 +1,9 @@
-﻿namespace CT.Network.Serialization
+﻿#if NET7_0_OR_GREATER
+#else
+using System;
+#endif
+
+namespace CT.Network.Serialization
 {
 	public class PacketSegment
 	{

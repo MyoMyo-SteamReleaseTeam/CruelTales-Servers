@@ -1,4 +1,8 @@
-﻿using CT.Network.Serialization;
+﻿#if NET7_0_OR_GREATER
+#else
+using System;
+using System.Threading;
+#endif
 using LiteNetLib;
 
 namespace CT.Network

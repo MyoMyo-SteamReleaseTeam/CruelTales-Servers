@@ -21,7 +21,10 @@ namespace CT.Tools.Collections
 		/// <summary>Byte수 만큼 비트 마스크를 생성합니다.</summary>
 		/// <param name="memoryStride1D">차지할 메모리 공간의 byte수 입니다. Size = byte * 8</param>
 		/// <param name="value">초기화 할 값</param>
-		public BitmaskByte(bool value = false) => Clear(value);
+		public BitmaskByte(bool value = false)
+		{
+			Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+		}
 
 		/// <summary>해당 비트를 참조합니다.</summary>
 		/// <param name="x">bitmask 인덱스</param>
@@ -96,7 +99,10 @@ namespace CT.Tools.Collections
 		/// <summary>Byte수 만큼 비트 마스크를 생성합니다.</summary>
 		/// <param name="memoryStride1D">차지할 메모리 공간의 byte수 입니다. Size = byte * 8</param>
 		/// <param name="value">초기화 할 값</param>
-		public Bitmask32(bool value = false) => Clear(value);
+		public Bitmask32(bool value = false)
+		{
+			Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+		}
 
 		/// <summary>해당 비트를 참조합니다.</summary>
 		/// <param name="x">bitmask 인덱스</param>

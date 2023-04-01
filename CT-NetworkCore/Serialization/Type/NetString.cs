@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿#if NET7_0_OR_GREATER
+using System.Diagnostics;
+#endif
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -7,7 +9,11 @@ namespace CT.Network.Serialization.Type
 	/// <summary>65536이하 길이의 string 입니다.</summary>
 	public struct NetString : IPacketSerializable
 	{
+#if NET7_0_OR_GREATER
 		public string Value = "";
+#else
+		public string Value;
+#endif
 		public const int MAX_BYTE_LENGTH = 65536;
 
 		private int _byteSize;
@@ -31,7 +37,11 @@ namespace CT.Network.Serialization.Type
 
 		public NetString(string value)
 		{
+#if NET7_0_OR_GREATER
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
+#else
+			_byteSize = Encoding.UTF8.GetByteCount(value);
+#endif
 			Value = value;
 		}
 
@@ -71,7 +81,7 @@ namespace CT.Network.Serialization.Type
 		public static bool operator !=(NetString lhs, string rhs) => lhs.Value != rhs;
 		public static bool operator ==(string lhs, NetString rhs) => lhs == rhs.Value;
 		public static bool operator !=(string lhs, NetString rhs) => lhs != rhs.Value;
-		public static bool operator==(NetString lhs, NetString rhs) => lhs.Value == rhs.Value;
+		public static bool operator ==(NetString lhs, NetString rhs) => lhs.Value == rhs.Value;
 		public static bool operator !=(NetString lhs, NetString rhs) => lhs.Value != rhs.Value;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -90,7 +100,11 @@ namespace CT.Network.Serialization.Type
 	/// <summary>256이하 길이의 string 입니다.</summary>
 	public struct NetStringShort : IPacketSerializable
 	{
+#if NET7_0_OR_GREATER
 		public string Value = "";
+#else
+		public string Value;
+#endif
 		public const int MAX_BYTE_LENGTH = 256;
 
 		private int _byteSize;
@@ -114,7 +128,11 @@ namespace CT.Network.Serialization.Type
 
 		public NetStringShort(string value)
 		{
+#if NET7_0_OR_GREATER
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
+#else
+			_byteSize = Encoding.UTF8.GetByteCount(value);
+#endif
 			Value = value;
 		}
 

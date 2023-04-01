@@ -29,7 +29,7 @@ namespace CT.CorePatcher
 				$"--{FilePatcherRunner.TARGET_PATH} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-NetworkCore",
 				$"-{FilePatcherRunner.GUARD_EXTENSION} .asmdef",
 				$"-{FilePatcherRunner.INCLUDE_EXTENSION} .cs .xml .meta",
-				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build",
+				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build Legacy",
 			};
 
 			if (FilePatcherRunner.Run(args) == false)
@@ -45,7 +45,7 @@ namespace CT.CorePatcher
 				$"--{FilePatcherRunner.TARGET_PATH} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-Tools",
 				$"-{FilePatcherRunner.GUARD_EXTENSION} .asmdef",
 				$"-{FilePatcherRunner.INCLUDE_EXTENSION} .cs .xml .meta",
-				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build",
+				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build Legacy",
 			};
 
 			if (FilePatcherRunner.Run(args) == false)

@@ -1,4 +1,8 @@
-﻿using CT.Network.Serialization.Type;
+﻿#if NET7_0_OR_GREATER
+#else
+using System;
+#endif
+using CT.Network.Serialization.Type;
 
 namespace CT.Network.Serialization
 {
