@@ -1,6 +1,6 @@
 ﻿using CT.Tool.GetOpt;
 
-namespace CTS.Gameplay
+namespace CTS.Instance
 {
 	public class ServerOption
 	{

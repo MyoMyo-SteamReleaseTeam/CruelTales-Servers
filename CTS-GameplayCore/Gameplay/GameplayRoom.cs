@@ -1,4 +1,4 @@
-﻿namespace CTS.Gameplay.Core
+﻿namespace CTS.Instance.Gameplay
 {
 	public class GameplayRoom
 	{

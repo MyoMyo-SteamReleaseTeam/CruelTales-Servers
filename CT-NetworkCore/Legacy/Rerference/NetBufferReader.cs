@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CT.Network.Serialization.Rerference
+namespace CT.Network.Legacy.Rerference
 {
 	/// <summary>NetBuffer를 읽습니다.</summary>
 	public class NetBufferReader

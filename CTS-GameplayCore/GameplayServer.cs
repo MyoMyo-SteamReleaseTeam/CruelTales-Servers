@@ -3,7 +3,7 @@ using System;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace CTS.Gameplay
+namespace CTS.Instance
 {
 	internal class GameplayServer
 	{
@@ -24,7 +24,7 @@ namespace CTS.Gameplay
 			listener.ConnectionRequestEvent += request =>
 			{
 				if (server.GetPeersCount(ConnectionState.Connected) < 5 /* max connections */)
-					request.AcceptIfKey("SomeConnectionKey");
+					request.AcceptIfKey("CTMatchmakingTestServer");
 				else
 					request.Reject();
 			};
@@ -40,9 +40,10 @@ namespace CTS.Gameplay
 			while (!Console.KeyAvailable)
 			{
 				server.PollEvents();
-				Thread.Sleep(15);
 			}
 			server.Stop();
 		}
+
+
 	}
 }

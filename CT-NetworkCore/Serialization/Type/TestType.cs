@@ -1,9 +1,6 @@
-﻿using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
-using CT.Network.Serialization;
-
-namespace CT.Network.Serialization.Type
+﻿namespace CT.Network.Serialization.Type
 {
+
 	public enum TestType : byte
 	{
 

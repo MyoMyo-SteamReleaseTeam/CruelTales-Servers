@@ -1,3 +1,4 @@
+using CT.Network.DataType;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
@@ -5,18 +6,21 @@ namespace CT.Packets.Connection
 {
 	public partial class MatchInfo : IPacketSerializable
 	{
-		public ulong RoomNumber;
+		public RoomGuid RoomID = new();
+		public ulong RoomHash;
 	
-		public int SerializeSize =>  + 8;
+		public int SerializeSize => RoomID.SerializeSize + 8;
 	
 		public void Serialize(PacketWriter writer)
 		{
-			writer.Put(RoomNumber);
+			RoomID.Serialize(writer);
+			writer.Put(RoomHash);
 		}
 	
 		public void Deserialize(PacketReader reader)
 		{
-			RoomNumber = reader.ReadUInt64();
+			RoomID.Deserialize(reader);
+			RoomHash = reader.ReadUInt64();
 		}
 	}
 	

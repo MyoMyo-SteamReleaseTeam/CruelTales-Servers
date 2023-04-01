@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using CT.Network.Exceptions;
 
-namespace CT.Network.Serialization.Rerference
+namespace CT.Network.Legacy.Rerference
 {
 	/// <summary>원시 타입을 byte 배열에 인코딩 하거나 디코딩합니다.</summary>
 	public static class DataConverter

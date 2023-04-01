@@ -5,12 +5,14 @@
 <Definition namespace="CT.Packets.Connection">
 	<!-- Using Segments -->>
 	<using>CT.Packets.Connection</using>>
+	<using>CT.Network.DataType</using>>
 	<using>CT.Network.Serialization</using>>
 	<using>CT.Network.Serialization.Type</using>>
 	
 	<!-- Declare Data Types -->>
 	<class name="MatchInfo">
-		<UInt64 name="RoomNumber"/>
+		<RoomGuid name="RoomID"/>
+		<UInt64 name="RoomHash"/>
 	</class>
 	
 	<struct name="NetworkId">

@@ -1,4 +1,4 @@
-﻿namespace CT.Network.Serialization.Rerference
+﻿namespace CT.Network.Legacy.Rerference
 {
 	public interface INetworkSerializable
 	{
