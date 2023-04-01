@@ -10,7 +10,6 @@ namespace CT.CorePatcher
 			{
 				$"--{PacketGenerator.XML_PATH} \"../../../../CT-NetworkCore/PacketDefinition/\"",
 				$"--{PacketGenerator.OUTPUT_SERVER} \"../../../../CT-NetworkCore/Packets/\"",
-				$"--{PacketGenerator.OUTPUT_CLIENT} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Scripts/Network/Packets/\"",
 				$"-{PacketGenerator.PACKET_TYPE_NAME} PacketType",
 				$"-{PacketGenerator.BASE_NAMESPACE} CT.Packets",
 			};

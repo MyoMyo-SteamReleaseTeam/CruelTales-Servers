@@ -6,7 +6,6 @@ namespace CT.CorePatcher.Packets
 	{
 		public string XmlSourcePath = string.Empty;
 		public string OutputServerPath = string.Empty;
-		public string OutputClientPath = string.Empty;
 
 		public string GetFileNameWithExtension()
 		{
@@ -16,11 +15,6 @@ namespace CT.CorePatcher.Packets
 		public string GetServerTargetPath()
 		{
 			return Path.Combine(OutputServerPath, GetFileNameWithExtension());
-		}
-
-		public string GetClientTargetPath()
-		{
-			return Path.Combine(OutputClientPath, GetFileNameWithExtension());
 		}
 	}
 }

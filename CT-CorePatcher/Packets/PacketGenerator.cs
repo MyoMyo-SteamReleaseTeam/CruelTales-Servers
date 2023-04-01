@@ -29,7 +29,6 @@ namespace CT.CorePatcher.Packets
 		public const string PACKET_TYPE_NAME = $@"packetTypeName";
 		public const string XML_PATH = @$"xmlpath";
 		public const string OUTPUT_SERVER = @$"outputServer";
-		public const string OUTPUT_CLIENT = @$"outputClient";
 
 		public static void Run(string[] args)
 		{
@@ -45,13 +44,11 @@ namespace CT.CorePatcher.Packets
 			StringArgument packetTypeName = new();
 			StringArgument xmlPath = new();
 			StringArgument outputServer = new();
-			StringArgument outputClient = new();
 
 			// Parse options
 			OptionParser optionParser = new OptionParser();
 			bindArgument(optionParser, XML_PATH, 2, xmlPath);
 			bindArgument(optionParser, OUTPUT_SERVER, 2, outputServer);
-			bindArgument(optionParser, OUTPUT_CLIENT, 2, outputClient);
 			bindArgument(optionParser, PACKET_TYPE_NAME, 1, packetTypeName);
 			bindArgument(optionParser, BASE_NAMESPACE, 1, baseNamespace);
 			optionParser.OnArguments(args);
@@ -63,9 +60,6 @@ namespace CT.CorePatcher.Packets
 
 			if (outputServer.HasArgument(ref isValidArguments) == false)
 				PatcherConsole.PrintError($"There is no server output path.");
-
-			if (outputClient.HasArgument(ref isValidArguments) == false)
-				PatcherConsole.PrintError($"There is no client output path.");
 
 			if (packetTypeName.HasArgument(ref isValidArguments) == false)
 				PatcherConsole.PrintError($"There is no packet type name.");
@@ -91,7 +85,6 @@ namespace CT.CorePatcher.Packets
 			// Start generate packet codes
 			GeneratePacket(xmlPath.Argument,
 						   outputServer.Argument, 
-						   outputClient.Argument,
 						   packetTypeName.Argument, 
 						   baseNamespace.Argument);
 		}
@@ -113,7 +106,6 @@ namespace CT.CorePatcher.Packets
 
 		public static void GeneratePacket(string xmlPath,
 										  string outputServer,
-										  string outputClient,
 										  string packetTypeName,
 										  string baseNamespace)
 		{
@@ -137,7 +129,6 @@ namespace CT.CorePatcher.Packets
 						JobOption op = new JobOption();
 						op.XmlSourcePath = f;
 						op.OutputServerPath = outputServer;
-						op.OutputClientPath = outputClient;
 						jobOptionList.Add(op);
 					}
 				}
@@ -174,17 +165,6 @@ namespace CT.CorePatcher.Packets
 					{
 						throw serverResult.Exception;
 					}
-
-					var clientPath = job.GetClientTargetPath();
-					var clientResult = FileHandler.TryWriteText(clientPath, generatedCode, true);
-					if (clientResult.ResultType == JobResultType.Success)
-					{
-						PatcherConsole.PrintSaveResult(job.GetFileNameWithExtension(), clientPath);
-					}
-					else
-					{
-						throw clientResult.Exception;
-					}
 				}
 				catch (Exception e)
 				{
@@ -205,9 +185,6 @@ namespace CT.CorePatcher.Packets
 					var enumServer = Path.Combine(outputServer, enumFileName);
 					FileHandler.TryWriteText(enumServer, enumCode, true);
 					PatcherConsole.PrintSaveResult(enumFileName, enumServer);
-					var enumClient = Path.Combine(outputClient, enumFileName);
-					FileHandler.TryWriteText(enumClient, enumCode, true);
-					PatcherConsole.PrintSaveResult(enumClient, enumServer);
 				}
 				catch (Exception e)
 				{
