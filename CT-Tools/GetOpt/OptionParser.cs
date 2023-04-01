@@ -3,8 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CT.Tool.GetOpt
+namespace CT.Tools.GetOpt
 {
+	public class StringArgument
+	{
+		public string Argument = string.Empty;
+
+		public bool HasArgument(ref bool checker)
+		{
+			bool result = !string.IsNullOrEmpty(Argument);
+			checker &= result;
+			return result;
+		}
+	}
+
 	/// <summary>옵션 이벤트입니다. -f의 경우 타입은 "f" 레벨은 하이픈의 개수로서 1 입니다.</summary>
 	public class OptionEvent
 	{
@@ -55,6 +67,22 @@ namespace CT.Tool.GetOpt
 					e.OnOptionCallback?.Invoke(op.Parameters);
 				}
 			}
+		}
+
+		public void BindArgument(OptionParser parser, string argumentName,
+								 int level, StringArgument value)
+		{
+			parser.RegisterEvent(argumentName, level, (options) =>
+			{
+				try
+				{
+					value.Argument = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(argumentName);
+				}
+			});
 		}
 
 		public static string GetSignature(string name, int level)

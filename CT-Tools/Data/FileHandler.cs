@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CT.Tool.Data
+namespace CT.Tools.Data
 {
 	/// <summary>예외를 발생시키지 않는 파일 입출력 도우미 클래스입니다.</summary>
 	public static class FileHandler

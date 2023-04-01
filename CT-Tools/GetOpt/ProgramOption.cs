@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CT.Tool.GetOpt
+namespace CT.Tools.GetOpt
 {
 	internal class ProgramOption : IEnumerable<string>
 	{

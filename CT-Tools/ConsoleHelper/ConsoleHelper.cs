@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tool.ConsoleHelper
+namespace CT.Tools.ConsoleHelper
 {
 	public static class ConsoleHelper
 	{

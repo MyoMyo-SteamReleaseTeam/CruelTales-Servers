@@ -2,27 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using CT.CorePatcher.Exceptions;
 using CT.Network.Serialization.Type;
-using CT.Tool.CodeGen;
-using CT.Tool.ConsoleHelper;
-using CT.Tool.Data;
-using CT.Tool.GetOpt;
+using CT.Tools.CodeGen;
+using CT.Tools.ConsoleHelper;
+using CT.Tools.Data;
+using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher.Packets
 {
-	public class StringArgument
-	{
-		public string Argument = string.Empty;
-
-		public bool HasArgument(ref bool checker)
-		{
-			bool result = !string.IsNullOrEmpty(Argument);
-			checker &= result;
-			return result;
-		}
-	}
-
 	internal static class PacketGenerator
 	{
 		public const string BASE_NAMESPACE = $@"baseNamespace";
@@ -30,14 +17,10 @@ namespace CT.CorePatcher.Packets
 		public const string XML_PATH = @$"xmlpath";
 		public const string OUTPUT_SERVER = @$"outputServer";
 
-		public static void Run(string[] args)
+		public static bool Run(string[] args)
 		{
 			// Print program info
-			PatcherConsole.PrintSeparator();
-			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.DarkGreen);
-			Console.WriteLine($"Packet Generator");
-			Console.ResetColor();
-			PatcherConsole.PrintSeparator();
+			PatcherConsole.PrintProgramInfo("Packet Generator");
 
 			// Declare arguments
 			StringArgument baseNamespace = new();
@@ -46,12 +29,22 @@ namespace CT.CorePatcher.Packets
 			StringArgument outputServer = new();
 
 			// Parse options
-			OptionParser optionParser = new OptionParser();
-			bindArgument(optionParser, XML_PATH, 2, xmlPath);
-			bindArgument(optionParser, OUTPUT_SERVER, 2, outputServer);
-			bindArgument(optionParser, PACKET_TYPE_NAME, 1, packetTypeName);
-			bindArgument(optionParser, BASE_NAMESPACE, 1, baseNamespace);
-			optionParser.OnArguments(args);
+			OptionParser op = new OptionParser();
+			op.BindArgument(op, XML_PATH, 2, xmlPath);
+			op.BindArgument(op, OUTPUT_SERVER, 2, outputServer);
+			op.BindArgument(op, PACKET_TYPE_NAME, 1, packetTypeName);
+			op.BindArgument(op, BASE_NAMESPACE, 1, baseNamespace);
+			try
+			{
+				op.OnArguments(args);
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintError(e.GetType().Name);
+				Console.WriteLine();
+				PatcherConsole.PrintError(e.Message);
+				return false;
+			}
 
 			// Check arguments validation
 			bool isValidArguments = true;
@@ -68,7 +61,7 @@ namespace CT.CorePatcher.Packets
 				PatcherConsole.PrintError($"There is no base namespace.");
 
 			if (isValidArguments == false)
-				return;
+				return false;
 
 			// Print current options
 
@@ -83,31 +76,26 @@ namespace CT.CorePatcher.Packets
 			PatcherConsole.PrintSeparator();
 
 			// Start generate packet codes
-			GeneratePacket(xmlPath.Argument,
-						   outputServer.Argument, 
-						   packetTypeName.Argument, 
-						   baseNamespace.Argument);
-		}
-
-		private static void bindArgument(OptionParser parser, string argumentName, int level, StringArgument value)
-		{
-			parser.RegisterEvent(argumentName, level, (options) =>
+			try
 			{
-				try
-				{
-					value.Argument = options[0];
-				}
-				catch
-				{
-					throw new NoProcessArgumentsException(argumentName);
-				}
-			});
+				generatePacket(xmlPath.Argument,
+							   outputServer.Argument,
+							   packetTypeName.Argument,
+							   baseNamespace.Argument);
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintException(e);
+				return false;
+			}
 		}
 
-		public static void GeneratePacket(string xmlPath,
-										  string outputServer,
-										  string packetTypeName,
-										  string baseNamespace)
+		private static void generatePacket(string xmlPath,
+										   string outputServer,
+										   string packetTypeName,
+										   string baseNamespace)
 		{
 			List<JobOption> jobOptionList = new List<JobOption>();
 
@@ -159,7 +147,8 @@ namespace CT.CorePatcher.Packets
 					var serverResult = FileHandler.TryWriteText(serverPath, generatedCode, true);
 					if (serverResult.ResultType == JobResultType.Success)
 					{
-						PatcherConsole.PrintSaveResult(job.GetFileNameWithExtension(), serverPath);
+						PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
+															  job.GetFileNameWithExtension(), serverPath);
 					}
 					else
 					{
@@ -184,7 +173,7 @@ namespace CT.CorePatcher.Packets
 
 					var enumServer = Path.Combine(outputServer, enumFileName);
 					FileHandler.TryWriteText(enumServer, enumCode, true);
-					PatcherConsole.PrintSaveResult(enumFileName, enumServer);
+					PatcherConsole.PrintSaveSuccessResult("Generate enum code completed : ", enumFileName, enumServer);
 				}
 				catch (Exception e)
 				{

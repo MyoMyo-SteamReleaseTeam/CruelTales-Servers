@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tool.Collections
+namespace CT.Tools.Collections
 {
 	public struct BitmaskByte
 	{

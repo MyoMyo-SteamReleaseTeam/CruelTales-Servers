@@ -1,4 +1,4 @@
-﻿using CT.Tool.GetOpt;
+﻿using CT.Tools.GetOpt;
 
 namespace CTS.Instance
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace CT.Tool.Collections
+namespace CT.Tools.Collections
 {
 	/// <summary>
 	/// 두 값을 양방향으로 짝 지은 Map 입니다.

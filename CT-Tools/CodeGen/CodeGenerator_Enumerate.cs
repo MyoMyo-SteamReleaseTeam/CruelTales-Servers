@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CT.Tool.CodeGen
+namespace CT.Tools.CodeGen
 {
 	public static class CodeGenerator_Enumerate
 	{

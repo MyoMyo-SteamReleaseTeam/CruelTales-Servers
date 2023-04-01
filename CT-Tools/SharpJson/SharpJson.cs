@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace CT.Tool.SharpJson
+namespace CT.Tools.SharpJson
 {
 	class Lexer
 	{

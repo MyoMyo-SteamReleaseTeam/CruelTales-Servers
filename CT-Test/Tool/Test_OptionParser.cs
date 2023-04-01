@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using CT.Tool.GetOpt;
+using CT.Tools.GetOpt;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.Tool

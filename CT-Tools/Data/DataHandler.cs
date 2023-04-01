@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CT.Tool.Data
+namespace CT.Tools.Data
 {
 	public static class DataHandler
 	{

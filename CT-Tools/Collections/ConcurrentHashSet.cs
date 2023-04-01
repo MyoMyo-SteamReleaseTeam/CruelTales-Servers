@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CT.Tool.Collections
+namespace CT.Tools.Collections
 {
 	public class ConcurrentHashSet<T> : IEnumerable<T>, ISet<T>, ICollection<T>
 		where T : notnull

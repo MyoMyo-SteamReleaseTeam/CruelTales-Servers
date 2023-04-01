@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CT.Tool.Collections
+namespace CT.Tools.Collections
 {
 	/// <summary>원형 큐입니다.</summary>
 	public class CircularQueue<T> : IEnumerable<T>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CT.Tool
+namespace CT.Tools
 {
 	public static class KeywordChecker
 	{

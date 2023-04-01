@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CT.Tool
+namespace CT.Tools
 {
 	public readonly struct EnumPair<EnumType, BaseEnumType>
 		where EnumType : Enum

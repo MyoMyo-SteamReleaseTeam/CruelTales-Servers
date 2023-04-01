@@ -1,4 +1,4 @@
-﻿namespace CT.Tool
+﻿namespace CT.Tools
 {
 	public static class Numeric
 	{

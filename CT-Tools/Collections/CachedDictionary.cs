@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CT.Tool.Collections
+namespace CT.Tools.Collections
 {
 	[Obsolete("Need benchmark")]
 	public class CachedDictionary<Key, Value>

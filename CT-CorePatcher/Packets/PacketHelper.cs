@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
-using CT.Tool.Collections;
+using CT.Tools.Collections;
 
 namespace CT.CorePatcher.Packets
 {

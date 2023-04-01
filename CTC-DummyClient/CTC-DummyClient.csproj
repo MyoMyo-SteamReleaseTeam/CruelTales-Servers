@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
-    <ProjectReference Include="..\CT-Tool\CT-Tool.csproj" />
+    <ProjectReference Include="..\CT-Tool\CT-Tools.csproj" />
   </ItemGroup>
 
 </Project>
