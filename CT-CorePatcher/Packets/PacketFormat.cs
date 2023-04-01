@@ -1,4 +1,4 @@
-﻿namespace CT.PacketGenerator
+﻿namespace CT.CorePatcher.Packets
 {
 	internal static class PacketFormat
 	{
@@ -119,7 +119,7 @@ namespace {1}
 		/// {1} Deserialize type signature<br/>
 		/// value = reader.ReadInt16();
 		/// </summary>
-		public static readonly string MemberDeserializeByReader = 
+		public static readonly string MemberDeserializeByReader =
 			@"{0} = reader.Read{1}();";
 	}
 }

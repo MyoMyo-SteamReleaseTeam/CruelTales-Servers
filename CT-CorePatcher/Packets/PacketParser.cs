@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using CT.CorePatcher.Exceptions;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
-using CT.PacketGenerator.Exceptions;
 
-namespace CT.PacketGenerator
+namespace CT.CorePatcher.Packets
 {
 	/// <summary>XML 패킷 정의로 부터 C# 코드를 생성합니다.</summary>
 	internal class PacketParser
@@ -45,7 +45,7 @@ namespace CT.PacketGenerator
 			};
 
 			// XML parsing start
-			using XmlReader r =  XmlReader.Create(path, settings);
+			using XmlReader r = XmlReader.Create(path, settings);
 
 			string usingStatements = string.Empty;
 			string packetNamespace = string.Empty;
@@ -221,7 +221,7 @@ namespace CT.PacketGenerator
 				sizeExpression += $" + {calcSerializeSize}";
 			}
 
-			sizeExpression = string.Format(PacketFormat.SerializeSize, 
+			sizeExpression = string.Format(PacketFormat.SerializeSize,
 										   nameof(IPacketSerializable.SerializeSize),
 										   sizeExpression);
 
@@ -281,13 +281,13 @@ namespace CT.PacketGenerator
 			serializeFunction = string.Format(PacketFormat.SerializeFunction,
 											  nameof(IPacketSerializable.Serialize),
 											  nameof(PacketWriter),
-											  this.WriterName,
+											  WriterName,
 											  serializeContent);
 
 			deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
 											  nameof(IPacketSerializable.Deserialize),
 											  nameof(PacketReader),
-											  this.ReaderName,
+											  ReaderName,
 											  deserializeContent);
 
 			// Combine generated codes
@@ -335,7 +335,7 @@ namespace CT.PacketGenerator
 		/// </summary>
 		/// <exception cref="WrongElementException"></exception>
 		/// <exception cref="WrongAttributeException"></exception>
-		private void parseMembers(XmlReader r, out string content, 
+		private void parseMembers(XmlReader r, out string content,
 								  out List<MemberDefinitionToken> members)
 		{
 			int currentDepth = r.Depth;

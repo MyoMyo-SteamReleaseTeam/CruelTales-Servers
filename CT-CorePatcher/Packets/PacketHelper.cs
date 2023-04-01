@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml;
 using CT.Tool.Collections;
 
-namespace CT.PacketGenerator
+namespace CT.CorePatcher.Packets
 {
 	internal enum PacketAttributeType
 	{
@@ -42,7 +37,7 @@ namespace CT.PacketGenerator
 
 		public static PacketDataType GetPacketDataType(XmlReader r)
 		{
-			if (_dataTypeKeywordTable.TryGetValue(r.Name, out var type)) 
+			if (_dataTypeKeywordTable.TryGetValue(r.Name, out var type))
 			{
 				return type;
 			}
@@ -98,20 +93,20 @@ namespace CT.PacketGenerator
 
 		public static readonly Dictionary<string, int> _dataSizeByTypeName = new()
 		{
-			{ "bool",	sizeof(byte) },
-			{ "byte",	sizeof(byte) },
-			{ "sbyte",	sizeof(sbyte) },
-			{ "short",	sizeof(short) },
-			{ "ushort",	sizeof(ushort) },
-			{ "int",	sizeof(int) },
-			{ "uint",	sizeof(uint) },
-			{ "long",	sizeof(long) },
-			{ "ulong",	sizeof(ulong) },
-			{ "float",	sizeof(float) },
-			{ "double",	sizeof(double) },
+			{ "bool",   sizeof(byte) },
+			{ "byte",   sizeof(byte) },
+			{ "sbyte",  sizeof(sbyte) },
+			{ "short",  sizeof(short) },
+			{ "ushort", sizeof(ushort) },
+			{ "int",    sizeof(int) },
+			{ "uint",   sizeof(uint) },
+			{ "long",   sizeof(long) },
+			{ "ulong",  sizeof(ulong) },
+			{ "float",  sizeof(float) },
+			{ "double", sizeof(double) },
 
-			{ "Bool",	sizeof(byte) },
-			{ "Byte",	sizeof(byte) },
+			{ "Bool",    sizeof(byte) },
+			{ "Byte",   sizeof(byte) },
 			{ "SByte",  sizeof(sbyte) },
 			{ "Int16",  sizeof(short) },
 			{ "UInt16", sizeof(ushort) },

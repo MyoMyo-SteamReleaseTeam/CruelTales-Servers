@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Xml;
+using CT.CorePatcher.Packets;
 
-namespace CT.PacketGenerator.Exceptions
+namespace CT.CorePatcher.Exceptions
 {
 	internal class WrongDefinitionException : Exception
 	{

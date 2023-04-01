@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>CT.PacketGenerator</RootNamespace>
+    <RootNamespace>CT.CorePatcher</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BaseOutputPath></BaseOutputPath>
@@ -13,10 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-Tool\CT-Tool.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PacketDefinition\" />
   </ItemGroup>
 
 </Project>
