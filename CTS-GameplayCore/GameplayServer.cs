@@ -7,7 +7,7 @@ namespace CTS.Instance
 	public class ServerOption
 	{
 		public int MaxConcurrentUser { get; set; }
-		public int Port { get; set; }
+		public int Port { get; set; } = 60128;
 		public int FramePerMs = 50;
 		public int GameCount = 700;
 		public int UpdateStress = 4000;
@@ -32,7 +32,7 @@ namespace CTS.Instance
 		{
 			EventBasedNetListener listener = new EventBasedNetListener();
 			NetManager server = new NetManager(listener);
-			server.Start(9050 /* port */);
+			server.Start(_serverOption.Port /* port */);
 
 			listener.ConnectionRequestEvent += request =>
 			{
@@ -50,6 +50,7 @@ namespace CTS.Instance
 				peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
 			};
 
+
 			while (!Console.KeyAvailable)
 			{
 				server.PollEvents();
@@ -57,6 +58,10 @@ namespace CTS.Instance
 			server.Stop();
 		}
 
+		public void StartMainNetwork()
+		{
+
+		}
 
 	}
 }

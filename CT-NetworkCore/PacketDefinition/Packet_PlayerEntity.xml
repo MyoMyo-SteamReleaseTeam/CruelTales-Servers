@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Packet definition from the server -->
+
+<Definition namespace="CT.Packets">
+	<!-- Using Segments -->>
+	<using>CT.Packets</using>>
+	<using>CT.Network.DataType</using>>
+	<using>CT.Network.Serialization</using>>
+	<using>CT.Network.Serialization.Type</using>>
+
+	<!-- Declare Data Types -->>
+	<class name="EntityPlayerState">
+		<NetEntityID name="NetID"/>
+		<NetTransform name="Transform"/>
+	</class>
+
+	<!-- Declare Packets -->>
+	
+</Definition>

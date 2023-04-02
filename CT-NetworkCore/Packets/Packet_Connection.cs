@@ -2,160 +2,130 @@ using CT.Network.DataType;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
-namespace CT.Packets.Connection
+namespace CT.Packets
 {
-	public partial class MatchInfo : IPacketSerializable
+	public sealed partial class UserProfile : IPacketSerializable
 	{
-		public RoomGuid RoomID = new();
-		public ulong RoomHash;
+		public NetStringShort Clothes;
 	
-		public int SerializeSize => RoomID.SerializeSize + 8;
+		public int SerializeSize => Clothes.SerializeSize;
 	
 		public void Serialize(PacketWriter writer)
 		{
-			RoomID.Serialize(writer);
-			writer.Put(RoomHash);
+			writer.Put(Clothes);
 		}
 	
 		public void Deserialize(PacketReader reader)
 		{
-			RoomID.Deserialize(reader);
-			RoomHash = reader.ReadUInt64();
-		}
-	}
-	
-	public partial struct NetworkId : IPacketSerializable
-	{
-		public ulong Id;
-	
-		public int SerializeSize =>  + 8;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(Id);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			Id = reader.ReadUInt64();
-		}
-	}
-	
-	public partial struct Position3D : IPacketSerializable
-	{
-		public float X;
-		public float Y;
-		public float Z;
-	
-		public int SerializeSize =>  + 12;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(X);
-			writer.Put(Y);
-			writer.Put(Z);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			X = reader.ReadSingle();
-			Y = reader.ReadSingle();
-			Z = reader.ReadSingle();
-		}
-	}
-	
-	public partial struct CoordInt : IPacketSerializable
-	{
-		public int X;
-		public int Y;
-		public int Z;
-	
-		public int SerializeSize =>  + 12;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(X);
-			writer.Put(Y);
-			writer.Put(Z);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			X = reader.ReadInt32();
-			Y = reader.ReadInt32();
-			Z = reader.ReadInt32();
-		}
-	}
-	
-	public partial class Entity : IPacketSerializable
-	{
-		public EntityType Type;
-		public Position3D Position3D = new();
-		public NetStringShort Name;
-		public CoordInt Coord = new();
-		public int Hp;
-		public int Level;
-		public NetIntArray Data = new();
-	
-		public int SerializeSize => Position3D.SerializeSize + Name.SerializeSize + Coord.SerializeSize + Data.SerializeSize + 9;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(Type);
-			Position3D.Serialize(writer);
-			writer.Put(Name);
-			Coord.Serialize(writer);
-			writer.Put(Hp);
-			writer.Put(Level);
-			Data.Serialize(writer);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			Type = reader.ReadEntityType();
-			Position3D.Deserialize(reader);
-			Name = reader.ReadNetStringShort();
-			Coord.Deserialize(reader);
-			Hp = reader.ReadInt32();
-			Level = reader.ReadInt32();
-			Data.Deserialize(reader);
-		}
-	}
-	
-	public sealed class Server_Okay : IPacketSerializable
-	{
-		public bool IsOkay;
-		public NetStringShort WelcomeMeesage;
-	
-		public int SerializeSize => WelcomeMeesage.SerializeSize + 1;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(IsOkay);
-			writer.Put(WelcomeMeesage);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			IsOkay = reader.ReadBool();
-			WelcomeMeesage = reader.ReadNetStringShort();
+			Clothes = reader.ReadNetStringShort();
 		}
 	}
 	
 	public sealed class Client_TryConnect : IPacketSerializable
 	{
-		public NetStringShort Username;
+		public ulong Id;
+		public NetStringShort Token;
+		public MatchEndpoint MatchTo = new();
 	
-		public int SerializeSize => Username.SerializeSize;
+		public int SerializeSize => Token.SerializeSize + MatchTo.SerializeSize + 8;
 	
 		public void Serialize(PacketWriter writer)
 		{
-			writer.Put(Username);
+			writer.Put(Id);
+			writer.Put(Token);
+			MatchTo.Serialize(writer);
 		}
 	
 		public void Deserialize(PacketReader reader)
 		{
-			Username = reader.ReadNetStringShort();
+			Id = reader.ReadUInt64();
+			Token = reader.ReadNetStringShort();
+			MatchTo.Deserialize(reader);
+		}
+	}
+	
+	public sealed class Server_AckConnect : IPacketSerializable
+	{
+		public ConnectAck Result;
+	
+		public int SerializeSize =>  + 1;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Result);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			Result = reader.ReadConnectAck();
+		}
+	}
+	
+	public sealed class Client_TrySendUserProfile : IPacketSerializable
+	{
+		public UserProfile UserProfile = new();
+	
+		public int SerializeSize => UserProfile.SerializeSize;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			UserProfile.Serialize(writer);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			UserProfile.Deserialize(reader);
+		}
+	}
+	
+	public sealed class Server_InitialWorldState : IPacketSerializable
+	{
+		public NetStringShort MiniGameName;
+	
+		public int SerializeSize => MiniGameName.SerializeSize;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(MiniGameName);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			MiniGameName = reader.ReadNetStringShort();
+		}
+	}
+	
+	public sealed class Server_SpawnEntities : IPacketSerializable
+	{
+		public NetArray<EntityPlayerState> SpawnedEntities = new NetArray<EntityPlayerState>();
+	
+		public int SerializeSize => SpawnedEntities.SerializeSize;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			SpawnedEntities.Serialize(writer);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			SpawnedEntities.Deserialize(reader);
+		}
+	}
+	
+	public sealed class Server_DespawnEntities : IPacketSerializable
+	{
+		public NetFixedArray<NetEntityID> DespawnEntities = new NetFixedArray<NetEntityID>();
+	
+		public int SerializeSize => DespawnEntities.SerializeSize;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			DespawnEntities.Serialize(writer);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			DespawnEntities.Deserialize(reader);
 		}
 	}
 }

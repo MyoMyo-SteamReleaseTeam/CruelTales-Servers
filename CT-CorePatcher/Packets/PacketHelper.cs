@@ -28,8 +28,8 @@ namespace CT.CorePatcher.Packets
 		private static readonly BidirectionalMap<PacketDataType, string> _dataTypeKeywordTable = new()
 		{
 			{ PacketDataType.Definition, "Definition" },
-			{ PacketDataType.ServerPacket, "packet-server" },
-			{ PacketDataType.ClientPacket, "packet-client" },
+			{ PacketDataType.ServerPacket, "server" },
+			{ PacketDataType.ClientPacket, "client" },
 			{ PacketDataType.Struct, "struct" },
 			{ PacketDataType.Class, "class" },
 			{ PacketDataType.Using, "using" },
@@ -50,7 +50,7 @@ namespace CT.CorePatcher.Packets
 			{ PacketDataType.ServerPacket, "sealed class" },
 			{ PacketDataType.ClientPacket, "sealed class" },
 			{ PacketDataType.Struct, "partial struct" },
-			{ PacketDataType.Class, "partial class" },
+			{ PacketDataType.Class, "sealed partial class" },
 		};
 
 		public static bool TryGetDeclarationBy(PacketDataType type, out string declaration)
