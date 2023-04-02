@@ -9,8 +9,39 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <AssemblyAttribute Include="log4net.Config.XmlConfigurator">
+	    <ConfigFile>log4net.config</ConfigFile>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>
