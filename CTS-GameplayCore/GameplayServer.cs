@@ -1,17 +1,30 @@
-﻿using System.Threading;
-using System;
+﻿using System;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
 namespace CTS.Instance
 {
-	internal class GameplayServer
+	public class ServerOption
 	{
+		public int MaxConcurrentUser { get; set; }
+		public int Port { get; set; }
+		public int FramePerMs = 50;
+		public int GameCount = 700;
+		public int UpdateStress = 4000;
+		public int UserCount = 7;
+		public int ReadSize = 500;
+		public int WriteSize = 1500;
+	}
+
+	public class GameplayServer
+	{
+		private ServerService _serverService;
 		private ServerOption _serverOption;
 		public int MaxConcurrentUser => _serverOption.MaxConcurrentUser;
 
-		public GameplayServer(ServerOption serverOption)
+		public GameplayServer(ServerService serverService, ServerOption serverOption)
 		{
+			_serverService = serverService;
 			_serverOption = serverOption;
 		}
 

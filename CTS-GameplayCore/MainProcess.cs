@@ -2,13 +2,8 @@
 
 namespace CTS.Instance
 {
-	public class ServerOption
-	{
-		public int MaxConcurrentUser { get; set; }
-		public int Port { get; set; }
-	}
 
-	internal class Program
+	internal class MainProcess
 	{
 		static void Main(string[] args)
 		{
@@ -20,7 +15,9 @@ namespace CTS.Instance
 			optionParser.RegisterEvent("maxuser", 1, e => serverOption.MaxConcurrentUser = int.Parse(e[0]));
 			optionParser.OnArguments(startOption);
 
-			GameplayServer server = new(serverOption);
+			ServerService serverService = new ServerService();
+
+			GameplayServer server = new(serverService, serverOption);
 			server.Start();
 		}
 	}
