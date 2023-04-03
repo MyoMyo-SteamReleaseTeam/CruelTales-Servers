@@ -1,23 +1,51 @@
-﻿namespace CTS.Instance
+﻿using System;
+using System.Threading;
+using CTS.Instance.Gameplay;
+using CTS.Instance.Services;
+using log4net;
+
+namespace CTS.Instance
 {
-	public class GameplayServer
+	public class GameplayServer : FrameRunner
 	{
-		private readonly ServerServices _serverService;
-		private readonly ServerOption _serverOption;
 		private readonly NetworkService _networkService;
+		private readonly GameInstanceManager _gameInstanceManager;
 
-		public int MaxConcurrentUser => _serverOption.MaxConcurrentUser;
-
-		public GameplayServer(ServerServices serverService, ServerOption serverOption)
+		public GameplayServer(ServerOption serverOption,
+							  NetworkService networkService,
+							  TickTimer tickTimer)
+			: base(serverOption, 
+				   tickTimer, 
+				   LogManager.GetLogger(typeof(GameplayServer)))
 		{
-			_serverService = serverService;
-			_serverOption = serverOption;
-			_networkService = serverService.NetworkService;
+			_networkService = networkService;
+			_gameInstanceManager = new(serverOption, tickTimer);
 		}
 
-		public void RunServer()
+		public void Start()
 		{
+			_networkService.Start(_serverOption.Port);
 
+			Thread t = new Thread(startServer);
+			t.IsBackground = false;
+			t.Start();
+		}
+
+		private void startServer()
+		{
+			this.Run();
+		}
+
+		protected override void OnUpdate(float deltaTime)
+		{
+			_networkService.PollEvents();
+			_gameInstanceManager.ProcessFrame(deltaTime);
+			_networkService.PollEvents();
+		}
+
+		public void PrintCollecitonCount()
+		{
+			_log.Info($"[Gen 0 : {GC.CollectionCount(0).ToString()}][Gen 1 : {GC.CollectionCount(1).ToString()}][Gen 2 : {GC.CollectionCount(2)}]");
 		}
 	}
 }

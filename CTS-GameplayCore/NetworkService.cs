@@ -23,12 +23,12 @@ namespace CTS.Instance
 
 		public void RemovePeer(NetPeer peer)
 		{
-			_peerByPeerId.ContainsKey()
+			//_peerByPeerId.ContainsKey()
 		}
 
 		public bool IsValidToken()
 		{
-
+			return true;
 		}
 	}
 
@@ -82,15 +82,14 @@ namespace CTS.Instance
 				ClientToken token = new ClientToken();
 				token.Deserialize(pr);
 
-				reader.Read
 
-				if (!_sessions.TryGetValue(token, out var clientSession) || clientSession == null)
-				{
-					peer.Disconnect();
-					return;
-				}
+				//if (!_sessions.TryGetValue(token, out var clientSession) || clientSession == null)
+				//{
+				//	peer.Disconnect();
+				//	return;
+				//}
 
-				OnPacketReceived?.Invoke(clientSession, pr);
+				//OnPacketReceived?.Invoke(clientSession, pr);
 			}
 			catch (Exception e)
 			{
@@ -139,7 +138,6 @@ namespace CTS.Instance
 		{
 			_netManager.Stop();
 		}
-
 
 		public bool CheckToken(ClientToken token)
 		{
