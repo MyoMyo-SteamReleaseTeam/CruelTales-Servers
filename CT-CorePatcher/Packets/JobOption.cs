@@ -12,9 +12,15 @@ namespace CT.CorePatcher.Packets
 			return Path.GetFileNameWithoutExtension(XmlSourcePath) + ".cs";
 		}
 
-		public string GetServerTargetPath()
+		public string GetTargetPath()
 		{
 			return Path.Combine(OutputServerPath, GetFileNameWithExtension());
 		}
+	}
+
+	public class CodeGenOperation
+	{
+		public string GeneratedCode = string.Empty;
+		public string TargetPath = string.Empty;
 	}
 }

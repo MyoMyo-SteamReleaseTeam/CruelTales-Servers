@@ -122,6 +122,9 @@ namespace CT.CorePatcher.Packets
 				}
 			}
 
+			List<CodeGenOperation> operation = new List<CodeGenOperation>();
+			List<string> packetEnumNames = new List<string>();
+
 			foreach (var job in jobOptionList)
 			{
 				// Read packet files
@@ -136,48 +139,63 @@ namespace CT.CorePatcher.Packets
 				}
 				parser.Initialize();
 
-				List<string> packetEnumNames = new List<string>();
-
 				// Save generated packet schema code
 				try
 				{
 					parser.ParseFromXml(job.XmlSourcePath, out var generatedCode, out var pakcetNames);
 					packetEnumNames.AddRange(pakcetNames);
-					var serverPath = job.GetServerTargetPath();
-					var serverResult = FileHandler.TryWriteText(serverPath, generatedCode, true);
-					if (serverResult.ResultType == JobResultType.Success)
-					{
-						PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
-															  job.GetFileNameWithExtension(), serverPath);
-					}
-					else
-					{
-						throw serverResult.Exception;
-					}
+					var targetPath = job.GetTargetPath();
+					operation.Add(new CodeGenOperation()
+					{ 
+						GeneratedCode = generatedCode,
+						TargetPath = targetPath 
+					});
 				}
 				catch (Exception e)
 				{
 					PatcherConsole.PrintError(job.GetFileNameWithExtension(), e);
 				}
 
-				// Save packet enum code
-				string enumFileName = packetTypeName + ".cs";
-				try
-				{
-					var enumCode = CodeGenerator_Enumerate
-						.Generate(packetTypeName,
-								  baseNamespace,
-								  true, true,
-								  new List<string>(),
-								  packetEnumNames);
+			}
 
-					var enumServer = Path.Combine(outputServer, enumFileName);
-					FileHandler.TryWriteText(enumServer, enumCode, true);
-					PatcherConsole.PrintSaveSuccessResult("Generate enum code completed : ", enumFileName, enumServer);
-				}
-				catch (Exception e)
+			// Save packet enum code
+			string enumFileName = packetTypeName + ".cs";
+			try
+			{
+				var enumCode = CodeGenerator_Enumerate
+					.Generate(packetTypeName,
+								baseNamespace,
+								true, true,
+								new List<string>(),
+								packetEnumNames);
+
+				var enumServer = Path.Combine(outputServer, enumFileName);
+				operation.Add(new CodeGenOperation()
 				{
-					PatcherConsole.PrintError(enumFileName, e);
+					GeneratedCode = enumCode,
+					TargetPath = enumServer
+				});
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintError(enumFileName, e);
+			}
+
+			foreach (var op in operation)
+			{
+				var saveResult = FileHandler.TryWriteText(op.TargetPath, op.GeneratedCode, true);
+				string fileName = string.Empty;
+
+				if (saveResult.ResultType == JobResultType.Success)
+				{
+					fileName = Path.GetFileNameWithoutExtension(op.TargetPath) + ".cs";
+					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
+															fileName, op.TargetPath);
+				}
+				else
+				{
+					PatcherConsole.PrintError(fileName, saveResult.Exception);
+					return;
 				}
 			}
 		}

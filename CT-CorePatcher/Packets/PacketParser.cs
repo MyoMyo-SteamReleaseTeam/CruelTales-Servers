@@ -6,6 +6,7 @@ using System.Xml;
 using CT.CorePatcher.Exceptions;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
+using CT.Packets;
 
 namespace CT.CorePatcher.Packets
 {
@@ -132,7 +133,6 @@ namespace CT.CorePatcher.Packets
 			PacketDataType dataType = PacketHelper.GetPacketDataType(r);
 			string className = string.Empty;
 			string declaration = string.Empty;
-			string interfaceName = nameof(IPacketSerializable);
 			string dataTypeContent = string.Empty;
 			string memberContent = string.Empty;
 			List<MemberDefinitionToken> memberTokenList = new();
@@ -194,6 +194,12 @@ namespace CT.CorePatcher.Packets
 			int calcSerializeSize = 0;
 			string sizeExpression = string.Empty;
 
+			if (dataType == PacketDataType.ClientPacket ||
+				dataType == PacketDataType.ServerPacket)
+			{
+				calcSerializeSize += sizeof(ushort);
+			}
+
 			foreach (var m in memberTokenList)
 			{
 				string typeName = m.Type;
@@ -221,9 +227,19 @@ namespace CT.CorePatcher.Packets
 				sizeExpression += $" + {calcSerializeSize}";
 			}
 
-			sizeExpression = string.Format(PacketFormat.SerializeSize,
-										   nameof(IPacketSerializable.SerializeSize),
-										   sizeExpression);
+			if (dataType == PacketDataType.ClientPacket ||
+				dataType == PacketDataType.ServerPacket)
+			{
+				sizeExpression = string.Format(PacketFormat.PacketSerializeSize,
+											   nameof(IPacketSerializable.SerializeSize),
+											   sizeExpression);
+			}
+			else
+			{
+				sizeExpression = string.Format(PacketFormat.SerializeSize,
+											   nameof(IPacketSerializable.SerializeSize),
+											   sizeExpression);
+			}
 
 			// Generate serialization codes
 			string serializeFunction = string.Empty;
@@ -278,17 +294,35 @@ namespace CT.CorePatcher.Packets
 			serializeContent = addIndent(serializeContent);
 			deserializeContent = addIndent(deserializeContent);
 
-			serializeFunction = string.Format(PacketFormat.SerializeFunction,
-											  nameof(IPacketSerializable.Serialize),
-											  nameof(PacketWriter),
-											  WriterName,
-											  serializeContent);
+			if (dataType == PacketDataType.ClientPacket ||
+				dataType == PacketDataType.ServerPacket)
+			{
+				serializeFunction = string.Format(PacketFormat.PacketSerializeFunction,
+												  nameof(IPacketSerializable.Serialize),
+												  nameof(PacketWriter),
+												  WriterName,
+												  serializeContent);
 
-			deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
-											  nameof(IPacketSerializable.Deserialize),
-											  nameof(PacketReader),
-											  ReaderName,
-											  deserializeContent);
+				deserializeFunction = string.Format(PacketFormat.PacketDeserializeFunction,
+												  nameof(IPacketSerializable.Deserialize),
+												  nameof(PacketReader),
+												  ReaderName,
+												  deserializeContent);
+			}
+			else
+			{
+				serializeFunction = string.Format(PacketFormat.SerializeFunction,
+												  nameof(IPacketSerializable.Serialize),
+												  nameof(PacketWriter),
+												  WriterName,
+												  serializeContent);
+
+				deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
+												  nameof(IPacketSerializable.Deserialize),
+												  nameof(PacketReader),
+												  ReaderName,
+												  deserializeContent);
+			}
 
 			// Combine generated codes
 			var combineContent = dataTypeContent;
@@ -301,14 +335,37 @@ namespace CT.CorePatcher.Packets
 			serializeFunction = addIndent(serializeFunction);
 			deserializeFunction = addIndent(deserializeFunction);
 
-			content = string.Format(PacketFormat.DataTypeDefinition,
-									declaration,
-									className,
-									interfaceName,
-									combineContent,
-									sizeExpression,
-									serializeFunction,
-									deserializeFunction);
+			if (dataType == PacketDataType.ClientPacket ||
+				dataType == PacketDataType.ServerPacket)
+			{
+				string packetType = string.Format(PacketFormat.PacketTypeDeclaration,
+												  nameof(PacketType),
+												  nameof(PacketBase.PacketType),
+												  $"{nameof(PacketType)}.{className}");
+
+				packetType = addIndent(packetType);
+
+				content = string.Format(PacketFormat.PacketDataTypeDefinition,
+										declaration,
+										className,
+										nameof(PacketBase),
+										packetType,
+										combineContent,
+										sizeExpression,
+										serializeFunction,
+										deserializeFunction);
+			}
+			else
+			{
+				content = string.Format(PacketFormat.DataTypeDefinition,
+										declaration,
+										className,
+										nameof(IPacketSerializable),
+										combineContent,
+										sizeExpression,
+										serializeFunction,
+										deserializeFunction);
+			}
 
 			return className;
 		}

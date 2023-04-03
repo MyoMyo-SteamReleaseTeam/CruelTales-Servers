@@ -25,7 +25,7 @@ namespace {1}
 		/// <summary>
 		/// {0} partial or sealed and class or struct<br/>
 		/// {1} Name<br/>
-		/// {2} interface<br/>
+		/// {2} inherit<br/>
 		/// {3} Content<br/>
 		/// {4} SerializeSize<br/>
 		/// {5} SerializeFunction<br/>
@@ -41,6 +41,67 @@ namespace {1}
 {5}
 
 {6}
+}}";
+
+		/// <summary>
+		/// {0} PacketType enum name<br/>
+		/// {1} PacketType property name<br/>
+		/// {2} PacketType enum<br/>
+		/// </summary>
+		public static readonly string PacketTypeDeclaration = @"public override {0} {1} => {2};";
+
+		/// <summary>
+		/// {0} partial or sealed and class or struct<br/>
+		/// {1} Name<br/>
+		/// {2} inherit<br/>
+		/// {3} Packet Type <br/>
+		/// {4} Content<br/>
+		/// {5} SerializeSize<br/>
+		/// {6} SerializeFunction<br/>
+		/// {7} DeserializeFuntion<br/>
+		/// </summary>
+		public static readonly string PacketDataTypeDefinition =
+@"public {0} {1} : {2}
+{{
+{3}
+
+{4}
+
+{5}
+
+{6}
+
+{7}
+}}";
+
+		/// <summary>
+		/// {0} Size getter name<br/>
+		/// {1} Constant size or expression<br/>
+		/// </summary>
+		public static readonly string PacketSerializeSize = @"public override int {0} => {1};";
+
+		/// <summary>
+		/// {0} Serialize function signature<br/>
+		/// {1} Writer type name<br/>
+		/// {2} Writer argument name<br/>
+		/// {3} Content<br/>
+		/// </summary>
+		public static readonly string PacketSerializeFunction =
+@"public override void {0}({1} {2})
+{{
+{3}
+}}";
+
+		/// <summary>
+		/// {0} Deserialize function signature<br/>
+		/// {1} Reader type name<br/>
+		/// {2} Reader argument name<br/>
+		/// {3} Content<br/>
+		/// </summary>
+		public static readonly string PacketDeserializeFunction =
+@"public override void {0}({1} {2})
+{{
+{3}
 }}";
 
 		/// <summary>

@@ -21,22 +21,24 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class Client_TryConnect : IPacketSerializable
+	public sealed class Client_TryConnect : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Client_TryConnect;
+	
 		public ulong Id;
 		public NetStringShort Token;
 		public MatchEndpoint MatchTo = new();
 	
-		public int SerializeSize => Token.SerializeSize + MatchTo.SerializeSize + 8;
+		public override int SerializeSize => Token.SerializeSize + MatchTo.SerializeSize + 10;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(Id);
 			writer.Put(Token);
 			MatchTo.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			Id = reader.ReadUInt64();
 			Token = reader.ReadNetStringShort();
@@ -44,86 +46,96 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class Server_AckConnect : IPacketSerializable
+	public sealed class Server_AckConnect : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Server_AckConnect;
+	
 		public ConnectAck Result;
 	
-		public int SerializeSize =>  + 1;
+		public override int SerializeSize =>  + 3;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(Result);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			Result = reader.ReadConnectAck();
 		}
 	}
 	
-	public sealed class Client_TrySendUserProfile : IPacketSerializable
+	public sealed class Client_TrySendUserProfile : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Client_TrySendUserProfile;
+	
 		public UserProfile UserProfile = new();
 	
-		public int SerializeSize => UserProfile.SerializeSize;
+		public override int SerializeSize => UserProfile.SerializeSize + 2;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			UserProfile.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			UserProfile.Deserialize(reader);
 		}
 	}
 	
-	public sealed class Server_InitialWorldState : IPacketSerializable
+	public sealed class Server_InitialWorldState : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Server_InitialWorldState;
+	
 		public NetStringShort MiniGameName;
 	
-		public int SerializeSize => MiniGameName.SerializeSize;
+		public override int SerializeSize => MiniGameName.SerializeSize + 2;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(MiniGameName);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			MiniGameName = reader.ReadNetStringShort();
 		}
 	}
 	
-	public sealed class Server_SpawnEntities : IPacketSerializable
+	public sealed class Server_SpawnEntities : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Server_SpawnEntities;
+	
 		public NetArray<EntityPlayerState> SpawnedEntities = new NetArray<EntityPlayerState>();
 	
-		public int SerializeSize => SpawnedEntities.SerializeSize;
+		public override int SerializeSize => SpawnedEntities.SerializeSize + 2;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			SpawnedEntities.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			SpawnedEntities.Deserialize(reader);
 		}
 	}
 	
-	public sealed class Server_DespawnEntities : IPacketSerializable
+	public sealed class Server_DespawnEntities : PacketBase
 	{
+		public override PacketType PacketType => PacketType.Server_DespawnEntities;
+	
 		public NetFixedArray<NetEntityID> DespawnEntities = new NetFixedArray<NetEntityID>();
 	
-		public int SerializeSize => DespawnEntities.SerializeSize;
+		public override int SerializeSize => DespawnEntities.SerializeSize + 2;
 	
-		public void Serialize(PacketWriter writer)
+		public override void Serialize(PacketWriter writer)
 		{
 			DespawnEntities.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public override void Deserialize(PacketReader reader)
 		{
 			DespawnEntities.Deserialize(reader);
 		}

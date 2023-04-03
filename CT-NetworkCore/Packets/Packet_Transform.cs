@@ -1,4 +1,4 @@
-﻿using CT.Network.DataType;
+using CT.Network.DataType;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
