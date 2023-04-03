@@ -6,16 +6,21 @@ using System;
 using CTS.Instance;
 using CTS.Instance.Services;
 using System.Linq;
+using log4net;
+using CT.Network.DataType;
+using CT.Network.Serialization;
 
 namespace TestThreadManagement
 {
-	public class GameByParallel
+	public class GameInstanceManager
 	{
-		private ServerService _serverService;
+		private static ILog _log = LogManager.GetLogger(typeof(GameInstanceManager));
+
+		private ServerServices _serverService;
 		private TickTimer _serverTimer;
 
 		private float _framePerMs;
-		private readonly List<GameInstance> _games = new List<GameInstance>();
+		private readonly Dictionary<int, GameInstance> _gameInstanceById = new();
 		private readonly int _gameCount;
 		private float _sleepDiffMs = 0;
 		private int _maxSleepDiffMs = 0;
@@ -25,8 +30,7 @@ namespace TestThreadManagement
 		private readonly int _averageSample = 16;
 		private int _averageCounter = 0;
 
-
-		public GameByParallel(ServerService serverService, ServerOption serverOption)
+		public GameInstanceManager(ServerServices serverService, ServerOption serverOption)
 		{
 			_serverService = serverService;
 			_serverTimer = serverService.ServerTimer;
@@ -41,7 +45,8 @@ namespace TestThreadManagement
 			_gameCount = serverOption.GameCount;
 			for (int i = 0; i < _gameCount; i++)
 			{
-				_games.Add(new GameInstance(serverService, serverOption));
+				var instance = new GameInstance(serverOption);
+				_gameInstanceById.Add(instance.Id, instance);
 			}
 
 			for (int i = 0; i < _averageSample; i++)
@@ -62,12 +67,18 @@ namespace TestThreadManagement
 				lastTick = currentTick;
 
 				#region Update
-				var result = Parallel.ForEach(_games, (game) =>
+				foreach (var  game in _gameInstanceById.Values)
 				{
 					game.ReadPackets();
 					game.Update(deltaTime);
 					game.WritePackets();
-				});
+				}
+				//var result = Parallel.ForEach(_games, (game) =>
+				//{
+				//	game.ReadPackets();
+				//	game.Update(deltaTime);
+				//	game.WritePackets();
+				//});
 				#endregion
 
 				#region For Debug
@@ -80,22 +91,7 @@ namespace TestThreadManagement
 				}
 				#endregion
 
-				//bool forceContinue = false;
-				//while (true)
-				//{
-				//	int tickLeft = _framePerMs - ServerTimer.GetMsDeltaTime(currentTick);
-
-				//	if (tickLeft <= 0)
-				//	{
-				//		forceContinue = true;
-				//		break;
-				//	}
-				//}
-				//if (forceContinue)
-				//{
-				//	continue;
-				//}
-
+				#region Sleep
 				int deltaMs = (int)(deltaTime * 1000);
 
 				this._deltaAverage[_averageCounter++ % _averageSample] = deltaMs;
@@ -106,7 +102,7 @@ namespace TestThreadManagement
 
 				//if (deltaMs >= _framePerMs)
 				{
-					Console.WriteLine(
+					_log.Info(
 						$"delta: {deltaMs:F2}\tAveDel: {average:F2}\tts: {timespent:F2}\t" +
 						$"left: {msLeft:F2}\tDiff : {_sleepDiffMs:F2}\tsleep: {(int)(msLeft - _sleepDiffMs):F2}");
 				}
@@ -133,12 +129,21 @@ namespace TestThreadManagement
 						//_sleepDiffMs -= 3;
 					}
 				}
+				#endregion
 			}
 		}
 
 		public void PrintCollecitonCount()
 		{
-			Console.WriteLine($"[Gen 0 : {GC.CollectionCount(0).ToString()}][Gen 1 : {GC.CollectionCount(1).ToString()}][Gen 2 : {GC.CollectionCount(2)}]");
+			_log.Info($"[Gen 0 : {GC.CollectionCount(0).ToString()}][Gen 1 : {GC.CollectionCount(1).ToString()}][Gen 2 : {GC.CollectionCount(2)}]");
+		}
+
+		public void OnReceivePacket(int instanceNumber, ClientToken clientToken, PacketReader reader)
+		{
+			//if (_gameInstanceById.TryGetValue(instanceNumber, out var instance))
+			//{
+			//	instance.
+			//}
 		}
 	}
 }

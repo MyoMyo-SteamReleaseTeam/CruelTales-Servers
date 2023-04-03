@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using CT.Network.Core;
+using CT.Network.DataType;
+using CT.Network.Serialization;
+using CT.Tools.Collections;
 
 namespace CTS.Instance.Gameplay
 {
@@ -61,7 +65,10 @@ namespace CTS.Instance.Gameplay
 
 	public class GameInstance
 	{
-		private ServerService _serverService;
+		private static int IdCounter = 1;
+		public int Id { get; private set; }
+
+		private BidirectionalMap<ClientToken, NetSession> _session;
 
 		private List<Enemy> _enemies = new();
 		private int MaxEnemySize = 100;
@@ -77,9 +84,10 @@ namespace CTS.Instance.Gameplay
 		private readonly Random _random = new Random();
 		private int _randomStressFactor = 70;
 
-		public GameInstance(ServerService serverService, ServerOption serverOption)
+		public GameInstance(ServerOption serverOption)
 		{
-			_serverService = serverService;
+			Id = IdCounter++;
+
 			_userCount = serverOption.UserCount;
 
 			_updateStress = serverOption.UpdateStress * _userCount;
@@ -156,6 +164,11 @@ namespace CTS.Instance.Gameplay
 					_sendBuffer[i] = (byte)(i % 256);
 				}
 			}
+		}
+
+		public void OnPacketRecevied(ClientToken token, PacketReader reader)
+		{
+
 		}
 	}
 }

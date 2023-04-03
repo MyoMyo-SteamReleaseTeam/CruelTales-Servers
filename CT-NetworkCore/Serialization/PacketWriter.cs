@@ -10,6 +10,7 @@ namespace CT.Network.Serialization
 	{
 		private PacketSegment _packet;
 		private ArraySegment<byte> _buffer;
+		public ArraySegment<byte> Buffer => _buffer;
 
 		public int Position { get; private set; }
 		public int Capacity => _packet.Capacity;
