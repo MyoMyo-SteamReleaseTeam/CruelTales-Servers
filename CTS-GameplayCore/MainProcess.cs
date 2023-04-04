@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Versioning;
 using CT.Tools.GetOpt;
+using CTS.Instance.Networks;
 using CTS.Instance.Services;
 using log4net;
 
@@ -26,8 +27,8 @@ namespace CTS.Instance
 			_log.Info("Create services");
 
 			ServerOption serverOption = new ServerOption();
-			NetworkService networkService = new NetworkService(serverOption);
 			TickTimer tickTimer = new TickTimer();
+			NetworkService networkService = new(serverOption, tickTimer);
 
 			// Read process option
 			_log.Info("Read process options");

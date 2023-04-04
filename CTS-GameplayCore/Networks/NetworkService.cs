@@ -1,37 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading;
 using CT.Network.Core;
 using CT.Network.DataType;
 using CT.Network.Serialization;
-using CT.Tools.Collections;
+using CTS.Instance.Services;
 using LiteNetLib;
 using log4net;
 
-namespace CTS.Instance
+namespace CTS.Instance.Networks
 {
-	public class SessionHandler
-	{
-		private BidirectionalMap<int, ClientToken> _tokenByPeerId = new();
-		private Dictionary<ClientToken, NetSession> _sessionByToken = new();
-		private Dictionary<int, NetPeer> _peerByPeerId = new();
-		public int SessionCount => _tokenByPeerId.Count;
-
-		public void AddNewPeer(NetPeer peer)
-		{
-			_peerByPeerId.Add(peer.Id, peer);
-		}
-
-		public void RemovePeer(NetPeer peer)
-		{
-			//_peerByPeerId.ContainsKey()
-		}
-
-		public bool IsValidToken()
-		{
-			return true;
-		}
-	}
-
 	public class NetworkService
 	{
 		// Log
@@ -43,21 +20,23 @@ namespace CTS.Instance
 
 		// Session
 		private SessionHandler _sessionHandler = new();
+		private WaitingPeerHandler _waitingPeerHandler;
 
 		// Events
-		public event Action<NetSession, PacketReader>? OnPacketReceived;
-		public event Action<NetSession>? OnSessionConnected;
+		public event Action<NetClientSession, PacketReader>? OnPacketReceived;
+		public event Action<NetClientSession>? OnSessionConnected;
 
-		public NetworkService(ServerOption serverOption)
+		public NetworkService(ServerOption serverOption, TickTimer serverTimer)
 		{
 			// Manager
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
+			_waitingPeerHandler = new WaitingPeerHandler(serverTimer);
 
 			// Events
 			_listener.ConnectionRequestEvent += onConnectionRequestEvent;
-			_listener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_listener.PeerConnectedEvent += onPeerConnectedEvent;
+			_listener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_listener.NetworkReceiveEvent += onNetworkReceiveEvent;
 		}
 
@@ -65,6 +44,10 @@ namespace CTS.Instance
 		{
 			_log.Info($"Start network service");
 			_netManager.Start(port: serverPort);
+
+			Thread t = new Thread(_waitingPeerHandler.Run);
+			t.IsBackground = true;
+			t.Start();
 		}
 
 		public void PollEvents()
@@ -101,14 +84,14 @@ namespace CTS.Instance
 
 		private void onPeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
 		{
-			_log.Info($"[UserCount:{_sessionHandler.SessionCount}] Client disconnect {peer.EndPoint.ToString()}");
 			_sessionHandler.RemovePeer(peer);
+			_log.Info($"[UserCount:{_sessionHandler.SessionCount}] Client disconnect {peer.EndPoint.ToString()}");
 		}
 
 		private void onPeerConnectedEvent(NetPeer peer)
 		{
+			_waitingPeerHandler.AddNewWaitingPeer(peer);
 			_log.Info($"[UserCount:{_sessionHandler.SessionCount}] Client connect from {peer.EndPoint.ToString()}");
-			_sessionHandler.AddNewPeer(peer);
 		}
 
 		/// <summary>클라이언트의 연결 요청시 호출됩니다.</summary>
@@ -119,7 +102,7 @@ namespace CTS.Instance
 			if (IsAvailable())
 			{
 				_log.Info($"Connection request from {request.RemoteEndPoint.ToString()}");
-				request.AcceptIfKey("CTMatchmakingTestServer"); // TODO: version check
+				request.AcceptIfKey("TestServer"); // TODO: version check
 			}
 			else
 			{

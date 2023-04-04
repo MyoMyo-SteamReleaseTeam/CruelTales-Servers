@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using CTS.Instance.Gameplay;
+using CTS.Instance.Networks;
 using CTS.Instance.Services;
 using log4net;
 
@@ -8,16 +9,17 @@ namespace CTS.Instance
 {
 	public class GameplayServer : FrameRunner
 	{
+		private readonly ServerOption _serverOption;
 		private readonly NetworkService _networkService;
 		private readonly GameInstanceManager _gameInstanceManager;
 
 		public GameplayServer(ServerOption serverOption,
 							  NetworkService networkService,
 							  TickTimer tickTimer)
-			: base(serverOption, 
-				   tickTimer, 
+			: base(serverOption.FramePerMs, tickTimer, 
 				   LogManager.GetLogger(typeof(GameplayServer)))
 		{
+			_serverOption = serverOption;
 			_networkService = networkService;
 			_gameInstanceManager = new(serverOption, tickTimer);
 		}

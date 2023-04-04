@@ -9,8 +9,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <AssemblyAttribute Include="log4net.Config.XmlConfigurator">
+	    <ConfigFile>log4net.config</ConfigFile>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

@@ -1,17 +1,17 @@
 ﻿using CT.Network.Serialization;
-using CTS.Instance;
 using CTS.Instance.Gameplay;
+using CTS.Instance.Networks;
 using LiteNetLib;
 
 namespace CT.Network.Core
 {
-	public class NetSession
+	public class NetClientSession
 	{
 		public GameInstance? CurrentInstance { get; private set; }
 		private NetworkService _netService;
 		private int _peerId;
 
-		public NetSession(NetworkService netService)
+		public NetClientSession(NetworkService netService)
 		{
 			_netService = netService;
 		}

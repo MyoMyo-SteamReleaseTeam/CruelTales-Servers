@@ -9,17 +9,20 @@ namespace CTS.Instance
 {
 	public abstract class FrameRunner
 	{
+		public bool IsRunning { get; private set; } = false;
+		public int FramePerMs { get; private set; }
+
 		protected ILog _log;
 		protected readonly TickTimer _tickTimer;
-		protected readonly ServerOption _serverOption;
 
 		private List<float> _deltaAverage = new List<float>();
 		private readonly int _averageSample = 16;
 		private int _averageCounter = 0;
+		private bool _shouldStop = false;
 
-		public FrameRunner(ServerOption serverOption, TickTimer tickTimer, ILog logger)
+		public FrameRunner(int famePerMs, TickTimer tickTimer, ILog logger)
 		{
-			_serverOption = serverOption;
+			FramePerMs = famePerMs;
 			_tickTimer = tickTimer;
 			_log = logger;
 
@@ -33,10 +36,17 @@ namespace CTS.Instance
 
 		public void Run()
 		{
+			IsRunning = true;
 			long lastTick = 0;
 
 			while (true)
 			{
+				if (_shouldStop)
+				{
+					IsRunning = false;
+					break;
+				}
+
 				// Set ticks
 				long currentTick = _tickTimer.CurrentTick;
 				float deltaTimeSec = _tickTimer.GetSecDeltaTime_Float(currentTick, lastTick);
@@ -47,26 +57,31 @@ namespace CTS.Instance
 
 				// Calculate sleep time
 				float currentTimespent = _tickTimer.GetMsDeltaTime_Float(currentTick);
-				float sleepTimeDistance = _serverOption.FramePerMs - currentTimespent;
+				float sleepTimeDistance = FramePerMs - currentTimespent;
 
-				#region Debug
-				this._deltaAverage[_averageCounter++ % _averageSample] = deltaTimeSec;
+				//#region Debug
+				//this._deltaAverage[_averageCounter++ % _averageSample] = deltaTimeSec;
 
-				//if (deltaMs >= _serverOption.FramePerMs)
-				{
-					Console.WriteLine(
-						$"delta: {deltaTimeSec * 1000:F2}\t" +
-						$"AveDel: {_deltaAverage.Average() * 1000:F2}\t" +
-						$"TimeSpand: {currentTimespent:F2}\t" +
-						$"SleepTime: {sleepTimeDistance:F2}\t");
-				}
-				#endregion
+				//if (deltaTimeSec * 1000 >= FramePerMs)
+				//{
+				//	Console.WriteLine(
+				//		$"delta: {deltaTimeSec * 1000:F2}\t" +
+				//		$"AveDel: {_deltaAverage.Average() * 1000:F2}\t" +
+				//		$"TimeSpand: {currentTimespent:F2}\t" +
+				//		$"SleepTime: {sleepTimeDistance:F2}\t");
+				//}
+				//#endregion
 
 				if (sleepTimeDistance > 0)
 				{
 					Thread.Sleep((int)sleepTimeDistance);
 				}
 			}
+		}
+
+		public void Suspend()
+		{
+			_shouldStop = true;
 		}
 	}
 }
