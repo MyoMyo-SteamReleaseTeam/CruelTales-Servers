@@ -12,6 +12,7 @@ namespace CTS.Instance.Gameplay
 		private static int IdCounter = 1;
 		public int Id { get; private set; }
 
+		private object _sessionLock = new object();
 		private BidirectionalMap<ClientToken, NetSession> _clientSessionByToken = new();
 		public int SessionCount => _clientSessionByToken.Count;
 
@@ -23,12 +24,18 @@ namespace CTS.Instance.Gameplay
 
 		public void OnConnected(ClientToken token, NetSession session)
 		{
-			_clientSessionByToken.TryAdd(token, session);
+			lock (_sessionLock)
+			{
+				_clientSessionByToken.TryAdd(token, session);
+			}
 		}
 
 		public void Disconnect(NetSession session)
 		{
-			_clientSessionByToken.TryRemove(session);
+			lock (_sessionLock)
+			{
+				_clientSessionByToken.TryRemove(session);
+			}
 		}
 
 		public void Update(float delta)

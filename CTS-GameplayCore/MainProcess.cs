@@ -45,6 +45,8 @@ namespace CTS.Instance
 
 			GameplayServer server = new(serverOption, networkService, tickTimer);
 			server.Start();
+
+			_log.Info($"Start game server!");
 		}
 	}
 }
