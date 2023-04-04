@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Runtime.InteropServices;
+using CT.Network.Core;
 using CTS.Instance.Services;
 using LiteNetLib;
 using log4net;
@@ -18,6 +21,32 @@ namespace CTS.Instance.Networks
 			PeerId = Peer.Id;
 			ConnectTime = connectTime;
 		}
+
+		public ulong GetHashCodeByIpPort()
+		{
+			return WaitingSession.GetHashCodeByIpPort(Peer);
+		}
+
+		[StructLayout(LayoutKind.Explicit)]
+		readonly struct EndpointHashHelper
+		{
+			[FieldOffset(0)] public readonly ulong EndpointHash;
+			[FieldOffset(0)] public readonly int IpEndpointHash;
+			[FieldOffset(4)] public readonly int Value;
+
+			public EndpointHashHelper(int ipEndPointHash, int value)
+			{
+				IpEndpointHash = ipEndPointHash;
+				Value = value;
+			}
+		}
+
+		public static ulong GetHashCodeByIpPort(NetPeer peer)
+		{
+			int endPointHash = peer.EndPoint.GetHashCode();
+			EndpointHashHelper hashHelper = new(endPointHash, peer.Id);
+			return hashHelper.EndpointHash;
+		}
 	}
 
 	public class WaitingPeerHandler : FrameRunner
@@ -25,18 +54,20 @@ namespace CTS.Instance.Networks
 		// Waiting Session
 		public const int WAITING_TIMEOUT_SEC = 5;
 		public readonly TimeSpan WAITING_TIMEOUT = new TimeSpan(0, 0, 0, WAITING_TIMEOUT_SEC);
-		public object _waitingLock = new object();
-		private List<WaitingSession> _waitingSessions = new();
 		public int WaitingSessionCount
 		{
 			get
 			{
 				lock (_waitingLock)
 				{
-					return _waitingSessions.Count;
+					return _waitingSessionByHash.Count;
 				}
 			}
 		}
+		private readonly object _waitingLock = new object();
+
+		private readonly Dictionary<ulong, WaitingSession> _waitingSessionByHash = new();
+		private readonly List<ulong> _kickSessionHashList = new();
 
 		public WaitingPeerHandler(TickTimer serverTimer) 
 			: base(WAITING_TIMEOUT_SEC * 900, serverTimer,
@@ -49,7 +80,18 @@ namespace CTS.Instance.Networks
 		{
 			lock (_waitingLock)
 			{
-				_waitingSessions.Add(new WaitingSession(peer, DateTime.UtcNow));
+				WaitingSession ws = new WaitingSession(peer, DateTime.UtcNow);
+				ulong peerHashCode = ws.GetHashCodeByIpPort();
+				if (_waitingSessionByHash.ContainsKey(peerHashCode))
+				{
+					_log.Fatal($"Peer {peer.EndPoint} already waiting in waiting queue!\n" +
+						$"Disconnect peer and remove from waiting queue!");
+					peer.Disconnect();
+					_waitingSessionByHash.Remove(peerHashCode);
+					return;
+				}
+
+				_waitingSessionByHash.Add(peerHashCode, ws);
 			}
 		}
 
@@ -59,42 +101,42 @@ namespace CTS.Instance.Networks
 			{
 				DateTime currentTime = DateTime.UtcNow;
 
-				for (int i = _waitingSessions.Count - 1; i >= 0; i--)
+				foreach (var currentPeer in _waitingSessionByHash.Values)
 				{
-					var currentPeer = _waitingSessions[i];
 					var elapsed = currentTime - currentPeer.ConnectTime;
 					if (elapsed < WAITING_TIMEOUT)
 					{
 						continue;
 					}
 
-					_waitingSessions.RemoveAt(i);
-					currentPeer.Peer.Disconnect();
+					_kickSessionHashList.Add(currentPeer.GetHashCodeByIpPort());
 				}
-			}
-		}
 
-		[Obsolete("For test")]
-		public void RemoveWaitingPeer(NetPeer peer)
-		{
-			lock (_waitingLock)
-			{
-				int count = _waitingSessions.Count;
-				for (int i = 0; i < count; i++)
+				int kickCount = _kickSessionHashList.Count;
+				for (int i = 0; i < kickCount; i++)
 				{
-					if (_waitingSessions[i].PeerId == peer.Id)
+					ulong kickPeerHash = _kickSessionHashList[i];
+					if (!_waitingSessionByHash.TryGetValue(kickPeerHash, out var kickSession))
 					{
-						_waitingSessions.RemoveAt(i);
-						return;
+						_log.Fatal($"There is no session to kick! Session hash code : {kickPeerHash}");
+						continue;
 					}
+
+					kickSession.Peer.Disconnect();
+					_waitingSessionByHash.Remove(kickPeerHash);
 				}
+
+				_kickSessionHashList.Clear();
 			}
 		}
 
 		protected override void OnUpdate(float deltaTime)
 		{
-			_log.Info("Try tick timout waiting peer...");
 			KickTimeoutWaitingPeer();
+			if (this.WaitingSessionCount > 0)
+			{
+				_log.Info($"Current waiting user count : {this.WaitingSessionCount}");
+			}
 		}
 	}
 }

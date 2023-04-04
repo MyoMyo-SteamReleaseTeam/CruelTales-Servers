@@ -6,79 +6,43 @@ using log4net;
 
 namespace CTC.DummyClient
 {
-	public class DummyClientNetworkManager
-	{
-		private static ILog _log = LogManager.GetLogger(typeof(DummyClientNetworkManager));
-
-		private EventBasedNetListener _listener;
-		private NetManager _netManager;
-
-		public DummyClientNetworkManager()
-		{
-			_listener = new EventBasedNetListener();
-			_netManager = new NetManager(_listener);
-
-			_listener.NetworkReceiveEvent += OnReceived;
-			_listener.PeerConnectedEvent += OnConnected;
-			_listener.PeerDisconnectedEvent += OnDisconnected;
-		}
-
-		public void Start()
-		{
-			_netManager.Start();
-		}
-
-		public void TryConnect(string address, int port)
-		{
-			_netManager.Connect(address, port, "TestServer");
-		}
-
-		private void OnConnected(NetPeer peer)
-		{
-			_log.Info($"Success to connect to the server. Server endpoint : {peer.EndPoint}");
-		}
-
-		private void OnDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-		{
-			_log.Warn($"Disconnected from the server. Disconnect reason : {disconnectInfo.Reason}");
-		}
-
-		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
-		{
-			_log.Info($"Packet received. Size : {reader.UserDataSize}");
-		}
-
-		public void PollEvents()
-		{
-			_netManager.PollEvents();
-		}
-	}
-
 	internal class MainProcess
 	{
 		public static readonly string ServerIp = "127.0.0.1";
 		public static readonly int ServerPort = 60128;
 		public static ILog _log = LogManager.GetLogger(typeof(MainProcess));
 
+		private static int _dummyClientBindPort = 40000;
+
 		static void Main(string[] args)
 		{
-			Thread t = new Thread(Start);
-			t.IsBackground = false;
-			t.Start();
+			for (int i = 5; i >= 0; i--)
+			{
+				_log.Info($"Start dummy client test in {i}");
+				Thread.Sleep(1000);
+			}
+
+			for (int i = 0; i < 100; i++)
+			{
+				Thread t = new Thread(Start);
+				t.IsBackground = false;
+				t.Start();
+				Thread.Sleep(1);
+			}
 		}
 
 		public static void Start()
 		{
-			_log.Info("Start Dummy Client");
 			DummyClientNetworkManager session = new DummyClientNetworkManager();
-			session.Start();
+			Interlocked.Increment(ref _dummyClientBindPort);
+			session.Start(_dummyClientBindPort);
 			session.TryConnect(ServerIp, ServerPort);
-			_log.Info($"Try connect {ServerIp}:{ServerPort}");
+			_log.Info($"Bind Port : {_dummyClientBindPort} / Try connect {ServerIp}:{ServerPort}");
 
 			while (true)
 			{
 				session.PollEvents();
-				Thread.Sleep(16);
+				Thread.Sleep(200);
 			}
 		}
 
@@ -102,7 +66,5 @@ namespace CTC.DummyClient
 
 			client.Stop();
 		}
-
-
 	}
 }
