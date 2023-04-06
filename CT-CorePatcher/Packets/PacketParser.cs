@@ -248,6 +248,14 @@ namespace CT.CorePatcher.Packets
 			string serializeContent = string.Empty;
 			string deserializeContent = string.Empty;
 
+			if (dataType == PacketDataType.ClientPacket ||
+				dataType == PacketDataType.ServerPacket)
+			{
+				serializeContent += string.Format(PacketFormat.MemberSerializeByWriter,
+												  nameof(PacketBase.PacketType));
+				serializeContent += NewLine;
+			}
+
 			for (int i = 0; i < memberTokenList.Count; i++)
 			{
 				var m = memberTokenList[i];

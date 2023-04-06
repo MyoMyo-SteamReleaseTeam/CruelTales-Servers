@@ -127,7 +127,6 @@ namespace CT.Tools.GetOpt
 					if (op != null)
 					{
 						result.Add(op);
-						op = null;
 					}
 
 					int level = 0;

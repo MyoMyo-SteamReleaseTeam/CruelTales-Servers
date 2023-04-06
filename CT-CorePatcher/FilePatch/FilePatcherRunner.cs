@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using CT.Tools.GetOpt;
-
-namespace CT.CorePatcher.FilePatch
+﻿namespace CT.CorePatcher.FilePatch
 {
 	public class FilePatcherRunner
 	{
