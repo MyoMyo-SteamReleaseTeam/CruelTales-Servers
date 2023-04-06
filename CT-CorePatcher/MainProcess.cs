@@ -1,57 +1,96 @@
-﻿using CT.CorePatcher.FilePatch;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using CT.CorePatcher.FilePatch;
 using CT.CorePatcher.Packets;
+using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher
 {
+	public static class OptionParserExtension
+	{
+		public static bool TryApplyArguments(this OptionParser op, string[] args)
+		{
+			try
+			{
+				op.OnArguments(args);
+				return true;
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintError(e.GetType().Name);
+				Console.WriteLine();
+				PatcherConsole.PrintError(e.Message);
+				return false;
+			}
+		}
+	}
+
 	internal class MainProcess
 	{
 		public static void Main(string[] args)
 		{
-			args = new string[]
-			{
-				// Packet Generator
-				$"--{PacketGenerator.XML_PATH} \"../../../../CT-NetworkCore/PacketDefinition/\"",
-				$"--{PacketGenerator.OUTPUT_SERVER} \"../../../../CT-NetworkCore/Packets/\"",
-				$"-{PacketGenerator.PACKET_TYPE_NAME} PacketType",
-				$"-{PacketGenerator.BASE_NAMESPACE} CT.Packets",
-			};
-			
+			// Run packet generator
 			if (PacketGenerator.Run(args) == false)
 			{
 				PatcherConsole.PrintError($"{nameof(PacketGenerator)} error!");
 				return;
 			}
 
-			args = new string[]
+			// Check copy count
+			StringArgument patchCountArg = new();
+			OptionParser filePatchOp = new OptionParser();
+			OptionParser.BindArgument(filePatchOp, "patchCount", 2, patchCountArg);
+			if (!filePatchOp.TryApplyArguments(args))
 			{
-				// FilePatcher
-				$"--{FilePatcherRunner.ORIGIN_PATH} \"../../../../CT-NetworkCore\"",
-				$"--{FilePatcherRunner.TARGET_PATH} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-NetworkCore",
-				$"-{FilePatcherRunner.GUARD_EXTENSION} .asmdef",
-				$"-{FilePatcherRunner.INCLUDE_EXTENSION} .cs .xml .meta",
-				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build Legacy",
-			};
-
-			if (FilePatcherRunner.Run(args) == false)
-			{
-				PatcherConsole.PrintError($"{nameof(FilePatcherRunner)} error! Project : CT-NetworkCore");
+				PatcherConsole.PrintError($"Copy count argument parse error!");
 				return;
 			}
 
-			args = new string[]
+			if (!int.TryParse(patchCountArg.Argument, out int patchCount))
 			{
-				// FilePatcher
-				$"--{FilePatcherRunner.ORIGIN_PATH} \"../../../../CT-Tools\"",
-				$"--{FilePatcherRunner.TARGET_PATH} \"../../../../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-Tools",
-				$"-{FilePatcherRunner.GUARD_EXTENSION} .asmdef",
-				$"-{FilePatcherRunner.INCLUDE_EXTENSION} .cs .xml .meta",
-				$"-{FilePatcherRunner.EXCLUDE_FOLDER} obj bin debug build Legacy",
-			};
-
-			if (FilePatcherRunner.Run(args) == false)
+				PatcherConsole.PrintError($"Copy count parse error! Argument : {patchCountArg.Argument}");
+			}
+			if (patchCount < 0)
 			{
-				PatcherConsole.PrintError($"{nameof(FilePatcherRunner)} error! Project : CT-Tools");
+				PatcherConsole.PrintWarm($"Zero copy count!");
 				return;
+			}
+
+			List<StringArgument> sourcePathList = new();
+			List<StringArgument> targetPathList = new();
+
+			OptionParser op = new OptionParser();
+			for (int i = 0; i < patchCount; i++)
+			{
+				sourcePathList.Add(new StringArgument());
+				targetPathList.Add(new StringArgument());
+
+				OptionParser.BindArgument(op, $"source_{i}", 2, sourcePathList[i]);
+				OptionParser.BindArgument(op, $"target_{i}", 2, targetPathList[i]);
+			}
+			if (!op.TryApplyArguments(args))
+			{
+				return;
+			}
+
+			Console.WriteLine($"Patch count : {patchCount}");
+
+			for (int i = 0; i < patchCount; i++)
+			{
+				string source = sourcePathList[i].Argument;
+				string target = targetPathList[i].Argument;
+
+				Console.WriteLine($"Patch from : {source}");
+				Console.WriteLine($"Patch to   : {target}");
+
+				if (!FilePatcherRunner.Run(source, target))
+				{
+					PatcherConsole.PrintError($"{nameof(FilePatcherRunner)} error!");
+					PatcherConsole.PrintError($"Project source : {source}");
+					PatcherConsole.PrintError($"Project target : {target}");
+					return;
+				}
 			}
 		}
 	}

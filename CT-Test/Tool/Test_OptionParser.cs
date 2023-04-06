@@ -20,7 +20,7 @@ namespace CT.Test.Tool
 		public void OptionParser_Single()
 		{
 			ParameterTest pt = new ParameterTest();
-			string argument = "-f-m -o path1 path2.abc path3/cc -c--level2 level2Param";
+			string argument = "-f -m -o path1 path2.abc path3/cc -c --level2 level2Param";
 			var options = new OptionParser();
 			options.RegisterEvent("f", 1, (e) => pt.Param_f = 10);
 			options.RegisterEvent("m", 1, (e) => pt.Param_m = 20);
@@ -48,12 +48,12 @@ namespace CT.Test.Tool
 			ParameterTest pt = new ParameterTest();
 			string[] args = new string[]
 			{
-				"-f-m",
+				"-f -m",
 				"-o",
 				"path1",
 				"path2.abc",
 				"path3/cc",
-				"-c--level2",
+				"-c --level2",
 				"level2Param"
 			};
 			var options = new OptionParser();
@@ -75,6 +75,25 @@ namespace CT.Test.Tool
 			Assert.AreEqual("path3/cc", pt.Param_o[2]);
 
 			Assert.AreEqual("level2Param", pt.Param_level2);
+		}
+
+		[TestMethod]
+		public void OptionParser_HyphenSimbol()
+		{
+			ParameterTest pt = new ParameterTest();
+			string[] args = new string[]
+			{
+				"--level2",
+				"hyphen-value",
+				"2"
+			};
+			var options = new OptionParser();
+			options.RegisterEvent("level2", 2, (e) => pt.Param_level2 = e[0]);
+			options.RegisterEvent("level2", 2, (e) => pt.Param_c = int.Parse(e[1]));
+			options.OnArguments(args);
+
+			Assert.AreEqual("hyphen-value", pt.Param_level2);
+			Assert.AreEqual(2, pt.Param_c);
 		}
 
 		[TestMethod]

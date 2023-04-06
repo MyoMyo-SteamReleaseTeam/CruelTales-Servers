@@ -44,6 +44,13 @@ namespace CT.CorePatcher
 			Console.ResetColor();
 		}
 
+		public static void PrintWarm(string warmMessage)
+		{
+			ConsoleHelper.SetColor(ConsoleColor.Black, ConsoleColor.DarkYellow);
+			Console.WriteLine(warmMessage);
+			Console.ResetColor();
+		}
+
 		public static void PrintException(Exception e)
 		{
 			PrintSeparator();

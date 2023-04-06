@@ -14,7 +14,7 @@ namespace CT.CorePatcher.Packets
 	{
 		public const string BASE_NAMESPACE = $@"baseNamespace";
 		public const string PACKET_TYPE_NAME = $@"packetTypeName";
-		public const string XML_PATH = @$"xmlpath";
+		public const string XML_PATH = @$"xmlPath";
 		public const string OUTPUT_SERVER = @$"outputServer";
 
 		public static bool Run(string[] args)
@@ -30,19 +30,12 @@ namespace CT.CorePatcher.Packets
 
 			// Parse options
 			OptionParser op = new OptionParser();
-			op.BindArgument(op, XML_PATH, 2, xmlPath);
-			op.BindArgument(op, OUTPUT_SERVER, 2, outputServer);
-			op.BindArgument(op, PACKET_TYPE_NAME, 1, packetTypeName);
-			op.BindArgument(op, BASE_NAMESPACE, 1, baseNamespace);
-			try
+			OptionParser.BindArgument(op, XML_PATH, 2, xmlPath);
+			OptionParser.BindArgument(op, OUTPUT_SERVER, 2, outputServer);
+			OptionParser.BindArgument(op, PACKET_TYPE_NAME, 1, packetTypeName);
+			OptionParser.BindArgument(op, BASE_NAMESPACE, 1, baseNamespace);
+			if (!op.TryApplyArguments(args))
 			{
-				op.OnArguments(args);
-			}
-			catch (Exception e)
-			{
-				PatcherConsole.PrintError(e.GetType().Name);
-				Console.WriteLine();
-				PatcherConsole.PrintError(e.Message);
 				return false;
 			}
 
@@ -71,8 +64,8 @@ namespace CT.CorePatcher.Packets
 			ConsoleHelper.WriteLine(xmlPath.Argument, ConsoleColor.White, ConsoleColor.DarkBlue);
 			Console.Write($"Output path : ");
 			ConsoleHelper.WriteLine(outputServer.Argument, ConsoleColor.White, ConsoleColor.DarkBlue);
-			Console.WriteLine($"Packet Type Name : {packetTypeName}");
-			Console.WriteLine($"Base Namespace: {baseNamespace}");
+			Console.WriteLine($"Packet Type Name : {packetTypeName.Argument}");
+			Console.WriteLine($"Base Namespace: {baseNamespace.Argument}");
 			PatcherConsole.PrintSeparator();
 
 			// Start generate packet codes

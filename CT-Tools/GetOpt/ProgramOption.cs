@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CT.Tools.GetOpt
 {
-	internal class ProgramOption : IEnumerable<string>
+	public class ProgramOption : IEnumerable<string>
 	{
 		public string Name { get; private set; } = string.Empty;
 		public int Level { get; private set; }

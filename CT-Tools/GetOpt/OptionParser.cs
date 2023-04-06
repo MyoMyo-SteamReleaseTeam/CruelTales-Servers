@@ -57,7 +57,7 @@ namespace CT.Tools.GetOpt
 
 		public void OnArguments(string[] args)
 		{
-			var programOption = parse(args);
+			var programOption = Parse(args);
 		
 			foreach (var e in _optionEvents)
 			{
@@ -69,7 +69,7 @@ namespace CT.Tools.GetOpt
 			}
 		}
 
-		public void BindArgument(OptionParser parser, string argumentName,
+		public static void BindArgument(OptionParser parser, string argumentName,
 								 int level, StringArgument value)
 		{
 			parser.RegisterEvent(argumentName, level, (options) =>
@@ -98,116 +98,64 @@ namespace CT.Tools.GetOpt
 			return sb.ToString();
 		}
 
-		private static ICollection<ProgramOption> parse(string argument)
+		public static ICollection<ProgramOption> Parse(string argument)
 		{
-			return parse(new string[] { argument });
+			return Parse(new string[] { argument });
 		}
 
-		private static ICollection<ProgramOption> parse(string[] inputArgs)
+		public static ICollection<ProgramOption> Parse(string[] inputArgs)
 		{
-			List<ValueTuple<string, int>> args = new();
-			foreach (var segment in inputArgs)
+			List<ProgramOption> result = new();
+			ProgramOption? op = null;
+
+			List<string> arguments = new List<string>();
+			foreach (var s in inputArgs)
 			{
-				args.AddRange(parseSegmentToArgs(segment));
+				arguments.AddRange(s.Split(' '));
 			}
 
-			List<ProgramOption> options = new();
-
-			ProgramOption? opt = null;
-			for (int i = 0; i < args.Count; i++)
+			for (int i = 0; i < arguments.Count; i++)
 			{
-				var value = args[i];
-
-				// Option parameter
-				if (value.Item2 == 0)
+				string arg = arguments[i].Trim();
+				if (string.IsNullOrEmpty(arg))
 				{
-					opt?.AddParameter(value.Item1);
 					continue;
 				}
 
-				if (opt != null)
+				if (arg[0] == '-')
 				{
-					options.Add(opt);
-				}
-
-				opt = new ProgramOption();
-
-				// Option with level
-				opt.SetOption(value.Item1, value.Item2);
-			}
-
-			if (opt != null)
-			{
-				options.Add(opt);
-			}
-
-			return options;
-		}
-
-		private static ICollection<ValueTuple<string, int>> parseSegmentToArgs(string segment)
-		{
-			List<ValueTuple<string, int>> result = new();
-
-			StringBuilder sb = new StringBuilder(16);
-			int level = 0;
-			StringBuilder stringArgu = new StringBuilder(16);
-			int hasStringArgu = 0;
-			for (int i = 0; i < segment.Length; i++)
-			{
-				char c = segment[i];
-				if (c == '"')
-				{
-					hasStringArgu++;
-					continue;
-				}
-
-				if (hasStringArgu == 1)
-				{
-					stringArgu.Append(c);
-					continue;
-				}
-				else if (hasStringArgu == 2)
-				{
-					result.Add(new ValueTuple<string, int>(stringArgu.ToString(), level));
-					stringArgu.Clear();
-					hasStringArgu = 0;
-				}
-
-				if (c == '-')
-				{
-					if (sb.Length != 0)
+					if (op != null)
 					{
-						result.Add(new ValueTuple<string, int>(sb.ToString(), level));
-						sb.Clear();
-						level = 0;
+						result.Add(op);
+						op = null;
 					}
-					level++;
-				}
-				else if (c == ' ')
-				{
-					if (sb.Length != 0)
+
+					int level = 0;
+					foreach (char c in arg)
 					{
-						result.Add(new ValueTuple<string, int>(sb.ToString(), level));
-						sb.Clear();
-						level = 0;
+						if (c == '-')
+							level++;
+						else
+							break;
 					}
+
+					string name = arg.Substring(level);
+					op = new ProgramOption();
+					op.SetOption(name, level);
+					continue;
 				}
-				else
+
+				if (op != null)
 				{
-					sb.Append(c);
+					op.AddParameter(arg);
 				}
 			}
 
-			if (stringArgu.Length != 0)
+			if (op != null)
 			{
-				result.Add(new ValueTuple<string, int>(stringArgu.ToString(), level));
+				result.Add(op);
 			}
-
-			if (sb.Length != 0)
-			{
-				result.Add(new ValueTuple<string, int>(sb.ToString(), level));
-			}
-
+			
 			return result;
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using CT.Tools.GetOpt;
 
@@ -6,88 +7,38 @@ namespace CT.CorePatcher.FilePatch
 {
 	public class FilePatcherRunner
 	{
-		public const string ORIGIN_PATH = "originPath";
-		public const string TARGET_PATH = "targetPath";
-
-		public const string GUARD_EXTENSION = "fp_guard_ext";
-		public const string INCLUDE_EXTENSION = "fp_include_ext";
-		public const string EXCLUDE_FOLDER = "fp_exclude_folder";
-
-		public static bool Run(string[] args)
+		public static bool Run(string sourcePath, string targetPath)
 		{
 			PatcherConsole.PrintProgramInfo("File Patcher");
 
-			StringArgument originPath = new();
-			StringArgument targetPath = new();
-			string[] guardExtensionList = new string[0];
-			string[] includeExtensionList = new string[0];
-			string[] excludeFolderList = new string[0];
-
-			OptionParser op = new OptionParser();
-			op.BindArgument(op, ORIGIN_PATH, 2, originPath);
-			op.BindArgument(op, TARGET_PATH, 2, targetPath);
-			op.RegisterEvent(GUARD_EXTENSION, 1, (options) =>
-			{
-				try
-				{
-					guardExtensionList = options.ToArray();
-				}
-				catch
-				{
-					throw new NoProcessArgumentsException(GUARD_EXTENSION);
-				}
-			});
-			op.RegisterEvent(INCLUDE_EXTENSION, 1, (options) =>
-			{
-				try
-				{
-					includeExtensionList = options.ToArray();
-				}
-				catch
-				{
-					throw new NoProcessArgumentsException(INCLUDE_EXTENSION);
-				}
-			});
-			op.RegisterEvent(EXCLUDE_FOLDER, 1, (options) =>
-			{
-				try
-				{
-					excludeFolderList = options.ToArray();
-				}
-				catch
-				{
-					throw new NoProcessArgumentsException(EXCLUDE_FOLDER);
-				}
-			});
-			try
-			{
-				op.OnArguments(args);
-			}
-			catch (Exception e)
-			{
-				PatcherConsole.PrintError(e.GetType().Name);
-				Console.WriteLine();
-				PatcherConsole.PrintError(e.Message);
-				return false;
-			}
-
 			// Check arguments validation
 			bool isValidArguments = true;
-			if (originPath.HasArgument(ref isValidArguments) == false)
-				PatcherConsole.PrintError($"There is no origin path.");
+			if (string.IsNullOrEmpty(sourcePath))
+			{
+				isValidArguments = false;
+				PatcherConsole.PrintError($"There is no source path.");
+			}
 
-			if (targetPath.HasArgument(ref isValidArguments) == false)
+			if (string.IsNullOrEmpty(targetPath))
+			{
+				isValidArguments = false;
 				PatcherConsole.PrintError($"There is no target path.");
+			}
+
+			if (isValidArguments == false)
+			{
+				return false;
+			}
 
 			// Setup patcher
 			FilePatcher filePatcher = new FilePatcher();
 
-			filePatcher.SetupGuardExtension(guardExtensionList);
-			filePatcher.SetupIncludeExtension(includeExtensionList);
-			filePatcher.SetupExcludeFolderName(excludeFolderList);
+			filePatcher.SetupGuardExtension(".asmdef");
+			filePatcher.SetupIncludeExtension(".cs", ".xml", ".meta");
+			filePatcher.SetupExcludeFolderName("obj", "bin", "debug", "build", "Legacy");
 
-			filePatcher.SetupSourceDirectory(originPath.Argument);
-			filePatcher.SetupTargetDirectory(targetPath.Argument);
+			filePatcher.SetupSourceDirectory(sourcePath);
+			filePatcher.SetupTargetDirectory(targetPath);
 
 			// Exception handling
 			if (!filePatcher.HasGuardExtension)
