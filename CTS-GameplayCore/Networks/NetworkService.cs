@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using CT.Network.Core;
 using CT.Network.DataType;
 using CT.Network.Serialization;
+using CT.Packets;
 using CTS.Instance.Services;
 using LiteNetLib;
 using log4net;
@@ -15,23 +17,16 @@ namespace CTS.Instance.Networks
 		private ILog _log = LogManager.GetLogger(typeof(NetworkService));
 
 		// Manager
-		public NetManager _netManager { get; private set; }
 		private readonly EventBasedNetListener _listener;
-
-		// Session
-		private SessionHandler _sessionHandler = new();
-		private WaitingPeerHandler _waitingPeerHandler;
-
-		// Events
-		public event Action<NetClientSession, PacketReader>? OnPacketReceived;
-		public event Action<NetClientSession>? OnSessionConnected;
+		public NetManager _netManager { get; private set; }
+		private SessionHandler _sessionHandler;
 
 		public NetworkService(ServerOption serverOption, TickTimer serverTimer)
 		{
 			// Manager
 			_listener = new EventBasedNetListener();
+			_sessionHandler = new SessionHandler(serverTimer);
 			_netManager = new NetManager(_listener);
-			_waitingPeerHandler = new WaitingPeerHandler(serverTimer);
 
 			// Events
 			_listener.ConnectionRequestEvent += onConnectionRequestEvent;
@@ -43,11 +38,8 @@ namespace CTS.Instance.Networks
 		public void Start(int serverPort)
 		{
 			_log.Info($"Start network service");
+			_sessionHandler.Start();
 			_netManager.Start(port: serverPort);
-
-			Thread t = new Thread(_waitingPeerHandler.Run);
-			t.IsBackground = true;
-			t.Start();
 		}
 
 		public void PollEvents()
@@ -59,20 +51,17 @@ namespace CTS.Instance.Networks
 		{
 			try
 			{
-				PacketSegment ps = new PacketSegment(reader.GetRemainingBytesSegment());
-				PacketReader pr = new PacketReader(ps);
+				PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
 
-				ClientToken token = new ClientToken();
-				token.Deserialize(pr);
-
-
-				//if (!_sessions.TryGetValue(token, out var clientSession) || clientSession == null)
-				//{
-				//	peer.Disconnect();
-				//	return;
-				//}
-
-				//OnPacketReceived?.Invoke(clientSession, pr);
+				// Check peer's session
+				// TODO...
+				while (!packetReader.IsEnd)
+				{
+					// Parse packet
+					PacketType packetType = packetReader.ReadPacketType();
+					var packet = PacketFactory.Create(packetType, packetReader);
+					_sessionHandler.OnReceivePacket(peer, packet);
+				}
 			}
 			catch (Exception e)
 			{
@@ -84,14 +73,12 @@ namespace CTS.Instance.Networks
 
 		private void onPeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
 		{
-			_sessionHandler.RemovePeer(peer);
-			_log.Info($"[UserCount:{_sessionHandler.SessionCount}] Client disconnect {peer.EndPoint.ToString()}");
+			_sessionHandler.OnPeerDisconnected(peer);
 		}
 
 		private void onPeerConnectedEvent(NetPeer peer)
 		{
-			_waitingPeerHandler.AddNewWaitingPeer(peer);
-			_log.Info($"[UserCount:{_sessionHandler.SessionCount}] Client connect from {peer.EndPoint.ToString()}");
+			_sessionHandler.OnPeerInitialConnected(peer);
 		}
 
 		/// <summary>클라이언트의 연결 요청시 호출됩니다.</summary>
@@ -120,11 +107,6 @@ namespace CTS.Instance.Networks
 		public void Stop()
 		{
 			_netManager.Stop();
-		}
-
-		public bool CheckToken(ClientToken token)
-		{
-			return true;
 		}
 	}
 }

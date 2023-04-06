@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CT.Network.Core;
+﻿using CT.Network.Core;
 using CT.Network.DataType;
 using CT.Network.Serialization;
 using CT.Tools.Collections;
@@ -13,7 +11,7 @@ namespace CTS.Instance.Gameplay
 		public int Id { get; private set; }
 
 		private object _sessionLock = new object();
-		private BidirectionalMap<ClientToken, NetClientSession> _clientSessionByToken = new();
+		private BidirectionalMap<ClientToken, NetSession> _clientSessionByToken = new();
 		public int SessionCount => _clientSessionByToken.Count;
 
 		public GameInstance(ServerOption serverOption)
@@ -22,7 +20,7 @@ namespace CTS.Instance.Gameplay
 
 		}
 
-		public void OnConnected(ClientToken token, NetClientSession session)
+		public void OnConnected(ClientToken token, NetSession session)
 		{
 			lock (_sessionLock)
 			{
@@ -30,7 +28,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void Disconnect(NetClientSession session)
+		public void Disconnect(NetSession session)
 		{
 			lock (_sessionLock)
 			{

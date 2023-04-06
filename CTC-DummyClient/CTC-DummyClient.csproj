@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CT-CorePatcher\CT-CorePatcher.csproj" />
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
   </ItemGroup>

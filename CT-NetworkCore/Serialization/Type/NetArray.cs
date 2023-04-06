@@ -55,7 +55,7 @@ namespace CT.Network.Serialization.Type
 			for (int i = 0; i < count; i++)
 			{
 				T element = new T();
-				reader.Read(element);
+				reader.ReadTo(element);
 				_array.Add(element);
 			}
 		}
@@ -136,7 +136,7 @@ namespace CT.Network.Serialization.Type
 			for (int i = 0; i < count; i++)
 			{
 				T element = new T();
-				reader.Read(element);
+				reader.ReadTo(element);
 				_array.Add(element);
 			}
 		}

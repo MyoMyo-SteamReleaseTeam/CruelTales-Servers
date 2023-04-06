@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CTS.Instance.Services;
 using log4net;
 
-namespace CTS.Instance
+namespace CTS.Instance.Services
 {
-	public abstract class FrameRunner
+	public abstract class TickRunner
 	{
 		public bool IsRunning { get; private set; } = false;
 		public int FramePerMs { get; private set; }
@@ -20,7 +19,7 @@ namespace CTS.Instance
 		private int _averageCounter = 0;
 		private bool _shouldStop = false;
 
-		public FrameRunner(int famePerMs, TickTimer tickTimer, ILog logger)
+		public TickRunner(int famePerMs, TickTimer tickTimer, ILog logger)
 		{
 			FramePerMs = famePerMs;
 			_tickTimer = tickTimer;

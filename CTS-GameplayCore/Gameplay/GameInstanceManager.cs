@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CT.Network.DataType;
 using CTS.Instance.Services;
 using log4net;
 
@@ -9,7 +10,7 @@ namespace CTS.Instance.Gameplay
 		private static ILog _log = LogManager.GetLogger(typeof(GameInstanceManager));
 
 		public int MaxGameCount { get; private set; }
-		private readonly Dictionary<int, GameInstance> _gameInstanceById = new();
+		private readonly Dictionary<RoomGuid, GameInstance> _gameInstanceById = new();
 		private readonly List<GameInstance> _gameInstanceList = new();
 
 		private readonly TickTimer _serverTimer;

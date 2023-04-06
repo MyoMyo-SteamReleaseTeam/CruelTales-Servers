@@ -26,5 +26,7 @@ namespace CT.Network.DataType
 		{
 			Guid = reader.ReadUInt64();
 		}
+
+		public override string ToString() => Guid.ToString();
 	}
 }

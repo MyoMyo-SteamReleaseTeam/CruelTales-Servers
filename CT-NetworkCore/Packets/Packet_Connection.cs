@@ -36,6 +36,7 @@ namespace CT.Packets
 	
 		public override void Serialize(PacketWriter writer)
 		{
+			writer.Put(PacketType);
 			Id.Serialize(writer);
 			Token.Serialize(writer);
 			MatchTo.Serialize(writer);
@@ -59,6 +60,7 @@ namespace CT.Packets
 	
 		public override void Serialize(PacketWriter writer)
 		{
+			writer.Put(PacketType);
 			writer.Put(AckResult);
 		}
 	

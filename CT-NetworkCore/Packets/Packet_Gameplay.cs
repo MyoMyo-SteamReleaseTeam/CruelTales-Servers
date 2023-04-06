@@ -14,6 +14,7 @@ namespace CT.Packets
 	
 		public override void Serialize(PacketWriter writer)
 		{
+			writer.Put(PacketType);
 			writer.Put(MiniGameName);
 		}
 	
@@ -33,6 +34,7 @@ namespace CT.Packets
 	
 		public override void Serialize(PacketWriter writer)
 		{
+			writer.Put(PacketType);
 			SpawnedEntities.Serialize(writer);
 		}
 	
@@ -52,6 +54,7 @@ namespace CT.Packets
 	
 		public override void Serialize(PacketWriter writer)
 		{
+			writer.Put(PacketType);
 			DespawnEntities.Serialize(writer);
 		}
 	

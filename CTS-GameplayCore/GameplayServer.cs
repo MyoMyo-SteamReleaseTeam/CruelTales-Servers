@@ -7,7 +7,7 @@ using log4net;
 
 namespace CTS.Instance
 {
-	public class GameplayServer : FrameRunner
+	public class GameplayServer : TickRunner
 	{
 		private readonly ServerOption _serverOption;
 		private readonly NetworkService _networkService;
@@ -28,14 +28,9 @@ namespace CTS.Instance
 		{
 			_networkService.Start(_serverOption.Port);
 
-			Thread t = new Thread(startServer);
+			Thread t = new Thread(Run);
 			t.IsBackground = false;
 			t.Start();
-		}
-
-		private void startServer()
-		{
-			this.Run();
 		}
 
 		protected override void OnUpdate(float deltaTime)
@@ -43,6 +38,11 @@ namespace CTS.Instance
 			_networkService.PollEvents();
 			_gameInstanceManager.ProcessFrame(deltaTime);
 			_networkService.PollEvents();
+		}
+
+		public void TryToJoinGame()
+		{
+
 		}
 
 		public void PrintCollecitonCount()

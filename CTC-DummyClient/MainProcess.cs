@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using LiteNetLib;
 using log4net;
@@ -22,7 +21,7 @@ namespace CTC.DummyClient
 				Thread.Sleep(1000);
 			}
 
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 1; i++)
 			{
 				Thread t = new Thread(Start);
 				t.IsBackground = false;

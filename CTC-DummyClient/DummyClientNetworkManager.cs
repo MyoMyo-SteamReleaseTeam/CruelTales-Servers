@@ -1,4 +1,6 @@
-﻿using LiteNetLib;
+﻿using CT.Network.DataType;
+using CT.Packets;
+using LiteNetLib;
 using log4net;
 
 namespace CTC.DummyClient
@@ -33,6 +35,11 @@ namespace CTC.DummyClient
 		private void OnConnected(NetPeer peer)
 		{
 			_log.Info($"Success to connect to the server. Server endpoint : {peer.EndPoint}");
+
+			Client_Req_TryJoinMatching reqJoinMatch = new Client_Req_TryJoinMatching();
+			reqJoinMatch.MatchTo = new RoomGuid(0);
+			//reqJoinMatch.Id = 
+			_log.Info($"Try send match endpoint to server...");
 		}
 
 		private void OnDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

@@ -4,6 +4,11 @@ namespace CT.Packets
 {
 	public static class PacketExtension
 	{
+		public static PacketType PeekPacketType(this PacketReader reader)
+		{
+			return (PacketType)reader.PeekUInt16();
+		}
+
 		public static PacketType ReadPacketType(this PacketReader reader)
 		{
 			return (PacketType)reader.ReadUInt16();

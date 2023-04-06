@@ -9,66 +9,8 @@ using log4net;
 
 namespace CTS.Instance.Networks
 {
-	public class WaitingSession
+	public class WaitingPeerHandler : TickRunner
 	{
-		public int PeerId { get; private set; }
-		public NetPeer Peer { get; private set; }
-		public DateTime ConnectTime { get; private set; }
-
-		public WaitingSession(NetPeer peer, DateTime connectTime)
-		{
-			Peer = peer;
-			PeerId = Peer.Id;
-			ConnectTime = connectTime;
-		}
-
-		public ulong GetHashCodeByIpPort()
-		{
-			return WaitingSession.GetHashCodeByIpPort(Peer);
-		}
-
-		[StructLayout(LayoutKind.Explicit)]
-		readonly struct EndpointHashHelper
-		{
-			[FieldOffset(0)] public readonly ulong EndpointHash;
-			[FieldOffset(0)] public readonly int IpEndpointHash;
-			[FieldOffset(4)] public readonly int Value;
-
-			public EndpointHashHelper(int ipEndPointHash, int value)
-			{
-				IpEndpointHash = ipEndPointHash;
-				Value = value;
-			}
-		}
-
-		public static ulong GetHashCodeByIpPort(NetPeer peer)
-		{
-			int endPointHash = peer.EndPoint.GetHashCode();
-			EndpointHashHelper hashHelper = new(endPointHash, peer.Id);
-			return hashHelper.EndpointHash;
-		}
-	}
-
-	public class WaitingPeerHandler : FrameRunner
-	{
-		// Waiting Session
-		public const int WAITING_TIMEOUT_SEC = 5;
-		public readonly TimeSpan WAITING_TIMEOUT = new TimeSpan(0, 0, 0, WAITING_TIMEOUT_SEC);
-		public int WaitingSessionCount
-		{
-			get
-			{
-				lock (_waitingLock)
-				{
-					return _waitingSessionByHash.Count;
-				}
-			}
-		}
-		private readonly object _waitingLock = new object();
-
-		private readonly Dictionary<ulong, WaitingSession> _waitingSessionByHash = new();
-		private readonly List<ulong> _kickSessionHashList = new();
-
 		public WaitingPeerHandler(TickTimer serverTimer) 
 			: base(WAITING_TIMEOUT_SEC * 900, serverTimer,
 				   LogManager.GetLogger(typeof(WaitingPeerHandler)))
@@ -80,18 +22,17 @@ namespace CTS.Instance.Networks
 		{
 			lock (_waitingLock)
 			{
-				WaitingSession ws = new WaitingSession(peer, DateTime.UtcNow);
-				ulong peerHashCode = ws.GetHashCodeByIpPort();
-				if (_waitingSessionByHash.ContainsKey(peerHashCode))
+				if (_sessionByPeerId.ContainsKey(peer.Id))
 				{
 					_log.Fatal($"Peer {peer.EndPoint} already waiting in waiting queue!\n" +
 						$"Disconnect peer and remove from waiting queue!");
 					peer.Disconnect();
-					_waitingSessionByHash.Remove(peerHashCode);
 					return;
 				}
+				WaitingSession ws = new WaitingSession();
+				ws.Initialize(peer);
 
-				_waitingSessionByHash.Add(peerHashCode, ws);
+				_sessionByPeerId.Add(ws.PeerId, ws);
 			}
 		}
 
@@ -101,7 +42,7 @@ namespace CTS.Instance.Networks
 			{
 				DateTime currentTime = DateTime.UtcNow;
 
-				foreach (var currentPeer in _waitingSessionByHash.Values)
+				foreach (var currentPeer in _sessionByPeerId.Values)
 				{
 					var elapsed = currentTime - currentPeer.ConnectTime;
 					if (elapsed < WAITING_TIMEOUT)
@@ -116,17 +57,32 @@ namespace CTS.Instance.Networks
 				for (int i = 0; i < kickCount; i++)
 				{
 					ulong kickPeerHash = _kickSessionHashList[i];
-					if (!_waitingSessionByHash.TryGetValue(kickPeerHash, out var kickSession))
+					if (!_sessionByPeerId.TryGetValue(kickPeerHash, out var kickSession))
 					{
 						_log.Fatal($"There is no session to kick! Session hash code : {kickPeerHash}");
 						continue;
 					}
 
 					kickSession.Peer.Disconnect();
-					_waitingSessionByHash.Remove(kickPeerHash);
+					_sessionByPeerId.Remove(kickPeerHash);
 				}
 
 				_kickSessionHashList.Clear();
+			}
+		}
+
+		public bool TryPopMatchedPeer(NetPeer matchedPeer)
+		{
+			lock (_waitingLock)
+			{
+				ulong peerHash = WaitingSession.GetHashCodeByIpPort(matchedPeer);
+				if (!_sessionByPeerId.ContainsKey(peerHash))
+				{
+					return false;
+				}
+
+				_sessionByPeerId.Remove(peerHash);
+				return true;
 			}
 		}
 

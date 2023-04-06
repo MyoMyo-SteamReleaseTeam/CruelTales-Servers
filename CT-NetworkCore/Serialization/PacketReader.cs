@@ -8,28 +8,32 @@ namespace CT.Network.Serialization
 {
 	public class PacketReader
 	{
-		private PacketSegment _packet;
 		private ArraySegment<byte> _buffer;
-
 		public int Position { get; private set; }
-		public int Capacity => _packet.Capacity;
+		public int Capacity => _buffer.Count;
+		public bool IsEnd => Capacity == Position;
 
-		public PacketReader()
+		public PacketReader(ArraySegment<byte> buffer)
 		{
-			_packet = new PacketSegment();
+			_buffer = buffer;
+			Position = 0;
 		}
 
 		public PacketReader(PacketSegment packet)
 		{
-			_packet = packet;
 			_buffer = packet.Buffer;
 			Position = 0;
 		}
 
-		public void SetPakcet(PacketSegment packet)
+		public void Initialize(PacketSegment packet)
 		{
-			_packet = packet;
 			_buffer = packet.Buffer;
+			Position = 0;
+		}
+
+		public void Initialize(ArraySegment<byte> buffer)
+		{
+			_buffer = buffer;
 			Position = 0;
 		}
 
@@ -48,10 +52,89 @@ namespace CT.Network.Serialization
 			Position = position;
 		}
 
-		public void Read<T>(T serializeObject) where T : IPacketSerializable
+		public void ReadTo<T>(T serializeObject) where T : IPacketSerializable
 		{
 			serializeObject.Deserialize(this);
 		}
+
+		public T Read<T>() where T : IPacketSerializable, new()
+		{
+			T instance = new();
+			this.ReadTo(instance);
+			return instance;
+		}
+
+		#region Peek
+
+		public bool PeekBool()
+		{
+			var value = BinaryConverter.ReadBool(_buffer, Position);
+			return value;
+		}
+
+		public byte PeekByte()
+		{
+			var value = BinaryConverter.ReadByte(_buffer, Position);
+			return value;
+		}
+
+		public sbyte PeekSByte()
+		{
+			var value = BinaryConverter.ReadSByte(_buffer, Position);
+			return value;
+		}
+
+		public short PeekInt16()
+		{
+			var value = BinaryConverter.ReadInt16(_buffer, Position);
+			return value;
+		}
+
+		public ushort PeekUInt16()
+		{
+			var value = BinaryConverter.ReadUInt16(_buffer, Position);
+			return value;
+		}
+
+		public int PeekInt32()
+		{
+			var value = BinaryConverter.ReadInt32(_buffer, Position);
+			return value;
+		}
+
+		public uint PeekUInt32()
+		{
+			var value = BinaryConverter.ReadUInt32(_buffer, Position);
+			return value;
+		}
+
+		public long PeekInt64()
+		{
+			var value = BinaryConverter.ReadInt64(_buffer, Position);
+			return value;
+		}
+
+		public ulong PeekUInt64()
+		{
+			var value = BinaryConverter.ReadUInt64(_buffer, Position);
+			return value;
+		}
+
+		public float PeekSingle()
+		{
+			var value = BinaryConverter.ReadFloat(_buffer, Position);
+			return value;
+		}
+
+		public double PeekDouble()
+		{
+			var value = BinaryConverter.ReadDouble(_buffer, Position);
+			return value;
+		}
+
+		#endregion
+
+		#region Read
 
 		public bool ReadBool()
 		{
@@ -157,5 +240,7 @@ namespace CT.Network.Serialization
 			Position += read;
 			return result;
 		}
+
+		#endregion
 	}
 }
