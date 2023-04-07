@@ -27,5 +27,10 @@ namespace CT.Network.DataType
 		{
 			return $"Token:{Token}";
 		}
+
+		public bool IsValid()
+		{
+			return Token > 0;
+		}
 	}
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using log4net;
 
-namespace CTS.Instance.Services
+namespace CTS.Instance.Utils
 {
-	public abstract class TickRunner
+	public class TickRunner
 	{
 		public bool IsRunning { get; private set; } = false;
 		public int FramePerMs { get; private set; }
@@ -18,6 +18,8 @@ namespace CTS.Instance.Services
 		private readonly int _averageSample = 16;
 		private int _averageCounter = 0;
 		private bool _shouldStop = false;
+
+		public event Action<float>? OnUpdate;
 
 		public TickRunner(int famePerMs, TickTimer tickTimer, ILog logger)
 		{
@@ -31,9 +33,19 @@ namespace CTS.Instance.Services
 			}
 		}
 
-		protected abstract void OnUpdate(float deltaTime);
-
 		public void Run()
+		{
+			if (IsRunning)
+			{
+				throw new Exception($"This tick is already running!");
+			}
+
+			Thread thread = new Thread(start);
+			thread.IsBackground = true;
+			thread.Start();
+		}
+
+		private void start()
 		{
 			IsRunning = true;
 			long lastTick = 0;
@@ -42,7 +54,6 @@ namespace CTS.Instance.Services
 			{
 				if (_shouldStop)
 				{
-					IsRunning = false;
 					break;
 				}
 
@@ -51,8 +62,8 @@ namespace CTS.Instance.Services
 				float deltaTimeSec = _tickTimer.GetSecDeltaTime_Float(currentTick, lastTick);
 				lastTick = currentTick;
 
-				// On update
-				OnUpdate(deltaTimeSec);
+				// Update call
+				OnUpdate?.Invoke(deltaTimeSec);
 
 				// Calculate sleep time
 				float currentTimespent = _tickTimer.GetMsDeltaTime_Float(currentTick);
@@ -76,11 +87,17 @@ namespace CTS.Instance.Services
 					Thread.Sleep((int)sleepTimeDistance);
 				}
 			}
+
+			_shouldStop = false;
+			IsRunning = false;
 		}
 
 		public void Suspend()
 		{
-			_shouldStop = true;
+			if (IsRunning)
+			{
+				_shouldStop = true;
+			}
 		}
 	}
 }

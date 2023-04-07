@@ -25,7 +25,7 @@ namespace CT.Network.DataType
 
 		public override string ToString()
 		{
-			return $"Id:{Id}";
+			return Id.ToString();
 		}
 	}
 }

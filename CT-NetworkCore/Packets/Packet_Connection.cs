@@ -1,4 +1,4 @@
-using CT.Network.DataType;
+﻿using CT.Network.DataType;
 using CT.Network.Serialization;
 using CT.Network.Serialization.Type;
 
@@ -24,13 +24,13 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class Client_Req_TryJoinMatching : PacketBase
+	public sealed class Client_Req_TryJoinGameInstance : PacketBase
 	{
-		public override PacketType PacketType => PacketType.Client_Req_TryJoinMatching;
+		public override PacketType PacketType => PacketType.Client_Req_TryJoinGameInstance;
 	
 		public ClientId Id = new();
 		public ClientToken Token = new();
-		public RoomGuid MatchTo = new();
+		public GameInstanceGuid MatchTo = new();
 	
 		public override int SerializeSize => Id.SerializeSize + Token.SerializeSize + MatchTo.SerializeSize + 2;
 	
@@ -50,9 +50,9 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class Server_Ack_TryJoinMatching : PacketBase
+	public sealed class Server_Ack_TryJoinGameInstance : PacketBase
 	{
-		public override PacketType PacketType => PacketType.Server_Ack_TryJoinMatching;
+		public override PacketType PacketType => PacketType.Server_Ack_TryJoinGameInstance;
 	
 		public AckJoinMatch AckResult;
 	

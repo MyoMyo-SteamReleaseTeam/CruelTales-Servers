@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CT.Tools.Collections
 {
@@ -155,14 +156,14 @@ namespace CT.Tools.Collections
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
-		public bool TryGetValue(in T1 key, out T2? value)
+		public bool TryGetValue(in T1 key, [MaybeNullWhen(false)] out T2 value)
 		{
 			return mForwardMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
-		public bool TryGetValue(in T2 key, out T1? value)
+		public bool TryGetValue(in T2 key, [MaybeNullWhen(false)] out T1 value)
 		{
 			return mReverseMap.TryGetValue(key, out value);
 		}

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.Versioning;
-using CT.Tools.GetOpt;
-using CTS.Instance.Networks;
-using CTS.Instance.Services;
+using CTS.Instance.Utils;
 using log4net;
 
 namespace CTS.Instance
@@ -15,7 +13,7 @@ namespace CTS.Instance
 	}
 
 	[SupportedOSPlatform("windows")]
-	internal class MainProcess
+	public class MainProcess
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(MainProcess));
 
@@ -23,31 +21,19 @@ namespace CTS.Instance
 		{
 			Console.SetWindowSize(200, 50);
 
-			// Create services
-			_log.Info("Create services");
-
-			ServerOption serverOption = new ServerOption();
-			TickTimer tickTimer = new TickTimer();
-			NetworkService networkService = new(serverOption, tickTimer);
-
-			// Read process option
-			_log.Info("Read process options");
-
-			//string startOption = "-maxuser 500";
-			//OptionParser optionParser = new OptionParser();
-			//optionParser.RegisterEvent("maxuser", 1, e => serverOption.MaxConcurrentUser = int.Parse(e[0]));
-			//optionParser.OnArguments(startOption);
-
-			// Start gameplay server
+			// Start server
 			_log.Info("Start gameplay server");
+
+			TickTimer serverTimer = new TickTimer();
+
+			// Setup server option
+			ServerOption serverOption = new ServerOption();
 			_log.Info($"Server Port\t: {serverOption.Port}");
 			_log.Info($"Tick ms\t: {serverOption.FramePerMs}");
 			_log.Info($"Max Game Count\t: {serverOption.GameCount}");
 
-			GameplayServer server = new(serverOption, networkService, tickTimer);
-			server.Start();
-
-			_log.Info($"Start game server!");
+			GameplayServer gameplayServer = new(serverTimer, serverOption);
+			gameplayServer.Start();
 		}
 	}
 }

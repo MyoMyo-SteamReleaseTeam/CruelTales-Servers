@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace CTS.Instance.Services
+namespace CTS.Instance.Utils
 {
 	public class TickTimer
 	{

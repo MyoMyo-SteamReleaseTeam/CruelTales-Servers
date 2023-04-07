@@ -18,13 +18,13 @@
 	<!-- Declare Packets -->>
 	
 	<!-- Try Join Matching -->>
-	<client name="Req_TryJoinMatching">
+	<client name="Req_TryJoinGameInstance">
 		<ClientId name="Id"/>
 		<ClientToken name="Token"/>
-		<RoomGuid name="MatchTo"/>
+		<GameInstanceGuid name="MatchTo"/>
 		<!-- TODO : define clothes and setting -->
 	</client>
-	<server name="Ack_TryJoinMatching">
+	<server name="Ack_TryJoinGameInstance">
 		<AckJoinMatch name="AckResult"/>
 	</server>
 </Definition>

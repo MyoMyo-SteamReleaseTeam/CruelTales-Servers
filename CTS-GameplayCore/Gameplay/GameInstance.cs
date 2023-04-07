@@ -1,56 +1,65 @@
-﻿using CT.Network.Core;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Network.DataType;
-using CT.Network.Serialization;
-using CT.Tools.Collections;
+using CTS.Instance.Networks;
+using log4net;
 
 namespace CTS.Instance.Gameplay
 {
+	public class GameInstanceOption
+	{
+		public int MaxMember { get; set; }
+	}
+
 	public class GameInstance
 	{
-		private static int IdCounter = 1;
-		public int Id { get; private set; }
+		// Log
+		[AllowNull]
+		public ILog _log;
 
-		private object _sessionLock = new object();
-		private BidirectionalMap<ClientToken, NetSession> _clientSessionByToken = new();
-		public int SessionCount => _clientSessionByToken.Count;
+		// Game Identification
+		public GameInstanceGuid Guid { get; private set; }
 
-		public GameInstance(ServerOption serverOption)
+		[AllowNull]
+		private GameInstanceOption _option;
+		private readonly Dictionary<ClientId, ClientSession> _playerById = new();
+		private readonly List<ClientSession> _playerList = new();
+		public int MemberCount => _playerById.Count;
+
+		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
 		{
-			Id = IdCounter++;
+			_log = LogManager.GetLogger($"{nameof(GameInstance)}_{guid}");
+
+			Guid = guid;
+			_option = option;
+		}
+
+		public void Update(float deltaTime)
+		{
 
 		}
 
-		public void OnConnected(ClientToken token, NetSession session)
+		public bool TryJoinSession(ClientSession clientSession)
 		{
-			lock (_sessionLock)
+			if (_playerById.ContainsKey(clientSession.ClientId))
 			{
-				_clientSessionByToken.TryAdd(token, session);
+				_log.Warn($"Client {clientSession.ClientId} try to join again");
+				return false;
 			}
-		}
 
-		public void Disconnect(NetSession session)
-		{
-			lock (_sessionLock)
+			if (MemberCount >= _option.MaxMember)
 			{
-				_clientSessionByToken.TryRemove(session);
+				_log.Warn($"This game instance is already full!");
 			}
+
+			_playerById.Add(clientSession.ClientId, clientSession);
+			_playerList.Add(clientSession);
+			return true;
 		}
 
-		public void Update(float delta)
-		{
-		}
-
-		public void OnPacketRecevied(ClientToken token, PacketReader reader)
+		public void OnPlayerDisconnected(ClientSession clientSession)
 		{
 
-		}
-
-		public void DeserializePackets()
-		{
-		}
-
-		public void SerializePackets()
-		{
 		}
 	}
 }

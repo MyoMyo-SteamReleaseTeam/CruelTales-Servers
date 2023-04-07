@@ -3,16 +3,16 @@
 namespace CT.Network.DataType
 {
 
-	public struct RoomGuid : IPacketSerializable
+	public struct GameInstanceGuid : IPacketSerializable
 	{
 		public ulong Guid;
 
 		public int SerializeSize => sizeof(ulong);
 
-		public static implicit operator ulong(RoomGuid value) => value.Guid;
-		public static explicit operator RoomGuid(ulong value) => new RoomGuid(value);
+		public static implicit operator ulong(GameInstanceGuid value) => value.Guid;
+		public static explicit operator GameInstanceGuid(ulong value) => new GameInstanceGuid(value);
 
-		public RoomGuid(ulong value)
+		public GameInstanceGuid(ulong value)
 		{
 			Guid = value;
 		}

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using CT.Network.Core;
 using CT.Network.Serialization;
 using CT.Packets;
+using CTS.Instance.Networks;
 
 namespace CTS.Instance.Packets
 {
@@ -11,7 +11,7 @@ namespace CTS.Instance.Packets
 	{
 		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
-			{ PacketType.Client_Req_TryJoinMatching, PacketHandler.Handle_Client_Req_TryJoinMatching }
+			{ PacketType.Client_Req_TryJoinGameInstance, PacketHandler.Handle_Client_Req_TryJoinGameInstance }
 		};
 
 		public static void Dispatch(PacketBase receivedPacket, ClientSession session)
