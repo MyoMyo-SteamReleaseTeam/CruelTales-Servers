@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Threading;
 using LiteNetLib;
 using log4net;
+using static System.Collections.Specialized.BitVector32;
 
 namespace CTC.DummyClient
 {
+	[SupportedOSPlatform("windows")]
 	internal class MainProcess
 	{
 		public static readonly string ServerIp = "127.0.0.1";
@@ -13,57 +16,59 @@ namespace CTC.DummyClient
 
 		private static int _dummyClientBindPort = 40000;
 
+		private static object _lock = new object();
+
 		static void Main(string[] args)
 		{
+			Console.SetWindowSize(160, 25);
+
 			for (int i = 5; i >= 0; i--)
 			{
 				_log.Info($"Start dummy client test in {i}");
 				Thread.Sleep(1000);
 			}
 
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 1000; i++)
 			{
-				Thread t = new Thread(Start);
+				int port = Interlocked.Increment(ref _dummyClientBindPort);
+				Thread t = new Thread(() => Start(port));
 				t.IsBackground = false;
 				t.Start();
-				Thread.Sleep(1);
 			}
 		}
 
-		public static void Start()
+		public static void Start(int port)
 		{
-			DummyClientNetworkManager session = new DummyClientNetworkManager();
-			Interlocked.Increment(ref _dummyClientBindPort);
-			session.Start(_dummyClientBindPort);
-			session.TryConnect(ServerIp, ServerPort);
-			_log.Info($"Bind Port : {_dummyClientBindPort} / Try connect {ServerIp}:{ServerPort}");
+			DummyClientNetworkManager session = new();
+
+			try
+			{
+				_log.Info($"Bind Port : {port} / Try connect {ServerIp}:{ServerPort}");
+
+				lock (_lock)
+				{
+					session.Start(port);
+					session.TryConnect(ServerIp, ServerPort);
+				}
+			}
+			catch (Exception e)
+			{
+				_log.Error($"Dummy client start error! : ", e);
+				return;
+			}
 
 			while (true)
 			{
-				session.PollEvents();
-				Thread.Sleep(200);
+				try
+				{
+					session.PollEvents();
+				}
+				catch (Exception e)
+				{
+					_log.Error($"Dummy client poll events error! : ", e);
+				}
+				Thread.Sleep(50);
 			}
-		}
-
-		public static void TestLogic()
-		{
-			EventBasedNetListener listener = new EventBasedNetListener();
-			NetManager client = new NetManager(listener);
-			client.Start();
-			client.Connect("localhost" /* host ip or name */, 60128 /* port */, "CTMatchmakingTestServer" /* text key or NetDataWriter */);
-			listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
-			{
-				Console.WriteLine("We got: {0}", dataReader.GetString(100 /* max length of string */));
-				dataReader.Recycle();
-			};
-
-			while (!Console.KeyAvailable)
-			{
-				client.PollEvents();
-				Thread.Sleep(1);
-			}
-
-			client.Stop();
 		}
 	}
 }

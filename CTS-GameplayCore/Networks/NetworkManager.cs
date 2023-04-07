@@ -14,7 +14,7 @@ namespace CTS.Instance.Networks
 		private static ILog _log = LogManager.GetLogger(typeof(NetworkManager));
 
 		private readonly EventBasedNetListener _networkListener;
-		private readonly NetManager _networkManager;
+		private readonly NetManager _netManager;
 		private readonly SessionManager _sessionManager;
 
 		// GameInstance
@@ -30,7 +30,7 @@ namespace CTS.Instance.Networks
 			_networkListener.PeerConnectedEvent += onPeerConnectedEvent;
 			_networkListener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
-			_networkManager = new NetManager(_networkListener);
+			_netManager = new NetManager(_networkListener);
 
 			// Gameplay Instance
 			_serverOption = serverOption;
@@ -43,9 +43,13 @@ namespace CTS.Instance.Networks
 		public void Start()
 		{
 			_log.Info($"Start NetworkManager...");
+
+			_netManager.Start(_serverOption.Port);
+
 			Thread thread = new Thread(startPollingEvents);
 			thread.IsBackground = false;
 			thread.Start();
+
 			GameplayInstanceManager.Start();
 		}
 
@@ -54,7 +58,7 @@ namespace CTS.Instance.Networks
 			_log.Info($"Start network polling events...");
 			while (true)
 			{
-				_networkManager.PollEvents();
+				_netManager.PollEvents();
 				Thread.Sleep(10);
 			}
 		}
@@ -79,6 +83,7 @@ namespace CTS.Instance.Networks
 				_log.Error($"Connection error from {peer.EndPoint.ToString()}");
 				return;
 			}
+
 			_log.Info($"[UserCount:{_sessionManager.Count}] Client connect from {peer.EndPoint.ToString()}");
 		}
 

@@ -3,6 +3,7 @@ using CT.Network.DataType;
 using CT.Network.Serialization;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
+using CT.Network.Extensions;
 using LiteNetLib;
 using log4net;
 
@@ -57,23 +58,28 @@ namespace CTS.Instance.Networks
 
 		public void OnDisconnected(DisconnectInfo disconnectInfo)
 		{
+			DisconnectReasonType reason;
+
 			lock (_clientSessionLock)
 			{
-				disconnectInternal();
+				reason = LiteNetLibExtension.ConvertEnum(disconnectInfo.Reason);
+				disconnectInternal(reason);
 			}
 
-			_log.Info($"Client {this} disconnected. Reason : {disconnectInfo.Reason}");
+			_log.Info($"Client {this} disconnected. Reason : {reason}");
 		}
 
-		public void Disconnect()
+		public void Disconnect(DisconnectReasonType disconnectReason)
 		{
 			lock (_clientSessionLock)
 			{
-				disconnectInternal();
+				disconnectInternal(disconnectReason);
 			}
+
+			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
 		}
 
-		private void disconnectInternal()
+		private void disconnectInternal(DisconnectReasonType disconnectReason)
 		{
 			if (CurrentState == NetSessionState.NoConnection)
 				return;
@@ -94,8 +100,10 @@ namespace CTS.Instance.Networks
 
 				_peer = peer;
 				PeerId = peer.Id;
-				return true;
 			}
+
+			var t = waitAuthenticationAsync();
+			return true;
 		}
 
 		public void OnReceive(PacketBase packet)
@@ -113,19 +121,6 @@ namespace CTS.Instance.Networks
 
 		}
 
-		public bool WaitForJoinRequest()
-		{
-			lock (_clientSessionLock)
-			{
-				if (CurrentState != NetSessionState.WaitForJoinRequest)
-					return false;
-				CurrentState = NetSessionState.WaitForJoinRequest;
-			}
-
-			var t = waitAuthenticationAsync();
-			return true;
-		}
-
 		private async ValueTask waitAuthenticationAsync()
 		{
 			for (int i = 0; i < WAITING_TIMEOUT_SEC; i++)
@@ -138,7 +133,7 @@ namespace CTS.Instance.Networks
 				}
 			}
 
-			Disconnect();
+			Disconnect(DisconnectReasonType.AuthenticationTimeout);
 		}
 
 		public void OnReqTryJoinGameInstance(ClientId id, ClientToken token, GameInstanceGuid roomGuid)
@@ -147,7 +142,7 @@ namespace CTS.Instance.Networks
 			{
 				if (CurrentState != NetSessionState.WaitForJoinTheGame)
 				{
-					disconnectInternal();
+					_log.Warn($"Client {this} request join game when current state is {CurrentState}");
 					return;
 				}
 
@@ -157,19 +152,20 @@ namespace CTS.Instance.Networks
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					if (instance.TryJoinSession(this))
+					if (instance.TryJoinSession(this, out var rejectReason))
 					{
 						CurrentState = NetSessionState.InGame;
 						GameInstance = instance;
+						return;
 					}
 
-					disconnectInternal();
 					_log.Error($"Client {this} fail to join GameInstance {GameInstanceGuid}");
+					disconnectInternal(rejectReason);
 				}
 				else
 				{
-					disconnectInternal();
 					_log.Error($"There is no GameInstance with GUID {GameInstanceGuid}");
+					disconnectInternal(DisconnectReasonType.ThereIsNoSuchGameInstance);
 				}
 			}
 

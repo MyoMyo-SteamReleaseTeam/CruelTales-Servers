@@ -36,7 +36,7 @@ namespace CTC.DummyClient
 		{
 			_log.Info($"Success to connect to the server. Server endpoint : {peer.EndPoint}");
 
-			Client_Req_TryJoinMatching reqJoinMatch = new Client_Req_TryJoinMatching();
+			Client_Req_TryJoinGameInstance reqJoinMatch = new Client_Req_TryJoinGameInstance();
 			reqJoinMatch.MatchTo = new GameInstanceGuid(0);
 			//reqJoinMatch.Id = 
 			_log.Info($"Try send match endpoint to server...");

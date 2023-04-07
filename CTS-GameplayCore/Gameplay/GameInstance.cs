@@ -39,8 +39,11 @@ namespace CTS.Instance.Gameplay
 
 		}
 
-		public bool TryJoinSession(ClientSession clientSession)
+		public bool TryJoinSession(ClientSession clientSession,
+								   out DisconnectReasonType rejectReason)
 		{
+			rejectReason = DisconnectReasonType.None;
+
 			if (_playerById.ContainsKey(clientSession.ClientId))
 			{
 				_log.Warn($"Client {clientSession.ClientId} try to join again");
@@ -50,6 +53,8 @@ namespace CTS.Instance.Gameplay
 			if (MemberCount >= _option.MaxMember)
 			{
 				_log.Warn($"This game instance is already full!");
+				rejectReason = DisconnectReasonType.GameInstanceIsAlreadyFull;
+				return false;
 			}
 
 			_playerById.Add(clientSession.ClientId, clientSession);
