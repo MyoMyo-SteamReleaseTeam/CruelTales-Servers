@@ -8,35 +8,40 @@ namespace CT.Network.Serialization
 {
 	public class PacketWriter
 	{
-		private PacketSegment _packet;
-		private ArraySegment<byte> _buffer;
-		public ArraySegment<byte> Buffer => _buffer;
-
-		public int Position { get; private set; }
-		public int Capacity => _packet.Capacity;
-
-		public PacketWriter()
+		public ArraySegment<byte> Buffer { get; private set; }
+		public bool IsEnd
 		{
-			_packet = new PacketSegment();
+			get
+			{
+				return Count >= Capacity;
+			}
 		}
+		public int Count => Position - Start;
+		public int Start { get; private set; }
+		public int Position { get; private set; }
+		public int Capacity { get; private set; }
 
 		public PacketWriter(PacketSegment packet)
 		{
-			_packet = packet;
-			_buffer = packet.Buffer;
-			Position = 0;
+			Initialize(packet.Buffer);
 		}
 
-		public void SetPakcet(PacketSegment packet)
+		public PacketWriter(ArraySegment<byte> buffer)
 		{
-			_packet = packet;
-			_buffer = packet.Buffer;
-			Position = 0;
+			Initialize(buffer);
+		}
+
+		public void Initialize(ArraySegment<byte> buffer)
+		{
+			Buffer = buffer;
+			Start = Buffer.Offset;
+			Position = Buffer.Offset;
+			Capacity = Buffer.Count;
 		}
 
 		public bool CanPut(int putSize)
 		{
-			return Position + putSize <= Capacity;
+			return Count + putSize <= Capacity;
 		}
 
 		public bool CanPut<T>(T serializeObject) where T : IPacketSerializable
@@ -51,85 +56,85 @@ namespace CT.Network.Serialization
 
 		public void Put(bool value)
 		{
-			BinaryConverter.WriteBool(_buffer, Position, value);
+			BinaryConverter.WriteBool(Buffer, Position, value);
 			Position += sizeof(byte);
 		}
 
 		public void Put(byte value)
 		{
-			BinaryConverter.WriteByte(_buffer, Position, value);
+			BinaryConverter.WriteByte(Buffer, Position, value);
 			Position += sizeof(byte);
 		}
 
 		public void Put(sbyte value)
 		{
-			BinaryConverter.WriteSByte(_buffer, Position, value);
+			BinaryConverter.WriteSByte(Buffer, Position, value);
 			Position += sizeof(sbyte);
 		}
 
 		public void Put(short value)
 		{
-			BinaryConverter.WriteInt16(_buffer, Position, value);
+			BinaryConverter.WriteInt16(Buffer, Position, value);
 			Position += sizeof(short);
 		}
 
 		public void Put(ushort value)
 		{
-			BinaryConverter.WriteUInt16(_buffer, Position, value);
+			BinaryConverter.WriteUInt16(Buffer, Position, value);
 			Position += sizeof(ushort);
 		}
 
 		public void Put(int value)
 		{
-			BinaryConverter.WriteInt32(_buffer, Position, value);
+			BinaryConverter.WriteInt32(Buffer, Position, value);
 			Position += sizeof(int);
 		}
 
 		public void Put(uint value)
 		{
-			BinaryConverter.WriteUInt32(_buffer, Position, value);
+			BinaryConverter.WriteUInt32(Buffer, Position, value);
 			Position += sizeof(uint);
 		}
 
 		public void Put(long value)
 		{
-			BinaryConverter.WriteInt64(_buffer, Position, value);
+			BinaryConverter.WriteInt64(Buffer, Position, value);
 			Position += sizeof(long);
 		}
 
 		public void Put(ulong value)
 		{
-			BinaryConverter.WriteUInt64(_buffer, Position, value);
+			BinaryConverter.WriteUInt64(Buffer, Position, value);
 			Position += sizeof(ulong);
 		}
 
 		public void Put(float value)
 		{
-			BinaryConverter.WriteSingle(_buffer, Position, value);
+			BinaryConverter.WriteSingle(Buffer, Position, value);
 			Position += sizeof(float);
 		}
 
 		public void Put(double value)
 		{
-			BinaryConverter.WriteDouble(_buffer, Position, value);
+			BinaryConverter.WriteDouble(Buffer, Position, value);
 			Position += sizeof(double);
 		}
 
 		public void Put(NetString value)
 		{
-			Position += BinaryConverter.WriteString(_buffer, Position, value);
+			Position += BinaryConverter.WriteString(Buffer, Position, value);
 		}
 
 		public void Put(NetStringShort value)
 		{
-			BinaryConverter.WriteByte(_buffer, Position, (byte)value.ByteSize);
+			BinaryConverter.WriteByte(Buffer, Position, (byte)value.ByteSize);
 			Position += sizeof(byte);
-			Position += BinaryConverter.WriteStringUnsafe(_buffer, Position, value.Value);
+			Position += BinaryConverter.WriteStringUnsafe(Buffer, Position, value.Value);
 		}
 
 		public void Put(byte[] value)
 		{
-			Position += BinaryConverter.WriteBytes(_buffer, Position, value);
+			Position += BinaryConverter.WriteBytes(Buffer, Position, value);
 		}
 	}
 }

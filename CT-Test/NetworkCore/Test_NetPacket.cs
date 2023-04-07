@@ -82,7 +82,7 @@ namespace CT.Test.NetworkCore
 		}
 
 		[TestMethod]
-		public void PacketCanRead()
+		public void PacketCanReadWrite()
 		{
 			PacketSegment ps = new PacketSegment(12);
 			PacketWriter writer = new PacketWriter(ps);
@@ -102,6 +102,49 @@ namespace CT.Test.NetworkCore
 			Assert.IsTrue(reader.CanRead(sizeof(double)));
 			Assert.AreEqual(doubleValue, reader.ReadDouble());
 			Assert.IsFalse(reader.CanRead(1));
+		}
+
+		[TestMethod]
+		public void PacketByArraySegment()
+		{
+			int testCount = 16;
+			int testOffset = 4;
+			byte[] data = new byte[testCount];
+
+			PacketSegment ps = new PacketSegment(data);
+			PacketWriter writer = new PacketWriter(ps);
+
+			writer.Put(10);
+			Assert.IsTrue(writer.CanPut(1));
+			Assert.IsFalse(writer.IsEnd);
+
+			writer.Put(20);
+			Assert.IsTrue(writer.CanPut(1));
+			Assert.IsFalse(writer.IsEnd);
+
+			writer.Put(30);
+			Assert.IsTrue(writer.CanPut(1));
+			Assert.IsFalse(writer.IsEnd);
+
+			writer.Put(40);
+			Assert.IsFalse(writer.CanPut(1));
+			Assert.IsTrue(writer.IsEnd);
+
+			ArraySegment<byte> segments = new(data, testOffset, testCount - testOffset);
+			ps = new PacketSegment(segments);
+			PacketReader reader = new PacketReader(ps);
+
+			Assert.AreEqual(20, reader.ReadInt32());
+			Assert.IsTrue(reader.CanRead(1));
+			Assert.IsFalse(reader.IsEnd);
+
+			Assert.AreEqual(30, reader.ReadInt32());
+			Assert.IsTrue(reader.CanRead(1));
+			Assert.IsFalse(reader.IsEnd);
+
+			Assert.AreEqual(40, reader.ReadInt32());
+			Assert.IsFalse(reader.CanRead(1));
+			Assert.IsTrue(reader.IsEnd);
 		}
 	}
 }
