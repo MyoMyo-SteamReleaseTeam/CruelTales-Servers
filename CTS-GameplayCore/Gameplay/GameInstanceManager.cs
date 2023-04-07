@@ -20,9 +20,7 @@ namespace CTS.Instance.Gameplay
 		// Game Instance
 		public int MaxGameCount { get; private set; }
 
-		// GUID는 바뀔 수 있음
 		private readonly Dictionary<GameInstanceGuid, GameInstance> _gameInstanceById = new();
-		// 생성되고 변하지 않음
 		private readonly List<GameInstance> _gameInstanceList = new();
 
 		private object _instanceManagerlock = new object();
@@ -39,10 +37,10 @@ namespace CTS.Instance.Gameplay
 			_serverTimer = tickTimer;
 			MaxGameCount = serverOption.GameCount;
 
-			for (int i = 0; i < MaxGameCount; i++)
+			for (int i = 1; i <= MaxGameCount; i++)
 			{
 				var instance = new GameInstance();
-				instance.Initialize(new GameInstanceGuid((ulong)_random.NextInt64()),
+				instance.Initialize(new GameInstanceGuid((ulong)i),
 									new GameInstanceOption() { MaxMember = 7 });
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);

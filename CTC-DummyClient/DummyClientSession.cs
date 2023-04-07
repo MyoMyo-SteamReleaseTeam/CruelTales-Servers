@@ -1,19 +1,24 @@
-﻿using CT.Network.DataType;
+﻿using CT.Network.Serialization;
 using CT.Packets;
 using LiteNetLib;
 using log4net;
 
 namespace CTC.DummyClient
 {
-	public class DummyClientNetworkManager
+	public class DummyClientSession
 	{
-		private static ILog _log = LogManager.GetLogger(typeof(DummyClientNetworkManager));
+		private static ILog _log = LogManager.GetLogger(typeof(DummyClientSession));
 
 		private EventBasedNetListener _listener;
 		private NetManager _netManager;
+		private NetPeer? _serverPeer;
 
-		public DummyClientNetworkManager()
+		private DummyUserInfo _userInfo;
+
+		public DummyClientSession(DummyUserInfo info)
 		{
+			_userInfo = info;
+
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
 
@@ -34,12 +39,21 @@ namespace CTC.DummyClient
 
 		private void OnConnected(NetPeer peer)
 		{
+			_serverPeer = peer;
 			_log.Info($"Success to connect to the server. Server endpoint : {peer.EndPoint}");
 
-			Client_Req_TryJoinGameInstance reqJoinMatch = new Client_Req_TryJoinGameInstance();
-			reqJoinMatch.MatchTo = new GameInstanceGuid(0);
-			//reqJoinMatch.Id = 
-			_log.Info($"Try send match endpoint to server...");
+			Client_Req_TryJoinGameInstance reqJoinGame = new Client_Req_TryJoinGameInstance();
+
+			reqJoinGame.MatchTo = _userInfo.GameInstanceGuid;
+			reqJoinGame.Id = _userInfo.ClientId;
+			reqJoinGame.Token = _userInfo.ClientToken;
+
+			_log.Info($"Try request join game to server... : {_userInfo}");
+
+			PacketWriter pw = new PacketWriter(new PacketSegment(1000));
+			pw.Put(reqJoinGame);
+
+			_serverPeer.Send(pw.Buffer.Array, 0, pw.Position, DeliveryMethod.ReliableOrdered);
 		}
 
 		private void OnDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

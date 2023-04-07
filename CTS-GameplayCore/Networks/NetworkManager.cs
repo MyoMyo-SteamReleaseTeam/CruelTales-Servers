@@ -76,7 +76,7 @@ namespace CTS.Instance.Networks
 				return;
 			}
 
-			var session = _sessionManager.Create();
+			var session = _sessionManager.Create(peer.Id);
 			if (!session.TryConnected(peer))
 			{
 				peer.Disconnect();

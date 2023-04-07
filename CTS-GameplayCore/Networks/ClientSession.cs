@@ -13,7 +13,6 @@ namespace CTS.Instance.Networks
 	{
 		NoConnection = 0,
 		WaitForJoinRequest,
-		WaitForJoinTheGame,
 		InGame,
 	}
 
@@ -65,8 +64,6 @@ namespace CTS.Instance.Networks
 				reason = LiteNetLibExtension.ConvertEnum(disconnectInfo.Reason);
 				disconnectInternal(reason);
 			}
-
-			_log.Info($"Client {this} disconnected. Reason : {reason}");
 		}
 
 		public void Disconnect(DisconnectReasonType disconnectReason)
@@ -75,8 +72,6 @@ namespace CTS.Instance.Networks
 			{
 				disconnectInternal(disconnectReason);
 			}
-
-			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
 		}
 
 		private void disconnectInternal(DisconnectReasonType disconnectReason)
@@ -87,7 +82,10 @@ namespace CTS.Instance.Networks
 			CurrentState = NetSessionState.NoConnection;
 			_peer?.Disconnect();
 			_sessionManager.Remove(this);
-			//GameInstance?.OnPlayerDisconnected(this); // TODO : Add disconnected job
+			GameInstance?.OnPlayerDisconnected(this); // TODO : Add disconnected job
+			GameInstance = null;
+
+			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
 		}
 
 		public bool TryConnected(NetPeer peer)
@@ -128,8 +126,9 @@ namespace CTS.Instance.Networks
 				await Task.Delay(1000);
 				lock (_clientSessionLock)
 				{
-					if (CurrentState == NetSessionState.WaitForJoinTheGame)
-						return;
+					if (CurrentState == NetSessionState.InGame || 
+						CurrentState == NetSessionState.NoConnection)
+					return;
 				}
 			}
 
@@ -140,7 +139,9 @@ namespace CTS.Instance.Networks
 		{
 			lock (_clientSessionLock)
 			{
-				if (CurrentState != NetSessionState.WaitForJoinTheGame)
+				_log.Info($"Client {ClientId} has been verified. [Token:{ClientToken}][TargetGUID:{GameInstanceGuid}]")
+					;
+				if (CurrentState != NetSessionState.WaitForJoinRequest)
 				{
 					_log.Warn($"Client {this} request join game when current state is {CurrentState}");
 					return;
@@ -161,15 +162,15 @@ namespace CTS.Instance.Networks
 
 					_log.Error($"Client {this} fail to join GameInstance {GameInstanceGuid}");
 					disconnectInternal(rejectReason);
+					return;
 				}
 				else
 				{
 					_log.Error($"There is no GameInstance with GUID {GameInstanceGuid}");
 					disconnectInternal(DisconnectReasonType.ThereIsNoSuchGameInstance);
+					return;
 				}
 			}
-
-			_log.Info($"Client {ClientId} has been verified. Token({ClientToken}) MatchEndPoint({GameInstanceGuid})");
 		}
 
 		public override string ToString()

@@ -1,12 +1,26 @@
 ﻿using System;
 using System.Runtime.Versioning;
 using System.Threading;
-using LiteNetLib;
+using CT.Network.DataType;
 using log4net;
-using static System.Collections.Specialized.BitVector32;
 
 namespace CTC.DummyClient
 {
+	public struct DummyUserInfo
+	{
+		public int DummyClientPort;
+		public ClientId ClientId;
+		public ClientToken ClientToken;
+		public GameInstanceGuid GameInstanceGuid;
+
+		public override string ToString()
+		{
+			return $"[{nameof(ClientId)}:{ClientId}]" +
+				$"[{nameof(ClientToken)}:{ClientToken}]" +
+				$"[{nameof(GameInstanceGuid)}:{GameInstanceGuid}]";
+		}
+	}
+
 	[SupportedOSPlatform("windows")]
 	internal class MainProcess
 	{
@@ -22,32 +36,47 @@ namespace CTC.DummyClient
 		{
 			Console.SetWindowSize(160, 25);
 
-			for (int i = 5; i >= 0; i--)
+			for (int i = 2; i >= 0; i--)
 			{
 				_log.Info($"Start dummy client test in {i}");
 				Thread.Sleep(1000);
 			}
 
-			for (int i = 0; i < 1000; i++)
+			for (int i = 1; i <= 10; i++)
 			{
-				int port = Interlocked.Increment(ref _dummyClientBindPort);
-				Thread t = new Thread(() => Start(port));
+				DummyUserInfo info = new DummyUserInfo()
+				{
+					DummyClientPort = _dummyClientBindPort + i,
+					ClientId = new ClientId((ulong)i * 100),
+					ClientToken = new ClientToken((ulong)(i * 10000)),
+					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 8) + 1))
+				};
+
+				//DummyUserInfo info = new DummyUserInfo()
+				//{
+				//	DummyClientPort = _dummyClientBindPort + i,
+				//	ClientId = new ClientId(1),
+				//	ClientToken = new ClientToken(2),
+				//	GameInstanceGuid = new GameInstanceGuid(3)
+				//};
+
+				Thread t = new Thread(() => Start(info));
 				t.IsBackground = false;
 				t.Start();
 			}
 		}
 
-		public static void Start(int port)
+		public static void Start(DummyUserInfo info)
 		{
-			DummyClientNetworkManager session = new();
+			DummyClientSession session = new(info);
 
 			try
 			{
-				_log.Info($"Bind Port : {port} / Try connect {ServerIp}:{ServerPort}");
+				_log.Info($"Bind Port : {info.DummyClientPort} / Try connect {ServerIp}:{ServerPort}");
 
 				lock (_lock)
 				{
-					session.Start(port);
+					session.Start(info.DummyClientPort);
 					session.TryConnect(ServerIp, ServerPort);
 				}
 			}

@@ -39,6 +39,7 @@ namespace CTS.Instance.Gameplay
 
 		}
 
+		// TODO : Bind operation as job
 		public bool TryJoinSession(ClientSession clientSession,
 								   out DisconnectReasonType rejectReason)
 		{
@@ -59,12 +60,26 @@ namespace CTS.Instance.Gameplay
 
 			_playerById.Add(clientSession.ClientId, clientSession);
 			_playerList.Add(clientSession);
+			_log.Info($"{this} Session {clientSession} join the game");
 			return true;
 		}
 
+		// TODO : Bind operation as job
 		public void OnPlayerDisconnected(ClientSession clientSession)
 		{
+			if (!_playerById.ContainsKey(clientSession.ClientId))
+			{
+				_log.Warn($"Player disconnected warning! There is no client {clientSession.ClientId}!");
+				return;
+			}
 
+			_playerById.Remove(clientSession.ClientId);
+			_log.Info($"{this} Session {clientSession} leave the game");
+		}
+
+		public override string ToString()
+		{
+			return $"[GUID:{Guid}][MemberCount:{MemberCount}]";
 		}
 	}
 }
