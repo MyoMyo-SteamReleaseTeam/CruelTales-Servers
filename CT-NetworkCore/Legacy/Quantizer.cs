@@ -1,4 +1,4 @@
-﻿namespace CT.Network.Legacy.Rerference
+﻿namespace CT.Network.Legacy
 {
 	public static class Quantizer
 	{
