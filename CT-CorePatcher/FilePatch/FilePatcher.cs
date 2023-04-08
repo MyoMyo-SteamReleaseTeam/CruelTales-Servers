@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CT.Tools.Data;
 
 namespace CT.CorePatcher.FilePatch
 {
@@ -173,8 +174,11 @@ namespace CT.CorePatcher.FilePatch
 				if (!Directory.Exists(targetDirPath))
 					Directory.CreateDirectory(targetDirPath);
 
-				File.Copy(srcFilePath, copyFilePath);
+				var readResult = FileHandler.TryReadText(srcFilePath);
+				
 				string copyFileName = Path.GetFileName(srcFilePath);
+				var copyFileContent = string.Format(FilePatcherFormat.CopyMetadata, copyFileName, readResult.Value);
+				FileHandler.TryWriteText(copyFilePath, copyFileContent);
 				PatcherConsole.PrintSaveSuccessResult("File copy completed : ",
 													  copyFileName, targetDirPath);
 			}

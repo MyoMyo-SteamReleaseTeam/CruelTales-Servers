@@ -276,7 +276,7 @@ namespace CT.CorePatcher.Packets
 			{
 				try
 				{
-					parser.GenerateDispatcherCode(packetNames, out var dispatcherCode, job.IsClient);
+					parser.GenerateDispatcherCode(packetNames, out var dispatcherCode, job.IsClient, dispatcherFileName);
 					var targetPath = Path.Combine(job.TargetPath, job.FileName);
 					var saveResult = FileHandler.TryWriteText(targetPath, dispatcherCode);
 					if (saveResult.ResultType == JobResultType.Success)
@@ -300,7 +300,7 @@ namespace CT.CorePatcher.Packets
 			string factoryFileName = PacketFormat.PacketFactoryFileName + ".cs";
 			try
 			{
-				parser.GenerateFactoryCode(packetNames, out var factoryCode);
+				parser.GenerateFactoryCode(packetNames, out var factoryCode, factoryFileName);
 				dispatcherPath = Path.Combine(dispatcherPath, factoryFileName);
 				var saveResult = FileHandler.TryWriteText(dispatcherPath, factoryCode);
 				if (saveResult.ResultType == JobResultType.Success)

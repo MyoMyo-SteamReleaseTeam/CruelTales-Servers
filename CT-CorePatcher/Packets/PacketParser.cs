@@ -37,7 +37,7 @@ namespace CT.CorePatcher.Packets
 			}
 		}
 
-		public void GenerateDispatcherCode(List<string> packetNames, out string code, bool isClient)
+		public void GenerateDispatcherCode(List<string> packetNames, out string code, bool isClient, string fileName)
 		{
 			string content = string.Empty;
 
@@ -61,9 +61,10 @@ namespace CT.CorePatcher.Packets
 			string format = isClient ? 
 				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
 			code = string.Format(format, content, sessionType + "Session");
+			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 
-		public void GenerateFactoryCode(List<string> packetNames, out string code)
+		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName)
 		{
 			string content = string.Empty;
 
@@ -76,6 +77,7 @@ namespace CT.CorePatcher.Packets
 				content = addIndent(content);
 
 			code = string.Format(PacketFormat.PacketFactoryFormat, content);
+			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 
 		public void ParseFromXml(string path, out string code, out List<string> packetNames)
