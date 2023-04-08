@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CT.Network.DataType;
-using CTS.Instance.Utils;
+using CT.Network.Runtimes;
 using log4net;
 
 namespace CTS.Instance.Gameplay

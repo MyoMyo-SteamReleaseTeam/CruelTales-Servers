@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using log4net;
 
-namespace CTS.Instance.Utils
+namespace CT.Network.Runtimes
 {
 	public class TickRunner
 	{
