@@ -5,9 +5,7 @@
  * Do not modify the code arbitrarily.
  */
 
-#if UNITY_2021_3
 using System.Collections.Generic;
-#endif
 using CT.Network.Serialization;
 using CT.Packets;
 

@@ -4,13 +4,17 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>CT.Network</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LiteNetLib\LiteNetLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,4 @@
-﻿#if NET7_0_OR_GREATER
-#else
-using System;
-#endif
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;

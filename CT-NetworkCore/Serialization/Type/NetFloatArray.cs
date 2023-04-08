@@ -1,9 +1,6 @@
-﻿#if NET7_0_OR_GREATER
-#else
-using System;
-using System.Collections.Generic;
-#endif
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace CT.Network.Serialization.Type
 {

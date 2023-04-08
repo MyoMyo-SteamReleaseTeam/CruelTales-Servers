@@ -212,9 +212,7 @@ namespace {1}
 		/// {0} Content<br/>
 		/// </summary>
 		public static readonly string PacketFactoryFormat =
-@"#if UNITY_2021_3
-using System.Collections.Generic;
-#endif
+@"using System.Collections.Generic;
 using CT.Network.Serialization;
 using CT.Packets;
 
