@@ -1,6 +1,10 @@
-﻿using CT.Packets;
+#if UNITY_2021_3
+using System.Collections.Generic;
+#endif
+using CT.Network.Serialization;
+using CT.Packets;
 
-namespace CT.Network.Serialization
+namespace CT.Network.Packets
 {
 	public delegate PacketBase CreatePacket(PacketReader reader);
 
@@ -13,6 +17,7 @@ namespace CT.Network.Serialization
 			{ PacketType.Server_InitialWorldState, (r) => r.Read<Server_InitialWorldState>() },
 			{ PacketType.Server_SpawnEntities, (r) => r.Read<Server_SpawnEntities>() },
 			{ PacketType.Server_DespawnEntities, (r) => r.Read<Server_DespawnEntities>() },
+			
 		};
 
 		public static PacketBase Create(PacketType packetType, PacketReader reader)

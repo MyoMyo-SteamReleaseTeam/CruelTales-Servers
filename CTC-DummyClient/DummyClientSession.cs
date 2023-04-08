@@ -3,7 +3,7 @@ using CT.Packets;
 using LiteNetLib;
 using log4net;
 
-namespace CTC.DummyClient
+namespace CTC.Networks
 {
 	public class DummyClientSession
 	{

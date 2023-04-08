@@ -1,6 +1,6 @@
-﻿using CT.Network.Serialization;
+﻿using CT.Packets;
 
-namespace CT.Packets
+namespace CT.Network.Serialization
 {
 	public static class PacketExtension
 	{
@@ -13,7 +13,7 @@ namespace CT.Packets
 		{
 			return (PacketType)reader.ReadUInt16();
 		}
-		
+
 		public static void Put(this PacketWriter writer, PacketType packetType)
 		{
 			writer.Put((ushort)packetType);

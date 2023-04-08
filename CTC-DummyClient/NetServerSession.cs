@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LiteNetLib;
 
-namespace CTC.DummyClient
+namespace CTC.Networks
 {
 	public class NetServerSession
 	{

@@ -4,7 +4,7 @@ using System.Threading;
 using CT.Network.DataType;
 using log4net;
 
-namespace CTC.DummyClient
+namespace CTC.Networks
 {
 	public struct DummyUserInfo
 	{

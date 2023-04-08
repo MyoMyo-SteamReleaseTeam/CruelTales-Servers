@@ -57,6 +57,7 @@ namespace CT.CorePatcher
 				return;
 			}
 
+			// File patch
 			List<StringArgument> sourcePathList = new();
 			List<StringArgument> targetPathList = new();
 

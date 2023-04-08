@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace CT.Tools.GetOpt
 {
@@ -12,6 +13,18 @@ namespace CT.Tools.GetOpt
 		public bool HasArgument(ref bool checker)
 		{
 			bool result = !string.IsNullOrEmpty(Argument);
+			checker &= result;
+			return result;
+		}
+	}
+
+	public class StringArgumentArray
+	{
+		public string[] ArgumentArray = new string[0];
+
+		public bool HasArgument(ref bool checker)
+		{
+			bool result = ArgumentArray.Length > 0;
 			checker &= result;
 			return result;
 		}
@@ -70,13 +83,29 @@ namespace CT.Tools.GetOpt
 		}
 
 		public static void BindArgument(OptionParser parser, string argumentName,
-								 int level, StringArgument value)
+										int level, StringArgument value)
 		{
 			parser.RegisterEvent(argumentName, level, (options) =>
 			{
 				try
 				{
 					value.Argument = options[0];
+				}
+				catch
+				{
+					throw new NoProcessArgumentsException(argumentName);
+				}
+			});
+		}
+
+		public static void BindArgumentArray(OptionParser parser, string argumentName,
+											 int level, StringArgumentArray values)
+		{
+			parser.RegisterEvent(argumentName, level, (options) =>
+			{
+				try
+				{
+					values.ArgumentArray = options.ToArray();
 				}
 				catch
 				{

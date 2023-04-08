@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
@@ -34,6 +35,47 @@ namespace CT.CorePatcher.Packets
 					_enumSizeByTypeName.Add(et.Name, enumSize);
 				}
 			}
+		}
+
+		public void GenerateDispatcherCode(List<string> packetNames, out string code, bool isClient)
+		{
+			string content = string.Empty;
+
+			foreach (var pn in packetNames)
+			{
+				if (isClient && pn.Contains(PacketFormat.ClientSidePacketPrefix) ||
+					!isClient && pn.Contains(PacketFormat.ServerSidePacketPrefix))
+				{
+					continue;
+				}
+
+				content += string.Format(PacketFormat.PacketDispatcherMember, pn) + NewLine;
+			}
+
+			for (int i = 0; i < 3; i++)
+				content = addIndent(content);
+
+			string sessionType = isClient ?
+				PacketFormat.ServerSidePacketPrefix : PacketFormat.ClientSidePacketPrefix;
+
+			string format = isClient ? 
+				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
+			code = string.Format(format, content, sessionType + "Session");
+		}
+
+		public void GenerateFactoryCode(List<string> packetNames, out string code)
+		{
+			string content = string.Empty;
+
+			foreach (var pn in packetNames)
+			{
+				content += string.Format(PacketFormat.PacketFactoryTableMember, pn) + NewLine;
+			}
+
+			for (int i = 0; i < 3; i++)
+				content = addIndent(content);
+
+			code = string.Format(PacketFormat.PacketFactoryFormat, content);
 		}
 
 		public void ParseFromXml(string path, out string code, out List<string> packetNames)
@@ -88,7 +130,8 @@ namespace CT.CorePatcher.Packets
 				if (type != PacketDataType.Other)
 				{
 					var dataTypeName = parseDataType(r, out string parseContent);
-					if (dataTypeName.Contains("Server") || dataTypeName.Contains("Client"))
+					if (dataTypeName.Contains(PacketFormat.ServerSidePacketPrefix) ||
+						dataTypeName.Contains(PacketFormat.ClientSidePacketPrefix))
 					{
 						packetNames.Add(dataTypeName);
 					}
@@ -108,9 +151,13 @@ namespace CT.CorePatcher.Packets
 			}
 
 			// Combine generated codes
+
+			string fileName = Path.GetFileNameWithoutExtension(path) + ".cs";
+
 			content = addIndent(content);
 			code = string.Format(PacketFormat.FileFormat,
 								 usingStatements, packetNamespace, content);
+			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 
 		/// <summary>
@@ -150,11 +197,11 @@ namespace CT.CorePatcher.Packets
 			// Set class signature
 			if (dataType == PacketDataType.ServerPacket)
 			{
-				className = PacketFormat.ServerSidePacketPrefix + className;
+				className = PacketFormat.ServerSidePacketPrefix + "_" + className;
 			}
 			else if (dataType == PacketDataType.ClientPacket)
 			{
-				className = PacketFormat.ClientSidePacketPrefix + className;
+				className = PacketFormat.ClientSidePacketPrefix + "_" + className;
 			}
 
 			// Generate data type definition codes
