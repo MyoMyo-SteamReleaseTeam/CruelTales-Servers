@@ -9,24 +9,20 @@ namespace CTC.Networks
 {
 	public static class PacketHandler
 	{
-		internal static void Handle_Server_Ack_TryJoinGameInstance(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_Ack_TryJoinGameInstance(PacketBase receivedPacket, ServerSession session)
 		{
-			throw new NotImplementedException();
 		}
 
-		internal static void Handle_Server_DespawnEntities(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_DespawnEntities(PacketBase receivedPacket, ServerSession session)
 		{
-			throw new NotImplementedException();
 		}
 
-		internal static void Handle_Server_InitialWorldState(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_InitialWorldState(PacketBase receivedPacket, ServerSession session)
 		{
-			throw new NotImplementedException();
 		}
 
-		internal static void Handle_Server_SpawnEntities(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_SpawnEntities(PacketBase receivedPacket, ServerSession session)
 		{
-			throw new NotImplementedException();
 		}
 	}
 }

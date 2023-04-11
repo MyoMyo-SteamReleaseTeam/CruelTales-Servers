@@ -214,12 +214,13 @@ namespace CT.CorePatcher.Packets
 
 			foreach (var op in operation)
 			{
+				string fileName = Path.GetFileName(op.TargetPath);
+				op.GeneratedCode = string.Format(PacketFormat.GeneratorMetadata, fileName, op.GeneratedCode);
 				var saveResult = FileHandler.TryWriteText(op.TargetPath, op.GeneratedCode, true);
-				string fileName = string.Empty;
 
 				if (saveResult.ResultType == JobResultType.Success)
 				{
-					fileName = Path.GetFileNameWithoutExtension(op.TargetPath) + ".cs";
+					//fileName = Path.GetFileNameWithoutExtension(op.TargetPath) + ".cs";
 					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
 															fileName, op.TargetPath);
 				}

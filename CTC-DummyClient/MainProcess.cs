@@ -42,14 +42,14 @@ namespace CTC.Networks
 				Thread.Sleep(1000);
 			}
 
-			for (int i = 1; i <= 10; i++)
+			for (int i = 1; i <= 200; i++)
 			{
 				DummyUserInfo info = new DummyUserInfo()
 				{
 					DummyClientPort = _dummyClientBindPort + i,
 					ClientId = new ClientId((ulong)i * 100),
 					ClientToken = new ClientToken((ulong)(i * 10000)),
-					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 8) + 1))
+					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 7) + 1))
 				};
 
 				//DummyUserInfo info = new DummyUserInfo()

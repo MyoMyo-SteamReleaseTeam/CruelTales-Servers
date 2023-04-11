@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- Packet definition from the server -->
+
+<Definition namespace="CT.Packets">
+	<!-- Using Segments -->>
+	<using>CT.Packets</using>>
+	<using>CT.Network.DataType</using>>
+	<using>CT.Network.Serialization</using>>
+	<using>CT.Network.Serialization.Type</using>>
+	
+	<!-- Declare Data Types -->>
+	<class name="Input_Movement">
+		<NetVec2 name="PivotPosition"/>
+		<NetVec2 name="Direction"/>
+		<Single name="Velocity"/>
+	</class>
+
+	<class name="Input_Action">
+		<Int32 name="ActionType"/>
+	</class>
+	
+	<!-- Declare Packets -->>
+	
+	<!-- Try Join Matching -->>
+	<client name="Req_PlayerInput_Movement">
+		<ClientToken name="Token"/>
+		<Input_Movement name="InputMovement"/>
+	</client>
+	<client name="Req_PlayerInput_Action">
+		<ClientToken name="Token"/>
+		<Input_Action name="InputAction"/>
+	</client>
+</Definition>

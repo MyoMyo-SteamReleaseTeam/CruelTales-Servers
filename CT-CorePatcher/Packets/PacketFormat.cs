@@ -18,8 +18,8 @@
 
 {1}";
 
-		public static readonly string ServerSidePacketPrefix = "Server";
-		public static readonly string ClientSidePacketPrefix = "Client";
+		public static readonly string ServerSidePacketPrefix = "SC";
+		public static readonly string ClientSidePacketPrefix = "CS";
 
 		#endregion
 
@@ -252,7 +252,7 @@ using CTS.Instance.Networks;
 
 namespace CTS.Instance.Packets
 {{
-	public delegate void HandlePacket(PacketBase receivedPacket, {1} session);
+	public delegate void HandlePacket(PacketBase receivedPacket, ClientSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -261,7 +261,7 @@ namespace CTS.Instance.Packets
 {0}
 		}};
 
-		public static void Dispatch(PacketBase receivedPacket, {1} session)
+		public static void Dispatch(PacketBase receivedPacket, ClientSession session)
 		{{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}
@@ -279,7 +279,7 @@ using CT.Packets;
 
 namespace CTC.Networks.Packets
 {{
-	public delegate void HandlePacket(PacketBase receivedPacket, {1} session);
+	public delegate void HandlePacket(PacketBase receivedPacket, ServerSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -288,7 +288,7 @@ namespace CTC.Networks.Packets
 {0}
 		}};
 
-		public static void Dispatch(PacketBase receivedPacket, {1} session)
+		public static void Dispatch(PacketBase receivedPacket, ServerSession session)
 		{{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}

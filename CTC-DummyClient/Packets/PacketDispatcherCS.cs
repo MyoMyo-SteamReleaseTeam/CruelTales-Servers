@@ -17,10 +17,10 @@ namespace CTC.Networks.Packets
 	{
 		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
-			{ PacketType.Server_Ack_TryJoinGameInstance, PacketHandler.Handle_Server_Ack_TryJoinGameInstance },
-			{ PacketType.Server_InitialWorldState, PacketHandler.Handle_Server_InitialWorldState },
-			{ PacketType.Server_SpawnEntities, PacketHandler.Handle_Server_SpawnEntities },
-			{ PacketType.Server_DespawnEntities, PacketHandler.Handle_Server_DespawnEntities },
+			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
+			{ PacketType.SC_InitialWorldState, PacketHandler.Handle_SC_InitialWorldState },
+			{ PacketType.SC_SpawnEntities, PacketHandler.Handle_SC_SpawnEntities },
+			{ PacketType.SC_DespawnEntities, PacketHandler.Handle_SC_DespawnEntities },
 			
 		};
 

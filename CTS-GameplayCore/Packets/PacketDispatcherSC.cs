@@ -18,7 +18,9 @@ namespace CTS.Instance.Packets
 	{
 		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
-			{ PacketType.Client_Req_TryJoinGameInstance, PacketHandler.Handle_Client_Req_TryJoinGameInstance },
+			{ PacketType.CS_Req_TryJoinGameInstance, PacketHandler.Handle_CS_Req_TryJoinGameInstance },
+			{ PacketType.CS_Req_PlayerInput_Movement, PacketHandler.Handle_CS_Req_PlayerInput_Movement },
+			{ PacketType.CS_Req_PlayerInput_Action, PacketHandler.Handle_CS_Req_PlayerInput_Action },
 			
 		};
 

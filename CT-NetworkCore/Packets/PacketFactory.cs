@@ -17,11 +17,13 @@ namespace CT.Network.Packets
 	{
 		private static Dictionary<PacketType, CreatePacket> _packetFactoryTable = new()
 		{
-			{ PacketType.Client_Req_TryJoinGameInstance, (r) => r.Read<Client_Req_TryJoinGameInstance>() },
-			{ PacketType.Server_Ack_TryJoinGameInstance, (r) => r.Read<Server_Ack_TryJoinGameInstance>() },
-			{ PacketType.Server_InitialWorldState, (r) => r.Read<Server_InitialWorldState>() },
-			{ PacketType.Server_SpawnEntities, (r) => r.Read<Server_SpawnEntities>() },
-			{ PacketType.Server_DespawnEntities, (r) => r.Read<Server_DespawnEntities>() },
+			{ PacketType.CS_Req_TryJoinGameInstance, (r) => r.Read<CS_Req_TryJoinGameInstance>() },
+			{ PacketType.SC_Ack_TryJoinGameInstance, (r) => r.Read<SC_Ack_TryJoinGameInstance>() },
+			{ PacketType.SC_InitialWorldState, (r) => r.Read<SC_InitialWorldState>() },
+			{ PacketType.SC_SpawnEntities, (r) => r.Read<SC_SpawnEntities>() },
+			{ PacketType.SC_DespawnEntities, (r) => r.Read<SC_DespawnEntities>() },
+			{ PacketType.CS_Req_PlayerInput_Movement, (r) => r.Read<CS_Req_PlayerInput_Movement>() },
+			{ PacketType.CS_Req_PlayerInput_Action, (r) => r.Read<CS_Req_PlayerInput_Action>() },
 			
 		};
 

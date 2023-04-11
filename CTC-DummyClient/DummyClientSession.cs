@@ -42,7 +42,7 @@ namespace CTC.Networks
 			_serverPeer = peer;
 			_log.Info($"Success to connect to the server. Server endpoint : {peer.EndPoint}");
 
-			Client_Req_TryJoinGameInstance reqJoinGame = new Client_Req_TryJoinGameInstance();
+			CS_Req_TryJoinGameInstance reqJoinGame = new CS_Req_TryJoinGameInstance();
 
 			reqJoinGame.MatchTo = _userInfo.GameInstanceGuid;
 			reqJoinGame.Id = _userInfo.ClientId;

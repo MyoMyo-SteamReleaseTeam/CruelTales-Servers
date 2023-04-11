@@ -60,7 +60,7 @@ namespace CT.CorePatcher.Packets
 
 			string format = isClient ? 
 				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
-			code = string.Format(format, content, sessionType + "Session");
+			code = string.Format(format, content);
 			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 

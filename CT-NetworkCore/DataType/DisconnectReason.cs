@@ -20,6 +20,7 @@
 		// CT Network's DisconnectReason
 		Unknown,
 		AuthenticationTimeout,
+		WrongPacket,
 
 		ThereIsNoSuchGameInstance,
 		GameInstanceIsAlreadyFull,

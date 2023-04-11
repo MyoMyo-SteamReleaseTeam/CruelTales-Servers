@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using CT.Network.DataType;
 using CT.Network.Packets;
 using CT.Network.Runtimes;
 using CT.Network.Serialization;
@@ -99,9 +100,11 @@ namespace CTS.Instance.Networks
 
 		private void onNetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
 		{
+			ClientSession? session = null;
+
 			try
 			{
-				if (_sessionManager.TryGetSessionBy(peer.Id, out var session))
+				if (_sessionManager.TryGetSessionBy(peer.Id, out session))
 				{
 					PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
 
@@ -116,7 +119,11 @@ namespace CTS.Instance.Networks
 			catch (Exception e)
 			{
 				_log.Error($"Receive error from : {peer.EndPoint.ToString()}", e);
-				peer.Disconnect();
+				session?.Disconnect(DisconnectReasonType.WrongPacket);
+				if (session == null)
+				{
+					peer.Disconnect();
+				}
 				return;
 			}
 		}
