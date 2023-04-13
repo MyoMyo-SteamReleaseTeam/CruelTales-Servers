@@ -1,4 +1,5 @@
-﻿using CT.Network.Serialization;
+﻿using CT.Network.DataType;
+using CT.Network.Serialization;
 using CT.Packets;
 using LiteNetLib;
 using log4net;
@@ -26,6 +27,7 @@ namespace CTC.Networks
 			_listener.PeerConnectedEvent += OnConnected;
 			_listener.PeerDisconnectedEvent += OnDisconnected;
 		}
+
 
 		public void Start(int clientBindPort)
 		{
@@ -58,7 +60,15 @@ namespace CTC.Networks
 
 		private void OnDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
 		{
-			_log.Warn($"Disconnected from the server. Disconnect reason : {disconnectInfo.Reason}");
+			if (disconnectInfo.AdditionalData.IsNull)
+			{
+				_log.Error($"Disconnected from the server. Disconnect reason : {disconnectInfo.Reason}");
+			}
+			else
+			{
+				var disconnectReason = (DisconnectReasonType)disconnectInfo.AdditionalData.GetByte();
+				_log.Warn($"Disconnected from the server. Disconnect reason : {disconnectReason}");
+			}
 		}
 
 		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)

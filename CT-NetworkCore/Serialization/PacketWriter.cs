@@ -36,6 +36,11 @@ namespace CT.Network.Serialization
 			Capacity = Buffer.Count;
 		}
 
+		public void Reset()
+		{
+			Position = Buffer.Offset;
+		}
+
 		public bool CanPut(int putSize)
 		{
 			return Count + putSize <= Capacity;

@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CT.Network.DataType;
+using CT.Network.Extensions;
 using CT.Network.Serialization;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
-using CT.Network.Extensions;
 using LiteNetLib;
 using log4net;
 
@@ -48,6 +49,9 @@ namespace CTS.Instance.Networks
 		// Lock
 		private object _clientSessionLock = new object();
 
+		// Buffer
+		private byte[] _disconnectReasonBuffer = new byte[1];
+
 		public ClientSession(SessionManager sessionManager,
 							 NetworkManager networkManager)
 		{
@@ -77,12 +81,19 @@ namespace CTS.Instance.Networks
 
 		private void disconnectInternal(DisconnectReasonType disconnectReason)
 		{
+			// Set state
 			if (CurrentState == NetSessionState.NoConnection)
 				return;
-
 			CurrentState = NetSessionState.NoConnection;
-			_peer?.Disconnect();
+
+			// Disconnect
+			_disconnectReasonBuffer[0] = (byte)disconnectReason;
+			_peer?.Disconnect(_disconnectReasonBuffer);
+
+			// Remove from session manager
 			_sessionManager.Remove(this);
+
+			// Leave from game instance and clear it's reference
 			GameInstance?.OnPlayerDisconnected(this); // TODO : Add disconnected job
 			GameInstance = null;
 

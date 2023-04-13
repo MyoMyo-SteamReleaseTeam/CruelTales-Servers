@@ -1,6 +1,8 @@
-﻿namespace CT.Network.DataType
+﻿using CT.Network.Serialization;
+
+namespace CT.Network.DataType
 {
-	public enum DisconnectReasonType
+	public enum DisconnectReasonType : byte
 	{
 		None = 0,
 
@@ -24,5 +26,19 @@
 
 		ThereIsNoSuchGameInstance,
 		GameInstanceIsAlreadyFull,
+	}
+
+	public static class DisconnectReasonTypeExtension
+	{
+		public static void PutDisconnectReasonType(this PacketWriter writer,
+												   DisconnectReasonType reasonType)
+		{
+			writer.Put((byte)reasonType);
+		}
+
+		public static DisconnectReasonType ReadDisconnectReasonType(this PacketReader reader)
+		{
+			return (DisconnectReasonType)reader.ReadByte();
+		}
 	}
 }
