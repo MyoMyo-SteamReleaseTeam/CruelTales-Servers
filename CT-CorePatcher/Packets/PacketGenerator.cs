@@ -199,6 +199,7 @@ namespace CT.CorePatcher.Packets
 								new List<string>(),
 								packetNames);
 
+				enumCode = string.Format(PacketFormat.GeneratorMetadata, enumFileName, enumCode);
 				var enumServer = Path.Combine(outputServer, enumFileName);
 				operation.Add(new CodeGenOperation()
 				{
@@ -215,7 +216,6 @@ namespace CT.CorePatcher.Packets
 			foreach (var op in operation)
 			{
 				string fileName = Path.GetFileName(op.TargetPath);
-				op.GeneratedCode = string.Format(PacketFormat.GeneratorMetadata, fileName, op.GeneratedCode);
 				var saveResult = FileHandler.TryWriteText(op.TargetPath, op.GeneratedCode, true);
 
 				if (saveResult.ResultType == JobResultType.Success)
