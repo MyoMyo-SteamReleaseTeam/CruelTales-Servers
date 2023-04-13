@@ -1,8 +1,10 @@
-﻿#if NET7_0_OR_GREATER
+﻿#if NET
 using System.Numerics;
-using CT.Network.Quantization;
+#elif UNITY_2021
+using UnityEngine;
 #endif
 
+using CT.Network.Quantization;
 using CT.Network.Serialization;
 
 namespace CT.Network.DataType.Input
@@ -20,6 +22,7 @@ namespace CT.Network.DataType.Input
 		public byte Direction;
 
 		public ByteDirection(Vector2 direction) => Direction = Quantizer.Vec2ToRadByte(direction);
+
 		public Vector2 GetDirectionVector2() => Quantizer.RadByteToVec2(Direction);
 		public int SerializeSize => sizeof(byte);
 		public void Serialize(PacketWriter writer) => writer.Put(Direction);

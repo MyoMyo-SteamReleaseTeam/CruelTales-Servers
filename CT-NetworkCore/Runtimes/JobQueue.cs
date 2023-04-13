@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace CT.Network.Runtimes
 {
+#if NET7_0_OR_GREATER
 	/// <summary>스레드로 부터 안전한 Job Queue 입니다. 우선 순위 Job Queue를 포함합니다.</summary>
 	/// <typeparam name="Job">Job의 타입입니다.</typeparam>
 	/// <typeparam name="FArg">Flush 후 Job과 함께 넘겨지는 인자의 타입입니다.</typeparam>
@@ -69,7 +70,7 @@ namespace CT.Network.Runtimes
 			{
 				_onJobExecute.Invoke(job, argument);
 			}
-			
+
 			while (true)
 			{
 				if (_jobPriorityQueueExecute.TryPeek(out _, out int ms))
@@ -94,7 +95,8 @@ namespace CT.Network.Runtimes
 			}
 		}
 	}
-	
+#endif
+
 	/// <summary>스레드로 부터 안전한 Job Queue 입니다.</summary>
 	/// <typeparam name="Job">Job의 타입입니다.</typeparam>
 	public class JobQueue<Job> where Job : struct
