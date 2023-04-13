@@ -37,11 +37,12 @@ namespace CTS.Instance.Gameplay
 			_serverTimer = tickTimer;
 			MaxGameCount = serverOption.GameCount;
 
+			var option = new GameInstanceOption() { MaxClient = 7 };
+
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
-				var instance = new GameInstance();
-				instance.Initialize(new GameInstanceGuid((ulong)i),
-									new GameInstanceOption() { MaxMember = 7 });
+				var instance = new GameInstance(_serverTimer);
+				instance.Initialize(new GameInstanceGuid((ulong)i), option);
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);
 			}

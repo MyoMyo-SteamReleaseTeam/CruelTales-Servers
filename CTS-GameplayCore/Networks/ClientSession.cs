@@ -13,6 +13,7 @@ namespace CTS.Instance.Networks
 	{
 		NoConnection = 0,
 		WaitForJoinRequest,
+		WaitForJoinGame,
 		InGame,
 	}
 
@@ -109,9 +110,9 @@ namespace CTS.Instance.Networks
 			PacketDispatcher.Dispatch(packet, this);
 		}
 
-		public void SendReliable(PacketWriter writer)
+		public void SendReliable(PacketWriter writer, int channelNumber)
 		{
-
+			//this._peer.Send(writer.Buffer, 0, writer.Count, channelNumber, DeliveryMethod.ReliableSequenced)
 		}
 
 		public void SendUnreliable(PacketWriter writer)
@@ -147,21 +148,15 @@ namespace CTS.Instance.Networks
 					return;
 				}
 
+				CurrentState = NetSessionState.WaitForJoinGame;
+
 				ClientId = id;
 				ClientToken = token;
 				GameInstanceGuid = roomGuid;
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					if (instance.TryJoinSession(this, out var rejectReason))
-					{
-						CurrentState = NetSessionState.InGame;
-						GameInstance = instance;
-						return;
-					}
-
-					_log.Error($"Client {this} fail to join GameInstance {GameInstanceGuid}");
-					disconnectInternal(rejectReason);
+					instance.TryJoinSession(this);
 					return;
 				}
 				else
@@ -171,6 +166,21 @@ namespace CTS.Instance.Networks
 					return;
 				}
 			}
+		}
+
+		public void Callback_TryJoinGame(bool isSuccess, GameInstance? instance, DisconnectReasonType rejectReason)
+		{
+			if (isSuccess)
+			{
+				CurrentState = NetSessionState.InGame;
+				GameInstance = instance;
+				return;
+
+			}
+
+			_log.Error($"Client {this} fail to join GameInstance {GameInstanceGuid}");
+			disconnectInternal(rejectReason);
+			return;
 		}
 
 		public override string ToString()

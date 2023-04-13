@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using CT.Network.DataType;
+using CT.Network.Runtimes;
+using CTS.Instance.Gameplay.ClientInput;
+using CTS.Instance.Gameplay.PlayerSession;
 using CTS.Instance.Networks;
 using log4net;
 
@@ -8,78 +10,88 @@ namespace CTS.Instance.Gameplay
 {
 	public class GameInstanceOption
 	{
-		public int MaxMember { get; set; }
+		public int MaxClient { get; set; }
 	}
 
 	public class GameInstance
 	{
-		// Log
-		[AllowNull]
-		public ILog _log;
+		// Support
+		[AllowNull] public ILog _log;
+		[AllowNull] private GameInstanceOption _option;
+		public TickTimer ServerTimer {get; private set; }
 
 		// Game Identification
 		public GameInstanceGuid Guid { get; private set; }
 
-		[AllowNull]
-		private GameInstanceOption _option;
-		private readonly Dictionary<ClientId, ClientSession> _playerById = new();
-		private readonly List<ClientSession> _playerList = new();
-		public int MemberCount => _playerById.Count;
+		// Handlers
+		private ClientSessionHandler _sessionHandler;
+		private ClientInputHandler _inputHandler;
+
+		public GameInstance(TickTimer serverTimer)
+		{
+			ServerTimer = serverTimer;
+			_sessionHandler = new ClientSessionHandler(this);
+			_inputHandler = new ClientInputHandler(this);
+		}
 
 		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
 		{
 			_log = LogManager.GetLogger($"{nameof(GameInstance)}_{guid}");
+			_option = option;
 
 			Guid = guid;
-			_option = option;
+
+			_sessionHandler.Initialize(_option);
+			_inputHandler.Clear();
 		}
 
+		/// <summary>Update logic</summary>
+		/// <param name="deltaTime">Delta Time</param>
 		public void Update(float deltaTime)
 		{
-
+			_sessionHandler.Flush();
+			_inputHandler.Flush(deltaTime);
 		}
 
-		// TODO : Bind operation as job
-		public bool TryJoinSession(ClientSession clientSession,
-								   out DisconnectReasonType rejectReason)
+		public void Shutdown(DisconnectReasonType reason)
 		{
-			rejectReason = DisconnectReasonType.None;
-
-			if (_playerById.ContainsKey(clientSession.ClientId))
+			foreach (var ps in _sessionHandler.PlayerList)
 			{
-				_log.Warn($"Client {clientSession.ClientId} try to join again");
-				return false;
+				DisconnectPlayer(ps, reason);
 			}
-
-			if (MemberCount >= _option.MaxMember)
-			{
-				_log.Warn($"This game instance is already full!");
-				rejectReason = DisconnectReasonType.GameInstanceIsAlreadyFull;
-				return false;
-			}
-
-			_playerById.Add(clientSession.ClientId, clientSession);
-			_playerList.Add(clientSession);
-			_log.Info($"{this} Session {clientSession} join the game");
-			return true;
 		}
 
-		// TODO : Bind operation as job
+		public void OnClientInput(ClientInputJob job)
+		{
+			_inputHandler.PushClientInput(job);
+		}
+
+		public void DisconnectPlayer(ClientSession clientSession, DisconnectReasonType reason)
+		{
+			clientSession.Disconnect(reason);
+		}
+
+		#region Session
+
+		/// <summary>게임 인스턴스에 접속을 시도합니다. 접속 결과는 Callback으로 호출됩니다.</summary>
+		/// <param name="clientSession"></param>
+		/// <param name="rejectReason"></param>
+		/// <returns></returns>
+		public void TryJoinSession(ClientSession clientSession)
+		{
+			_sessionHandler.Push_TryJoinGame(clientSession);
+		}
+
 		public void OnPlayerDisconnected(ClientSession clientSession)
 		{
-			if (!_playerById.ContainsKey(clientSession.ClientId))
-			{
-				_log.Warn($"Player disconnected warning! There is no client {clientSession.ClientId}!");
-				return;
-			}
-
-			_playerById.Remove(clientSession.ClientId);
-			_log.Info($"{this} Session {clientSession} leave the game");
+			_sessionHandler.Push_OnDisconnected(clientSession);
 		}
+
+		#endregion
 
 		public override string ToString()
 		{
-			return $"[GUID:{Guid}][MemberCount:{MemberCount}]";
+			return $"[GUID:{Guid}][MemberCount:{_sessionHandler.MemberCount}]";
 		}
 	}
 }

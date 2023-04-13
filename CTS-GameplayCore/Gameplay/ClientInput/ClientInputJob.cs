@@ -1,12 +1,12 @@
 ﻿using System.Runtime.InteropServices;
 using CT.Network.DataType.Input;
 
-namespace CT.Network.Runtimes
+namespace CTS.Instance.Gameplay.ClientInput
 {
 	[StructLayout(LayoutKind.Explicit)]
 	public struct ClientInputJob
 	{
-		[FieldOffset(0)] InputType Type;
-		[FieldOffset(4)] InputMovementData InputMovement;
+		[FieldOffset(0)] public InputType Type;
+		[FieldOffset(4)] public InputMovementData InputMovement;
 	}
 }
