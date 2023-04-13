@@ -1,5 +1,11 @@
 ﻿using System;
+
+#if NET7_0_OR_GREATER
 using System.Numerics;
+#elif UNITY_2021
+using UnityEngine;
+#endif
+
 using System.Runtime.CompilerServices;
 
 namespace CT.Network.Quantization
@@ -53,9 +59,15 @@ namespace CT.Network.Quantization
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static byte Vec2ToRadByte(Vector2 vec2)
 		{
+#if NET7_0_OR_GREATER
 			return vec2.Y >= 0 ?
 				(byte)(MathF.Acos(vec2.X) * QUANTIZE_RAD) : 
 				(byte)(MathF.Acos(-vec2.X) * QUANTIZE_RAD + 128);
+#elif UNITY_2021
+			return vec2.y >= 0 ?
+				(byte)(MathF.Acos(vec2.x) * QUANTIZE_RAD) : 
+				(byte)(MathF.Acos(-vec2.x) * QUANTIZE_RAD + 128);
+#endif
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

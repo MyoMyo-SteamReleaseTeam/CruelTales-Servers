@@ -59,14 +59,14 @@ namespace CT.Network.Runtimes
 
 				// Set ticks
 				long currentTick = _tickTimer.CurrentTick;
-				float deltaTimeSec = _tickTimer.GetSecDeltaTime_Float(currentTick, lastTick);
+				float deltaTimeSec = TickTimer.GetDeltaTimeSec_Float(currentTick, lastTick);
 				lastTick = currentTick;
 
 				// Update call
 				OnUpdate?.Invoke(deltaTimeSec);
 
 				// Calculate sleep time
-				float currentTimespent = _tickTimer.GetMsDeltaTime_Float(currentTick);
+				float currentTimespent = _tickTimer.GetDeltaTimeMs_Float(currentTick);
 				float sleepTimeDistance = FramePerMs - currentTimespent;
 
 				//#region Debug
