@@ -85,7 +85,7 @@ namespace CT.Tools.Collections
 		public uint Mask;
 
 		/// <summary>전체 비트의 크기입니다.</summary>
-		public const int BIT_SIZE = 8;
+		public const int BIT_SIZE = 32;
 		public const uint ALL_BIT_SET = 0x_FFFFFFFF;
 		public const uint ALL_BIT_UNSET = 0x_00000000;
 
