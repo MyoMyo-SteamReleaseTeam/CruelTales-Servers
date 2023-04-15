@@ -6,7 +6,7 @@
  */
 
 using System.Collections.Generic;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Packets;
 
 namespace CT.Network.Packets

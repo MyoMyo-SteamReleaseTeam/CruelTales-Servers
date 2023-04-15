@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 using CT.CorePatcher.Exceptions;
-using CT.Network.Serialization;
-using CT.Network.Serialization.Type;
 using CT.Packets;
 
 namespace CT.CorePatcher.Packets
@@ -223,7 +223,7 @@ namespace CT.CorePatcher.Packets
 				if (nextDataType == PacketDataType.Other)
 				{
 					// Parse members
-					parseMembers(r, out string parseMemberContent, out var memberTokens);
+					parseMembers(dataType, r, out string parseMemberContent, out var memberTokens);
 					memberTokenList.AddRange(memberTokens);
 					memberContent += parseMemberContent;
 				}
@@ -434,6 +434,8 @@ namespace CT.CorePatcher.Packets
 		{
 			/// <summary>멤버의 타입 이름입니다.</summary>
 			public string Type;
+			/// <summary>데이터 타입입니다.</summary>
+			public PacketDataType DataType;
 			/// <summary>멤버 변수의 이름입니다.</summary>
 			public string MemeberName;
 			/// <summary>원시 타입이거나 enum 타입인지 여부입니다.</summary>
@@ -449,7 +451,7 @@ namespace CT.CorePatcher.Packets
 		/// </summary>
 		/// <exception cref="WrongElementException"></exception>
 		/// <exception cref="WrongAttributeException"></exception>
-		private void parseMembers(XmlReader r, out string content,
+		private void parseMembers(PacketDataType dataType, XmlReader r, out string content,
 								  out List<MemberDefinitionToken> members)
 		{
 			int currentDepth = r.Depth;
@@ -511,11 +513,25 @@ namespace CT.CorePatcher.Packets
 				}
 				else
 				{
-					memberContent += m.HasGeneric ?
-						string.Format(PacketFormat.MemberDeclarationGeneric,
-									  m.Type, m.GenericType, m.MemeberName) :
-						string.Format(PacketFormat.MemberDeclaration,
-									  m.Type, m.MemeberName, @"new()");
+					if (m.HasGeneric)
+					{
+						memberContent += string.Format(PacketFormat.MemberDeclarationGeneric,
+													   m.Type, m.GenericType, m.MemeberName);
+					}
+					else
+					{
+						// Struct은 클래스를 멤버로 가지고 있을 수 없다.
+						if (dataType == PacketDataType.Struct)
+						{
+							memberContent += string.Format(PacketFormat.MemberDeclarationNotInitialize,
+														   m.Type, m.MemeberName);
+						}
+						else
+						{
+							memberContent += string.Format(PacketFormat.MemberDeclaration,
+														   m.Type, m.MemeberName, @"new()");
+						}
+					}
 				}
 
 				if (i < members.Count - 1)

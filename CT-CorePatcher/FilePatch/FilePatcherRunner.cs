@@ -29,7 +29,7 @@
 			FilePatcher filePatcher = new FilePatcher();
 
 			filePatcher.SetupGuardExtension(".asmdef");
-			filePatcher.SetupIncludeExtension(".cs", ".meta");
+			filePatcher.SetupIncludeExtension(".cs");
 			filePatcher.SetupExcludeFolderName("obj", "bin", "debug", "build", "Legacy");
 
 			filePatcher.SetupSourceDirectory(sourcePath);

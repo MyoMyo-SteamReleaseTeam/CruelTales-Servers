@@ -5,9 +5,9 @@
  * Do not modify the code arbitrarily.
  */
 
-using CT.Network.DataType;
-using CT.Network.Serialization;
-using CT.Network.Serialization.Type;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {

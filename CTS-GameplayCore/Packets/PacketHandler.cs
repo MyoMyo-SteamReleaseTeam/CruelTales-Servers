@@ -1,5 +1,5 @@
 ﻿using System;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Packets;
 using CTS.Instance.Networks;
 using log4net;

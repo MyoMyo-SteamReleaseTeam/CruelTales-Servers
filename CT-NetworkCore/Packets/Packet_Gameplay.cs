@@ -5,12 +5,32 @@
  * Do not modify the code arbitrarily.
  */
 
-using CT.Network.DataType;
-using CT.Network.Serialization;
-using CT.Network.Serialization.Type;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {
+	public partial struct NetEntityIno : IPacketSerializable
+	{
+		public NetEntityType Type;
+		public NetEntityId Id;
+	
+		public int SerializeSize => Id.SerializeSize + 1;
+	
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Type);
+			Id.Serialize(writer);
+		}
+	
+		public void Deserialize(PacketReader reader)
+		{
+			Type = reader.ReadNetEntityType();
+			Id.Deserialize(reader);
+		}
+	}
+	
 	public sealed class SC_InitialWorldState : PacketBase
 	{
 		public override PacketType PacketType => PacketType.SC_InitialWorldState;
@@ -55,7 +75,7 @@ namespace CT.Packets
 	{
 		public override PacketType PacketType => PacketType.SC_DespawnEntities;
 	
-		public NetFixedArray<NetEntityID> DespawnEntities = new NetFixedArray<NetEntityID>();
+		public NetFixedArray<NetEntityId> DespawnEntities = new NetFixedArray<NetEntityId>();
 	
 		public override int SerializeSize => DespawnEntities.SerializeSize + 2;
 	

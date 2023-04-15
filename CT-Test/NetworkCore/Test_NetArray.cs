@@ -1,5 +1,5 @@
-﻿using CT.Network.Serialization;
-using CT.Network.Serialization.Type;
+﻿using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 
 namespace CTC.Networks
 {

@@ -1,5 +1,5 @@
-﻿using CT.Network.DataType;
-using CT.Network.Serialization;
+﻿using CT.Common.DataType;
+using CT.Common.Serialization;
 using CT.Packets;
 using LiteNetLib;
 using log4net;

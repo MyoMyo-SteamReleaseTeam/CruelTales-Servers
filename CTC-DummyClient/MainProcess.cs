@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Versioning;
 using System.Threading;
-using CT.Network.DataType;
+using CT.Common.DataType;
 using log4net;
 
 namespace CTC.Networks

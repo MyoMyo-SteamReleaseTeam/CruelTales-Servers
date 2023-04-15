@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using CT.Network.DataType;
+using CT.Common.DataType;
 using CT.Network.Runtimes;
 using log4net;
 

@@ -1,4 +1,4 @@
-﻿using CT.Network.DataType;
+﻿using CT.Common.DataType;
 using LiteNetLib;
 
 namespace CT.Network.Extensions

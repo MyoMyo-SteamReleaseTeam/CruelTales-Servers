@@ -1,5 +1,5 @@
 ﻿using System;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Network.Serialization.Type;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -5,11 +5,15 @@
 <Definition namespace="CT.Packets">
 	<!-- Using Segments -->>
 	<using>CT.Packets</using>>
-	<using>CT.Network.DataType</using>>
-	<using>CT.Network.Serialization</using>>
-	<using>CT.Network.Serialization.Type</using>>
-	
+	<using>CT.Common.DataType</using>>
+	<using>CT.Common.Serialization</using>>
+	<using>CT.Common.Serialization.Type</using>>
+
 	<!-- Declare Data Types -->>
+	<struct name="NetEntityIno">
+		<NetEntityType name="Type"/>
+		<NetEntityId name="Id"/>
+	</struct>
 	
 	<!-- Declare Packets -->>
 	<server name="InitialWorldState">
@@ -21,6 +25,6 @@
 	</server>
 
 	<server name="DespawnEntities">
-		<NetFixedArray name="DespawnEntities" type="NetEntityID"/>
+		<NetFixedArray name="DespawnEntities" type="NetEntityId"/>
 	</server>
 </Definition>

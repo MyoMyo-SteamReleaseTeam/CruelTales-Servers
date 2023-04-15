@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using CT.Network.DataType;
+using CT.Common.DataType;
 using CT.Network.Runtimes;
-using CTS.Instance.Gameplay.ClientInput;
-using CTS.Instance.Gameplay.PlayerSession;
 using CTS.Instance.Networks;
 using log4net;
 

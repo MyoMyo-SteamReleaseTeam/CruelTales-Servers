@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Intrinsics.Arm;
-using CT.Network.Serialization.Type;
+using CT.Common.Serialization.Type;
 using CT.Tools.CodeGen;
 using CT.Tools.ConsoleHelper;
 using CT.Tools.Data;
@@ -18,6 +17,7 @@ namespace CT.CorePatcher.Packets
 		public const string XML_PATH = @$"xmlPath";
 		public const string OUTPUT_SERVER = @$"outputServer";
 
+		public const string PACKET_TYPE_PATH = @"packetTypePath";
 		public const string FACTORY_PATH = @"factoryPath";
 		public const string SERVER_DISPATCHER = @"sdispatcher";
 		public const string CLIENT_DISPATCHER = @"cdispatcher";
@@ -33,6 +33,7 @@ namespace CT.CorePatcher.Packets
 			StringArgument xmlPath = new();
 			StringArgument outputServer = new();
 
+			StringArgument packetTypePath = new();
 			StringArgument factoryPath = new();
 			StringArgumentArray serverDispatcherPaths = new();
 			StringArgumentArray clientDispatcherPaths = new();
@@ -44,6 +45,7 @@ namespace CT.CorePatcher.Packets
 			OptionParser.BindArgument(op, PACKET_TYPE_NAME, 1, packetTypeName);
 			OptionParser.BindArgument(op, BASE_NAMESPACE, 1, baseNamespace);
 
+			OptionParser.BindArgument(op, PACKET_TYPE_PATH, 2, packetTypePath);
 			OptionParser.BindArgument(op, FACTORY_PATH, 2, factoryPath);
 			OptionParser.BindArgumentArray(op, SERVER_DISPATCHER, 2, serverDispatcherPaths);
 			OptionParser.BindArgumentArray(op, CLIENT_DISPATCHER, 2, clientDispatcherPaths);
@@ -92,6 +94,7 @@ namespace CT.CorePatcher.Packets
 			try
 			{
 				generatePacket(xmlPath.Argument,
+							   packetTypePath.Argument,
 							   outputServer.Argument,
 							   packetTypeName.Argument,
 							   baseNamespace.Argument,
@@ -122,6 +125,7 @@ namespace CT.CorePatcher.Packets
 		}
 
 		private static void generatePacket(string xmlPath,
+										   string packetTypePath,
 										   string outputServer,
 										   string packetTypeName,
 										   string baseNamespace,
@@ -194,17 +198,17 @@ namespace CT.CorePatcher.Packets
 			{
 				var enumCode = CodeGenerator_Enumerate
 					.Generate(packetTypeName,
-								baseNamespace,
-								true, true,
-								new List<string>(),
-								packetNames);
+							  baseNamespace,
+							  true, true,
+							  new List<string>(),
+							  packetNames);
 
 				enumCode = string.Format(PacketFormat.GeneratorMetadata, enumFileName, enumCode);
-				var enumServer = Path.Combine(outputServer, enumFileName);
+				var packetTypeTarget = Path.Combine(packetTypePath, enumFileName);
 				operation.Add(new CodeGenOperation()
 				{
 					GeneratedCode = enumCode,
-					TargetPath = enumServer
+					TargetPath = packetTypeTarget
 				});
 			}
 			catch (Exception e)

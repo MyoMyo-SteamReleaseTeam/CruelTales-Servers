@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using CT.Network.DataType;
+using CT.Common.DataType;
+using CT.Common.Serialization;
 using CT.Network.Packets;
 using CT.Network.Runtimes;
-using CT.Network.Serialization;
 using CT.Packets;
 using CTS.Instance.Gameplay;
 using LiteNetLib;

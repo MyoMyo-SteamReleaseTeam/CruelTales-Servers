@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CT.Network.DataType;
+using CT.Common.DataType;
+using CT.Common.Serialization;
 using CT.Network.Extensions;
-using CT.Network.Serialization;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
 using LiteNetLib;

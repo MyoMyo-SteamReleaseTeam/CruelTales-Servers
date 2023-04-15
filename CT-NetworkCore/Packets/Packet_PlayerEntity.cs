@@ -5,15 +5,15 @@
  * Do not modify the code arbitrarily.
  */
 
-using CT.Network.DataType;
-using CT.Network.Serialization;
-using CT.Network.Serialization.Type;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {
 	public sealed partial class EntityPlayerState : IPacketSerializable
 	{
-		public NetEntityID NetID = new();
+		public NetEntityId NetID = new();
 		public NetTransform Transform = new();
 	
 		public int SerializeSize => NetID.SerializeSize + Transform.SerializeSize;

@@ -134,6 +134,13 @@ namespace {1}
 		/// <summary>
 		/// {0} Data Type<br/>
 		/// {1} Name<br/>
+		/// {2} Default value or constructor<br/>
+		/// </summary>
+		public static readonly string MemberDeclarationNotInitialize = @"public {0} {1};";
+
+		/// <summary>
+		/// {0} Data Type<br/>
+		/// {1} Name<br/>
 		/// </summary>
 		public static readonly string MemberPrimitiveDeclaration = @"public {0} {1};";
 
@@ -213,7 +220,7 @@ namespace {1}
 		/// </summary>
 		public static readonly string PacketFactoryFormat =
 @"using System.Collections.Generic;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Packets;
 
 namespace CT.Network.Packets
@@ -246,7 +253,7 @@ namespace CT.Network.Packets
 		/// </summary>
 		public static readonly string PacketDispatcherServerFormat =
 @"using System.Collections.Generic;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Packets;
 using CTS.Instance.Networks;
 
@@ -274,7 +281,7 @@ namespace CTS.Instance.Packets
 		/// </summary>
 		public static readonly string PacketDispatcherClientFormat =
 @"using System.Collections.Generic;
-using CT.Network.Serialization;
+using CT.Common.Serialization;
 using CT.Packets;
 
 namespace CTC.Networks.Packets
