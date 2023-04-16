@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
@@ -30,6 +31,10 @@ namespace CTS.Instance.Gameplay
 
 		// DI
 		private readonly GameInstance _gameInstance;
+
+		// Events
+		public event Action<ClientSession> OnClientEnterGame;
+		public event Action<ClientSession> OnClientLeaveGame;
 
 		// Settings
 		public int MemberCount => _playerById.Count;
@@ -99,6 +104,7 @@ namespace CTS.Instance.Gameplay
 			_playerById.Add(clientSession.ClientId, clientSession);
 			_playerList.Add(clientSession);
 
+			OnClientEnterGame(clientSession);
 			clientSession.Callback_TryJoinGame(true, _gameInstance, DisconnectReasonType.None);
 
 			_log.Info($"{this} Session {clientSession} join the game");
@@ -118,10 +124,11 @@ namespace CTS.Instance.Gameplay
 			if (_playerById.TryRemove(clientSession.ClientId))
 			{
 				_log.Info($"{this} Session {clientSession} leave the game");
+				OnClientLeaveGame(clientSession);
 			}
 			else
 			{
-				_log.Warn($"Player disconnected warning! There is no client {clientSession.ClientId}!");
+				_log.Error($"Player disconnected warning! There is no client {clientSession.ClientId}!");
 			}
 		}
 	}

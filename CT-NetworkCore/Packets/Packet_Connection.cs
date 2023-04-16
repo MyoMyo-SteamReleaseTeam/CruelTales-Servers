@@ -31,7 +31,7 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class CS_Req_TryJoinGameInstance : PacketBase
+	public sealed partial class CS_Req_TryJoinGameInstance : PacketBase
 	{
 		public override PacketType PacketType => PacketType.CS_Req_TryJoinGameInstance;
 	
@@ -57,7 +57,7 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class SC_Ack_TryJoinGameInstance : PacketBase
+	public sealed partial class SC_Ack_TryJoinGameInstance : PacketBase
 	{
 		public override PacketType PacketType => PacketType.SC_Ack_TryJoinGameInstance;
 	

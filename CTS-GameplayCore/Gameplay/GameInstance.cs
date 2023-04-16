@@ -29,6 +29,8 @@ namespace CTS.Instance.Gameplay
 		{
 			ServerTimer = serverTimer;
 			_sessionHandler = new ClientSessionHandler(this);
+			_sessionHandler.OnClientLeaveGame += onClientLeaveGame;
+			_sessionHandler.OnClientEnterGame += onClientEnterGame;
 			_inputHandler = new ClientInputHandler(this);
 		}
 
@@ -71,16 +73,24 @@ namespace CTS.Instance.Gameplay
 
 		#region Session
 
+		private void onClientEnterGame(ClientSession obj)
+		{
+		}
+
+		private void onClientLeaveGame(ClientSession obj)
+		{
+		}
+
 		/// <summary>게임 인스턴스에 접속을 시도합니다. 접속 결과는 Callback으로 호출됩니다.</summary>
 		/// <param name="clientSession"></param>
 		/// <param name="rejectReason"></param>
 		/// <returns></returns>
-		public void TryJoinSession(ClientSession clientSession)
+		public void Push_TryJoinSession(ClientSession clientSession)
 		{
 			_sessionHandler.Push_TryJoinGame(clientSession);
 		}
 
-		public void OnPlayerDisconnected(ClientSession clientSession)
+		public void Push_OnDisconnected(ClientSession clientSession)
 		{
 			_sessionHandler.Push_OnDisconnected(clientSession);
 		}

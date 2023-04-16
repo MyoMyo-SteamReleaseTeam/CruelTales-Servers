@@ -131,14 +131,19 @@ namespace CT.CorePatcher.Packets
 
 				if (type != PacketDataType.Other)
 				{
-					var dataTypeName = parseDataType(r, out string parseContent);
+					var dataTypeName = parseDataType(r, out string parseContent,
+													 out bool isCustom);
 					if (dataTypeName.Contains(PacketFormat.ServerSidePacketPrefix) ||
 						dataTypeName.Contains(PacketFormat.ClientSidePacketPrefix))
 					{
 						packetNames.Add(dataTypeName);
 					}
 
-					content += parseContent;
+					if (parseContent != null && !isCustom)
+					{
+						content += parseContent;
+					}
+
 					if (!r.EOF)
 					{
 						content += NewLine + NewLine;
@@ -172,7 +177,7 @@ namespace CT.CorePatcher.Packets
 		/// <exception cref="WrongDataTypeException"></exception>
 		/// <exception cref="WrongDeclarationException"></exception>
 		/// <exception cref="WrongAttributeException"></exception>
-		private string parseDataType(XmlReader r, out string content)
+		private string parseDataType(XmlReader r, out string content, out bool isCustom)
 		{
 			if (isValidElement(r) == false)
 				throw new WrongElementException(r);
@@ -195,6 +200,11 @@ namespace CT.CorePatcher.Packets
 
 			if (!tryParse(r, PacketAttributeType.Name, out className))
 				throw new WrongAttributeException(r, PacketAttributeType.Name);
+
+			if (tryParse(r, PacketAttributeType.Custom, out var custom))
+				isCustom = custom.ToLower() == "true";
+			else
+				isCustom = false;
 
 			// Set class signature
 			if (dataType == PacketDataType.ServerPacket)
@@ -230,7 +240,7 @@ namespace CT.CorePatcher.Packets
 				else
 				{
 					// Parse data type recursively
-					parseDataType(r, out string dataContent);
+					parseDataType(r, out string dataContent, out _);
 					dataTypeContent += addIndentWithNewLine(dataContent) + NewLine;
 				}
 
@@ -471,7 +481,7 @@ namespace CT.CorePatcher.Packets
 
 				if (PacketHelper.GetPacketDataType(r) != PacketDataType.Other)
 				{
-					parseDataType(r, out string dataContent);
+					parseDataType(r, out string dataContent, out _);
 					content += addIndentWithNewLine(dataContent) + NewLine;
 					continue;
 				}

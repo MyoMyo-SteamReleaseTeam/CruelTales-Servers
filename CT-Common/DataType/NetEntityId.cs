@@ -11,6 +11,11 @@ namespace CT.Common.DataType
 		public static implicit operator byte(NetEntityId value) => value.ID;
 		public static explicit operator NetEntityId(byte value) => new NetEntityId(value);
 
+		public NetEntityId(int value)
+		{
+			ID = (byte)value;
+		}
+
 		public NetEntityId(byte value)
 		{
 			ID = value;

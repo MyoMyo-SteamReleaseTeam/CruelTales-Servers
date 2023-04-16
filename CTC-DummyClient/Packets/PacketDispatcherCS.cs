@@ -20,7 +20,6 @@ namespace CTC.Networks.Packets
 			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
 			{ PacketType.SC_InitialWorldState, PacketHandler.Handle_SC_InitialWorldState },
 			{ PacketType.SC_SpawnEntities, PacketHandler.Handle_SC_SpawnEntities },
-			{ PacketType.SC_DespawnEntities, PacketHandler.Handle_SC_DespawnEntities },
 			
 		};
 

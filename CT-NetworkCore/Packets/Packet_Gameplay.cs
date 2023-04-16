@@ -11,27 +11,7 @@ using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {
-	public partial struct NetEntityIno : IPacketSerializable
-	{
-		public NetEntityType Type;
-		public NetEntityId Id;
-	
-		public int SerializeSize => Id.SerializeSize + 1;
-	
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(Type);
-			Id.Serialize(writer);
-		}
-	
-		public void Deserialize(PacketReader reader)
-		{
-			Type = reader.ReadNetEntityType();
-			Id.Deserialize(reader);
-		}
-	}
-	
-	public sealed class SC_InitialWorldState : PacketBase
+	public sealed partial class SC_InitialWorldState : PacketBase
 	{
 		public override PacketType PacketType => PacketType.SC_InitialWorldState;
 	
@@ -51,43 +31,5 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed class SC_SpawnEntities : PacketBase
-	{
-		public override PacketType PacketType => PacketType.SC_SpawnEntities;
 	
-		public NetArray<EntityPlayerState> SpawnedEntities = new NetArray<EntityPlayerState>();
-	
-		public override int SerializeSize => SpawnedEntities.SerializeSize + 2;
-	
-		public override void Serialize(PacketWriter writer)
-		{
-			writer.Put(PacketType);
-			SpawnedEntities.Serialize(writer);
-		}
-	
-		public override void Deserialize(PacketReader reader)
-		{
-			SpawnedEntities.Deserialize(reader);
-		}
-	}
-	
-	public sealed class SC_DespawnEntities : PacketBase
-	{
-		public override PacketType PacketType => PacketType.SC_DespawnEntities;
-	
-		public NetFixedArray<NetEntityId> DespawnEntities = new NetFixedArray<NetEntityId>();
-	
-		public override int SerializeSize => DespawnEntities.SerializeSize + 2;
-	
-		public override void Serialize(PacketWriter writer)
-		{
-			writer.Put(PacketType);
-			DespawnEntities.Serialize(writer);
-		}
-	
-		public override void Deserialize(PacketReader reader)
-		{
-			DespawnEntities.Deserialize(reader);
-		}
-	}
 }

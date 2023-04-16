@@ -14,7 +14,6 @@ namespace CT.Packets
 		SC_Ack_TryJoinGameInstance,
 		SC_InitialWorldState,
 		SC_SpawnEntities,
-		SC_DespawnEntities,
 		CS_Req_PlayerInput_Movement,
 		CS_Req_PlayerInput_Action,
 	}

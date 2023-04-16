@@ -11,7 +11,8 @@
 
 	<!-- Declare Data Types -->>
 	<class name="EntityPlayerState">
-		<NetEntityId name="NetID"/>
+		<NetEntityId name="Id"/>
+		<NetEntityType name="Type"/>
 		<NetTransform name="Transform"/>
 	</class>
 

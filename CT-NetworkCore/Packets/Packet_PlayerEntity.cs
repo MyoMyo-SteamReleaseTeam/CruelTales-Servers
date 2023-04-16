@@ -13,20 +13,23 @@ namespace CT.Packets
 {
 	public sealed partial class EntityPlayerState : IPacketSerializable
 	{
-		public NetEntityId NetID = new();
+		public NetEntityId Id = new();
+		public NetEntityType Type;
 		public NetTransform Transform = new();
 	
-		public int SerializeSize => NetID.SerializeSize + Transform.SerializeSize;
+		public int SerializeSize => Id.SerializeSize + Transform.SerializeSize + 1;
 	
 		public void Serialize(PacketWriter writer)
 		{
-			NetID.Serialize(writer);
+			Id.Serialize(writer);
+			writer.Put(Type);
 			Transform.Serialize(writer);
 		}
 	
 		public void Deserialize(PacketReader reader)
 		{
-			NetID.Deserialize(reader);
+			Id.Deserialize(reader);
+			Type = reader.ReadNetEntityType();
 			Transform.Deserialize(reader);
 		}
 	}

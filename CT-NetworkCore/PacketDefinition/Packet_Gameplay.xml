@@ -10,21 +10,19 @@
 	<using>CT.Common.Serialization.Type</using>>
 
 	<!-- Declare Data Types -->>
-	<struct name="NetEntityIno">
-		<NetEntityType name="Type"/>
-		<NetEntityId name="Id"/>
-	</struct>
 	
 	<!-- Declare Packets -->>
 	<server name="InitialWorldState">
 		<NetStringShort name="MiniGameName"/>
 	</server>
-	
-	<server name="SpawnEntities">
-		<NetArray name="SpawnedEntities" type="EntityPlayerState"/>
-	</server>
+
+	<server name="SpawnEntities" custom="true"/>
+	<!--<server name="SpawnEntities">
+		<NetArray name="SpawnInfoList" type="BaseEntity"/>
+	</server>-->
 
 	<server name="DespawnEntities">
-		<NetFixedArray name="DespawnEntities" type="NetEntityId"/>
+		<NetFixedArray name="DespawnIdArray" type="NetEntityId"/>
 	</server>
+	
 </Definition>

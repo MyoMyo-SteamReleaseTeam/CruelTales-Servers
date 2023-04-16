@@ -9,7 +9,8 @@ namespace CT.CorePatcher.Packets
 		None = 0,
 		Name,
 		Type,
-		Namespace
+		Namespace,
+		Custom,
 	}
 
 	internal enum PacketDataType
@@ -47,8 +48,8 @@ namespace CT.CorePatcher.Packets
 
 		private static readonly Dictionary<PacketDataType, string> _declarationByDataType = new()
 		{
-			{ PacketDataType.ServerPacket, "sealed class" },
-			{ PacketDataType.ClientPacket, "sealed class" },
+			{ PacketDataType.ServerPacket, "sealed partial class" },
+			{ PacketDataType.ClientPacket, "sealed partial class" },
 			{ PacketDataType.Struct, "partial struct" },
 			{ PacketDataType.Class, "sealed partial class" },
 		};

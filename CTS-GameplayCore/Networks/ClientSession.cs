@@ -94,7 +94,7 @@ namespace CTS.Instance.Networks
 			_sessionManager.Remove(this);
 
 			// Leave from game instance and clear it's reference
-			GameInstance?.OnPlayerDisconnected(this); // TODO : Add disconnected job
+			GameInstance?.Push_OnDisconnected(this); // TODO : Add disconnected job
 			GameInstance = null;
 
 			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
@@ -167,7 +167,7 @@ namespace CTS.Instance.Networks
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					instance.TryJoinSession(this);
+					instance.Push_TryJoinSession(this);
 					return;
 				}
 				else

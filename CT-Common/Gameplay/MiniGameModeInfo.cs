@@ -9,7 +9,7 @@ namespace CT.Common.Gameplay
 	public class MiniGameModeInfo
 	{
 		public MiniGameModeType MiniGameMode { get; set; }
-		public MiniGameMapType[] MapTypes { get; set; }
+		public MiniGameMapType[] MapTypes { get; set; } = new MiniGameMapType[0];
 		public int MaxPlayer { get; set; }
 		public int MinPlayer { get; set; }
 		public int MiniGameTime { get; set; }

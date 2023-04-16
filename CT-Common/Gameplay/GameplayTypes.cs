@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace CT.Common.Gameplay
 {
-	public enum MiniGameMapType
-	{
-		None = 0,
-		Map_RedHood_0,
-	}
 
 	public enum MiniGameModeType
 	{
