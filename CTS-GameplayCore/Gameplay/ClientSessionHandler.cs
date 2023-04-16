@@ -46,7 +46,7 @@ namespace CTS.Instance.Gameplay
 		public ClientSessionHandler(GameInstance gameInstance)
 		{
 			_gameInstance = gameInstance;
-			_jobQueue = new(_gameInstance.ServerTimer, onJobExecuted);
+			_jobQueue = new(onJobExecuted);
 		}
 
 		public void Initialize(GameInstanceOption option)
