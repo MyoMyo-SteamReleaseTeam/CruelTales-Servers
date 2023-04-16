@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CT.CorePatcher.FilePatch
+﻿namespace CT.CorePatcher.FilePatch
 {
 	internal static class FilePatcherFormat
 	{
@@ -20,6 +14,10 @@ namespace CT.CorePatcher.FilePatch
  * Do not modify the code arbitrarily. If you need to add new feature,
  * You should write the code at origin library project.
  */
+
+/* Enable nullable option for unsupported platform */
+
+#nullable enable
 
 {1}";
 	}

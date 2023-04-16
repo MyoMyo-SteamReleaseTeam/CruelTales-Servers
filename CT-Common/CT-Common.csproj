@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>CT.Common</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
