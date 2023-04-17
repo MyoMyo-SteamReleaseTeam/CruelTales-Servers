@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Network.Extensions;
@@ -10,14 +9,6 @@ using log4net;
 
 namespace CTS.Instance.Networks
 {
-	public enum NetSessionState
-	{
-		NoConnection = 0,
-		WaitForJoinRequest,
-		WaitForJoinGame,
-		InGame,
-	}
-
 	public class ClientSession
 	{
 		// Constant
@@ -39,7 +30,7 @@ namespace CTS.Instance.Networks
 		public int PeerId { get; private set; }
 
 		// State
-		public NetSessionState CurrentState { get; private set; }
+		public ClientSessionState CurrentState { get; private set; }
 
 		// Verifications
 		public ClientId ClientId { get; private set; }
@@ -82,9 +73,9 @@ namespace CTS.Instance.Networks
 		private void disconnectInternal(DisconnectReasonType disconnectReason)
 		{
 			// Set state
-			if (CurrentState == NetSessionState.NoConnection)
+			if (CurrentState == ClientSessionState.NoConnection)
 				return;
-			CurrentState = NetSessionState.NoConnection;
+			CurrentState = ClientSessionState.NoConnection;
 
 			// Disconnect
 			_disconnectReasonBuffer[0] = (byte)disconnectReason;
@@ -104,9 +95,9 @@ namespace CTS.Instance.Networks
 		{
 			lock (_clientSessionLock)
 			{
-				if (CurrentState != NetSessionState.NoConnection)
+				if (CurrentState != ClientSessionState.NoConnection)
 					return false;
-				CurrentState = NetSessionState.WaitForJoinRequest;
+				CurrentState = ClientSessionState.WaitForJoinRequest;
 
 				_peer = peer;
 				PeerId = peer.Id;
@@ -138,8 +129,8 @@ namespace CTS.Instance.Networks
 				await Task.Delay(1000);
 				lock (_clientSessionLock)
 				{
-					if (CurrentState == NetSessionState.InGame || 
-						CurrentState == NetSessionState.NoConnection)
+					if (CurrentState == ClientSessionState.InGame || 
+						CurrentState == ClientSessionState.NoConnection)
 					return;
 				}
 			}
@@ -153,13 +144,13 @@ namespace CTS.Instance.Networks
 			{
 				_log.Info($"Client {ClientId} has been verified. [Token:{ClientToken}][TargetGUID:{GameInstanceGuid}]")
 					;
-				if (CurrentState != NetSessionState.WaitForJoinRequest)
+				if (CurrentState != ClientSessionState.WaitForJoinRequest)
 				{
 					_log.Warn($"Client {this} request join game when current state is {CurrentState}");
 					return;
 				}
 
-				CurrentState = NetSessionState.WaitForJoinGame;
+				CurrentState = ClientSessionState.WaitForJoinGame;
 
 				ClientId = id;
 				ClientToken = token;
@@ -183,7 +174,7 @@ namespace CTS.Instance.Networks
 		{
 			if (isSuccess)
 			{
-				CurrentState = NetSessionState.InGame;
+				CurrentState = ClientSessionState.InGame;
 				GameInstance = instance;
 				return;
 
