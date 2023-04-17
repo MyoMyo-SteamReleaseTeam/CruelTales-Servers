@@ -1,7 +1,9 @@
-﻿using CT.Common.Serialization;
+﻿using System;
+using CT.Common.Serialization;
 
 namespace CT.Common.DataType
 {
+	[Serializable]
 	public struct NetVec2 : IPacketSerializable
 	{
 		public float X;
@@ -21,7 +23,8 @@ namespace CT.Common.DataType
 			Y = reader.ReadSingle();
 		}
 	}
-	
+
+	[Serializable]
 	public struct NetVecZ : IPacketSerializable
 	{
 		public float Z;
@@ -38,7 +41,8 @@ namespace CT.Common.DataType
 			Z = reader.ReadSingle();
 		}
 	}
-	
+
+	[Serializable]
 	public sealed class NetTransform : IPacketSerializable
 	{
 		public NetVec2 Position = new();

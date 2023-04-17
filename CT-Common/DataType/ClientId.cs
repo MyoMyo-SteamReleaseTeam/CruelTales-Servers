@@ -1,7 +1,9 @@
-﻿using CT.Common.Serialization;
+﻿using System;
+using CT.Common.Serialization;
 
 namespace CT.Common.DataType
 {
+	[Serializable]
 	public struct ClientId : IPacketSerializable
 	{
 		public ulong Id;

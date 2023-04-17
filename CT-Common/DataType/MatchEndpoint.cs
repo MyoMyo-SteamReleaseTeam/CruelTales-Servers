@@ -1,8 +1,10 @@
-﻿using CT.Common.Serialization;
+﻿using System;
+using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 
 namespace CT.Common.DataType
 {
+	[Serializable]
 	public struct MatchEndpoint : IPacketSerializable
 	{
 		public NetStringShort IpEndpoint;

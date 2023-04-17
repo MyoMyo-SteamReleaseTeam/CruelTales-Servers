@@ -1,8 +1,9 @@
-﻿using CT.Common.Serialization;
+﻿using System;
+using CT.Common.Serialization;
 
 namespace CT.Common.DataType
 {
-
+	[Serializable]
 	public struct GameInstanceGuid : IPacketSerializable
 	{
 		public ulong Guid;
