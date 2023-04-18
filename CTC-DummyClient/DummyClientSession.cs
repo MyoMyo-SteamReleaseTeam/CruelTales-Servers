@@ -14,11 +14,11 @@ namespace CTC.Networks
 		private NetManager _netManager;
 		private NetPeer? _serverPeer;
 
-		private DummyUserInfo _userInfo;
+		public DummyUserInfo UserInfo { get; private set; }
 
 		public DummyClientSession(DummyUserInfo info)
 		{
-			_userInfo = info;
+			UserInfo = info;
 
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
@@ -27,7 +27,6 @@ namespace CTC.Networks
 			_listener.PeerConnectedEvent += OnConnected;
 			_listener.PeerDisconnectedEvent += OnDisconnected;
 		}
-
 
 		public void Start(int clientBindPort)
 		{
@@ -46,11 +45,11 @@ namespace CTC.Networks
 
 			CS_Req_TryJoinGameInstance reqJoinGame = new CS_Req_TryJoinGameInstance();
 
-			reqJoinGame.MatchTo = _userInfo.GameInstanceGuid;
-			reqJoinGame.Id = _userInfo.ClientId;
-			reqJoinGame.Token = _userInfo.ClientToken;
+			reqJoinGame.MatchTo = UserInfo.GameInstanceGuid;
+			reqJoinGame.Id = UserInfo.ClientId;
+			reqJoinGame.Token = UserInfo.ClientToken;
 
-			_log.Info($"Try request join game to server... : {_userInfo}");
+			_log.Info($"Try request join game to server... : {UserInfo}");
 
 			PacketWriter pw = new PacketWriter(new PacketSegment(1000));
 			pw.Put(reqJoinGame);
@@ -74,6 +73,12 @@ namespace CTC.Networks
 		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
 		{
 			_log.Info($"Packet received. Size : {reader.UserDataSize}");
+		}
+
+		public void Disconnect()
+		{
+			_serverPeer?.Disconnect();
+			_netManager.DisconnectAll();
 		}
 
 		public void PollEvents()

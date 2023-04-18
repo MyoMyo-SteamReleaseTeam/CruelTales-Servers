@@ -123,7 +123,7 @@ namespace CTS.Instance.Gameplay
 		{
 			if (_playerById.TryRemove(clientSession.ClientId))
 			{
-				_log.Info($"{this} Session {clientSession} leave the game");
+				_log.Info($"[GUID:{_gameInstance.Guid}][Current player:{this.MemberCount}] Session {clientSession} leave the game");
 				OnClientLeaveGame(clientSession);
 			}
 			else
