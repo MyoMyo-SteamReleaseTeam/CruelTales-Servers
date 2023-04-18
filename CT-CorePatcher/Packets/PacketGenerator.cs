@@ -159,6 +159,7 @@ namespace CT.CorePatcher.Packets
 			List<CodeGenOperation> operation = new List<CodeGenOperation>();
 			packetNames = new List<string>();
 
+			// Create packet codes
 			foreach (var job in jobOptionList)
 			{
 				// Read packet files
@@ -189,10 +190,9 @@ namespace CT.CorePatcher.Packets
 				{
 					PatcherConsole.PrintError(job.GetFileNameWithExtension(), e);
 				}
-
 			}
 
-			// Save packet enum code
+			// Create packet enum codes
 			string enumFileName = packetTypeName + ".cs";
 			try
 			{
@@ -215,6 +215,14 @@ namespace CT.CorePatcher.Packets
 			{
 				PatcherConsole.PrintError(enumFileName, e);
 				return;
+			}
+
+			// Generate codes to files
+
+			var removeFiles = Directory.GetFiles(outputServer);
+			foreach (var removeFile in removeFiles)
+			{
+				File.Delete(removeFile);
 			}
 
 			foreach (var op in operation)
