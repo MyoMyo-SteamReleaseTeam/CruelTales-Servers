@@ -34,7 +34,7 @@ namespace CTC.Networks
 
 		// Dummy client setup
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 1000;
+		private static int _dummyCount = 4000;
 		private static List<DummyClientSession> _dummyClients = new();
 
 		// Handle test process
@@ -44,7 +44,7 @@ namespace CTC.Networks
 		{
 			Console.SetWindowSize(160, 25);
 
-			for (int i = 2; i >= 0; i--)
+			for (int i = 10; i >= 0; i--)
 			{
 				_log.Info($"Start dummy client test in {i}");
 				Thread.Sleep(1000);

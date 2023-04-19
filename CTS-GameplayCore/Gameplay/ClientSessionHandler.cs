@@ -33,8 +33,8 @@ namespace CTS.Instance.Gameplay
 		private readonly GameInstance _gameInstance;
 
 		// Events
-		public event Action<ClientSession> OnClientEnterGame;
-		public event Action<ClientSession> OnClientLeaveGame;
+		private event Action<ClientSession> OnClientEnterGame;
+		private event Action<ClientSession> OnClientLeaveGame;
 
 		// Settings
 		public int MemberCount => _playerById.Count;
@@ -48,10 +48,14 @@ namespace CTS.Instance.Gameplay
 		// Job Queue
 		private JobQueue<SessionJob> _jobQueue;
 
-		public ClientSessionHandler(GameInstance gameInstance)
+		public ClientSessionHandler(GameInstance gameInstance,
+									Action<ClientSession> onClientEnterGame,
+									Action<ClientSession> onClientLeaveGame)
 		{
 			_gameInstance = gameInstance;
 			_jobQueue = new(onJobExecuted);
+			OnClientEnterGame = onClientEnterGame;
+			OnClientLeaveGame = onClientLeaveGame;
 		}
 
 		public void Initialize(GameInstanceOption option)

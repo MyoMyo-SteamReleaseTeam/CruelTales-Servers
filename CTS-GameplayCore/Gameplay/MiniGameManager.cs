@@ -28,8 +28,6 @@ namespace CTS.Instance.Gameplay
 
 	public class MiniGameManager
 	{
-		
-
 		public event Action OnGameEnd;
 
 		public void StartGame()

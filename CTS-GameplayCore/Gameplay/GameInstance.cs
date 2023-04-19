@@ -25,13 +25,15 @@ namespace CTS.Instance.Gameplay
 		private ClientSessionHandler _sessionHandler;
 		private ClientInputHandler _inputHandler;
 
+		// Managers
+		private MiniGameManager _miniGameManager;
+
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
-			_sessionHandler = new ClientSessionHandler(this);
-			_sessionHandler.OnClientLeaveGame += onClientLeaveGame;
-			_sessionHandler.OnClientEnterGame += onClientEnterGame;
+			_sessionHandler = new ClientSessionHandler(this, onClientEnterGame, onClientLeaveGame);
 			_inputHandler = new ClientInputHandler(this);
+			_miniGameManager = new MiniGameManager();
 		}
 
 		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
@@ -49,8 +51,13 @@ namespace CTS.Instance.Gameplay
 		/// <param name="deltaTime">Delta Time</param>
 		public void Update(float deltaTime)
 		{
+			// Handle network connections
 			_sessionHandler.Flush();
+
+			// Handle received input
 			_inputHandler.Flush(deltaTime);
+
+			// Update mini game
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
@@ -73,11 +80,11 @@ namespace CTS.Instance.Gameplay
 
 		#region Session
 
-		private void onClientEnterGame(ClientSession obj)
+		private void onClientEnterGame(ClientSession session)
 		{
 		}
 
-		private void onClientLeaveGame(ClientSession obj)
+		private void onClientLeaveGame(ClientSession session)
 		{
 		}
 
