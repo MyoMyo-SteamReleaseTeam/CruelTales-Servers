@@ -82,6 +82,8 @@ namespace CTS.Instance.Gameplay
 
 		private void onClientEnterGame(ClientSession session)
 		{
+
+			// TODO : Send initial packet
 		}
 
 		private void onClientLeaveGame(ClientSession session)

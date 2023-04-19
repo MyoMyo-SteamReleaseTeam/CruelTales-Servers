@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using CT.Common.DataType;
+using CT.Common.Gameplay;
 using CTS.Instance.Gameplay.Entities;
 using CTS.Instance.Networks;
 
@@ -28,7 +30,33 @@ namespace CTS.Instance.Gameplay
 
 	public class MiniGameManager
 	{
-		public event Action OnGameEnd;
+		private MiniGameMapData MiniGameMapData { get; set; }
+
+		public MiniGameManager()
+		{
+			// Temp
+			MiniGameMapData = new()
+			{
+				MapType = MiniGameMapType.Map_Square_Europe,
+				Theme = MiniGameMapTheme.Europe,
+				SpawnPosition = new()
+				{
+					new Vector3(12.27F, 0F, 7.45F),
+					new Vector3(13.77F, 0F, 5.75F),
+					new Vector3(15.77F, 0F, 5.25F),
+					new Vector3(17.77F, 0F, 5.75F),
+					new Vector3(19.27F, 0F, 7.45F),
+					new Vector3(14.57F, 0F, 7.75F),
+					new Vector3(16.97F, 0F, 7.75F),
+					new Vector3(15.77F, 0F, 6.55F),
+				},
+			};
+		}
+
+		public void Update(float deltaTime)
+		{
+
+		}
 
 		public void StartGame()
 		{

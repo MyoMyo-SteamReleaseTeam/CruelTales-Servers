@@ -19,7 +19,9 @@ namespace CT.Network.Packets
 		{
 			{ PacketType.CS_Req_TryJoinGameInstance, (r) => r.Read<CS_Req_TryJoinGameInstance>() },
 			{ PacketType.SC_Ack_TryJoinGameInstance, (r) => r.Read<SC_Ack_TryJoinGameInstance>() },
-			{ PacketType.SC_InitialWorldState, (r) => r.Read<SC_InitialWorldState>() },
+			{ PacketType.SC_OnClientEnter, (r) => r.Read<SC_OnClientEnter>() },
+			{ PacketType.SC_OnClientLeave, (r) => r.Read<SC_OnClientLeave>() },
+			{ PacketType.SC_MiniGameData, (r) => r.Read<SC_MiniGameData>() },
 			{ PacketType.SC_SpawnEntities, (r) => r.Read<SC_SpawnEntities>() },
 			{ PacketType.CS_Req_PlayerInput_Movement, (r) => r.Read<CS_Req_PlayerInput_Movement>() },
 			{ PacketType.CS_Req_PlayerInput_Action, (r) => r.Read<CS_Req_PlayerInput_Action>() },

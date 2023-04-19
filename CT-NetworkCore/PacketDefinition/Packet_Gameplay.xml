@@ -12,15 +12,23 @@
 	<!-- Declare Data Types -->>
 	
 	<!-- Declare Packets -->>
-	<server name="InitialWorldState">
-		<NetStringShort name="MiniGameName"/>
+	
+	<server name="OnClientEnter">
+		<ClientId name="ClientId"/>
+		<NetStringShort name="Username"/>
+		<Int32 name="Costume"/>
 	</server>
-
+	<server name="OnClientLeave">
+		<ClientId name="ClientId"/>
+	</server>
+	
+	<server name="MiniGameData" custom="true">
+		<MiniGameMapType name="MapType"/>
+		<MiniGameMapTheme name="Theme"/>
+		<NetFixedArray name="SpawnPositions" type="NetVec3"/>
+	</server>
+		
 	<server name="SpawnEntities" custom="true"/>
-	<!--<server name="SpawnEntities">
-		<NetArray name="SpawnInfoList" type="BaseEntity"/>
-	</server>-->
-
 	<server name="DespawnEntities">
 		<NetFixedArray name="DespawnIdArray" type="NetEntityId"/>
 	</server>

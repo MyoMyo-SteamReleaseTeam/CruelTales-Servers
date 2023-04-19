@@ -11,25 +11,53 @@ using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {
-	public sealed partial class SC_InitialWorldState : PacketBase
+	public sealed partial class SC_OnClientEnter : PacketBase
 	{
-		public override PacketType PacketType => PacketType.SC_InitialWorldState;
+		public override PacketType PacketType => PacketType.SC_OnClientEnter;
 	
-		public NetStringShort MiniGameName;
+		public ClientId ClientId = new();
+		public NetStringShort Username;
+		public int Costume;
 	
-		public override int SerializeSize => MiniGameName.SerializeSize + 2;
+		public override int SerializeSize => ClientId.SerializeSize + Username.SerializeSize + 6;
 	
 		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(PacketType);
-			writer.Put(MiniGameName);
+			ClientId.Serialize(writer);
+			writer.Put(Username);
+			writer.Put(Costume);
 		}
 	
 		public override void Deserialize(PacketReader reader)
 		{
-			MiniGameName = reader.ReadNetStringShort();
+			ClientId.Deserialize(reader);
+			Username = reader.ReadNetStringShort();
+			Costume = reader.ReadInt32();
 		}
 	}
+	
+	public sealed partial class SC_OnClientLeave : PacketBase
+	{
+		public override PacketType PacketType => PacketType.SC_OnClientLeave;
+	
+		public ClientId ClientId = new();
+	
+		public override int SerializeSize => ClientId.SerializeSize + 2;
+	
+		public override void Serialize(PacketWriter writer)
+		{
+			writer.Put(PacketType);
+			ClientId.Serialize(writer);
+		}
+	
+		public override void Deserialize(PacketReader reader)
+		{
+			ClientId.Deserialize(reader);
+		}
+	}
+	
+	
 	
 	
 }
