@@ -1,6 +1,6 @@
 ﻿using System;
 using CT.Common.Serialization;
-using CT.Network.Serialization.Type;
+using CT.Common.Serialization.Type;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore
@@ -145,6 +145,37 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(40, reader.ReadInt32());
 			Assert.IsFalse(reader.CanRead(1));
 			Assert.IsTrue(reader.IsEnd);
+		}
+
+		[TestMethod]
+		public void OffsetArraySegment()
+		{
+			byte[] data = new byte[4];
+			data[0] = (byte)1;
+			data[1] = (byte)2;
+			data[2] = (byte)3;
+			data[3] = (byte)4;
+			ArraySegment<byte> section = new(data, 2, 2);
+			PacketReader reader = new PacketReader(section);
+
+			Assert.AreEqual(3, reader.ReadByte());
+			Assert.AreEqual(4, reader.ReadByte());
+		}
+
+		[TestMethod]
+		public void OffsetArraySegmentString()
+		{
+			byte[] data = new byte[16];
+			PacketWriter writer = new PacketWriter(data);
+			writer.Put(0); // 4
+			writer.Put(0); // 4
+			writer.Put(0); // 4
+			writer.Put(new NetStringShort("12"));
+
+			ArraySegment<byte> section = new(data, 12, 3);
+			PacketReader reader = new PacketReader(section);
+
+			Assert.AreEqual("12", reader.ReadNetStringShort().Value);
 		}
 	}
 }

@@ -46,7 +46,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(short*)(ptr + offset) = data;
+				*(short*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(ushort*)(ptr + offset) = data;
+				*(ushort*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(int*)(ptr + offset) = data;
+				*(int*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(uint*)(ptr + offset) = data;
+				*(uint*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(long*)(ptr + offset) = data;
+				*(long*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(ulong*)(ptr + offset) = data;
+				*(ulong*)(ptr + dest.Offset + offset) = data;
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(float*)(ptr + offset) = data;
+				*(float*)(ptr + dest.Offset + offset) = data;
 			}
 			//MemoryLayoutUInt32 layout = new MemoryLayoutUInt32(data);
 			//BinaryConverter.WriteUInt32(dest, offset, layout.LayoutValue);
@@ -111,7 +111,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = dest.Array)
 			{
-				*(double*)(ptr + offset) = data;
+				*(double*)(ptr + dest.Offset + offset) = data;
 			}
 			//MemoryLayoutUInt64 layout = new MemoryLayoutUInt64(data);
 			//BinaryConverter.WriteUInt64(dest, offset, layout.LayoutValue);
@@ -176,7 +176,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(short*)(ptr + offset);
+				return *(short*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -185,7 +185,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(ushort*)(ptr + offset);
+				return *(ushort*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(int*)(ptr + offset);
+				return *(int*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -203,7 +203,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(uint*)(ptr + offset);
+				return *(uint*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -212,7 +212,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(long*)(ptr + offset);
+				return *(long*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(ulong*)(ptr + offset);
+				return *(ulong*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -230,7 +230,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(float*)(ptr + offset);
+				return *(float*)(ptr + src.Offset + offset);
 			}
 		}
 
@@ -239,7 +239,7 @@ namespace CT.Common.Serialization
 		{
 			fixed (byte* ptr = src.Array)
 			{
-				return *(double*)(ptr + offset);
+				return *(double*)(ptr + src.Offset + offset);
 			}
 		}
 

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
 using CT.Common.Serialization;
-using CT.Network.Legacy;
 
 namespace CT.Benchmark
 {

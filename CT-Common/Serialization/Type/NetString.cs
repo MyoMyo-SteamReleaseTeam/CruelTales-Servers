@@ -19,31 +19,31 @@ namespace CT.Common.Serialization.Type
 #endif
 		public const int MAX_BYTE_LENGTH = 65536;
 
-		private int _byteSize;
 		public int ByteSize
 		{
 			get
 			{
-				if (Value.Length == 0)
+				if (string.IsNullOrEmpty(Value))
 					return 0;
 
-				if (_byteSize == 0)
-					_byteSize = Encoding.UTF8.GetByteCount(Value);
-
-				return _byteSize;
+				return Encoding.UTF8.GetByteCount(Value);
 			}
 		}
 		public int SerializeSize => ByteSize + 2;
-
 		public static implicit operator string(NetString value) => value.Value;
-		public static implicit operator NetString(string value) => new NetString(value);
+		public static implicit operator NetString(string value) => new NetString(value ?? string.Empty);
+
+#if NET7_0_OR_GREATER
+		public NetString()
+		{
+			Value = string.Empty;
+		}
+#endif
 
 		public NetString(string value)
 		{
 #if NET7_0_OR_GREATER
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
-#else
-			_byteSize = Encoding.UTF8.GetByteCount(value);
 #endif
 			Value = value;
 		}
@@ -111,31 +111,32 @@ namespace CT.Common.Serialization.Type
 #endif
 		public const int MAX_BYTE_LENGTH = 256;
 
-		private int _byteSize;
 		public int ByteSize
 		{
 			get
 			{
-				if (Value.Length == 0)
+				if (string.IsNullOrEmpty(Value))
 					return 0;
 
-				if (_byteSize == 0)
-					_byteSize = Encoding.UTF8.GetByteCount(Value);
-
-				return _byteSize;
+				return Encoding.UTF8.GetByteCount(Value);
 			}
 		}
 		public int SerializeSize => ByteSize + 1;
 
 		public static implicit operator string(NetStringShort value) => value.Value;
-		public static implicit operator NetStringShort(string value) => new NetStringShort(value);
+		public static implicit operator NetStringShort(string value) => new NetStringShort(value ?? string.Empty);
+
+#if NET7_0_OR_GREATER
+		public NetStringShort()
+		{
+			Value = string.Empty;
+		}
+#endif
 
 		public NetStringShort(string value)
 		{
 #if NET7_0_OR_GREATER
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
-#else
-			_byteSize = Encoding.UTF8.GetByteCount(value);
 #endif
 			Value = value;
 		}

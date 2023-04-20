@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CT.Network.Runtimes
+namespace CT.Networks.Runtimes
 {
 #if NET7_0_OR_GREATER
 	/// <summary>스레드로 부터 안전한 Job Queue 입니다. 우선 순위 Job Queue를 포함합니다.</summary>

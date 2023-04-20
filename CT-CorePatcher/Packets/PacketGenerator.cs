@@ -18,7 +18,8 @@ namespace CT.CorePatcher.Packets
 		public const string OUTPUT_SERVER = @$"outputServer";
 
 		public const string PACKET_TYPE_PATH = @"packetTypePath";
-		public const string FACTORY_PATH = @"factoryPath";
+		public const string FACTORY_SERVER_PATH = @"factoryServerPath";
+		public const string FACTORY_CLIENT_PATH = @"factoryClientPath";
 		public const string SERVER_DISPATCHER = @"sdispatcher";
 		public const string CLIENT_DISPATCHER = @"cdispatcher";
 
@@ -34,7 +35,8 @@ namespace CT.CorePatcher.Packets
 			StringArgument outputServer = new();
 
 			StringArgument packetTypePath = new();
-			StringArgument factoryPath = new();
+			StringArgument factoryServerPath = new();
+			StringArgument factoryClientPath = new();
 			StringArgumentArray serverDispatcherPaths = new();
 			StringArgumentArray clientDispatcherPaths = new();
 
@@ -46,7 +48,8 @@ namespace CT.CorePatcher.Packets
 			OptionParser.BindArgument(op, BASE_NAMESPACE, 1, baseNamespace);
 
 			OptionParser.BindArgument(op, PACKET_TYPE_PATH, 2, packetTypePath);
-			OptionParser.BindArgument(op, FACTORY_PATH, 2, factoryPath);
+			OptionParser.BindArgument(op, FACTORY_SERVER_PATH, 2, factoryServerPath);
+			OptionParser.BindArgument(op, FACTORY_CLIENT_PATH, 2, factoryClientPath);
 			OptionParser.BindArgumentArray(op, SERVER_DISPATCHER, 2, serverDispatcherPaths);
 			OptionParser.BindArgumentArray(op, CLIENT_DISPATCHER, 2, clientDispatcherPaths);
 
@@ -66,8 +69,8 @@ namespace CT.CorePatcher.Packets
 			if (baseNamespace.HasArgument(ref isValidArguments) == false)
 				PatcherConsole.PrintError($"There is no {nameof(baseNamespace)}.");
 
-			if (factoryPath.HasArgument(ref isValidArguments) == false)
-				PatcherConsole.PrintError($"There is no {nameof(factoryPath)}.");
+			if (factoryServerPath.HasArgument(ref isValidArguments) == false)
+				PatcherConsole.PrintError($"There is no {nameof(factoryServerPath)}.");
 			if (serverDispatcherPaths.HasArgument(ref isValidArguments) == false)
 				PatcherConsole.PrintError($"There is no {nameof(serverDispatcherPaths)}.");
 			if (clientDispatcherPaths.HasArgument(ref isValidArguments) == false)
@@ -113,7 +116,8 @@ namespace CT.CorePatcher.Packets
 				generatePacketHelpers(packetNames,
 									  serverDispatcherPaths.ArgumentArray,
 									  clientDispatcherPaths.ArgumentArray,
-									  factoryPath.Argument);
+									  factoryServerPath.Argument,
+									  factoryClientPath.Argument);
 			}
 			catch (Exception e)
 			{
@@ -254,7 +258,8 @@ namespace CT.CorePatcher.Packets
 		private static void generatePacketHelpers(List<string> packetNames,
 												  string[] serverDispatcherPaths,
 												  string[] clientDispatcherPaths,
-												  string dispatcherPath)
+												  string factoryServerPath,
+												  string factoryClientPath)
 		{
 			PacketParser parser = new PacketParser();
 
@@ -313,17 +318,33 @@ namespace CT.CorePatcher.Packets
 			string factoryFileName = PacketFormat.PacketFactoryFileName + ".cs";
 			try
 			{
-				parser.GenerateFactoryCode(packetNames, out var factoryCode, factoryFileName);
-				dispatcherPath = Path.Combine(dispatcherPath, factoryFileName);
-				var saveResult = FileHandler.TryWriteText(dispatcherPath, factoryCode);
-				if (saveResult.ResultType == JobResultType.Success)
+				// Server side
+				parser.GenerateFactoryCode(packetNames, out var factoryServerCode, factoryFileName, isServer: true);
+				factoryServerPath = Path.Combine(factoryServerPath, factoryFileName);
+				var saveResultServer = FileHandler.TryWriteText(factoryServerPath, factoryServerCode);
+				if (saveResultServer.ResultType == JobResultType.Success)
 				{
 					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
-														  factoryFileName, dispatcherPath);
+														  factoryFileName, factoryServerPath);
 				}
 				else
 				{
-					PatcherConsole.PrintError(factoryFileName, saveResult.Exception);
+					PatcherConsole.PrintError(factoryFileName, saveResultServer.Exception);
+					return;
+				}
+
+				// Client side
+				parser.GenerateFactoryCode(packetNames, out var factoryClientCode, factoryFileName, isServer: false);
+				factoryClientPath = Path.Combine(factoryClientPath, factoryFileName);
+				var saveResultClient = FileHandler.TryWriteText(factoryClientPath, factoryClientCode);
+				if (saveResultClient.ResultType == JobResultType.Success)
+				{
+					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
+														  factoryFileName, factoryClientPath);
+				}
+				else
+				{
+					PatcherConsole.PrintError(factoryFileName, saveResultClient.Exception);
 					return;
 				}
 			}

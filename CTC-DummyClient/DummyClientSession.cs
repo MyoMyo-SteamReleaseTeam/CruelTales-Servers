@@ -48,13 +48,14 @@ namespace CTC.Networks
 			reqJoinGame.MatchTo = UserInfo.GameInstanceGuid;
 			reqJoinGame.Id = UserInfo.ClientId;
 			reqJoinGame.Token = UserInfo.ClientToken;
+			reqJoinGame.Username = "abc";
 
 			_log.Info($"Try request join game to server... : {UserInfo}");
 
 			PacketWriter pw = new PacketWriter(new PacketSegment(1000));
 			pw.Put(reqJoinGame);
 
-			_serverPeer.Send(pw.Buffer.Array, 0, pw.Position, DeliveryMethod.ReliableOrdered);
+			_serverPeer.Send(pw.Buffer.Array, 0, pw.Count, DeliveryMethod.ReliableOrdered);
 		}
 
 		private void OnDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

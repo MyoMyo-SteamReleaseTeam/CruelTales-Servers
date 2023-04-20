@@ -74,8 +74,8 @@ namespace CT.CorePatcher.Packets
 			{ "ulong", "UInt64" },
 			{ "float", "Single" },
 			{ "double", "Double" },
-			{ "NetString", "NetString" },
-			{ "NetStringShort", "NetStringShort" },
+			//{ "NetString", "NetString" },
+			//{ "NetStringShort", "NetStringShort" },
 		};
 
 		public static bool TryGetCLRTypeByPrimitive(string primitiveType, out string CLRtype)

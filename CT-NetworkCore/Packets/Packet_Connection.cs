@@ -13,21 +13,21 @@ namespace CT.Packets
 {
 	public sealed partial class UserProfile : IPacketSerializable
 	{
-		public NetStringShort Username;
-		public NetStringShort Clothes;
+		public NetStringShort Username = new();
+		public NetStringShort Clothes = new();
 	
 		public int SerializeSize => Username.SerializeSize + Clothes.SerializeSize;
 	
 		public void Serialize(PacketWriter writer)
 		{
-			writer.Put(Username);
-			writer.Put(Clothes);
+			Username.Serialize(writer);
+			Clothes.Serialize(writer);
 		}
 	
 		public void Deserialize(PacketReader reader)
 		{
-			Username = reader.ReadNetStringShort();
-			Clothes = reader.ReadNetStringShort();
+			Username.Deserialize(reader);
+			Clothes.Deserialize(reader);
 		}
 	}
 	
@@ -38,7 +38,7 @@ namespace CT.Packets
 		public ClientId Id = new();
 		public ClientToken Token = new();
 		public GameInstanceGuid MatchTo = new();
-		public NetStringShort Username;
+		public NetStringShort Username = new();
 	
 		public override int SerializeSize => Id.SerializeSize + Token.SerializeSize + MatchTo.SerializeSize + Username.SerializeSize + 2;
 	
@@ -48,7 +48,7 @@ namespace CT.Packets
 			Id.Serialize(writer);
 			Token.Serialize(writer);
 			MatchTo.Serialize(writer);
-			writer.Put(Username);
+			Username.Serialize(writer);
 		}
 	
 		public override void Deserialize(PacketReader reader)
@@ -56,7 +56,7 @@ namespace CT.Packets
 			Id.Deserialize(reader);
 			Token.Deserialize(reader);
 			MatchTo.Deserialize(reader);
-			Username = reader.ReadNetStringShort();
+			Username.Deserialize(reader);
 		}
 	}
 	

@@ -1,7 +1,7 @@
 ﻿using CT.Common.DataType;
 using LiteNetLib;
 
-namespace CT.Network.Extensions
+namespace CT.Networks.Extensions
 {
 	public static class LiteNetLibExtension
 	{

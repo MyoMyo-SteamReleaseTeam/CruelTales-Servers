@@ -13,12 +13,19 @@ namespace CTC.Networks
 		{
 		}
 
-		internal static void Handle_SC_DespawnEntities(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_MiniGameData(PacketBase receivedPacket, ServerSession session)
 		{
+			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_InitialWorldState(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_OnClientEnter(PacketBase receivedPacket, ServerSession session)
 		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_OnClientLeave(PacketBase receivedPacket, ServerSession session)
+		{
+			throw new NotImplementedException();
 		}
 
 		internal static void Handle_SC_SpawnEntities(PacketBase receivedPacket, ServerSession session)

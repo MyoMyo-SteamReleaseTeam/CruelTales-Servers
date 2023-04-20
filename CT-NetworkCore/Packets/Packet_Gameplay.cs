@@ -16,7 +16,7 @@ namespace CT.Packets
 		public override PacketType PacketType => PacketType.SC_OnClientEnter;
 	
 		public ClientId ClientId = new();
-		public NetStringShort Username;
+		public NetStringShort Username = new();
 		public int Costume;
 	
 		public override int SerializeSize => ClientId.SerializeSize + Username.SerializeSize + 6;
@@ -25,14 +25,14 @@ namespace CT.Packets
 		{
 			writer.Put(PacketType);
 			ClientId.Serialize(writer);
-			writer.Put(Username);
+			Username.Serialize(writer);
 			writer.Put(Costume);
 		}
 	
 		public override void Deserialize(PacketReader reader)
 		{
 			ClientId.Deserialize(reader);
-			Username = reader.ReadNetStringShort();
+			Username.Deserialize(reader);
 			Costume = reader.ReadInt32();
 		}
 	}

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using CT.Common.DataType.Input;
-using CT.Network.Runtimes;
+using CT.Networks.Runtimes;
 using log4net;
 
 namespace CTS.Instance.Gameplay

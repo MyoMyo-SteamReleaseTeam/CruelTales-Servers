@@ -10,11 +10,9 @@ namespace CT.Common.Serialization
 		{
 			get
 			{
-				return Count >= Capacity;
+				return Position >= Capacity;
 			}
 		}
-		public int Count => Position - Start;
-		public int Start { get; private set; }
 		public int Position { get; private set; }
 		public int Capacity { get; private set; }
 
@@ -31,14 +29,13 @@ namespace CT.Common.Serialization
 		public void Initialize(ArraySegment<byte> buffer)
 		{
 			Buffer = buffer;
-			Start = Buffer.Offset;
-			Position = Buffer.Offset;
+			Position = 0;
 			Capacity = Buffer.Count;
 		}
 
 		public bool CanRead(int readSize)
 		{
-			return Count + readSize <= Capacity;
+			return Position + readSize <= Capacity;
 		}
 
 		public bool CanRead<T>(T serializeObject) where T : IPacketSerializable

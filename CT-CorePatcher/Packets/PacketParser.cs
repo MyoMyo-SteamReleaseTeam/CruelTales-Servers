@@ -55,28 +55,31 @@ namespace CT.CorePatcher.Packets
 			for (int i = 0; i < 3; i++)
 				content = addIndent(content);
 
-			string sessionType = isClient ?
-				PacketFormat.ServerSidePacketPrefix : PacketFormat.ClientSidePacketPrefix;
-
 			string format = isClient ? 
 				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
 			code = string.Format(format, content);
 			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 
-		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName)
+		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName, bool isServer)
 		{
-			string content = string.Empty;
+			string readFuncContent = string.Empty;
+			string createFuncContent = string.Empty;
 
 			foreach (var pn in packetNames)
 			{
-				content += string.Format(PacketFormat.PacketFactoryTableMember, pn) + NewLine;
+				readFuncContent += string.Format(PacketFormat.PacketReadFuncMember, pn) + NewLine;
+				createFuncContent += string.Format(PacketFormat.PacketCreateFuncMember, pn) + NewLine;
 			}
 
 			for (int i = 0; i < 3; i++)
-				content = addIndent(content);
+			{
+				readFuncContent = addIndent(readFuncContent);
+				createFuncContent = addIndent(createFuncContent);
+			}
 
-			code = string.Format(PacketFormat.PacketFactoryFormat, content);
+			string factoryFormat = isServer ? PacketFormat.PacketFactoryServerFormat : PacketFormat.PacketFactoryClientFormat;
+			code = string.Format(factoryFormat, readFuncContent, createFuncContent);
 			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 
@@ -319,10 +322,10 @@ namespace CT.CorePatcher.Packets
 			{
 				var m = memberTokenList[i];
 
-				if (m.Type == nameof(NetString) || m.Type == nameof(NetStringShort))
-				{
-					m.IsNative = true;
-				}
+				//if (m.Type == nameof(NetString) || m.Type == nameof(NetStringShort))
+				//{
+				//	m.IsNative = true;
+				//}
 
 				if (m.IsNative)
 				{
@@ -530,7 +533,6 @@ namespace CT.CorePatcher.Packets
 					}
 					else
 					{
-						// Struct은 클래스를 멤버로 가지고 있을 수 없다.
 						if (dataType == PacketDataType.Struct)
 						{
 							memberContent += string.Format(PacketFormat.MemberDeclarationNotInitialize,

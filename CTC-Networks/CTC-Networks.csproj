@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>CTC.Networks</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CT-Common\CT-Common.csproj" />
+    <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
+    <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
+  </ItemGroup>
+
+</Project>

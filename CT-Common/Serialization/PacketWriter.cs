@@ -13,9 +13,7 @@ namespace CT.Common.Serialization
 				return Count >= Capacity;
 			}
 		}
-		public int Count => Position - Start;
-		public int Start { get; private set; }
-		public int Position { get; private set; }
+		public int Count { get; private set; }
 		public int Capacity { get; private set; }
 
 		public PacketWriter(PacketSegment packet)
@@ -31,14 +29,13 @@ namespace CT.Common.Serialization
 		public void Initialize(ArraySegment<byte> buffer)
 		{
 			Buffer = buffer;
-			Start = Buffer.Offset;
-			Position = Buffer.Offset;
+			Count = 0;
 			Capacity = Buffer.Count;
 		}
 
 		public void Reset()
 		{
-			Position = Buffer.Offset;
+			Count = Buffer.Offset;
 		}
 
 		public bool CanPut(int putSize)
@@ -58,85 +55,85 @@ namespace CT.Common.Serialization
 
 		public void Put(bool value)
 		{
-			BinaryConverter.WriteBool(Buffer, Position, value);
-			Position += sizeof(byte);
+			BinaryConverter.WriteBool(Buffer, Count, value);
+			Count += sizeof(byte);
 		}
 
 		public void Put(byte value)
 		{
-			BinaryConverter.WriteByte(Buffer, Position, value);
-			Position += sizeof(byte);
+			BinaryConverter.WriteByte(Buffer, Count, value);
+			Count += sizeof(byte);
 		}
 
 		public void Put(sbyte value)
 		{
-			BinaryConverter.WriteSByte(Buffer, Position, value);
-			Position += sizeof(sbyte);
+			BinaryConverter.WriteSByte(Buffer, Count, value);
+			Count += sizeof(sbyte);
 		}
 
 		public void Put(short value)
 		{
-			BinaryConverter.WriteInt16(Buffer, Position, value);
-			Position += sizeof(short);
+			BinaryConverter.WriteInt16(Buffer, Count, value);
+			Count += sizeof(short);
 		}
 
 		public void Put(ushort value)
 		{
-			BinaryConverter.WriteUInt16(Buffer, Position, value);
-			Position += sizeof(ushort);
+			BinaryConverter.WriteUInt16(Buffer, Count, value);
+			Count += sizeof(ushort);
 		}
 
 		public void Put(int value)
 		{
-			BinaryConverter.WriteInt32(Buffer, Position, value);
-			Position += sizeof(int);
+			BinaryConverter.WriteInt32(Buffer, Count, value);
+			Count += sizeof(int);
 		}
 
 		public void Put(uint value)
 		{
-			BinaryConverter.WriteUInt32(Buffer, Position, value);
-			Position += sizeof(uint);
+			BinaryConverter.WriteUInt32(Buffer, Count, value);
+			Count += sizeof(uint);
 		}
 
 		public void Put(long value)
 		{
-			BinaryConverter.WriteInt64(Buffer, Position, value);
-			Position += sizeof(long);
+			BinaryConverter.WriteInt64(Buffer, Count, value);
+			Count += sizeof(long);
 		}
 
 		public void Put(ulong value)
 		{
-			BinaryConverter.WriteUInt64(Buffer, Position, value);
-			Position += sizeof(ulong);
+			BinaryConverter.WriteUInt64(Buffer, Count, value);
+			Count += sizeof(ulong);
 		}
 
 		public void Put(float value)
 		{
-			BinaryConverter.WriteSingle(Buffer, Position, value);
-			Position += sizeof(float);
+			BinaryConverter.WriteSingle(Buffer, Count, value);
+			Count += sizeof(float);
 		}
 
 		public void Put(double value)
 		{
-			BinaryConverter.WriteDouble(Buffer, Position, value);
-			Position += sizeof(double);
+			BinaryConverter.WriteDouble(Buffer, Count, value);
+			Count += sizeof(double);
 		}
 
 		public void Put(NetString value)
 		{
-			Position += BinaryConverter.WriteString(Buffer, Position, value);
+			Count += BinaryConverter.WriteString(Buffer, Count, value);
 		}
 
 		public void Put(NetStringShort value)
 		{
-			BinaryConverter.WriteByte(Buffer, Position, (byte)value.ByteSize);
-			Position += sizeof(byte);
-			Position += BinaryConverter.WriteStringUnsafe(Buffer, Position, value.Value);
+			BinaryConverter.WriteByte(Buffer, Count, (byte)value.ByteSize);
+			Count += sizeof(byte);
+			Count += BinaryConverter.WriteStringUnsafe(Buffer, Count, value.Value);
 		}
 
 		public void Put(byte[] value)
 		{
-			Position += BinaryConverter.WriteBytes(Buffer, Position, value);
+			Count += BinaryConverter.WriteBytes(Buffer, Count, value);
 		}
 	}
 }

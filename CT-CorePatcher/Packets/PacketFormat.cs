@@ -1,4 +1,9 @@
-﻿namespace CT.CorePatcher.Packets
+﻿using CT.Common.Serialization;
+using CT.Packets;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+namespace CT.CorePatcher.Packets
 {
 	internal static class PacketFormat
 	{
@@ -216,27 +221,111 @@ namespace {1}
 		public static readonly string PacketDispatcherFileName = "PacketDispatcher";
 
 		/// <summary>
-		/// {0} Content<br/>
+		/// {0} Read function content<br/>
+		/// {1} Create function content<br/>
 		/// </summary>
-		public static readonly string PacketFactoryFormat =
+		public static readonly string PacketFactoryServerFormat =
 @"using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 using CT.Packets;
+using CTS.Instance.PacketCustom;
 
-namespace CT.Network.Packets
+namespace CTC.Networks.Packets
 {{
-	public delegate PacketBase CreatePacket(PacketReader reader);
+	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase CreatePacket();
 
 	public static class PacketFactory
 	{{
-		private static Dictionary<PacketType, CreatePacket> _packetFactoryTable = new()
+		private static Dictionary<PacketType, ReadPacket> _packetReadFactoryTable = new()
 		{{
 {0}
 		}};
 
-		public static PacketBase Create(PacketType packetType, PacketReader reader)
+		private static Dictionary<PacketType, CreatePacket> _packetCreateFactoryTable = new()
 		{{
-			return _packetFactoryTable[packetType](reader);
+{1}
+		}};
+
+		public static bool ReadPacket(PacketType packetType, PacketReader reader,
+										[MaybeNullWhen(false)] out PacketBase packet)
+		{{
+			if (_packetReadFactoryTable.TryGetValue(packetType, out var readFunc))
+			{{
+				packet = readFunc(reader);
+				return true;
+			}}
+
+			packet = null;
+			return false;
+		}}
+
+		public static bool CreatePacket(PacketType packetType, [MaybeNullWhen(false)] out PacketBase packet)
+		{{
+			if (_packetCreateFactoryTable.TryGetValue(packetType, out var createFunc))
+			{{
+				packet = createFunc();
+				return true;
+			}}
+
+			packet = null;
+			return false;
+		}}
+	}}
+}}";
+
+		/// <summary>
+		/// {0} Read function content<br/>
+		/// {1} Create function content<br/>
+		/// </summary>
+		public static readonly string PacketFactoryClientFormat =
+@"using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using CT.Common.Serialization;
+using CT.Packets;
+using CTC.Networks.PacketCustom;
+
+namespace CTC.Networks.Packets
+{{
+	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase CreatePacket();
+
+	public static class PacketFactory
+	{{
+		private static Dictionary<PacketType, ReadPacket> _packetReadFactoryTable = new()
+		{{
+{0}
+		}};
+
+		private static Dictionary<PacketType, CreatePacket> _packetCreateFactoryTable = new()
+		{{
+{1}
+		}};
+
+		public static bool ReadPacket(PacketType packetType, PacketReader reader,
+										[MaybeNullWhen(false)] out PacketBase packet)
+		{{
+			if (_packetReadFactoryTable.TryGetValue(packetType, out var readFunc))
+			{{
+				packet = readFunc(reader);
+				return true;
+			}}
+
+			packet = null;
+			return false;
+		}}
+
+		public static bool CreatePacket(PacketType packetType, [MaybeNullWhen(false)] out PacketBase packet)
+		{{
+			if (_packetCreateFactoryTable.TryGetValue(packetType, out var createFunc))
+			{{
+				packet = createFunc();
+				return true;
+			}}
+
+			packet = null;
+			return false;
 		}}
 	}}
 }}";
@@ -244,8 +333,14 @@ namespace CT.Network.Packets
 		/// <summary>
 		/// {0} Packet name
 		/// </summary>
-		public static readonly string PacketFactoryTableMember =
+		public static readonly string PacketReadFuncMember =
 			@"{{ PacketType.{0}, (r) => r.Read<{0}>() }},";
+
+		/// <summary>
+		/// {0} Packet name
+		/// </summary>
+		public static readonly string PacketCreateFuncMember =
+			@"{{ PacketType.{0}, () => new {0}() }},";
 
 		/// <summary>
 		/// {0} Content<br/>

@@ -8,7 +8,7 @@ using log4net;
 using CT.Logger;
 #endif
 
-namespace CT.Network.Runtimes
+namespace CT.Networks.Runtimes
 {
 	public class TickRunner
 	{
@@ -20,7 +20,7 @@ namespace CT.Network.Runtimes
 
 		private List<float> _deltaAverage = new List<float>();
 		private readonly int _averageSample = 16;
-		private int _averageCounter = 0;
+		//private int _averageCounter = 0;
 		private bool _shouldStop = false;
 
 		public event Action<float>? OnUpdate;

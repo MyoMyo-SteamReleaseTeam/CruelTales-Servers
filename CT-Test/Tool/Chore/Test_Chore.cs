@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,8 +20,8 @@ namespace CT.Test.Tool.Chore
 			string reletivePath2 = Path.GetRelativePath(rootPath, sourcePath2);
 			string reletivePath3 = Path.GetRelativePath(rootPath, sourcePath3);
 
-			string directoryName = Path.GetDirectoryName(sourcePath1);
-			string directoryName2 = Path.GetDirectoryName(sourcePath2);
+			//string directoryName = Path.GetDirectoryName(sourcePath1);
+			//string directoryName2 = Path.GetDirectoryName(sourcePath2);
 		}
 
 		public enum TestEnumType
@@ -46,11 +46,7 @@ namespace CT.Test.Tool.Chore
 
 			string enumToString = myType.ToString();
 
-			Debug.Log($"Enum To String : {enumToString}");
-
 			Assert.IsTrue(Enum.TryParse(enumToString, out TestEnumType parseType));
-
-			Debug.Log($"Paser Type : {parseType}");
 
 			Assert.AreEqual(myType, parseType);
 		}

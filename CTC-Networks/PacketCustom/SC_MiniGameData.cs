@@ -1,7 +1,7 @@
 ﻿using CT.Common.Serialization;
 using CT.Packets;
 
-namespace CT.Network.Packets
+namespace CTC.Networks.PacketCustom
 {
 	public sealed partial class SC_MiniGameData : PacketBase
 	{

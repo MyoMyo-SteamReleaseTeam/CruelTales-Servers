@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using CT.Common.Quantization;
-using CT.Network.DataType.Input;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.Tool

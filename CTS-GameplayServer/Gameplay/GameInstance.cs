@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
-using CT.Network.Runtimes;
+using CT.Networks.Runtimes;
 using CT.Packets;
 using CTS.Instance.Networks;
+using CTS.Instance.PacketCustom;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -90,6 +91,7 @@ namespace CTS.Instance.Gameplay
 			enter.Username = clientSession.ClientName;
 
 			// TODO : Send initial packet
+			SC_SpawnEntities spawnEntities = new SC_SpawnEntities();
 		}
 
 		public void OnClientLeaveGame(ClientSession clientSession)

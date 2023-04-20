@@ -44,7 +44,10 @@ namespace CTC.Networks
 		{
 			Console.SetWindowSize(160, 25);
 
-			for (int i = 10; i >= 0; i--)
+			//Console.WriteLine($"Start dummy test for press anykey...");
+			//Console.ReadLine();
+
+			for (int i = 1; i >= 0; i--)
 			{
 				_log.Info($"Start dummy client test in {i}");
 				Thread.Sleep(1000);

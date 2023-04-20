@@ -2,10 +2,11 @@
 using System.Threading;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Network.Packets;
-using CT.Network.Runtimes;
+using CT.Networks.Runtimes;
 using CT.Packets;
+using CTC.Networks.Packets;
 using CTS.Instance.Gameplay;
+using CTS.Instance.Packets;
 using LiteNetLib;
 using log4net;
 
@@ -29,6 +30,10 @@ namespace CTS.Instance.Networks
 
 		// Constant
 		public const byte CHANNEL_CONNECTION = 1;
+
+		// Packets
+		private readonly PacketPool _packetPool = new PacketPool();
+		private readonly byte[] _wrongPacketDisconnectInfo = new byte[1] { (byte)DisconnectReasonType.WrongPacket };
 
 		public NetworkManager(ServerOption serverOption, TickTimer serverTimer)
 		{
@@ -116,18 +121,29 @@ namespace CTS.Instance.Networks
 					while (!packetReader.IsEnd)
 					{
 						PacketType packetType = packetReader.ReadPacketType();
-						var packet = PacketFactory.Create(packetType, packetReader);
-						session.OnReceive(packet);
+						
+						if (_packetPool.TryReadPacket(packetType, packetReader, out var packet))
+						{
+							session.OnReceive(packet);
+							_packetPool.Return(packet);
+						}
+						else
+						{
+							session.Disconnect(DisconnectReasonType.WrongPacket);
+						}
 					}
 				}
 			}
 			catch (Exception e)
 			{
 				_log.Error($"Receive error from : {peer.EndPoint.ToString()}", e);
-				session?.Disconnect(DisconnectReasonType.WrongPacket);
 				if (session == null)
 				{
-					peer.Disconnect();
+					peer.Disconnect(_wrongPacketDisconnectInfo);
+				}
+				else
+				{
+					session.Disconnect(DisconnectReasonType.WrongPacket);
 				}
 				return;
 			}

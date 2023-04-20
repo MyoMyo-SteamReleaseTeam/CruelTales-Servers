@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
-using CT.Network.Extensions;
+using CT.Networks.Extensions;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
 using LiteNetLib;
@@ -117,7 +118,7 @@ namespace CTS.Instance.Networks
 		public void SendReliable(PacketWriter writer, byte channelNumber)
 		{
 			_peer?.Send(writer.Buffer.Array,
-						writer.Start, 
+						writer.Buffer.Offset, 
 						writer.Count, 
 						channelNumber, 
 						DeliveryMethod.ReliableSequenced);
@@ -126,7 +127,7 @@ namespace CTS.Instance.Networks
 		public void SendUnreliable(PacketWriter writer, byte channelNumber)
 		{
 			_peer?.Send(writer.Buffer.Array,
-						writer.Start,
+						writer.Buffer.Offset,
 						writer.Count,
 						channelNumber,
 						DeliveryMethod.Unreliable);
