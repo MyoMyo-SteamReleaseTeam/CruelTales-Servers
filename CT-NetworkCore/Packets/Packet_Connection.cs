@@ -38,8 +38,9 @@ namespace CT.Packets
 		public ClientId Id = new();
 		public ClientToken Token = new();
 		public GameInstanceGuid MatchTo = new();
+		public NetStringShort Username;
 	
-		public override int SerializeSize => Id.SerializeSize + Token.SerializeSize + MatchTo.SerializeSize + 2;
+		public override int SerializeSize => Id.SerializeSize + Token.SerializeSize + MatchTo.SerializeSize + Username.SerializeSize + 2;
 	
 		public override void Serialize(PacketWriter writer)
 		{
@@ -47,6 +48,7 @@ namespace CT.Packets
 			Id.Serialize(writer);
 			Token.Serialize(writer);
 			MatchTo.Serialize(writer);
+			writer.Put(Username);
 		}
 	
 		public override void Deserialize(PacketReader reader)
@@ -54,6 +56,7 @@ namespace CT.Packets
 			Id.Deserialize(reader);
 			Token.Deserialize(reader);
 			MatchTo.Deserialize(reader);
+			Username = reader.ReadNetStringShort();
 		}
 	}
 	

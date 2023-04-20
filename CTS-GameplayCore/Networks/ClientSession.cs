@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 using CT.Network.Extensions;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
@@ -18,7 +19,7 @@ namespace CTS.Instance.Networks
 		public static ILog _log = LogManager.GetLogger(typeof(ClientSession));
 
 		// Gameplay
-		public GameInstance? GameInstance { get; private set; }
+		public ClientSessionHandler? SessionHandler { get; private set; }
 
 		// Services
 		private readonly SessionManager _sessionManager;
@@ -35,6 +36,7 @@ namespace CTS.Instance.Networks
 		// Verifications
 		public ClientId ClientId { get; private set; }
 		public ClientToken ClientToken { get; private set; }
+		public NetStringShort ClientName { get; private set; }
 		public GameInstanceGuid GameInstanceGuid { get; private set; }
 
 		// Lock
@@ -85,8 +87,8 @@ namespace CTS.Instance.Networks
 			_sessionManager.Remove(this);
 
 			// Leave from game instance and clear it's reference
-			GameInstance?.Push_OnDisconnected(this); // TODO : Add disconnected job
-			GameInstance = null;
+			SessionHandler?.Push_OnDisconnected(this);
+			SessionHandler = null;
 
 			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
 		}
@@ -103,7 +105,7 @@ namespace CTS.Instance.Networks
 				PeerId = peer.Id;
 			}
 
-			var t = waitAuthenticationAsync();
+			_ = waitAuthenticationAsync();
 			return true;
 		}
 
@@ -112,14 +114,22 @@ namespace CTS.Instance.Networks
 			PacketDispatcher.Dispatch(packet, this);
 		}
 
-		public void SendReliable(PacketWriter writer, int channelNumber)
+		public void SendReliable(PacketWriter writer, byte channelNumber)
 		{
-			//this._peer.Send(writer.Buffer, 0, writer.Count, channelNumber, DeliveryMethod.ReliableSequenced)
+			_peer?.Send(writer.Buffer.Array,
+						writer.Start, 
+						writer.Count, 
+						channelNumber, 
+						DeliveryMethod.ReliableSequenced);
 		}
 
-		public void SendUnreliable(PacketWriter writer)
+		public void SendUnreliable(PacketWriter writer, byte channelNumber)
 		{
-
+			_peer?.Send(writer.Buffer.Array,
+						writer.Start,
+						writer.Count,
+						channelNumber,
+						DeliveryMethod.Unreliable);
 		}
 
 		private async ValueTask waitAuthenticationAsync()
@@ -138,12 +148,12 @@ namespace CTS.Instance.Networks
 			Disconnect(DisconnectReasonType.AuthenticationTimeout);
 		}
 
-		public void OnReqTryJoinGameInstance(ClientId id, ClientToken token, GameInstanceGuid roomGuid)
+		public void OnReqTryJoinGameInstance(ClientId id, ClientToken token, GameInstanceGuid roomGuid, NetStringShort username)
 		{
 			lock (_clientSessionLock)
 			{
-				_log.Info($"Client {ClientId} has been verified. [Token:{ClientToken}][TargetGUID:{GameInstanceGuid}]")
-					;
+				_log.Info($"Client {ClientId}:{username} has been verified. [Token:{ClientToken}][TargetGUID:{GameInstanceGuid}]");
+
 				if (CurrentState != ClientSessionState.WaitForJoinRequest)
 				{
 					_log.Warn($"Client {this} request join game when current state is {CurrentState}");
@@ -154,40 +164,32 @@ namespace CTS.Instance.Networks
 
 				ClientId = id;
 				ClientToken = token;
+				ClientName = username;
 				GameInstanceGuid = roomGuid;
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					instance.Push_TryJoinSession(this);
+					instance.SessionHandler.Push_TryJoinGame(this);
 					return;
 				}
 				else
 				{
 					_log.Error($"There is no GameInstance with GUID {GameInstanceGuid}");
-					disconnectInternal(DisconnectReasonType.ThereIsNoSuchGameInstance);
+					Disconnect(DisconnectReasonType.ThereIsNoSuchGameInstance);
 					return;
 				}
 			}
 		}
-
-		public void Callback_TryJoinGame(bool isSuccess, GameInstance? instance, DisconnectReasonType rejectReason)
+		
+		public void OnEnterGame(ClientSessionHandler sessionHandler)
 		{
-			if (isSuccess)
-			{
-				CurrentState = ClientSessionState.InGame;
-				GameInstance = instance;
-				return;
-
-			}
-
-			_log.Error($"Client {this} fail to join GameInstance {GameInstanceGuid}");
-			disconnectInternal(rejectReason);
-			return;
+			SessionHandler = sessionHandler;
+			CurrentState = ClientSessionState.InGame;
 		}
 
 		public override string ToString()
 		{
-			return ClientId.ToString();
+			return $"{ClientId}:{ClientName}";
 		}
 	}
 }

@@ -10,12 +10,10 @@ namespace CTS.Instance.Packets
 	{
 		public static ILog _log = LogManager.GetLogger(typeof(PacketHandler));
 
-		public static void Handle_CS_Req_TryJoinGameInstance(PacketBase receivedPacket, ClientSession session)
+		internal static void Handle_CS_Req_TryJoinGameInstance(PacketBase receivedPacket, ClientSession session)
 		{
 			var packet = (CS_Req_TryJoinGameInstance)receivedPacket;
-			_log.Info($"Receive {nameof(CS_Req_TryJoinGameInstance)} {packet.Id} {packet.Token} {packet.MatchTo}");
-
-			session.OnReqTryJoinGameInstance(packet.Id, packet.Token, packet.MatchTo);
+			session.OnReqTryJoinGameInstance(packet.Id, packet.Token, packet.MatchTo, packet.Username);
 		}
 
 		internal static void Handle_CS_Req_PlayerInput_Action(PacketBase receivedPacket, ClientSession session)

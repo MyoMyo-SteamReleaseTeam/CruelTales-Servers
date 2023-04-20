@@ -22,6 +22,7 @@
 		<ClientId name="Id"/>
 		<ClientToken name="Token"/>
 		<GameInstanceGuid name="MatchTo"/>
+		<NetStringShort name="Username"/>
 		<!-- TODO : define clothes and setting -->
 	</client>
 	<server name="Ack_TryJoinGameInstance">

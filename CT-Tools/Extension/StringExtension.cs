@@ -1,4 +1,6 @@
-﻿public static class StringExtension
+﻿using System;
+
+public static class StringExtension
 {
 	/// <summary>해당 문자열이 알파벳과 숫자로만 이루어져있는지 판단합니다.</summary>
 	/// <param name="data">검사할 문자열</param>
@@ -14,5 +16,29 @@
 		}
 
 		return true;
+	}
+
+	public static string TryFormat(string format, object arg)
+	{
+		try
+		{
+			return string.Format(format, arg);
+		}
+		catch (FormatException e)
+		{
+			return format + e.Message;
+		}
+	}
+
+	public static string TryFormat(string format, params object[] args)
+	{
+		try
+		{
+			return string.Format(format, args);
+		}
+		catch (FormatException e)
+		{
+			return format + e.Message;
+		}
 	}
 }

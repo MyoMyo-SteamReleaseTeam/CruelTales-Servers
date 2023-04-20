@@ -15,6 +15,7 @@ namespace CTS.Instance.Networks
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(NetworkManager));
 
+		// Managers
 		private readonly EventBasedNetListener _networkListener;
 		private readonly NetManager _netManager;
 		private readonly SessionManager _sessionManager;
@@ -22,8 +23,12 @@ namespace CTS.Instance.Networks
 		// GameInstance
 		public readonly GameInstanceManager GameplayInstanceManager;
 
+		// References
 		private readonly ServerOption _serverOption;
 		private readonly TickTimer _serverTimer;
+
+		// Constant
+		public const byte CHANNEL_CONNECTION = 1;
 
 		public NetworkManager(ServerOption serverOption, TickTimer serverTimer)
 		{

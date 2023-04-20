@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
+using CT.Common.Serialization;
 using CT.Network.Runtimes;
 using CT.Tools.Collections;
 using CTS.Instance.Networks;
@@ -32,10 +33,6 @@ namespace CTS.Instance.Gameplay
 		// DI
 		private readonly GameInstance _gameInstance;
 
-		// Events
-		private event Action<ClientSession> OnClientEnterGame;
-		private event Action<ClientSession> OnClientLeaveGame;
-
 		// Settings
 		public int MemberCount => _playerById.Count;
 		public int MaxClient { get; private set; }
@@ -48,14 +45,10 @@ namespace CTS.Instance.Gameplay
 		// Job Queue
 		private JobQueue<SessionJob> _jobQueue;
 
-		public ClientSessionHandler(GameInstance gameInstance,
-									Action<ClientSession> onClientEnterGame,
-									Action<ClientSession> onClientLeaveGame)
+		public ClientSessionHandler(GameInstance gameInstance)
 		{
 			_gameInstance = gameInstance;
 			_jobQueue = new(onJobExecuted);
-			OnClientEnterGame = onClientEnterGame;
-			OnClientLeaveGame = onClientLeaveGame;
 		}
 
 		public void Initialize(GameInstanceOption option)
@@ -100,18 +93,18 @@ namespace CTS.Instance.Gameplay
 
 			if (MemberCount >= MaxClient)
 			{
-				_log.Warn($"This game instance is already full!");
-				clientSession.Callback_TryJoinGame(false, null, DisconnectReasonType.GameInstanceIsAlreadyFull);
+				_log.Warn($"Client {clientSession} fail to join GameInstance {_gameInstance.Guid}. " +
+					$"Reason : {DisconnectReasonType.GameInstanceIsAlreadyFull}");
+
+				clientSession.Disconnect(DisconnectReasonType.GameInstanceIsAlreadyFull);
 				return;
 			}
 
 			_playerById.Add(clientSession.ClientId, clientSession);
 			_playerList.Add(clientSession);
 
-			OnClientEnterGame(clientSession);
-			clientSession.Callback_TryJoinGame(true, _gameInstance, DisconnectReasonType.None);
-
-			_log.Info($"{this} Session {clientSession} join the game");
+			clientSession.OnEnterGame(this);
+			_gameInstance.OnClientEnterGame(clientSession);
 		}
 
 		public void Push_OnDisconnected(ClientSession clientSession)
@@ -128,11 +121,37 @@ namespace CTS.Instance.Gameplay
 			if (_playerById.TryRemove(clientSession.ClientId))
 			{
 				_log.Info($"[GUID:{_gameInstance.Guid}][Current player:{this.MemberCount}] Session {clientSession} leave the game");
-				OnClientLeaveGame(clientSession);
+				_gameInstance.OnClientLeaveGame(clientSession);
 			}
 			else
 			{
 				_log.Error($"Player disconnected warning! There is no client {clientSession.ClientId}!");
+			}
+		}
+
+		public void SendReliable(ClientId clientId, PacketWriter writer,
+								 byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
+		{
+			if (_playerById.TryGetValue(clientId, out var player))
+			{
+				player.SendReliable(writer, channelNumber);
+			}
+			else
+			{
+				_log.Warn($"There is no {clientId} to {nameof(SendReliable)} in GI:{_gameInstance.Guid}");
+			}
+		}
+
+		public void SendUnreliable(ClientId clientId, PacketWriter writer,
+								 byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
+		{
+			if (_playerById.TryGetValue(clientId, out var player))
+			{
+				player.SendUnreliable(writer, channelNumber);
+			}
+			else
+			{
+				_log.Warn($"There is no {clientId} to {nameof(SendUnreliable)} in GI:{_gameInstance.Guid}");
 			}
 		}
 	}

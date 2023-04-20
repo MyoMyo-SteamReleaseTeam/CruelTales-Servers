@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CT.Network.Runtimes;
+using CT.Packets;
 using CTS.Instance.Networks;
 using log4net;
 
@@ -23,6 +24,7 @@ namespace CTS.Instance.Gameplay
 
 		// Handlers
 		private ClientSessionHandler _sessionHandler;
+		public ClientSessionHandler SessionHandler => _sessionHandler;
 		private ClientInputHandler _inputHandler;
 
 		// Managers
@@ -31,7 +33,7 @@ namespace CTS.Instance.Gameplay
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
-			_sessionHandler = new ClientSessionHandler(this, onClientEnterGame, onClientLeaveGame);
+			_sessionHandler = new ClientSessionHandler(this);
 			_inputHandler = new ClientInputHandler(this);
 			_miniGameManager = new MiniGameManager();
 		}
@@ -80,28 +82,19 @@ namespace CTS.Instance.Gameplay
 
 		#region Session
 
-		private void onClientEnterGame(ClientSession session)
+		public void OnClientEnterGame(ClientSession clientSession)
 		{
+			_log.Info($"[Instance:{Guid}] Session {clientSession} enter the game");
+
+			SC_OnClientEnter enter = new SC_OnClientEnter();
+			enter.Username = clientSession.ClientName;
 
 			// TODO : Send initial packet
 		}
 
-		private void onClientLeaveGame(ClientSession session)
+		public void OnClientLeaveGame(ClientSession clientSession)
 		{
-		}
-
-		/// <summary>게임 인스턴스에 접속을 시도합니다. 접속 결과는 Callback으로 호출됩니다.</summary>
-		/// <param name="clientSession"></param>
-		/// <param name="rejectReason"></param>
-		/// <returns></returns>
-		public void Push_TryJoinSession(ClientSession clientSession)
-		{
-			_sessionHandler.Push_TryJoinGame(clientSession);
-		}
-
-		public void Push_OnDisconnected(ClientSession clientSession)
-		{
-			_sessionHandler.Push_OnDisconnected(clientSession);
+			_log.Info($"[Instance:{Guid}] Session {clientSession} leave the game");
 		}
 
 		#endregion
