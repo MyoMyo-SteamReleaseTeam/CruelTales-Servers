@@ -1,8 +1,9 @@
 ﻿using System;
+using CT.Common.Serialization;
 
 namespace CT.Tools.Collections
 {
-	public struct BitmaskByte
+	public struct BitmaskByte : IPacketSerializable
 	{
 		public byte Mask;
 
@@ -10,6 +11,8 @@ namespace CT.Tools.Collections
 		public const int BIT_SIZE = 8;
 		public const byte ALL_BIT_SET = 0b_1111_1111;
 		public const byte ALL_BIT_UNSET = 0b_0000_0000;
+
+		public int SerializeSize => sizeof(byte);
 
 		public static implicit operator BitmaskByte(byte value) => new BitmaskByte(value);
 		public static implicit operator byte(BitmaskByte value) => value.Mask;
@@ -84,9 +87,19 @@ namespace CT.Tools.Collections
 		{
 			return $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
 		}
+
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Mask);
+		}
+
+		public void Deserialize(PacketReader reader)
+		{
+			Mask = reader.ReadByte();
+		}
 	}
 
-	public struct Bitmask32
+	public struct Bitmask32 : IPacketSerializable
 	{
 		public uint Mask;
 
@@ -94,6 +107,8 @@ namespace CT.Tools.Collections
 		public const int BIT_SIZE = 32;
 		public const uint ALL_BIT_SET = 0x_FFFFFFFF;
 		public const uint ALL_BIT_UNSET = 0x_00000000;
+
+		public int SerializeSize => sizeof(uint);
 
 		public static implicit operator Bitmask32(uint value) => new Bitmask32(value);
 		public static implicit operator uint(Bitmask32 value) => value.Mask;
@@ -161,6 +176,16 @@ namespace CT.Tools.Collections
 		public override string ToString()
 		{
 			return $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
+		}
+
+		public void Serialize(PacketWriter writer)
+		{
+			writer.Put(Mask);
+		}
+
+		public void Deserialize(PacketReader reader)
+		{
+			Mask = reader.ReadUInt32();
 		}
 	}
 }
