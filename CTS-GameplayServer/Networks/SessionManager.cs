@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Tools.Collections;
 using log4net;
 
@@ -12,6 +13,7 @@ namespace CTS.Instance.Networks
 		private object _sessionManagerLock = new object();
 		private BidirectionalMap<int, UserSession> _sessionById = new();
 		private NetworkManager _networkManager;
+		private Stack<UserSession> _sessionPool = new();
 
 		public SessionManager(NetworkManager networkManager)
 		{
@@ -20,9 +22,13 @@ namespace CTS.Instance.Networks
 
 		public UserSession Create(int peerId)
 		{
-			UserSession session = new(this, _networkManager);
 			lock (_sessionManagerLock)
 			{
+				if (!_sessionPool.TryPop(out var session))
+				{
+					session = new(this, _networkManager);
+				}
+				session.Reset();
 				_sessionById.Add(peerId, session);
 				return session;
 			}
@@ -32,6 +38,7 @@ namespace CTS.Instance.Networks
 		{
 			lock (_sessionManagerLock)
 			{
+				_sessionPool.Push(session);
 				if (_sessionById.TryRemove(session))
 				{
 					return;

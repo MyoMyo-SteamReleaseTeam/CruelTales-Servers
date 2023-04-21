@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
@@ -54,6 +53,10 @@ namespace CTS.Instance.Networks
 			_sessionManager = sessionManager;
 			_networkManager = networkManager;
 			_gameInstanceManager = _networkManager.GameplayInstanceManager;
+		}
+
+		public void Reset()
+		{
 		}
 
 		public void OnDisconnected(DisconnectInfo disconnectInfo)
