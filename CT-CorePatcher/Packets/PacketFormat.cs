@@ -221,69 +221,73 @@ namespace {1}
 		public static readonly string PacketDispatcherFileName = "PacketDispatcher";
 
 		/// <summary>
-		/// {0} Read function content<br/>
-		/// {1} Create function content<br/>
+		/// {0} Create by enum function content<br/>
+		/// {1} Create by type function content<br/>
+		/// {2} Match type and enum content<br/>
 		/// </summary>
 		public static readonly string PacketFactoryServerFormat =
-@"using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+@"using System;
+using System.Collections.Generic;
 using CT.Common.Serialization;
 using CT.Packets;
+using CT.Tools.Collections;
 using CTS.Instance.PacketCustom;
 
-namespace CTC.Networks.Packets
+namespace CTS.Instance.Packets
 {{
 	public delegate PacketBase ReadPacket(PacketReader reader);
 	public delegate PacketBase CreatePacket();
 
 	public static class PacketFactory
 	{{
-		private static Dictionary<PacketType, ReadPacket> _packetReadFactoryTable = new()
+		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{{
 {0}
 		}};
 
-		private static Dictionary<PacketType, CreatePacket> _packetCreateFactoryTable = new()
+		private static Dictionary<Type, CreatePacket> _packetCreateByType = new()
 		{{
 {1}
 		}};
 
-		public static bool ReadPacket(PacketType packetType, PacketReader reader,
-										[MaybeNullWhen(false)] out PacketBase packet)
+		private static BidirectionalMap<Type, PacketType> _packetTypeTable = new()
 		{{
-			if (_packetReadFactoryTable.TryGetValue(packetType, out var readFunc))
-			{{
-				packet = readFunc(reader);
-				return true;
-			}}
+{2}
+		}};
 
-			packet = null;
-			return false;
+		public static T CreatePacket<T>() where T : PacketBase
+		{{
+			return (T)_packetCreateByType[typeof(T)]();
 		}}
 
-		public static bool CreatePacket(PacketType packetType, [MaybeNullWhen(false)] out PacketBase packet)
+		public static PacketBase CreatePacket(PacketType type)
 		{{
-			if (_packetCreateFactoryTable.TryGetValue(packetType, out var createFunc))
-			{{
-				packet = createFunc();
-				return true;
-			}}
+			return _packetCreateByEnum[type]();
+		}}
 
-			packet = null;
-			return false;
+		public static Type GetTypeByEnum(PacketType value)
+		{{
+			return _packetTypeTable.GetValue(value);
+		}}
+
+		public static PacketType GetEnumByType(Type value)
+		{{
+			return _packetTypeTable.GetValue(value);
 		}}
 	}}
 }}";
 
 		/// <summary>
-		/// {0} Read function content<br/>
-		/// {1} Create function content<br/>
+		/// {0} Create by enum function content<br/>
+		/// {1} Create by type function content<br/>
+		/// {2} Match type and enum content<br/>
 		/// </summary>
 		public static readonly string PacketFactoryClientFormat =
-@"using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+@"using System;
+using System.Collections.Generic;
 using CT.Common.Serialization;
 using CT.Packets;
+using CT.Tools.Collections;
 using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
@@ -293,39 +297,39 @@ namespace CTC.Networks.Packets
 
 	public static class PacketFactory
 	{{
-		private static Dictionary<PacketType, ReadPacket> _packetReadFactoryTable = new()
+		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{{
 {0}
 		}};
 
-		private static Dictionary<PacketType, CreatePacket> _packetCreateFactoryTable = new()
+		private static Dictionary<Type, CreatePacket> _packetCreateByType = new()
 		{{
 {1}
 		}};
 
-		public static bool ReadPacket(PacketType packetType, PacketReader reader,
-										[MaybeNullWhen(false)] out PacketBase packet)
+		private static BidirectionalMap<Type, PacketType> _packetTypeTable = new()
 		{{
-			if (_packetReadFactoryTable.TryGetValue(packetType, out var readFunc))
-			{{
-				packet = readFunc(reader);
-				return true;
-			}}
+{2}
+		}};
 
-			packet = null;
-			return false;
+		public static T CreatePacket<T>() where T : PacketBase
+		{{
+			return (T)_packetCreateByType[typeof(T)]();
 		}}
 
-		public static bool CreatePacket(PacketType packetType, [MaybeNullWhen(false)] out PacketBase packet)
+		public static PacketBase CreatePacket(PacketType type)
 		{{
-			if (_packetCreateFactoryTable.TryGetValue(packetType, out var createFunc))
-			{{
-				packet = createFunc();
-				return true;
-			}}
+			return _packetCreateByEnum[type]();
+		}}
 
-			packet = null;
-			return false;
+		public static Type GetTypeByEnum(PacketType value)
+		{{
+			return _packetTypeTable.GetValue(value);
+		}}
+
+		public static PacketType GetEnumByType(Type value)
+		{{
+			return _packetTypeTable.GetValue(value);
 		}}
 	}}
 }}";
@@ -333,14 +337,20 @@ namespace CTC.Networks.Packets
 		/// <summary>
 		/// {0} Packet name
 		/// </summary>
-		public static readonly string PacketReadFuncMember =
-			@"{{ PacketType.{0}, (r) => r.Read<{0}>() }},";
+		public static readonly string PacketCreateByEnumItem =
+			@"{{ PacketType.{0}, () => new {0}() }},";
 
 		/// <summary>
 		/// {0} Packet name
 		/// </summary>
-		public static readonly string PacketCreateFuncMember =
-			@"{{ PacketType.{0}, () => new {0}() }},";
+		public static readonly string PacketCreateByTypeItem =
+			@"{{ typeof({0}), () => new {0}() }},";
+
+		/// <summary>
+		/// {0} Packet name
+		/// </summary>
+		public static readonly string PacketMatchTypeEnumItem =
+			@"{{ typeof({0}), PacketType.{0} }},";
 
 		/// <summary>
 		/// {0} Content<br/>

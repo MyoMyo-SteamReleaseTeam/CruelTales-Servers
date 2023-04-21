@@ -5,10 +5,11 @@
  * Do not modify the code arbitrarily.
  */
 
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 using CT.Packets;
+using CT.Tools.Collections;
 using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
@@ -18,20 +19,7 @@ namespace CTC.Networks.Packets
 
 	public static class PacketFactory
 	{
-		private static Dictionary<PacketType, ReadPacket> _packetReadFactoryTable = new()
-		{
-			{ PacketType.CS_Req_TryJoinGameInstance, (r) => r.Read<CS_Req_TryJoinGameInstance>() },
-			{ PacketType.SC_Ack_TryJoinGameInstance, (r) => r.Read<SC_Ack_TryJoinGameInstance>() },
-			{ PacketType.SC_OnClientEnter, (r) => r.Read<SC_OnClientEnter>() },
-			{ PacketType.SC_OnClientLeave, (r) => r.Read<SC_OnClientLeave>() },
-			{ PacketType.SC_MiniGameData, (r) => r.Read<SC_MiniGameData>() },
-			{ PacketType.SC_SpawnEntities, (r) => r.Read<SC_SpawnEntities>() },
-			{ PacketType.CS_Req_PlayerInput_Movement, (r) => r.Read<CS_Req_PlayerInput_Movement>() },
-			{ PacketType.CS_Req_PlayerInput_Action, (r) => r.Read<CS_Req_PlayerInput_Action>() },
-			
-		};
-
-		private static Dictionary<PacketType, CreatePacket> _packetCreateFactoryTable = new()
+		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{
 			{ PacketType.CS_Req_TryJoinGameInstance, () => new CS_Req_TryJoinGameInstance() },
 			{ PacketType.SC_Ack_TryJoinGameInstance, () => new SC_Ack_TryJoinGameInstance() },
@@ -44,29 +32,50 @@ namespace CTC.Networks.Packets
 			
 		};
 
-		public static bool ReadPacket(PacketType packetType, PacketReader reader,
-										[MaybeNullWhen(false)] out PacketBase packet)
+		private static Dictionary<Type, CreatePacket> _packetCreateByType = new()
 		{
-			if (_packetReadFactoryTable.TryGetValue(packetType, out var readFunc))
-			{
-				packet = readFunc(reader);
-				return true;
-			}
+			{ typeof(CS_Req_TryJoinGameInstance), () => new CS_Req_TryJoinGameInstance() },
+			{ typeof(SC_Ack_TryJoinGameInstance), () => new SC_Ack_TryJoinGameInstance() },
+			{ typeof(SC_OnClientEnter), () => new SC_OnClientEnter() },
+			{ typeof(SC_OnClientLeave), () => new SC_OnClientLeave() },
+			{ typeof(SC_MiniGameData), () => new SC_MiniGameData() },
+			{ typeof(SC_SpawnEntities), () => new SC_SpawnEntities() },
+			{ typeof(CS_Req_PlayerInput_Movement), () => new CS_Req_PlayerInput_Movement() },
+			{ typeof(CS_Req_PlayerInput_Action), () => new CS_Req_PlayerInput_Action() },
+			
+		};
 
-			packet = null;
-			return false;
+		private static BidirectionalMap<Type, PacketType> _packetTypeTable = new()
+		{
+			{ typeof(CS_Req_TryJoinGameInstance), PacketType.CS_Req_TryJoinGameInstance },
+			{ typeof(SC_Ack_TryJoinGameInstance), PacketType.SC_Ack_TryJoinGameInstance },
+			{ typeof(SC_OnClientEnter), PacketType.SC_OnClientEnter },
+			{ typeof(SC_OnClientLeave), PacketType.SC_OnClientLeave },
+			{ typeof(SC_MiniGameData), PacketType.SC_MiniGameData },
+			{ typeof(SC_SpawnEntities), PacketType.SC_SpawnEntities },
+			{ typeof(CS_Req_PlayerInput_Movement), PacketType.CS_Req_PlayerInput_Movement },
+			{ typeof(CS_Req_PlayerInput_Action), PacketType.CS_Req_PlayerInput_Action },
+			
+		};
+
+		public static T CreatePacket<T>() where T : PacketBase
+		{
+			return (T)_packetCreateByType[typeof(T)]();
 		}
 
-		public static bool CreatePacket(PacketType packetType, [MaybeNullWhen(false)] out PacketBase packet)
+		public static PacketBase CreatePacket(PacketType type)
 		{
-			if (_packetCreateFactoryTable.TryGetValue(packetType, out var createFunc))
-			{
-				packet = createFunc();
-				return true;
-			}
+			return _packetCreateByEnum[type]();
+		}
 
-			packet = null;
-			return false;
+		public static Type GetTypeByEnum(PacketType value)
+		{
+			return _packetTypeTable.GetValue(value);
+		}
+
+		public static PacketType GetEnumByType(Type value)
+		{
+			return _packetTypeTable.GetValue(value);
 		}
 	}
 }

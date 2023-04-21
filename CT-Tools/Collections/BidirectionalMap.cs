@@ -11,22 +11,22 @@ namespace CT.Tools.Collections
 		where T1 : notnull
 		where T2 : notnull
 	{
-		private readonly Dictionary<T1, T2> mForwardMap = new Dictionary<T1, T2>();
-		private readonly Dictionary<T2, T1> mReverseMap = new Dictionary<T2, T1>();
+		private readonly Dictionary<T1, T2> _forwardMap = new Dictionary<T1, T2>();
+		private readonly Dictionary<T2, T1> _reverseMap = new Dictionary<T2, T1>();
 
-		public Dictionary<T1, T2>.ValueCollection ForwardValues => mForwardMap.Values;
-		public Dictionary<T2, T1>.ValueCollection ReverseValues => mReverseMap.Values;
-		public Dictionary<T1, T2>.KeyCollection ForwardKeys => mForwardMap.Keys;
-		public Dictionary<T2, T1>.KeyCollection ReverseKeys => mReverseMap.Keys;
+		public Dictionary<T1, T2>.ValueCollection ForwardValues => _forwardMap.Values;
+		public Dictionary<T2, T1>.ValueCollection ReverseValues => _reverseMap.Values;
+		public Dictionary<T1, T2>.KeyCollection ForwardKeys => _forwardMap.Keys;
+		public Dictionary<T2, T1>.KeyCollection ReverseKeys => _reverseMap.Keys;
 
-		public IEnumerator GetEnumerator() => mForwardMap.GetEnumerator();
-		public int Count => mForwardMap.Count;
+		public IEnumerator GetEnumerator() => _forwardMap.GetEnumerator();
+		public int Count => _forwardMap.Count;
 
 		/// <summary>Map의 모든 요소를 삭제합니다.</summary>
 		public void Clear()
 		{
-			mForwardMap.Clear();
-			mReverseMap.Clear();
+			_forwardMap.Clear();
+			_reverseMap.Clear();
 		}
 
 		public void Add(T1 fValue, T2 rValue)
@@ -41,13 +41,13 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryAddForward(in T1 key, in T2 value)
 		{
-			if (mForwardMap.ContainsKey(key) || mReverseMap.ContainsKey(value))
+			if (_forwardMap.ContainsKey(key) || _reverseMap.ContainsKey(value))
 			{
 				return false;
 			}
 
-			mForwardMap[key] = value;
-			mReverseMap[value] = key;
+			_forwardMap[key] = value;
+			_reverseMap[value] = key;
 			return true;
 		}
 
@@ -55,38 +55,50 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryAddReverse(in T2 key, in T1 value)
 		{
-			if (mForwardMap.ContainsKey(value) || mReverseMap.ContainsKey(key))
+			if (_forwardMap.ContainsKey(value) || _reverseMap.ContainsKey(key))
 			{
 				return false;
 			}
 
-			mForwardMap[value] = key;
-			mReverseMap[key] = value;
+			_forwardMap[value] = key;
+			_reverseMap[key] = value;
 			return true;
+		}
+
+		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
+		public T2 GetForward(in T1 key)
+		{
+			return _forwardMap[key];
+		}
+
+		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
+		public T1 GetReverse(in T2 key)
+		{
+			return _reverseMap[key];
 		}
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryGetForward(in T1 key, out T2? value)
 		{
-			return mForwardMap.TryGetValue(key, out value);
+			return _forwardMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryGetReverse(in T2 key, out T1? value)
 		{
-			return mReverseMap.TryGetValue(key, out value);
+			return _reverseMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 제거합니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryRemoveForward(in T1 key)
 		{
-			if (mForwardMap.TryGetValue(key, out var value))
+			if (_forwardMap.TryGetValue(key, out var value))
 			{
-				mForwardMap.Remove(key);
-				mReverseMap.Remove(value);
+				_forwardMap.Remove(key);
+				_reverseMap.Remove(value);
 				return true;
 			}
 
@@ -97,10 +109,10 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryRemoveReverse(in T2 key)
 		{
-			if (mReverseMap.TryGetValue(key, out var value))
+			if (_reverseMap.TryGetValue(key, out var value))
 			{
-				mReverseMap.Remove(key);
-				mForwardMap.Remove(value);
+				_reverseMap.Remove(key);
+				_forwardMap.Remove(value);
 				return true;
 			}
 
@@ -111,14 +123,14 @@ namespace CT.Tools.Collections
 		/// <returns>값이 존재하면 True를 반환합니다.</returns>
 		public bool ContainsForward(in T1 key)
 		{
-			return mForwardMap.ContainsKey(key);
+			return _forwardMap.ContainsKey(key);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값의 존재 유무를 판단합니다.</summary>
 		/// <returns>값이 존재하면 True를 반환합니다.</returns>
 		public bool ContainsReverse(in T2 key)
 		{
-			return mReverseMap.ContainsKey(key);
+			return _reverseMap.ContainsKey(key);
 		}
 
 		#endregion
@@ -130,13 +142,13 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryAdd(in T1 key, in T2 value)
 		{
-			if (mForwardMap.ContainsKey(key) || mReverseMap.ContainsKey(value))
+			if (_forwardMap.ContainsKey(key) || _reverseMap.ContainsKey(value))
 			{
 				return false;
 			}
 
-			mForwardMap[key] = value;
-			mReverseMap[value] = key;
+			_forwardMap[key] = value;
+			_reverseMap[value] = key;
 			return true;
 		}
 
@@ -144,38 +156,50 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryAdd(in T2 key, in T1 value)
 		{
-			if (mForwardMap.ContainsKey(value) || mReverseMap.ContainsKey(key))
+			if (_forwardMap.ContainsKey(value) || _reverseMap.ContainsKey(key))
 			{
 				return false;
 			}
 
-			mForwardMap[value] = key;
-			mReverseMap[key] = value;
+			_forwardMap[value] = key;
+			_reverseMap[key] = value;
 			return true;
+		}
+
+		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
+		public T2 GetValue(in T1 key)
+		{
+			return _forwardMap[key];
+		}
+
+		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
+		public T1 GetValue(in T2 key)
+		{
+			return _reverseMap[key];
 		}
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryGetValue(in T1 key, [MaybeNullWhen(false)] out T2 value)
 		{
-			return mForwardMap.TryGetValue(key, out value);
+			return _forwardMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryGetValue(in T2 key, [MaybeNullWhen(false)] out T1 value)
 		{
-			return mReverseMap.TryGetValue(key, out value);
+			return _reverseMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 제거합니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryRemove(in T1 key)
 		{
-			if (mForwardMap.TryGetValue(key, out var value))
+			if (_forwardMap.TryGetValue(key, out var value))
 			{
-				mForwardMap.Remove(key);
-				mReverseMap.Remove(value);
+				_forwardMap.Remove(key);
+				_reverseMap.Remove(value);
 				return true;
 			}
 
@@ -186,10 +210,10 @@ namespace CT.Tools.Collections
 		/// <returns>성공 여부입니다.</returns>
 		public bool TryRemove(in T2 key)
 		{
-			if (mReverseMap.TryGetValue(key, out var value))
+			if (_reverseMap.TryGetValue(key, out var value))
 			{
-				mReverseMap.Remove(key);
-				mForwardMap.Remove(value);
+				_reverseMap.Remove(key);
+				_forwardMap.Remove(value);
 				return true;
 			}
 
@@ -200,14 +224,14 @@ namespace CT.Tools.Collections
 		/// <returns>값이 존재하면 True를 반환합니다.</returns>
 		public bool Contains(in T1 key)
 		{
-			return mForwardMap.ContainsKey(key);
+			return _forwardMap.ContainsKey(key);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값의 존재 유무를 판단합니다.</summary>
 		/// <returns>값이 존재하면 True를 반환합니다.</returns>
 		public bool Contains(in T2 key)
 		{
-			return mReverseMap.ContainsKey(key);
+			return _reverseMap.ContainsKey(key);
 		}
 
 		#endregion

@@ -4,6 +4,7 @@ using CT.Networks.Runtimes;
 using CT.Packets;
 using CTS.Instance.Networks;
 using CTS.Instance.PacketCustom;
+using CTS.Instance.Packets;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -30,6 +31,9 @@ namespace CTS.Instance.Gameplay
 
 		// Managers
 		private MiniGameManager _miniGameManager;
+
+		// Packets
+		private PacketPool _packetPool = new();
 
 		public GameInstance(TickTimer serverTimer)
 		{
@@ -87,8 +91,10 @@ namespace CTS.Instance.Gameplay
 		{
 			_log.Info($"[Instance:{Guid}] Session {clientSession} enter the game");
 
-			SC_OnClientEnter enter = new SC_OnClientEnter();
+			SC_OnClientEnter enter = _packetPool.GetPacket<SC_OnClientEnter>();
 			enter.Username = clientSession.ClientName;
+
+			_packetPool.Return(enter);
 
 			// TODO : Send initial packet
 			SC_SpawnEntities spawnEntities = new SC_SpawnEntities();

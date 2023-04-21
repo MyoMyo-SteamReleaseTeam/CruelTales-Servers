@@ -1,85 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 using CT.Packets;
-using CTC.Networks.Packets;
 using log4net;
 
 namespace CTS.Instance.Packets
 {
 	public class PacketPool
 	{
+#pragma warning disable IDE0052
 		private static readonly ILog _log = LogManager.GetLogger(typeof(PacketPool));
+#pragma warning restore IDE0052
 
-		private Dictionary<PacketType, Stack<PacketBase>> _packetPoolTable = new();
+		private Dictionary<Type, Stack<PacketBase>> _packetByType = new();
+		private Dictionary<PacketType, Stack<PacketBase>> _packetByEnum = new();
 
-		public PacketPool()
+		public T GetPacket<T>() where T : PacketBase
 		{
-			var types = Enum.GetValues<PacketType>();
-			foreach (var pt in types)
-			{
-				_packetPoolTable.Add(pt, new Stack<PacketBase>());
-			}
-		}
-
-		public bool TryGetPacket(PacketType packetType,
-								 [MaybeNullWhen(false)] out PacketBase packet)
-		{
-			if (_packetPoolTable.TryGetValue(packetType, out var packetStack))
+			Type type = typeof(T);
+			if (_packetByType.TryGetValue(type, out var packetStack))
 			{
 				if (packetStack.TryPop(out var poolPacket))
 				{
-					packet = poolPacket;
-					return true;
-				}
-
-				if (PacketFactory.CreatePacket(packetType, out var createPacket))
-				{
-					packet = createPacket;
-					return true;
+					return (T)poolPacket;
 				}
 			}
+			else
+			{
+				var pool = new Stack<PacketBase>();
+				_packetByType.Add(type, pool);
+				var packetEnum = PacketFactory.GetEnumByType(type);
+				_packetByEnum.Add(packetEnum, pool);
+			}
 
-			packet = null;
-			_log.Fatal($"There is no {packetType} in the packet pool!");
-			return false;
+			return PacketFactory.CreatePacket<T>();
 		}
 
-		public bool TryReadPacket(PacketType packetType, PacketReader reader,
-								  [MaybeNullWhen(false)] out PacketBase packet)
+		public PacketBase GetPacket(PacketType type)
 		{
-			if (_packetPoolTable.TryGetValue(packetType, out var packetStack))
+			if (_packetByEnum.TryGetValue(type, out var packetStack))
 			{
 				if (packetStack.TryPop(out var poolPacket))
 				{
-					poolPacket.Deserialize(reader);
-					packet = poolPacket;
-					return true;
-				}
-				
-				if (PacketFactory.ReadPacket(packetType, reader, out var readPacket))
-				{
-					packet = readPacket;
-					return true;
+					return poolPacket;
 				}
 			}
+			else
+			{
+				var pool = new Stack<PacketBase>();
+				_packetByEnum.Add(type, pool);
+				var packetType = PacketFactory.GetTypeByEnum(type);
+				_packetByType.Add(packetType, pool);
+			}
 
-			packet = null;
-			_log.Fatal($"There is no {packetType} in the packet pool!");
-			return false;
+			return PacketFactory.CreatePacket(type);
 		}
 
-		public bool Return(PacketBase packet)
+		public PacketBase ReadPacket(PacketType packetType, PacketReader reader)
 		{
-			if (_packetPoolTable.TryGetValue(packet.PacketType, out var packetStack))
+			var packet = GetPacket(packetType);
+			packet.Deserialize(reader);
+			return packet;
+		}
+
+		public void Return(PacketBase packet)
+		{
+			var type = packet.PacketType;
+			if (_packetByEnum.TryGetValue(type, out var packetStack))
 			{
 				packetStack.Push(packet);
-				return true;
+				return;
 			}
 
-			_log.Fatal($"There is no {packet.PacketType} in the packet pool!");
-			return false;
+			var pool = new Stack<PacketBase>();
+			_packetByEnum.Add(type, pool);
+			var packetType = PacketFactory.GetTypeByEnum(type);
+			_packetByType.Add(packetType, pool);
 		}
 	}
 }

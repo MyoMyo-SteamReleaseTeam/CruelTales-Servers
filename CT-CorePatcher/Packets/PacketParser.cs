@@ -63,23 +63,29 @@ namespace CT.CorePatcher.Packets
 
 		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName, bool isServer)
 		{
-			string readFuncContent = string.Empty;
-			string createFuncContent = string.Empty;
+			string createByEnum = string.Empty;
+			string createByType = string.Empty;
+			string matchTypeEnum = string.Empty;
 
 			foreach (var pn in packetNames)
 			{
-				readFuncContent += string.Format(PacketFormat.PacketReadFuncMember, pn) + NewLine;
-				createFuncContent += string.Format(PacketFormat.PacketCreateFuncMember, pn) + NewLine;
+				createByEnum += string.Format(PacketFormat.PacketCreateByEnumItem, pn) + NewLine;
+				createByType += string.Format(PacketFormat.PacketCreateByTypeItem, pn) + NewLine;
+				matchTypeEnum += string.Format(PacketFormat.PacketMatchTypeEnumItem, pn) + NewLine;
 			}
 
 			for (int i = 0; i < 3; i++)
 			{
-				readFuncContent = addIndent(readFuncContent);
-				createFuncContent = addIndent(createFuncContent);
+				createByEnum = addIndent(createByEnum);
+				createByType = addIndent(createByType);
+				matchTypeEnum = addIndent(matchTypeEnum);
 			}
 
-			string factoryFormat = isServer ? PacketFormat.PacketFactoryServerFormat : PacketFormat.PacketFactoryClientFormat;
-			code = string.Format(factoryFormat, readFuncContent, createFuncContent);
+			string factoryFormat = isServer ?
+				PacketFormat.PacketFactoryServerFormat : 
+				PacketFormat.PacketFactoryClientFormat;
+
+			code = string.Format(factoryFormat, createByEnum, createByType, matchTypeEnum);
 			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
 		}
 

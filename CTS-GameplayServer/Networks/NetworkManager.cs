@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Networks.Runtimes;
 using CT.Packets;
-using CTC.Networks.Packets;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
 using LiteNetLib;
@@ -121,16 +121,9 @@ namespace CTS.Instance.Networks
 					while (!packetReader.IsEnd)
 					{
 						PacketType packetType = packetReader.ReadPacketType();
-						
-						if (_packetPool.TryReadPacket(packetType, packetReader, out var packet))
-						{
-							session.OnReceive(packet);
-							_packetPool.Return(packet);
-						}
-						else
-						{
-							session.Disconnect(DisconnectReasonType.WrongPacket);
-						}
+						var packet = _packetPool.ReadPacket(packetType, packetReader);
+						session.OnReceive(packet);
+						_packetPool.Return(packet);
 					}
 				}
 			}
