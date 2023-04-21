@@ -1,4 +1,5 @@
 ﻿using CT.Common.DataType;
+using CT.Common.Gameplay.Entities;
 using CT.Common.Serialization;
 
 namespace CTS.Instance.Gameplay.Entities
@@ -21,5 +22,7 @@ namespace CTS.Instance.Gameplay.Entities
 			EntityId.Deserialize(reader);
 			Transform.Deserialize(reader);
 		}
+
+		public abstract SpawnData GetSpawnData();
 	}
 }

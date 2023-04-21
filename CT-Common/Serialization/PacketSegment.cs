@@ -10,10 +10,6 @@ namespace CT.Common.Serialization
 		public int Capacity => _buffer.Count;
 		public int Size { get; private set; }
 
-		public PacketSegment()
-		{
-		}
-
 		/// <summary>Count 만큼 패킷을 할당받습니다. GC가 발생합니다.</summary>
 		/// <param name="count"></param>
 		public PacketSegment(int count)
@@ -29,11 +25,6 @@ namespace CT.Common.Serialization
 		public PacketSegment(ArraySegment<byte> buffer)
 		{
 			_buffer = buffer;
-		}
-
-		public void Reserve(int putSize)
-		{
-
 		}
 	}
 }

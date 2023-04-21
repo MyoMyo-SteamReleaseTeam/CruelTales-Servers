@@ -135,5 +135,20 @@ namespace CT.Common.Serialization
 		{
 			Count += BinaryConverter.WriteBytes(Buffer, Count, value);
 		}
+
+		public void Put(PacketWriter writer)
+		{
+			var src = writer.Buffer.Array;
+			int srcOffset = writer.Buffer.Offset;
+			var dest = this.Buffer.Array;
+			int destOffset = this.Buffer.Offset + Count;
+			int count = writer.Buffer.Count;
+#if NET
+			System.Diagnostics.Debug.Assert(src != null);
+			System.Diagnostics.Debug.Assert(dest != null);
+#endif
+			System.Buffer.BlockCopy(src, srcOffset, dest, destOffset, count);
+			this.Count += count;
+		}
 	}
 }

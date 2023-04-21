@@ -177,5 +177,29 @@ namespace CT.Test.NetworkCore
 
 			Assert.AreEqual("12", reader.ReadNetStringShort().Value);
 		}
+
+		[TestMethod]
+		public void WriteWriter()
+		{
+			byte[] srcData = new byte[12];
+			PacketWriter writer0 = new(new ArraySegment<byte>(srcData, 0, 4));
+			PacketWriter writer1 = new(new ArraySegment<byte>(srcData, 4, 4));
+			PacketWriter writer2 = new(new ArraySegment<byte>(srcData, 8, 4));
+			writer0.Put(1);
+			writer1.Put(2);
+			writer2.Put(3);
+
+			byte[] destData = new byte[12];
+			PacketReader reader = new(destData);
+			PacketWriter destWriter = new(destData);
+			destWriter.Put(writer0);
+			destWriter.Put(writer1);
+			destWriter.Put(writer2);
+
+			reader.SetPosition(0);
+			Assert.AreEqual(1, reader.ReadInt32());
+			Assert.AreEqual(2, reader.ReadInt32());
+			Assert.AreEqual(3, reader.ReadInt32());
+		}
 	}
 }

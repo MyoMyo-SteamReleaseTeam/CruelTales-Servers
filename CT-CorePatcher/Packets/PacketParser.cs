@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.CorePatcher.Exceptions;
+using CT.CorePatcher.Helper;
 using CT.Packets;
 
 namespace CT.CorePatcher.Packets
@@ -14,10 +14,10 @@ namespace CT.CorePatcher.Packets
 	/// <summary>XML 패킷 정의로 부터 C# 코드를 생성합니다.</summary>
 	internal class PacketParser
 	{
+		public static string NewLine { get; set; } = TextFormat.LF;
+		public static string Indent { get; set; } = TextFormat.Indent;
 		public string WriterName { get; set; } = "writer";
 		public string ReaderName { get; set; } = "reader";
-		public string NewLine { get; set; } = "\n";
-		public string Indent { get; set; } = "\t";
 		public List<Assembly> ReferenceAssemblys { get; set; } = new List<Assembly>();
 		private Dictionary<string, int> _enumSizeByTypeName = new Dictionary<string, int>();
 
@@ -26,12 +26,12 @@ namespace CT.CorePatcher.Packets
 			// Find enums from assemblys
 			foreach (var a in ReferenceAssemblys)
 			{
-				var enumTypes = getTypeNamesBy(a, typeof(Enum));
+				var enumTypes = ReflectionExtension.GetTypeNamesBy(a, typeof(Enum));
 
 				foreach (var et in enumTypes)
 				{
 					var enumSizeTypeName = Enum.GetUnderlyingType(et).Name;
-					int enumSize = PacketHelper.GetByteSizeByTypeName(enumSizeTypeName);
+					int enumSize = ReflectionHelper.GetByteSizeByTypeName(enumSizeTypeName);
 					_enumSizeByTypeName.Add(et.Name, enumSize);
 				}
 			}
@@ -58,7 +58,7 @@ namespace CT.CorePatcher.Packets
 			string format = isClient ? 
 				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
 			code = string.Format(format, content);
-			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
+			code = string.Format(CodeFormat.GeneratorMetadata, fileName, code);
 		}
 
 		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName, bool isServer)
@@ -86,7 +86,7 @@ namespace CT.CorePatcher.Packets
 				PacketFormat.PacketFactoryClientFormat;
 
 			code = string.Format(factoryFormat, createByEnum, createByType, matchTypeEnum);
-			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
+			code = string.Format(CodeFormat.GeneratorMetadata, fileName, code);
 		}
 
 		public void ParseFromXml(string path, out string code, out List<string> packetNames)
@@ -173,7 +173,7 @@ namespace CT.CorePatcher.Packets
 			content = addIndent(content);
 			code = string.Format(PacketFormat.FileFormat,
 								 usingStatements, packetNamespace, content);
-			code = string.Format(PacketFormat.GeneratorMetadata, fileName, code);
+			code = string.Format(CodeFormat.GeneratorMetadata, fileName, code);
 		}
 
 		/// <summary>
@@ -272,9 +272,9 @@ namespace CT.CorePatcher.Packets
 			{
 				string typeName = m.Type;
 
-				if (PacketHelper.CanGetByteSizeByTypeName(typeName))
+				if (ReflectionHelper.CanGetByteSizeByTypeName(typeName))
 				{
-					calcSerializeSize += PacketHelper.GetByteSizeByTypeName(typeName);
+					calcSerializeSize += ReflectionHelper.GetByteSizeByTypeName(typeName);
 				}
 				else if (_enumSizeByTypeName.TryGetValue(typeName, out var size))
 				{
@@ -347,7 +347,7 @@ namespace CT.CorePatcher.Packets
 						typeName = m.Type;
 					}
 					// Check CLR type name
-					else if (PacketHelper.TryGetCLRTypeByPrimitive(m.Type, out string clrType))
+					else if (ReflectionHelper.TryGetCLRTypeByPrimitive(m.Type, out string clrType))
 					{
 						typeName = clrType;
 					}
@@ -505,7 +505,7 @@ namespace CT.CorePatcher.Packets
 				}
 				else
 				{
-					member.IsNative = PacketHelper.TryGetTypeByCLRType(dataTypeName, out var value);
+					member.IsNative = ReflectionHelper.TryGetTypeByCLRType(dataTypeName, out var value);
 					member.Type = member.IsNative ? value : dataTypeName;
 				}
 
@@ -592,18 +592,6 @@ namespace CT.CorePatcher.Packets
 		private string addIndentWithNewLine(string content)
 		{
 			return Indent + content.Replace(NewLine, $"{NewLine + Indent}") + NewLine;
-		}
-
-		/// <summary>해당 어셈블리에 해당하는 타입을 상속받는 타입들의 이름 문자열들을 반환합니다.</summary>
-		/// <param name="referenceAssembly">참조 어셈블리</param>
-		/// <param name="baseType">찾는 타입</param>
-		/// <returns>baseType을 상속받는 타입들의 이름 문자열 리스트입니다.</returns>
-		private List<Type> getTypeNamesBy(Assembly referenceAssembly, Type baseType)
-		{
-			return referenceAssembly
-				.GetTypes()
-				.Where(t => t.BaseType == baseType)
-				.ToList();
 		}
 	}
 }

@@ -169,8 +169,6 @@ namespace CT.CorePatcher.Packets
 				// Read packet files
 				PacketParser parser = new PacketParser();
 
-				parser.NewLine = TextFormat.LF;
-				parser.Indent = TextFormat.Indent;
 				var netcore = Assembly.GetAssembly(typeof(NetString));
 				if (netcore != null)
 				{
@@ -207,7 +205,7 @@ namespace CT.CorePatcher.Packets
 							  new List<string>(),
 							  packetNames);
 
-				enumCode = string.Format(PacketFormat.GeneratorMetadata, enumFileName, enumCode);
+				enumCode = string.Format(CodeFormat.GeneratorMetadata, enumFileName, enumCode);
 				var packetTypeTarget = Path.Combine(packetTypePath, enumFileName);
 				operation.Add(new CodeGenOperation()
 				{

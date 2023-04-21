@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CT.CorePatcher.FilePatch;
 using CT.CorePatcher.Packets;
+using CT.CorePatcher.SynchronizationsCodeGen;
 using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher
@@ -29,6 +30,11 @@ namespace CT.CorePatcher
 	{
 		public static void Main(string[] args)
 		{
+			SynchronizerGenerator syncCodeGen = new();
+			Console.WriteLine(syncCodeGen.ParseCode());
+
+			return;
+
 			try
 			{
 				// Run packet generator

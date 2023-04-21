@@ -20,10 +20,9 @@
 		<UserId name="UserId"/>
 	</server>
 	
-	<server name="MiniGameData" custom="true">
+	<server name="InitialData" custom="true">
 		<MiniGameMapType name="MapType"/>
 		<MiniGameMapTheme name="Theme"/>
-		<NetFixedArray name="SpawnPositions" type="NetVec3"/>
 	</server>
 		
 	<server name="SpawnEntities" custom="true"/>

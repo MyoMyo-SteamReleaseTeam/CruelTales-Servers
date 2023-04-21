@@ -1,4 +1,5 @@
 ﻿using CT.Common.DataType;
+using CT.Common.Gameplay.Entities;
 using CT.Common.Serialization;
 
 namespace CTS.Instance.Gameplay.Entities
@@ -23,6 +24,17 @@ namespace CTS.Instance.Gameplay.Entities
 		{
 			base.SerializeSpawnDataTo(writer);
 			writer.Put(OwnerId);
+		}
+
+		public override SpawnData GetSpawnData()
+		{
+			//SpawnData spawnData = new SpawnData()
+			//{
+			//	EntityId = this.EntityId,
+			//	Transform = this.Transform,
+			//	Property = 
+			//}
+			return new();
 		}
 	}
 }

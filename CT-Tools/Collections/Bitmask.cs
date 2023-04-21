@@ -69,6 +69,12 @@ namespace CT.Tools.Collections
 		/// <summary>모든 비트가 false라면 true를 반환합니다.</summary>
 		public bool IsAllFalse() => Mask == ALL_BIT_UNSET;
 
+		/// <summary>하나의 비트라도 ture라면 true를 반환합니다.</summary>
+		public bool AnyTrue() => Mask != ALL_BIT_UNSET;
+
+		/// <summary>하나의 비트라도 false라면 false를 반환합니다.</summary>
+		public bool AnyFalse() => Mask != ALL_BIT_SET;
+
 		/// <summary>인덱스가 유효한 범위인지 검사합니다.</summary>
 		/// <param name="index">인덱스 x</param>
 		/// <returns>유효한 인덱스라면 true를 반환합니다.</returns>

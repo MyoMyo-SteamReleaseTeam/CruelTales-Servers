@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Reflection.PortableExecutable;
 using CT.Common.Serialization;
 using CT.Packets;
-using CTS.Instance.Gameplay.Entities;
 
 namespace CTC.Networks.PacketCustom
 {
@@ -9,7 +9,16 @@ namespace CTC.Networks.PacketCustom
 	{
 		public override PacketType PacketType => PacketType.SC_SpawnEntities;
 
-		public List<BaseEntity> SpawnEntites = new();
+		private ArraySegment<byte> _data;
+		private PacketWriter _writer;
+		private PacketReader _reader;
+
+		public SC_SpawnEntities()
+		{
+			_data = new(new byte[1500]);
+			_writer = new PacketWriter(_data);
+			_reader = new PacketReader(_data);
+		}
 
 		public override int SerializeSize => 1;
 
@@ -17,6 +26,8 @@ namespace CTC.Networks.PacketCustom
 
 		public override void Deserialize(PacketReader reader)
 		{
+			_data = reader.ReadBytes();
+
 			var count = reader.ReadByte();
 			for (int i = 0; i < count; ++i)
 			{
