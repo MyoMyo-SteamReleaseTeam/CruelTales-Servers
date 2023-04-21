@@ -19,11 +19,11 @@ namespace CTS.Instance.Gameplay
 			_entityById.Clear();
 		}
 
-		public void AddPlayer(ClientSession session)
+		public void AddPlayer(UserSession session)
 		{
 			_entityIdCounter = new NetEntityId(_entityIdCounter.ID + 1);
 			var playerEntity = new Entity_Player();
-			playerEntity.BindClient(session.ClientId);
+			playerEntity.BindClient(session.UserId);
 			_entityById.Add(_entityIdCounter, playerEntity);
 		}
 	}

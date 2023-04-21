@@ -35,28 +35,25 @@ namespace CT.Packets
 	{
 		public override PacketType PacketType => PacketType.CS_Req_TryJoinGameInstance;
 	
-		public ClientId Id = new();
-		public ClientToken Token = new();
 		public GameInstanceGuid MatchTo = new();
-		public NetStringShort Username = new();
+		public UserDataInfo UserDataInfo = new();
+		public UserToken Token = new();
 	
-		public override int SerializeSize => Id.SerializeSize + Token.SerializeSize + MatchTo.SerializeSize + Username.SerializeSize + 2;
+		public override int SerializeSize => MatchTo.SerializeSize + UserDataInfo.SerializeSize + Token.SerializeSize + 2;
 	
 		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(PacketType);
-			Id.Serialize(writer);
-			Token.Serialize(writer);
 			MatchTo.Serialize(writer);
-			Username.Serialize(writer);
+			UserDataInfo.Serialize(writer);
+			Token.Serialize(writer);
 		}
 	
 		public override void Deserialize(PacketReader reader)
 		{
-			Id.Deserialize(reader);
-			Token.Deserialize(reader);
 			MatchTo.Deserialize(reader);
-			Username.Deserialize(reader);
+			UserDataInfo.Deserialize(reader);
+			Token.Deserialize(reader);
 		}
 	}
 	

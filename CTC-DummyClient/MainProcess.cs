@@ -10,14 +10,14 @@ namespace CTC.Networks
 	public struct DummyUserInfo
 	{
 		public int DummyClientPort;
-		public ClientId ClientId;
-		public ClientToken ClientToken;
+		public UserId UserId;
+		public UserToken UserToken;
 		public GameInstanceGuid GameInstanceGuid;
 
 		public override string ToString()
 		{
-			return $"[{nameof(ClientId)}:{ClientId}]" +
-				$"[{nameof(ClientToken)}:{ClientToken}]" +
+			return $"[{nameof(UserId)}:{UserId}]" +
+				$"[{nameof(UserToken)}:{UserToken}]" +
 				$"[{nameof(GameInstanceGuid)}:{GameInstanceGuid}]";
 		}
 	}
@@ -58,8 +58,8 @@ namespace CTC.Networks
 				DummyUserInfo info = new DummyUserInfo()
 				{
 					DummyClientPort = _dummyClientBindPort + i,
-					ClientId = new ClientId((ulong)i * 100),
-					ClientToken = new ClientToken((ulong)(i * 10000)),
+					UserId = new UserId((ulong)i * 100),
+					UserToken = new UserToken((ulong)(i * 10000)),
 					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 9) + 1))
 				};
 

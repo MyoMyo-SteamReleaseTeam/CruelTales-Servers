@@ -11,7 +11,7 @@ namespace CTS.Instance.Gameplay
 {
 	public class GameInstanceOption
 	{
-		public int MaxClient { get; set; }
+		public int MaxUser { get; set; }
 	}
 
 	public class GameInstance
@@ -25,9 +25,9 @@ namespace CTS.Instance.Gameplay
 		public GameInstanceGuid Guid { get; private set; }
 
 		// Handlers
-		private ClientSessionHandler _sessionHandler;
-		public ClientSessionHandler SessionHandler => _sessionHandler;
-		private ClientInputHandler _inputHandler;
+		private UserSessionHandler _sessionHandler;
+		public UserSessionHandler SessionHandler => _sessionHandler;
+		private UserInputHandler _inputHandler;
 
 		// Managers
 		private MiniGameManager _miniGameManager;
@@ -38,8 +38,8 @@ namespace CTS.Instance.Gameplay
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
-			_sessionHandler = new ClientSessionHandler(this);
-			_inputHandler = new ClientInputHandler(this);
+			_sessionHandler = new UserSessionHandler(this);
+			_inputHandler = new UserInputHandler(this);
 			_miniGameManager = new MiniGameManager();
 		}
 
@@ -69,40 +69,40 @@ namespace CTS.Instance.Gameplay
 
 		public void Shutdown(DisconnectReasonType reason)
 		{
-			foreach (var ps in _sessionHandler.PlayerList)
+			foreach (var ps in _sessionHandler.UserList)
 			{
 				DisconnectPlayer(ps, reason);
 			}
 		}
 
-		public void OnClientInput(ClientInputJob job)
+		public void OnUserInput(UserInputJob job)
 		{
-			_inputHandler.PushClientInput(job);
+			_inputHandler.PushUserInput(job);
 		}
 
-		public void DisconnectPlayer(ClientSession clientSession, DisconnectReasonType reason)
+		public void DisconnectPlayer(UserSession userSession, DisconnectReasonType reason)
 		{
-			clientSession.Disconnect(reason);
+			userSession.Disconnect(reason);
 		}
 
 		#region Session
 
-		public void OnClientEnterGame(ClientSession clientSession)
+		public void OnUserEnterGame(UserSession userSession)
 		{
-			_log.Info($"[Instance:{Guid}] Session {clientSession} enter the game");
+			_log.Info($"[Instance:{Guid}] Session {userSession} enter the game");
 
-			SC_OnClientEnter enter = _packetPool.GetPacket<SC_OnClientEnter>();
-			enter.Username = clientSession.ClientName;
-
+			SC_OnUserEnter enter = _packetPool.GetPacket<SC_OnUserEnter>();
+			enter.UserDataInfo = userSession.UserDataInfo;
 			_packetPool.Return(enter);
 
 			// TODO : Send initial packet
+
 			SC_SpawnEntities spawnEntities = new SC_SpawnEntities();
 		}
 
-		public void OnClientLeaveGame(ClientSession clientSession)
+		public void OnUserLeaveGame(UserSession userSession)
 		{
-			_log.Info($"[Instance:{Guid}] Session {clientSession} leave the game");
+			_log.Info($"[Instance:{Guid}] Session {userSession} leave the game");
 		}
 
 		#endregion

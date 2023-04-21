@@ -364,7 +364,7 @@ using CTS.Instance.Networks;
 
 namespace CTS.Instance.Packets
 {{
-	public delegate void HandlePacket(PacketBase receivedPacket, ClientSession session);
+	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -373,7 +373,7 @@ namespace CTS.Instance.Packets
 {0}
 		}};
 
-		public static void Dispatch(PacketBase receivedPacket, ClientSession session)
+		public static void Dispatch(PacketBase receivedPacket, UserSession session)
 		{{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}

@@ -23,12 +23,12 @@
 	<!-- Declare Packets -->>
 	
 	<!-- Try Join Matching -->>
-	<client name="Req_PlayerInput_Movement">
-		<ClientToken name="Token"/>
+	<client name="Req_UserInput_Movement">
+		<UserToken name="Token"/>
 		<Input_Movement name="InputMovement"/>
 	</client>
-	<client name="Req_PlayerInput_Action">
-		<ClientToken name="Token"/>
+	<client name="Req_UserInput_Action">
+		<UserToken name="Token"/>
 		<Input_Action name="InputAction"/>
 	</client>
 </Definition>

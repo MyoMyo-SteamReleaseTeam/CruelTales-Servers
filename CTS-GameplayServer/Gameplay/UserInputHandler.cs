@@ -17,18 +17,18 @@ namespace CTS.Instance.Gameplay
 		public void Flush(FArg arg);
 	}
 
-	public class ClientInputHandler : IJobHandler<float>
+	public class UserInputHandler : IJobHandler<float>
 	{
 		// Log
-		private readonly ILog _log = LogManager.GetLogger(typeof(ClientInputHandler));
+		private readonly ILog _log = LogManager.GetLogger(typeof(UserInputHandler));
 
 		// DI
 		private readonly GameInstance _gameInstance;
 
 		// Job Queue
-		private readonly JobQueue<ClientInputJob, float> _jobQueue;
+		private readonly JobQueue<UserInputJob, float> _jobQueue;
 
-		public ClientInputHandler(GameInstance gameInstance)
+		public UserInputHandler(GameInstance gameInstance)
 		{
 			_gameInstance = gameInstance;
 			_jobQueue = new(_gameInstance.ServerTimer, onJobExecuted);
@@ -44,12 +44,12 @@ namespace CTS.Instance.Gameplay
 			_jobQueue.Flush(delta);
 		}
 
-		public void PushClientInput(ClientInputJob job)
+		public void PushUserInput(UserInputJob job)
 		{
 			_jobQueue.Push(job);
 		}
 
-		private void onJobExecuted(ClientInputJob job, float delta)
+		private void onJobExecuted(UserInputJob job, float delta)
 		{
 			switch (job.Type)
 			{

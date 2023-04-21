@@ -4,11 +4,11 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct ClientId : IPacketSerializable
+	public struct UserId : IPacketSerializable
 	{
 		public ulong Id;
 
-		public ClientId(ulong value)
+		public UserId(ulong value)
 		{
 			Id = value;
 		}

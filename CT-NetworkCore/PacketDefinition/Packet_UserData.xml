@@ -8,22 +8,17 @@
 	<using>CT.Common.DataType</using>>
 	<using>CT.Common.Serialization</using>>
 	<using>CT.Common.Serialization.Type</using>>
-	
+
 	<!-- Declare Data Types -->>
-	<class name="UserProfile">
+	<struct name="UserDataInfo">
+		<UserId name="UserId"/>
 		<NetStringShort name="Username"/>
-		<NetStringShort name="Clothes"/>
-	</class>
+		<DokzaCostume name="UserCostume"/>
+	</struct>
+	<struct name="DokzaCostume">
+		<Int32 name="Head"/>
+		<Int32 name="Body"/>
+	</struct>
 	
 	<!-- Declare Packets -->>
-	
-	<!-- Try Join Matching -->>
-	<client name="Req_TryJoinGameInstance">
-		<GameInstanceGuid name="MatchTo"/>
-		<UserDataInfo name="UserDataInfo"/>
-		<UserToken name="Token"/>
-	</client>
-	<server name="Ack_TryJoinGameInstance">
-		<AckJoinMatch name="AckResult"/>
-	</server>
 </Definition>

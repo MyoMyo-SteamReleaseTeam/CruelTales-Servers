@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Networks.Runtimes;
@@ -110,13 +109,13 @@ namespace CTS.Instance.Networks
 
 		private void onNetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
 		{
-			ClientSession? session = null;
+			UserSession? session = null;
 
 			try
 			{
 				if (_sessionManager.TryGetSessionBy(peer.Id, out session))
 				{
-					PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
+					PacketReader packetReader = new(reader.GetRemainingBytesSegment());
 
 					while (!packetReader.IsEnd)
 					{

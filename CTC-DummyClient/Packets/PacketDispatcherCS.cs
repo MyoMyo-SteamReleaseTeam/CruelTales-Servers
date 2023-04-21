@@ -18,8 +18,8 @@ namespace CTC.Networks.Packets
 		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
 			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
-			{ PacketType.SC_OnClientEnter, PacketHandler.Handle_SC_OnClientEnter },
-			{ PacketType.SC_OnClientLeave, PacketHandler.Handle_SC_OnClientLeave },
+			{ PacketType.SC_OnUserEnter, PacketHandler.Handle_SC_OnUserEnter },
+			{ PacketType.SC_OnUserLeave, PacketHandler.Handle_SC_OnUserLeave },
 			{ PacketType.SC_MiniGameData, PacketHandler.Handle_SC_MiniGameData },
 			{ PacketType.SC_SpawnEntities, PacketHandler.Handle_SC_SpawnEntities },
 			

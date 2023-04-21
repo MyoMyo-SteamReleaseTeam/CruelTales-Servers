@@ -10,7 +10,7 @@ namespace CTS.Instance.Networks
 
 		private static ILog _log = LogManager.GetLogger(typeof(SessionManager));
 		private object _sessionManagerLock = new object();
-		private BidirectionalMap<int, ClientSession> _sessionById = new();
+		private BidirectionalMap<int, UserSession> _sessionById = new();
 		private NetworkManager _networkManager;
 
 		public SessionManager(NetworkManager networkManager)
@@ -18,9 +18,9 @@ namespace CTS.Instance.Networks
 			_networkManager = networkManager;
 		}
 
-		public ClientSession Create(int peerId)
+		public UserSession Create(int peerId)
 		{
-			ClientSession session = new(this, _networkManager);
+			UserSession session = new(this, _networkManager);
 			lock (_sessionManagerLock)
 			{
 				_sessionById.Add(peerId, session);
@@ -28,7 +28,7 @@ namespace CTS.Instance.Networks
 			}
 		}
 
-		public void Remove(ClientSession session)
+		public void Remove(UserSession session)
 		{
 			lock (_sessionManagerLock)
 			{
@@ -40,7 +40,7 @@ namespace CTS.Instance.Networks
 			_log.Error($"There is no session to remove. Session : {session.ToString()}");
 		}
 
-		public bool TryGetSessionBy(int peerId, [MaybeNullWhen(false)] out ClientSession session)
+		public bool TryGetSessionBy(int peerId, [MaybeNullWhen(false)] out UserSession session)
 		{
 			lock (_sessionManagerLock)
 			{

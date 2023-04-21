@@ -1,6 +1,6 @@
 ﻿namespace CT.Common.DataType
 {
-	public enum ClientSessionState
+	public enum UserSessionState
 	{
 		NoConnection = 0,
 		WaitForJoinRequest,

@@ -18,12 +18,12 @@ namespace CTC.Networks
 			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_OnClientEnter(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_OnUserEnter(PacketBase receivedPacket, ServerSession session)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_OnClientLeave(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_OnUserLeave(PacketBase receivedPacket, ServerSession session)
 		{
 			throw new NotImplementedException();
 		}

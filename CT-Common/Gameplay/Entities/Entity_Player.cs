@@ -6,9 +6,9 @@ namespace CTS.Instance.Gameplay.Entities
 	public partial class Entity_Player : BaseEntity
 	{
 		public override NetEntityType EntityType => NetEntityType.Player;
-		public ClientId OwnerId { get; protected set; }
+		public UserId OwnerId { get; protected set; }
 
-		public void BindClient(ClientId clientId)
+		public void BindClient(UserId clientId)
 		{
 			OwnerId = clientId;
 		}

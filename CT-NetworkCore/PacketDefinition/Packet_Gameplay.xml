@@ -13,13 +13,11 @@
 	
 	<!-- Declare Packets -->>
 	
-	<server name="OnClientEnter">
-		<ClientId name="ClientId"/>
-		<NetStringShort name="Username"/>
-		<Int32 name="Costume"/>
+	<server name="OnUserEnter">
+		<UserDataInfo name="UserDataInfo"/>
 	</server>
-	<server name="OnClientLeave">
-		<ClientId name="ClientId"/>
+	<server name="OnUserLeave">
+		<UserId name="UserId"/>
 	</server>
 	
 	<server name="MiniGameData" custom="true">

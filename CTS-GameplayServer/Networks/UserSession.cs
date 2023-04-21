@@ -4,6 +4,7 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 using CT.Networks.Extensions;
+using CT.Packets;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Packets;
 using LiteNetLib;
@@ -11,16 +12,16 @@ using log4net;
 
 namespace CTS.Instance.Networks
 {
-	public class ClientSession
+	public class UserSession
 	{
 		// Constant
 		public const int WAITING_TIMEOUT_SEC = 5;
 
 		// Log
-		public static ILog _log = LogManager.GetLogger(typeof(ClientSession));
+		public static ILog _log = LogManager.GetLogger(typeof(UserSession));
 
 		// Gameplay
-		public ClientSessionHandler? SessionHandler { get; private set; }
+		public UserSessionHandler? SessionHandler { get; private set; }
 
 		// Services
 		private readonly SessionManager _sessionManager;
@@ -32,21 +33,22 @@ namespace CTS.Instance.Networks
 		public int PeerId { get; private set; }
 
 		// State
-		public ClientSessionState CurrentState { get; private set; }
+		public UserSessionState CurrentState { get; private set; }
 
-		// Verifications
-		public ClientId ClientId { get; private set; }
-		public ClientToken ClientToken { get; private set; }
-		public NetStringShort ClientName { get; private set; }
+		// User Data
 		public GameInstanceGuid GameInstanceGuid { get; private set; }
+		public UserToken UserToken { get; private set; }
+		public UserDataInfo UserDataInfo { get; private set; }
+		public UserId UserId => UserDataInfo.UserId;
+		public NetStringShort Username => UserDataInfo.Username;
 
 		// Lock
-		private object _clientSessionLock = new object();
+		private object _sessionLock = new object();
 
 		// Buffer
 		private byte[] _disconnectReasonBuffer = new byte[1];
 
-		public ClientSession(SessionManager sessionManager,
+		public UserSession(SessionManager sessionManager,
 							 NetworkManager networkManager)
 		{
 			_sessionManager = sessionManager;
@@ -58,7 +60,7 @@ namespace CTS.Instance.Networks
 		{
 			DisconnectReasonType reason;
 
-			lock (_clientSessionLock)
+			lock (_sessionLock)
 			{
 				reason = LiteNetLibExtension.ConvertEnum(disconnectInfo.Reason);
 				disconnectInternal(reason);
@@ -67,7 +69,7 @@ namespace CTS.Instance.Networks
 
 		public void Disconnect(DisconnectReasonType disconnectReason)
 		{
-			lock (_clientSessionLock)
+			lock (_sessionLock)
 			{
 				disconnectInternal(disconnectReason);
 			}
@@ -76,9 +78,9 @@ namespace CTS.Instance.Networks
 		private void disconnectInternal(DisconnectReasonType disconnectReason)
 		{
 			// Set state
-			if (CurrentState == ClientSessionState.NoConnection)
+			if (CurrentState == UserSessionState.NoConnection)
 				return;
-			CurrentState = ClientSessionState.NoConnection;
+			CurrentState = UserSessionState.NoConnection;
 
 			// Disconnect
 			_disconnectReasonBuffer[0] = (byte)disconnectReason;
@@ -91,16 +93,16 @@ namespace CTS.Instance.Networks
 			SessionHandler?.Push_OnDisconnected(this);
 			SessionHandler = null;
 
-			_log.Info($"Client {this} disconnected. Reason : {disconnectReason}");
+			_log.Info($"User {this} disconnected. Reason : {disconnectReason}");
 		}
 
 		public bool TryConnected(NetPeer peer)
 		{
-			lock (_clientSessionLock)
+			lock (_sessionLock)
 			{
-				if (CurrentState != ClientSessionState.NoConnection)
+				if (CurrentState != UserSessionState.NoConnection)
 					return false;
-				CurrentState = ClientSessionState.WaitForJoinRequest;
+				CurrentState = UserSessionState.WaitForJoinRequest;
 
 				_peer = peer;
 				PeerId = peer.Id;
@@ -138,10 +140,10 @@ namespace CTS.Instance.Networks
 			for (int i = 0; i < WAITING_TIMEOUT_SEC; i++)
 			{
 				await Task.Delay(1000);
-				lock (_clientSessionLock)
+				lock (_sessionLock)
 				{
-					if (CurrentState == ClientSessionState.InGame || 
-						CurrentState == ClientSessionState.NoConnection)
+					if (CurrentState == UserSessionState.InGame || 
+						CurrentState == UserSessionState.NoConnection)
 					return;
 				}
 			}
@@ -149,24 +151,24 @@ namespace CTS.Instance.Networks
 			Disconnect(DisconnectReasonType.AuthenticationTimeout);
 		}
 
-		public void OnReqTryJoinGameInstance(ClientId id, ClientToken token, GameInstanceGuid roomGuid, NetStringShort username)
+		public void OnReqTryJoinGameInstance(UserDataInfo userDataInfo, UserToken token, GameInstanceGuid roomGuid)
 		{
-			lock (_clientSessionLock)
+			lock (_sessionLock)
 			{
-				_log.Info($"Client {ClientId}:{username} has been verified. [Token:{ClientToken}][TargetGUID:{GameInstanceGuid}]");
 
-				if (CurrentState != ClientSessionState.WaitForJoinRequest)
+				if (CurrentState != UserSessionState.WaitForJoinRequest)
 				{
-					_log.Warn($"Client {this} request join game when current state is {CurrentState}");
+					_log.Warn($"User {this} request join game when current state is {CurrentState}");
 					return;
 				}
 
-				CurrentState = ClientSessionState.WaitForJoinGame;
+				CurrentState = UserSessionState.WaitForJoinGame;
 
-				ClientId = id;
-				ClientToken = token;
-				ClientName = username;
+				UserToken = token;
+				UserDataInfo = userDataInfo;
 				GameInstanceGuid = roomGuid;
+
+				_log.Info($"User {UserId}:{Username} has been verified. [Token:{UserToken}][TargetGUID:{GameInstanceGuid}]");
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
@@ -182,15 +184,15 @@ namespace CTS.Instance.Networks
 			}
 		}
 		
-		public void OnEnterGame(ClientSessionHandler sessionHandler)
+		public void OnEnterGame(UserSessionHandler sessionHandler)
 		{
 			SessionHandler = sessionHandler;
-			CurrentState = ClientSessionState.InGame;
+			CurrentState = UserSessionState.InGame;
 		}
 
 		public override string ToString()
 		{
-			return $"{ClientId}:{ClientName}";
+			return $"{UserId}:{Username}";
 		}
 	}
 }

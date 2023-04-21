@@ -23,12 +23,12 @@ namespace CTS.Instance.Packets
 		{
 			{ PacketType.CS_Req_TryJoinGameInstance, () => new CS_Req_TryJoinGameInstance() },
 			{ PacketType.SC_Ack_TryJoinGameInstance, () => new SC_Ack_TryJoinGameInstance() },
-			{ PacketType.SC_OnClientEnter, () => new SC_OnClientEnter() },
-			{ PacketType.SC_OnClientLeave, () => new SC_OnClientLeave() },
+			{ PacketType.SC_OnUserEnter, () => new SC_OnUserEnter() },
+			{ PacketType.SC_OnUserLeave, () => new SC_OnUserLeave() },
 			{ PacketType.SC_MiniGameData, () => new SC_MiniGameData() },
 			{ PacketType.SC_SpawnEntities, () => new SC_SpawnEntities() },
-			{ PacketType.CS_Req_PlayerInput_Movement, () => new CS_Req_PlayerInput_Movement() },
-			{ PacketType.CS_Req_PlayerInput_Action, () => new CS_Req_PlayerInput_Action() },
+			{ PacketType.CS_Req_UserInput_Movement, () => new CS_Req_UserInput_Movement() },
+			{ PacketType.CS_Req_UserInput_Action, () => new CS_Req_UserInput_Action() },
 			
 		};
 
@@ -36,12 +36,12 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), () => new CS_Req_TryJoinGameInstance() },
 			{ typeof(SC_Ack_TryJoinGameInstance), () => new SC_Ack_TryJoinGameInstance() },
-			{ typeof(SC_OnClientEnter), () => new SC_OnClientEnter() },
-			{ typeof(SC_OnClientLeave), () => new SC_OnClientLeave() },
+			{ typeof(SC_OnUserEnter), () => new SC_OnUserEnter() },
+			{ typeof(SC_OnUserLeave), () => new SC_OnUserLeave() },
 			{ typeof(SC_MiniGameData), () => new SC_MiniGameData() },
 			{ typeof(SC_SpawnEntities), () => new SC_SpawnEntities() },
-			{ typeof(CS_Req_PlayerInput_Movement), () => new CS_Req_PlayerInput_Movement() },
-			{ typeof(CS_Req_PlayerInput_Action), () => new CS_Req_PlayerInput_Action() },
+			{ typeof(CS_Req_UserInput_Movement), () => new CS_Req_UserInput_Movement() },
+			{ typeof(CS_Req_UserInput_Action), () => new CS_Req_UserInput_Action() },
 			
 		};
 
@@ -49,12 +49,12 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), PacketType.CS_Req_TryJoinGameInstance },
 			{ typeof(SC_Ack_TryJoinGameInstance), PacketType.SC_Ack_TryJoinGameInstance },
-			{ typeof(SC_OnClientEnter), PacketType.SC_OnClientEnter },
-			{ typeof(SC_OnClientLeave), PacketType.SC_OnClientLeave },
+			{ typeof(SC_OnUserEnter), PacketType.SC_OnUserEnter },
+			{ typeof(SC_OnUserLeave), PacketType.SC_OnUserLeave },
 			{ typeof(SC_MiniGameData), PacketType.SC_MiniGameData },
 			{ typeof(SC_SpawnEntities), PacketType.SC_SpawnEntities },
-			{ typeof(CS_Req_PlayerInput_Movement), PacketType.CS_Req_PlayerInput_Movement },
-			{ typeof(CS_Req_PlayerInput_Action), PacketType.CS_Req_PlayerInput_Action },
+			{ typeof(CS_Req_UserInput_Movement), PacketType.CS_Req_UserInput_Movement },
+			{ typeof(CS_Req_UserInput_Action), PacketType.CS_Req_UserInput_Action },
 			
 		};
 

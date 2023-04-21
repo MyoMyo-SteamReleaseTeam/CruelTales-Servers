@@ -4,11 +4,11 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct ClientToken : IPacketSerializable
+	public struct UserToken : IPacketSerializable
 	{
 		public ulong Token;
 
-		public ClientToken(ulong token)
+		public UserToken(ulong token)
 		{
 			Token = token;
 		}

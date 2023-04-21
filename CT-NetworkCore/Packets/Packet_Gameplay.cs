@@ -11,49 +11,43 @@ using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {
-	public sealed partial class SC_OnClientEnter : PacketBase
+	public sealed partial class SC_OnUserEnter : PacketBase
 	{
-		public override PacketType PacketType => PacketType.SC_OnClientEnter;
+		public override PacketType PacketType => PacketType.SC_OnUserEnter;
 	
-		public ClientId ClientId = new();
-		public NetStringShort Username = new();
-		public int Costume;
+		public UserDataInfo UserDataInfo = new();
 	
-		public override int SerializeSize => ClientId.SerializeSize + Username.SerializeSize + 6;
+		public override int SerializeSize => UserDataInfo.SerializeSize + 2;
 	
 		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(PacketType);
-			ClientId.Serialize(writer);
-			Username.Serialize(writer);
-			writer.Put(Costume);
+			UserDataInfo.Serialize(writer);
 		}
 	
 		public override void Deserialize(PacketReader reader)
 		{
-			ClientId.Deserialize(reader);
-			Username.Deserialize(reader);
-			Costume = reader.ReadInt32();
+			UserDataInfo.Deserialize(reader);
 		}
 	}
 	
-	public sealed partial class SC_OnClientLeave : PacketBase
+	public sealed partial class SC_OnUserLeave : PacketBase
 	{
-		public override PacketType PacketType => PacketType.SC_OnClientLeave;
+		public override PacketType PacketType => PacketType.SC_OnUserLeave;
 	
-		public ClientId ClientId = new();
+		public UserId UserId = new();
 	
-		public override int SerializeSize => ClientId.SerializeSize + 2;
+		public override int SerializeSize => UserId.SerializeSize + 2;
 	
 		public override void Serialize(PacketWriter writer)
 		{
 			writer.Put(PacketType);
-			ClientId.Serialize(writer);
+			UserId.Serialize(writer);
 		}
 	
 		public override void Deserialize(PacketReader reader)
 		{
-			ClientId.Deserialize(reader);
+			UserId.Deserialize(reader);
 		}
 	}
 	

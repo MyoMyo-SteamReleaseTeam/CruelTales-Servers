@@ -12,11 +12,11 @@ namespace CT.Packets
 		None = 0,
 		CS_Req_TryJoinGameInstance,
 		SC_Ack_TryJoinGameInstance,
-		SC_OnClientEnter,
-		SC_OnClientLeave,
+		SC_OnUserEnter,
+		SC_OnUserLeave,
 		SC_MiniGameData,
 		SC_SpawnEntities,
-		CS_Req_PlayerInput_Movement,
-		CS_Req_PlayerInput_Action,
+		CS_Req_UserInput_Movement,
+		CS_Req_UserInput_Action,
 	}
 }

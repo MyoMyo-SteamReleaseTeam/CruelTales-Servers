@@ -46,9 +46,17 @@ namespace CTC.Networks
 			CS_Req_TryJoinGameInstance reqJoinGame = new CS_Req_TryJoinGameInstance();
 
 			reqJoinGame.MatchTo = UserInfo.GameInstanceGuid;
-			reqJoinGame.Id = UserInfo.ClientId;
-			reqJoinGame.Token = UserInfo.ClientToken;
-			reqJoinGame.Username = "abc";
+			reqJoinGame.Token = UserInfo.UserToken;
+			reqJoinGame.UserDataInfo = new UserDataInfo()
+			{
+				UserId = UserInfo.UserId,
+				Username = "abc",
+				UserCostume = new DokzaCostume()
+				{
+					Body = 1,
+					Head = 2,
+				}
+			};
 
 			_log.Info($"Try request join game to server... : {UserInfo}");
 

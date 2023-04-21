@@ -37,7 +37,7 @@ namespace CTS.Instance.Gameplay
 			_serverTimer = tickTimer;
 			MaxGameCount = serverOption.GameCount;
 
-			var option = new GameInstanceOption() { MaxClient = 7 };
+			var option = new GameInstanceOption() { MaxUser = 7 };
 
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
