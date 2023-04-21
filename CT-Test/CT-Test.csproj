@@ -21,7 +21,7 @@
     <ProjectReference Include="..\CT-CorePatcher\CT-CorePatcher.csproj" />
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
     <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
-    <ProjectReference Include="..\CTS-GameplayCore\CTS-GameplayServer.csproj" />
+    <ProjectReference Include="..\CTS-GameplayServer\CTS-GameplayServer.csproj" />
   </ItemGroup>
 
 </Project>
