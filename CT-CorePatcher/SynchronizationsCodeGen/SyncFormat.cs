@@ -124,6 +124,22 @@ private Queue<({1})> {0}Callstack = new();
 
 		/// <summary>
 		/// {0} Function name<br/>
+		/// {1} Parameter content<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Dirty index<br/>
+		/// </summary>
+		public static readonly string FunctionCallWithStackVoid =
+@"public partial void {0}({1})
+{{
+	{0}CallstackCount++;
+	{2}[{3}] = true;
+}}
+private byte {0}CallstackCount = 0;
+
+";
+
+		/// <summary>
+		/// {0} Function name<br/>
 		/// {1} Bitmask type name<br/>
 		/// {2} Check any dirty content<br/>
 		/// {3} Property serialize group content<br/>
@@ -213,7 +229,21 @@ if (objectDirty[{0}])
 }}
 "
 ;
-		
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Function name<br/>
+		/// </summary>
+		public static readonly string FunctionSerializeIfDirtyVoid =
+@"if ({0}[{1}])
+{{
+	writer.Put({2}CallstackCount);
+	{2}CallstackCount = 0;
+}}
+"
+;
+
 		/// <summary>
 		/// {0} Dirty bits name<br/>
 		/// </summary>

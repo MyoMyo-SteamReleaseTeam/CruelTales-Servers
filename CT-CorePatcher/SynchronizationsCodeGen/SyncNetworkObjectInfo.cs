@@ -27,11 +27,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			foreach (var prop in Properties)
 			{
-				declarationContent += prop.GetPraivteDeclaration() + NewLine + NewLine;
+				declarationContent += prop.GeneratePraivteDeclaration() + NewLine + NewLine;
 			}
 			foreach (var func in Functions)
 			{
-				declarationContent += func.GetPartialDeclaraction() + NewLine + NewLine;
+				declarationContent += func.GeneratePartialDeclaraction() + NewLine + NewLine;
 			}
 
 			// Property Synchronization
@@ -41,13 +41,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			int propDirtyBitsCount = 0;
 			foreach (var prop in Properties)
 			{
-				string dirtyBitname = string.Format(SyncFormat.PropertyDirtyBitname, propDirtyBitsCount);
-				syncContent += string.Format(SyncFormat.PropertyGetSet,
-											 prop.TypeName,
-											 prop.GetPublicPropertyName(),
-											 prop.PrivateName,
-											 dirtyBitname,
-											 propIndex);
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitname, propDirtyBitsCount);
+				syncContent += prop.GeneratePropertyGetSet(dirtyBitName, propIndex);
 				propIndex++;
 				if (propIndex >= 8)
 				{
@@ -61,13 +56,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			int funcDirtyBitsCount = 0;
 			foreach (var func in Functions)
 			{
-				string dirtyBitname = string.Format(SyncFormat.FunctionDirtyBitname, funcDirtyBitsCount);
-				syncContent += string.Format(SyncFormat.FunctionCallWithStack,
-											 func.FunctionName,
-											 func.GetParameterContent(),
-											 func.GetCallStackTupleContent(),
-											 dirtyBitname,
-											 funcIndex);
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitname, funcDirtyBitsCount);
+				syncContent += func.GenerateFunctionCallWithStack(dirtyBitName, funcIndex);
 
 				funcIndex++;
 				if (funcIndex >= 8)
@@ -81,15 +71,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string dirtyBitsContent = string.Empty;
 			for (int i = 0; i <= propDirtyBitsCount; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.PropertyDirtyBitname, i);
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitname, i);
 				dirtyBitsContent += string.Format(SyncFormat.DeclarationDirtyBits,
-												  nameof(BitmaskByte), dirtyBitname) + NewLine;
+												  nameof(BitmaskByte), dirtyBitName) + NewLine;
 			}
 			for (int i = 0; i <= funcDirtyBitsCount; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.FunctionDirtyBitname, i);
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitname, i);
 				dirtyBitsContent += string.Format(SyncFormat.DeclarationDirtyBits,
-												  nameof(BitmaskByte), dirtyBitname) + NewLine;
+												  nameof(BitmaskByte), dirtyBitName) + NewLine;
 			}
 
 			syncContent = dirtyBitsContent + NewLine + syncContent;
@@ -98,13 +88,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string anyDirtyBitsContent = string.Empty;
 			for (int i = 0; i <= propDirtyBitsCount; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.PropertyDirtyBitname, i);
-				anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i, dirtyBitname) + NewLine;
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitname, i);
+				anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i, dirtyBitName) + NewLine;
 			}
 			for (int i = 0; i <= funcDirtyBitsCount; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.FunctionDirtyBitname, i);
-				anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i + 4, dirtyBitname) + NewLine;
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitname, i);
+				anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i + 4, dirtyBitName) + NewLine;
 			}
 			CodeFormat.AddIndent(ref anyDirtyBitsContent);
 
@@ -120,9 +110,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 				var prop = Properties[i];
 
-				string dirtyBitname = string.Format(SyncFormat.PropertyDirtyBitname, propDirtyBitsCounter);
-				propSerializeGroup[propDirtyBitsCounter] += string.Format(SyncFormat.PropertySerializeIfDirty,
-																		  dirtyBitname, curPropIndex, prop.GetWriterSerialize());
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitname, propDirtyBitsCounter);
+				propSerializeGroup[propDirtyBitsCounter] += prop.GeneratetPropertySerializeIfDirty(dirtyBitName, curPropIndex);
 				curPropIndex++;
 				if (curPropIndex >= 8)
 				{
@@ -134,10 +123,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string propSerialize = string.Empty;
 			for (int i = 0; i < propSerializeGroup.Count; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.PropertyDirtyBitname, i);
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitname, i);
 				string contentGroup = propSerializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				propSerialize += string.Format(SyncFormat.PropertySerializeGroup, i, dirtyBitname, contentGroup);
+				propSerialize += string.Format(SyncFormat.PropertySerializeGroup, i, dirtyBitName, contentGroup);
 			}
 			CodeFormat.AddIndent(ref propSerialize);
 
@@ -153,13 +142,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 				var func = Functions[i];
 
-				var funcSerializeContent = func.GetCallstackSerializeContent();
-				CodeFormat.AddIndent(ref funcSerializeContent, 2);
-				string dirtyBitname = string.Format(SyncFormat.FunctionDirtyBitname, funcDirtyBitsCounter);
-				funcSerializeGroup[funcDirtyBitsCounter] += string.Format(SyncFormat.FunctionSerializeIfDirty,
-																		  dirtyBitname, curFuncIndex,
-																		  func.FunctionName,
-																		  funcSerializeContent);
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitname, funcDirtyBitsCounter);
+				funcSerializeGroup[funcDirtyBitsCounter] += func.GenerateSerializeIfDirty(dirtyBitName, curFuncIndex);
 				curFuncIndex++;
 				if (curFuncIndex >= 8)
 				{
@@ -171,10 +155,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string funcSerialize = string.Empty;
 			for (int i = 0; i < funcSerializeGroup.Count; i++)
 			{
-				string dirtyBitname = string.Format(SyncFormat.FunctionDirtyBitname, i);
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitname, i);
 				string contentGroup = funcSerializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				funcSerialize += string.Format(SyncFormat.FunctionSerializeGroup, i, dirtyBitname, contentGroup);
+				funcSerialize += string.Format(SyncFormat.FunctionSerializeGroup, i, dirtyBitName, contentGroup);
 			}
 			CodeFormat.AddIndent(ref funcSerialize);
 

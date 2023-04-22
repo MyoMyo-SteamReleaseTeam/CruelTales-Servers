@@ -32,18 +32,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>Enum의 원시 타입 이름입니다.</summary>
 		public string EnumSizeTypeName { get; private set; } = "int";
 
-		/// <summary>프로퍼티의 Public 선언 이름을 반환받습니다.</summary>
-		public string GetPublicPropertyName()
-		{
-			string publicName = PrivateName;
-			if (publicName[0] == '_')
-			{
-				publicName = publicName[1..];
-			}
-
-			return ($"{publicName[0]}").ToUpper() + publicName[1..];
-		}
-
 		public SyncPropertyToken(SynchronizerGenerator generator, SyncType syncType, string propertyName, Type fieldType)
 		{
 			this.SyncType = syncType;
@@ -90,11 +78,40 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string GetPraivteDeclaration()
+		public string GeneratePraivteDeclaration()
 		{
 			return string.Format(SyncFormat.PrivateDeclaration,
-								 SyncFormat.GetSyncVarAttribute(SyncType), 
+								 SyncFormat.GetSyncVarAttribute(SyncType),
 								 TypeName, PrivateName, Initializer);
+		}
+
+		public string GeneratePropertyGetSet(string dirtyBitName, int propIndex)
+		{
+			return string.Format(SyncFormat.PropertyGetSet,
+								 this.TypeName,
+								 this.GetPublicPropertyName(),
+								 this.PrivateName,
+								 dirtyBitName,
+								 propIndex);
+		}
+
+		public string GeneratetPropertySerializeIfDirty(string dirtyBitName, int curPropIndex)
+		{
+			return string.Format(SyncFormat.PropertySerializeIfDirty,
+								 dirtyBitName,
+								 curPropIndex,
+								 this.GetWriterSerialize());
+		}
+
+		public string GetPublicPropertyName()
+		{
+			string publicName = PrivateName;
+			if (publicName[0] == '_')
+			{
+				publicName = publicName[1..];
+			}
+
+			return ($"{publicName[0]}").ToUpper() + publicName[1..];
 		}
 
 		public string GetParameter()
@@ -172,11 +189,51 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string GetPartialDeclaraction()
+		public string GeneratePartialDeclaraction()
 		{
 			return string.Format(SyncFormat.FunctionPartialDeclaration,
 								 SyncFormat.GetSyncRpcAttribute(SyncType),
 								 FunctionName, GetParameterContent());
+		}
+
+		public string GenerateFunctionCallWithStack(string dirtyBitsName, int funcIndex)
+		{
+			if (Parameters.Count == 0)
+			{
+				return string.Format(SyncFormat.FunctionCallWithStackVoid,
+									 this.FunctionName,
+									 this.GetParameterContent(),
+									 dirtyBitsName,
+									 funcIndex);
+			}
+			else
+			{
+				return string.Format(SyncFormat.FunctionCallWithStack,
+									 this.FunctionName,
+									 this.GetParameterContent(),
+									 this.GetCallStackTupleContent(),
+									 dirtyBitsName,
+									 funcIndex);
+			}
+		}
+
+		public string GenerateSerializeIfDirty(string dirtyBitName, int curFuncIndex)
+		{
+			if (Parameters.Count == 0)
+			{
+				return string.Format(SyncFormat.FunctionSerializeIfDirtyVoid,
+									 dirtyBitName, curFuncIndex,
+									 this.FunctionName);
+			}
+			else
+			{
+				var funcSerializeContent = this.GetCallstackSerializeContent();
+				CodeFormat.AddIndent(ref funcSerializeContent, 2);
+				return string.Format(SyncFormat.FunctionSerializeIfDirty,
+									 dirtyBitName, curFuncIndex,
+									 this.FunctionName,
+									 funcSerializeContent);
+			}
 		}
 
 		public string GetParameterContent()
