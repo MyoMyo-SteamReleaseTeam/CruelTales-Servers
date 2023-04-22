@@ -78,6 +78,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public string GenerateDeserializeIfDirty(string dirtyBitName, int curFuncIndex)
+		{
+			if (Parameters.Count == 0)
+			{
+				return string.Format(SyncFormat.FunctionDeserializeIfDirtyVoid,
+									 dirtyBitName, curFuncIndex,
+									 this.FunctionName);
+			}
+			else
+			{
+				var funcDeserializeContent = this.GetCallstackDeserializeContent();
+				CodeFormat.AddIndent(ref funcDeserializeContent, 2);
+				return string.Format(SyncFormat.FunctionDeserializeIfDirty,
+									 dirtyBitName, curFuncIndex,
+									 this.FunctionName,
+									 funcDeserializeContent,
+									 this.GetCallStackTupleContent());
+			}
+		}
+
 		public string GetParameterContent()
 		{
 			string paramContent = string.Empty;
@@ -119,7 +139,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string content = string.Empty;
 			foreach (var param in Parameters)
 			{
-				content += param.GetWriterSerializeWithPrefix("args");
+				content += param.GetWriterSerializeWithPrefix("args.");
+			}
+
+			return content;
+		}
+
+		public string GetCallstackDeserializeContent()
+		{
+			string content = string.Empty;
+			foreach (var param in Parameters)
+			{
+				content += param.GetTempReadDeserialize() + NewLine;
 			}
 
 			return content;

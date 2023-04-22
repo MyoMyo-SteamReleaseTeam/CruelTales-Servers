@@ -18,8 +18,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>타입 이름입니다.</summary>
 		public string TypeName { get; private set; } = string.Empty;
 
-		/// <summary>원시 타입인 경우의 CRL 타입 이름입니다.</summary>
-		public string CRLTypeName { get; private set; } = string.Empty;
+		/// <summary>원시 타입인 경우의 CLR 타입 이름입니다.</summary>
+		public string CLRTypeName { get; private set; } = string.Empty;
 
 		/// <summary>프로퍼티 초기화 구문 입니다.</summary>
 		public string Initializer { get; private set; } = string.Empty;
@@ -44,8 +44,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				if (ReflectionHelper.IsCLRPrimitiveType(typeName))
 				{
 					this.SerializeType = SerializeType.Primitive;
-					this.CRLTypeName = typeName;
-					ReflectionHelper.TryGetTypeByCLRType(this.CRLTypeName, out var primitiveType);
+					this.CLRTypeName = typeName;
+					ReflectionHelper.TryGetTypeByCLRType(this.CLRTypeName, out var primitiveType);
 					this.TypeName = primitiveType;
 
 				}
@@ -66,6 +66,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				{
 					this.SerializeType = SerializeType.Enum;
 					this.EnumSizeTypeName = generator.GetEnumSizeTypeName(typeName);
+					ReflectionHelper.TryGetCLRTypeByPrimitive(this.EnumSizeTypeName, out string clrType);
+					this.CLRTypeName = clrType;
 					this.Initializer = string.Empty;
 				}
 				else
@@ -81,6 +83,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return string.Format(SyncFormat.PrivateDeclaration,
 								 SyncFormat.GetSyncVarAttribute(SyncType),
 								 TypeName, PrivateName, Initializer);
+		}
+
+		public string GenerateRemotePropertyDeclaration()
+		{
+			return string.Format(SyncFormat.RemotePropertyDeclaration,
+								 SyncFormat.GetSyncVarAttribute(SyncType),
+								 TypeName, PrivateName, GetPublicPropertyName(),
+								 Initializer);
 		}
 
 		public string GeneratePropertyGetSet(string dirtyBitName, int propIndex)
@@ -99,6 +109,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 dirtyBitName,
 								 curPropIndex,
 								 this.GetWriterSerialize());
+		}
+
+		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex)
+		{
+			return string.Format(SyncFormat.PropertyDeserializeIfDirty,
+								 dirtyBitName,
+								 curPropIndex,
+								 this.GetPublicPropertyName(),
+								 this.PrivateName,
+								 this.GetReadDeserialize());
 		}
 
 		public string GetPublicPropertyName()
@@ -137,6 +157,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public string GetReadDeserialize()
+		{
+			switch (SerializeType)
+			{
+				case SerializeType.Primitive:
+					return string.Format(SyncFormat.ReadEmbededTypeProperty, PrivateName, CLRTypeName);
+
+				case SerializeType.NetString:
+				case SerializeType.Class:
+				case SerializeType.Struct:
+					return string.Format(SyncFormat.ReadByDeserializer, PrivateName);
+
+				case SerializeType.Enum:
+					return string.Format(SyncFormat.ReadEnum, PrivateName, TypeName, CLRTypeName);
+
+				default:
+					return string.Empty;
+			}
+		}
+
 		public string GetWriterSerializeWithPrefix(string prefix)
 		{
 			string name = prefix + PrivateName;
@@ -153,6 +193,28 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 				case SerializeType.Enum:
 					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
+
+				default:
+					return string.Empty;
+			}
+		}
+
+		public string GetTempReadDeserialize()
+		{
+			switch (SerializeType)
+			{
+				case SerializeType.Primitive:
+					return string.Format(SyncFormat.TempReadEmbededTypeProperty, TypeName, PrivateName, CLRTypeName);
+
+				case SerializeType.Class:
+					return string.Format(SyncFormat.TempReadByDeserializerClass, PrivateName);
+
+				case SerializeType.NetString:
+				case SerializeType.Struct:
+					return string.Format(SyncFormat.TempReadByDeserializerStruct, TypeName, PrivateName);
+
+				case SerializeType.Enum:
+					return string.Format(SyncFormat.TempReadEnum, PrivateName, TypeName, CLRTypeName);
 
 				default:
 					return string.Empty;

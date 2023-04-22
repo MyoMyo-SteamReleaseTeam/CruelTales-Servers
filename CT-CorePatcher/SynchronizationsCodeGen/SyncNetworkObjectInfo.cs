@@ -196,5 +196,101 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 syncContent,
 								 serializeContent);
 		}
+
+		public string GenerateClientDeclaration()
+		{
+			// Declaration
+			string declarationContent = string.Empty;
+
+			foreach (var prop in Properties)
+			{
+				declarationContent += prop.GenerateRemotePropertyDeclaration() + NewLine + NewLine;
+			}
+			foreach (var func in Functions)
+			{
+				declarationContent += func.GeneratePartialDeclaraction() + NewLine + NewLine;
+			}
+
+			// Property Deserialize group content
+			List<string> propDeserializeGroup = new();
+			int propDirtyBitsCounter = 0;
+			int curPropIndex = 0;
+			for (int i = 0; i < Properties.Count; i++)
+			{
+				if (propDeserializeGroup.Count <= propDirtyBitsCounter)
+				{
+					propDeserializeGroup.Add(string.Empty);
+				}
+				var prop = Properties[i];
+
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitName, propDirtyBitsCounter);
+				propDeserializeGroup[propDirtyBitsCounter] += prop.GeneratetPropertyDeserializeIfDirty(dirtyBitName, curPropIndex);
+				curPropIndex++;
+				if (curPropIndex >= 8)
+				{
+					curPropIndex = 0;
+					propDirtyBitsCounter++;
+				}
+			}
+
+			string propDeserialize = string.Empty;
+			for (int i = 0; i < propDeserializeGroup.Count; i++)
+			{
+				string dirtyBitName = string.Format(SyncFormat.PropertyDirtyBitName, i);
+				string contentGroup = propDeserializeGroup[i];
+				CodeFormat.AddIndent(ref contentGroup);
+				propDeserialize += string.Format(SyncFormat.PropertyDeserializeGroup, i,
+												 nameof(BitmaskByte), dirtyBitName, contentGroup);
+			}
+			CodeFormat.AddIndent(ref propDeserialize);
+
+			// Funtion serilalize group content
+			List<string> funcDeserializeGroup = new();
+			int funcDirtyBitsCounter = 0;
+			int curFuncIndex = 0;
+			for (int i = 0; i < Functions.Count; i++)
+			{
+				if (funcDeserializeGroup.Count <= funcDirtyBitsCounter)
+				{
+					funcDeserializeGroup.Add(string.Empty);
+				}
+				var func = Functions[i];
+
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitName, funcDirtyBitsCounter);
+				funcDeserializeGroup[funcDirtyBitsCounter] += func.GenerateDeserializeIfDirty(dirtyBitName, curFuncIndex);
+				curFuncIndex++;
+				if (curFuncIndex >= 8)
+				{
+					curFuncIndex = 0;
+					funcDirtyBitsCounter++;
+				}
+			}
+
+			string funcDeserialize = string.Empty;
+			for (int i = 0; i < funcDeserializeGroup.Count; i++)
+			{
+				string dirtyBitName = string.Format(SyncFormat.FunctionDirtyBitName, i);
+				string contentGroup = funcDeserializeGroup[i];
+				CodeFormat.AddIndent(ref contentGroup);
+				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i, dirtyBitName, nameof(BitmaskByte), contentGroup);
+			}
+			CodeFormat.AddIndent(ref funcDeserialize);
+
+			// Combind
+			var serializeContent = string.Format(SyncFormat.DeserializeSync,
+												 nameof(RemoteNetworkObject.DeserializeSyncReliable),
+												 nameof(BitmaskByte),
+												 propDeserialize,
+												 funcDeserialize);
+
+			CodeFormat.AddIndent(ref serializeContent);
+			CodeFormat.AddIndent(ref declarationContent);
+
+			return string.Format(SyncFormat.ClientDeclaration,
+								 ObjectName,
+								 nameof(RemoteNetworkObject),
+								 declarationContent,
+								 serializeContent);
+		}
 	}
 }

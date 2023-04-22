@@ -190,16 +190,13 @@ namespace CT.Test.NetworkCore
 	// 클라 자동 구현부
 	public partial class NetworkObjectClient : C_NetworkObject
 	{
-		private BitmaskByte _propertyDirty_0 = new();
-		private BitmaskByte _rpcDirty_0 = new();
-
 		[SyncVar]
 		private NetTransform _transform;
-		public Action<NetTransform>? OnTransformChanged;
+		public event Action<NetTransform>? OnTransformChanged;
 
 		[SyncVar]
-		public int _abc = 0;
-		public Action<int>? OnABCChanged;
+		private int _abc = 0;
+		public event Action<int>? OnABCChanged;
 
 		[ServerRpc]
 		public partial void Server_Some(int value1, float value2);
@@ -245,9 +242,6 @@ namespace CT.Test.NetworkCore
 					}
 				}
 			}
-
-			_propertyDirty_0.Clear();
-			_rpcDirty_0.Clear();
 		}
 	}
 

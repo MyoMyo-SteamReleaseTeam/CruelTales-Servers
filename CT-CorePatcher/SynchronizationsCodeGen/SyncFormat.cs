@@ -44,6 +44,24 @@ public partial class {0} : {1}
 ";
 
 		/// <summary>
+		/// {0} Object name<br/>
+		/// {1} Inherit type name<br/>
+		/// {2} Declaration Content<br/>
+		/// {3} Deserilalize Content<br/>
+		/// </summary>
+		public static readonly string ClientDeclaration =
+@"
+[Serializable]
+public partial class {0} : {1}
+{{
+{2}
+	#region Synchronization
+{3}
+	#endregion
+}}
+";
+
+		/// <summary>
 		/// {0} Type name<br/>
 		/// {1} Argument name<br/>
 		/// </summary>
@@ -67,6 +85,18 @@ private {1} {2}{3};";
 		public static readonly string FunctionPartialDeclaration =
 @"[{0}]
 public partial void {1}({2});";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Type name<br/>
+		/// {2} Private property name<br/>
+		/// {3} Public property name<br/>
+		/// {4} Initialize<br/>
+		/// </summary>
+		public static readonly string RemotePropertyDeclaration =
+@"[{0}]
+private {1} {2}{4};
+public event Action<{1}>? On{3}Changed;";
 
 		/// <summary>
 		/// {0} Dirty bits type name<br/>
@@ -227,8 +257,7 @@ if (objectDirty[{0}])
 {3}
 	}}
 }}
-"
-;
+";
 
 		/// <summary>
 		/// {0} Dirty bits name<br/>
@@ -241,8 +270,7 @@ if (objectDirty[{0}])
 	writer.Put({2}CallstackCount);
 	{2}CallstackCount = 0;
 }}
-"
-;
+";
 
 		/// <summary>
 		/// {0} Dirty bits name<br/>
@@ -264,6 +292,153 @@ if (objectDirty[{0}])
 		/// {1} Private member name<br/>
 		/// </summary>
 		public static readonly string WriteEnum = @"writer(({0}){1});";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Bitmask type name<br/>
+		/// {2} Property serialize group content<br/>
+		/// {3} Function serialize group content<br/>
+		/// </summary>
+		public static readonly string DeserializeSync =
+@"public override void {0}(PacketWriter writer)
+{{
+	{1} objectDirty = reader.Read{1}();
+
+	// Deserialize Property
+{2}
+
+	// Deserialize RPC callstack
+{3}
+}}
+";
+
+		/// <summary>
+		/// {0} Master dirty bits index<br/>
+		/// {1} Bitmask type name<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Deserialize content<br/>
+		/// </summary>
+		public static readonly string FunctionDeserializeGroup =
+@"if (objectDirty[{0}])
+{{
+	{1} {2} = reader.Read{1}();
+
+{3}
+}}
+";
+
+		/// <summary>
+		/// {0} Master dirty bits index<br/>
+		/// {1} Bitmask type name<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Deserialize content<br/>
+		/// </summary>
+		public static readonly string PropertyDeserializeGroup =
+@"
+if (objectDirty[{0}])
+{{
+	{1} {2} = reader.Read{1}();
+
+{3}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Public property name<br/>
+		/// {3} Private property name<br/>
+		/// {4} Deserialize content<br/>
+		/// </summary>
+		public static readonly string PropertyDeserializeIfDirty =
+@"if ({0}[{1}])
+{{
+	{4}
+	On{2}Changed?.Invoke({3});
+}}
+";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} CLR type name<br/>
+		/// </summary>
+		public static readonly string ReadEmbededTypeProperty = @"{0} = reader.Read{1}();";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// </summary>
+		public static readonly string ReadByDeserializer= @"{0}.Deserialize(reader);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Enum type name<br/>
+		/// {2} CLR enum size type name<br/>
+		/// </summary>
+		public static readonly string ReadEnum = @"{0} = ({1})reader.Read{2}();";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Function name<br/>
+		/// {3} Callstack serialize content<br/>
+		/// {4} Arguments content<br/>
+		/// </summary>
+		public static readonly string FunctionDeserializeIfDirty =
+@"if ({0}[{1}])
+{{
+	byte count = reader.ReadByte();
+	for (int i = 0; i < count; i++)
+	{{
+{3}
+		{2}({4});
+	}}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Function name<br/>
+		/// </summary>
+		public static readonly string FunctionDeserializeIfDirtyVoid =
+@"if ({0}[{1}])
+{{
+	byte count = reader.ReadByte();
+	for (int i = 0; i < count; i++)
+	{{
+		{2}();
+	}}
+}}
+";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Private member name<br/>
+		/// {2} CLR type name<br/>
+		/// </summary>
+		public static readonly string TempReadEmbededTypeProperty = @"{0} {1} = reader.Read{2}();";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Argument name<br/>
+		/// </summary>
+		public static readonly string TempReadByDeserializerStruct =
+@"{0} {1} = new();
+{1}.Deserialize(reader);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// </summary>
+		public static readonly string TempReadByDeserializerClass = @"{0}.Deserialize(reader);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Enum type name<br/>
+		/// {2} CLR enum size type name<br/>
+		/// </summary>
+		public static readonly string TempReadEnum = @"{1} {0} = ({1})reader.Read{2}();";
+
+
 
 		public static string GetSyncVarAttribute(SyncType syncType)
 		{

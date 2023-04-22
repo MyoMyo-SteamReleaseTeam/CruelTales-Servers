@@ -54,7 +54,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			foreach (var syncObj in syncObjects)
 			{
-				code += syncObj.GenerateServerDeclaration();
+				//code += syncObj.GenerateServerDeclaration();
+				code += syncObj.GenerateClientDeclaration();
 			}
 
 			return code;
