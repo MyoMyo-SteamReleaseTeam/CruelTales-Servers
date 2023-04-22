@@ -60,6 +60,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					this.Initializer = " = new()";
 				}
 			}
+			else if (baseTpyeName == nameof(IMasterSynchronizable))
+			{
+				this.SerializeType = SerializeType.SyncObject;
+				this.Initializer = " = new()";
+			}
 			else
 			{
 				if (generator.IsEnum(typeName))
@@ -162,15 +167,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.ReadEmbededTypeProperty, PrivateName, CLRTypeName);
+					return string.Format(SyncFormat.ReadEmbededTypeProperty, PrivateName, CLRTypeName) + NewLine;
 
 				case SerializeType.NetString:
 				case SerializeType.Class:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.ReadByDeserializer, PrivateName);
+					return string.Format(SyncFormat.ReadByDeserializer, PrivateName) + NewLine;
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.ReadEnum, PrivateName, TypeName, CLRTypeName);
+					return string.Format(SyncFormat.ReadEnum, PrivateName, TypeName, CLRTypeName) + NewLine;
 
 				default:
 					return string.Empty;

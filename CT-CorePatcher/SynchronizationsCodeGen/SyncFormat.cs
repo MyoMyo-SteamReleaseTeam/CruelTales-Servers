@@ -1,8 +1,71 @@
-﻿using CT.CorePatcher.Synchronizations;
+﻿using System.Collections.Generic;
+using CT.CorePatcher.Synchronizations;
 using CT.Tools.Collections;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	public class GenerateOption
+	{
+		public string ObjectName = string.Empty;
+		public string SerializeFunctionName = string.Empty;
+		public string BitmaskTypeName => nameof(BitmaskByte);
+
+		public List<SyncPropertyToken> Properties { get; private set; }
+		public List<SyncFunctionToken> Functions { get; private set; }
+
+		public GenerateOption(SyncType syncType,
+							  string serializeFunctionName,
+							  List<SyncPropertyToken> properties,
+							  List<SyncFunctionToken> functions)
+		{
+			SerializeFunctionName = serializeFunctionName;
+			Properties = properties;
+			Functions = functions;
+
+			if (syncType == SyncType.Unreliable)
+			{
+				IsDirtyGetter =
+@"public bool IsUnreliableDirty
+{{
+	get
+	{{
+		bool isDirty = true;
+{0}
+		return isDirty;
+	}}
+}}
+";
+				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
+				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
+			}
+		}
+
+		/// <summary>
+		/// {0} Dirty bits content<br/>
+		/// </summary>
+		public readonly string IsDirtyGetter =
+@"public bool IsDirty
+{{
+	get
+	{{
+		bool isDirty = true;
+{0}
+		return isDirty;
+	}}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits Count<br/>
+		/// </summary>
+		public readonly string PropertyDirtyBitName = @"_propertyDirty_{0}";
+
+		/// <summary>
+		/// {0} Dirty bits Count<br/>
+		/// </summary>
+		public readonly string FunctionDirtyBitName = @"_rpcDirty_{0}";
+	}
+
 	public static class SyncFormat
 	{
 		/// <summary>
@@ -26,11 +89,56 @@ namespace {1}
 		/// <summary>
 		/// {0} Object name<br/>
 		/// {1} Inherit type name<br/>
-		/// {2} Declaration Content<br/>
-		/// {3} Synchronization Content<br/>
-		/// {4} Serilalize Content<br/>
+		/// {2} NetworkObjectType declaration<br/>
+		/// {3} Declaration content<br/>
+		/// {4} Synchronization content<br/>
+		/// {5} Serilalize content<br/>
+		/// {6} Clear dirty bit content<br/>
+		/// {7} Serialize every property content<br/>
 		/// </summary>
-		public static readonly string ServerDeclaration =
+		public static readonly string MasterDeclaration =
+@"
+[Serializable]
+public partial class {0} : {1}
+{{
+	{2}
+
+{3}
+	#region Synchronization
+{4}
+{5}
+{6}
+{7}
+	#endregion
+}}
+";
+
+		/// <summary>
+		/// {0} Reliable or unreliable<br/>
+		/// {1} Declaration content<br/>
+		/// {2} Synchronization content<br/>
+		/// {3} Reliable Serilalize content<br/>
+		/// {4} Clear dirty bit content<br/>
+		/// </summary>
+		public static readonly string SyncSerializeContent =
+@"
+{1}
+	#region {0} Synchronization
+{2}
+{3}
+{4}
+	#endregion
+}}
+";
+
+		/// <summary>
+		/// {0} Object name<br/>
+		/// {1} Inherit type name<br/>
+		/// {2} Declaration Content<br/>
+		/// {3} Deserilalize Content<br/>
+		/// {4} Deserialize every property content<br/>
+		/// </summary>
+		public static readonly string RemoteDeclaration =
 @"
 [Serializable]
 public partial class {0} : {1}
@@ -44,22 +152,9 @@ public partial class {0} : {1}
 ";
 
 		/// <summary>
-		/// {0} Object name<br/>
-		/// {1} Inherit type name<br/>
-		/// {2} Declaration Content<br/>
-		/// {3} Deserilalize Content<br/>
+		/// {0} Dirty bits name<br/>
 		/// </summary>
-		public static readonly string ClientDeclaration =
-@"
-[Serializable]
-public partial class {0} : {1}
-{{
-{2}
-	#region Synchronization
-{3}
-	#endregion
-}}
-";
+		public static readonly string IsDirtyBinder = @"isDirty &= {0}.AnyTrue()";
 
 		/// <summary>
 		/// {0} Type name<br/>
@@ -104,15 +199,6 @@ public event Action<{1}>? On{3}Changed;";
 		/// </summary>
 		public static readonly string DeclarationDirtyBits = @"private {0} {1} = new();";
 
-		/// <summary>
-		/// {0} Dirty bits Count<br/>
-		/// </summary>
-		public static readonly string PropertyDirtyBitName = @"_propertyDirty_{0}";
-
-		/// <summary>
-		/// {0} Dirty bits Count<br/>
-		/// </summary>
-		public static readonly string FunctionDirtyBitName = @"_rpcDirty_{0}";
 
 		/// <summary>
 		/// {0} Type name<br/>
@@ -174,7 +260,6 @@ private byte {0}CallstackCount = 0;
 		/// {2} Check any dirty content<br/>
 		/// {3} Property serialize group content<br/>
 		/// {4} Function serialize group content<br/>
-		/// {5} Dirty bits clear content<br/>
 		/// </summary>
 		public static readonly string SerializeSync =
 @"public override void {0}(PacketWriter writer)
@@ -190,10 +275,15 @@ private byte {0}CallstackCount = 0;
 
 	// Serialize RPC callstack
 {4}
-
-{5}
 }}
 ";
+
+		/// {0} Dirty bits clear content<br/>
+		public static readonly string ClearDirtyBitFunction =
+@"public override void ClearDirtyBit()
+{{
+{0}
+}}";
 
 		/// <summary>
 		/// {0} Master dirty bits index<br/>
@@ -222,9 +312,7 @@ if (objectDirty[{0}])
 		/// {2} Serialize content<br/>
 		/// </summary>
 		public static readonly string PropertySerializeIfDirty =
-@"if ({0}[{1}])
-{2}
-";
+@"if ({0}[{1}]) {2}";
 
 		/// <summary>
 		/// {0} Master dirty bits index<br/>
@@ -353,8 +441,7 @@ if (objectDirty[{0}])
 		public static readonly string PropertyDeserializeIfDirty =
 @"if ({0}[{1}])
 {{
-	{4}
-	On{2}Changed?.Invoke({3});
+	{4}	On{2}Changed?.Invoke({3});
 }}
 ";
 
@@ -438,7 +525,26 @@ if (objectDirty[{0}])
 		/// </summary>
 		public static readonly string TempReadEnum = @"{1} {0} = ({1})reader.Read{2}();";
 
-
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Serialize every property content<br/>
+		/// </summary>
+		public static readonly string SerializeEveryProperty =
+@"public override void {0}(PacketWriter writer)
+{{
+{1}
+}}
+";
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Deserialize every property content<br/>
+		/// </summary>
+		public static readonly string DeserializeEveryProperty =
+@"public override void {0}(PacketWriter writer)
+{{
+{1}
+}}
+";
 
 		public static string GetSyncVarAttribute(SyncType syncType)
 		{

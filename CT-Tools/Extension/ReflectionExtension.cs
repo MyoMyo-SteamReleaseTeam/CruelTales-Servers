@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -31,5 +32,11 @@ public class ReflectionExtension
 			.GetTypes()
 			.Where(t => t.BaseType == baseType)
 			.ToList();
+	}
+
+	public static bool TryGetAttribute<T>(Type type, [MaybeNullWhen(false)] out T attribute) where T : Attribute
+	{
+		attribute = type.GetCustomAttributes<T>().First();
+		return attribute != null;
 	}
 }

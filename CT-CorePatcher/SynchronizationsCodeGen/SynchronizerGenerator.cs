@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CT.Common.Serialization.Type;
@@ -17,6 +18,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		Class,
 		Struct,
 		Enum,
+		SyncObject,
 	}
 
 	public class SynchronizerGenerator
@@ -24,8 +26,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public List<Assembly> ReferenceAssemblys { get; set; } = new();
 		private Dictionary<string, string> _enumSizeByTypeName = new();
 
-		public void Initialize()
+		public string ParseCode()
 		{
+			var syncObjects = parseAssemblys();
+
+			string code = string.Empty;
+
+			foreach (var syncObj in syncObjects)
+			{
+				code += syncObj.GenerateMasterDeclaration();
+				//code += syncObj.GenerateRemoteDeclaration();
+			}
+
+			return code;
+		}
+
+		public List<SyncObjectInfo> parseAssemblys()
+		{
+			// Setup Enums
 			var netcore = Assembly.GetAssembly(typeof(NetString));
 			if (netcore != null)
 			{
@@ -44,66 +62,65 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					_enumSizeByTypeName.Add(et.Name, primitiveType);
 				}
 			}
-		}
 
-		public string ParseCode()
-		{
-			var syncObjects = parseAssemblys();
+			// Get difinition types
+			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>(GetType(), out var netObjDefititionTypes);
+			TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>(GetType(), out var syncObjDefinitionTypes);
 
-			string code = string.Empty;
+			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
+			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
 
-			foreach (var syncObj in syncObjects)
+			List<SyncObjectInfo> syncObjects = new();
+
+			foreach (var st in syncNetObjectTypes)
 			{
-				//code += syncObj.GenerateServerDeclaration();
-				code += syncObj.GenerateClientDeclaration();
+				syncObjects.Add(getSyncObjectInfo(st, true));
 			}
 
-			return code;
-		}
-
-		public List<SyncNetworkObjectInfo> parseAssemblys()
-		{
-			if (!TryGetSyncDifinitionTypes(GetType(), out var syncTypes))
-				return new();
-
-			Debug.Assert(syncTypes != null);
-
-			List<SyncNetworkObjectInfo> syncObjects = new();
-
-			foreach (var st in syncTypes)
+			foreach (var st in syncObjectTypes)
 			{
-				SyncNetworkObjectInfo syncObject = new(st.Name);
-
-				// Parse properties
-				foreach (var f in st.GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
-				{
-					foreach (var att in f.GetCustomAttributes())
-					{
-						if (att is not SyncVarAttribute syncAtt)
-							continue;
-
-						SyncPropertyToken token = new(this, syncAtt.SyncType, f.Name, f.FieldType);
-						syncObject.Properties.Add(token);
-					}
-				}
-
-				// Parse functions
-				foreach (var f in st.GetMethods(BindingFlags.Instance | BindingFlags.Public))
-				{
-					foreach (var att in f.GetCustomAttributes())
-					{
-						if (att is not SyncRpcAttribute syncAtt)
-							continue;
-
-						SyncFunctionToken token = new(this, syncAtt.SyncType, f);
-						syncObject.Functions.Add(token);
-					}
-				}
-
-				syncObjects.Add(syncObject);
+				syncObjects.Add(getSyncObjectInfo(st, false));
 			}
 
 			return syncObjects;
+		}
+
+		private SyncObjectInfo getSyncObjectInfo(Type type, bool isNetworkObject)
+		{
+			SyncObjectInfo syncObject = new(type.Name, isNetworkObject);
+
+			// Parse properties
+			foreach (var f in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
+			{
+				foreach (var att in f.GetCustomAttributes())
+				{
+					if (att is SyncVarAttribute syncVarAtt)
+					{
+						SyncPropertyToken token = new(this, syncVarAtt.SyncType, f.Name, f.FieldType);
+						syncObject.AddPropertyToken(token);
+					}
+					//else if (att is SyncObjectAttribute syncObjAtt)
+					//{
+					//	SyncPropertyToken token = new(this, SyncType.None, f.Name, f.FieldType);
+					//	syncObject.Properties.Add(token);
+					//}
+				}
+			}
+
+			// Parse functions
+			foreach (var f in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+			{
+				foreach (var att in f.GetCustomAttributes())
+				{
+					if (att is SyncRpcAttribute syncAtt)
+					{
+						SyncFunctionToken token = new(this, syncAtt.SyncType, f);
+						syncObject.AddFunctionToken(token);
+					}
+				}
+			}
+
+			return syncObject;
 		}
 
 		public bool IsEnum(string typeName)
@@ -116,7 +133,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return _enumSizeByTypeName[typeName];
 		}
 
-		public static bool TryGetSyncDifinitionTypes(Type typeInAssembly, out IEnumerable<Type>? types)
+		public static bool TryGetSyncDifinitionTypes<T>(Type typeInAssembly, out IEnumerable<Type>? types)
+			where T : Attribute
 		{
 			types = null;
 			var assemTypes = Assembly.GetAssembly(typeInAssembly)?.GetTypes();
@@ -128,11 +146,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			var findTypes = Assembly
 				.GetAssembly(typeInAssembly)?
 				.GetTypes()
-				.Where((t) => t.GetCustomAttributes<SyncDefinitionAttribute>().Count() > 0);
+				.Where((t) => t.GetCustomAttributes<T>().Count() > 0);
 
 			if (findTypes == null)
 				return false;
-
 
 			types = findTypes;
 			return true;

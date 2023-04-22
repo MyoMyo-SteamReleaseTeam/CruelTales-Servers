@@ -31,7 +31,6 @@ namespace CT.CorePatcher
 		public static void Main(string[] args)
 		{
 			SynchronizerGenerator syncCodeGen = new();
-			syncCodeGen.Initialize();
 			Console.WriteLine(syncCodeGen.ParseCode());
 
 			return;

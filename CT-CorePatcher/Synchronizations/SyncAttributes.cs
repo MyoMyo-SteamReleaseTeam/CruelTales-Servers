@@ -9,7 +9,22 @@ namespace CT.CorePatcher.Synchronizations
 		Unreliable,
 	}
 
-	public class SyncDefinitionAttribute : Attribute
+	public class SyncNetworkObjectDefinitionAttribute : Attribute
+	{
+
+	}
+
+	public class SyncObjectDefinitionAttribute : Attribute
+	{
+		public bool IsCustom { get; private set; }
+
+		public SyncObjectDefinitionAttribute(bool isCustom = false)
+		{
+			IsCustom = isCustom;
+		}
+	}
+
+	public class SyncObjectAttribute : Attribute
 	{
 	}
 

@@ -73,6 +73,7 @@ namespace CT.Test.NetworkCore
 	public abstract class S_NetworkObject
 	{
 		public abstract void SerializeSyncReliable(PacketWriter writer);
+		public abstract void ClearDirtyBit();
 	}
 
 	public abstract class C_NetworkObject
@@ -102,6 +103,16 @@ namespace CT.Test.NetworkCore
 
 		private BitmaskByte _propertyDirty_0 = new();
 		private BitmaskByte _rpcDirty_0 = new();
+		public bool IsDirty
+		{
+			get
+			{
+				bool isDirty = true;
+				isDirty &= _propertyDirty_0.AnyTrue();
+				isDirty &= _rpcDirty_0.AnyTrue();
+				return isDirty;
+			}
+		}
 
 		public NetTransform Transform
 		{
@@ -173,7 +184,10 @@ namespace CT.Test.NetworkCore
 					}
 				}
 			}
+		}
 
+		public override void ClearDirtyBit()
+		{
 			_propertyDirty_0.Clear();
 			_rpcDirty_0.Clear();
 		}
