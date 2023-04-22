@@ -188,4 +188,27 @@ namespace CT.Tools.Collections
 			Mask = reader.ReadUInt32();
 		}
 	}
+
+	public static class BitmaskExtension
+	{
+		public static void Put(this PacketWriter writer, BitmaskByte value)
+		{
+			writer.Put(value.Mask);
+		}
+
+		public static BitmaskByte ReadBitmaskByte(this PacketReader reader)
+		{
+			return new BitmaskByte(reader.ReadByte());
+		}
+
+		public static void Put(this PacketWriter writer, Bitmask32 value)
+		{
+			writer.Put(value.Mask);
+		}
+
+		public static Bitmask32 ReadBitmask32(this PacketReader reader)
+		{
+			return new Bitmask32(reader.ReadUInt32());
+		}
+	}
 }

@@ -8,6 +8,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public class SyncPropertyToken
 	{
+		public static string NewLine { get; set; } = TextFormat.LF;
+		public static string Indent { get; set; } = TextFormat.Indent;
+
 		/// <summary>동기화 타입입니다.</summary>
 		public SyncType SyncType { get; private set; }
 
@@ -27,7 +30,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string PrivateName { get; private set; } = string.Empty;
 
 		/// <summary>Enum의 원시 타입 이름입니다.</summary>
-		public string EnumSizeType { get; private set; } = "int";
+		public string EnumSizeTypeName { get; private set; } = "int";
 
 		/// <summary>프로퍼티의 Public 선언 이름을 반환받습니다.</summary>
 		public string GetPublicPropertyName()
@@ -65,11 +68,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					this.SerializeType = SerializeType.NetString;
 					this.Initializer = " = string.Empty";
 				}
-				else if (generator.IsEnum(typeName))
-				{
-					this.SerializeType = SerializeType.Enum;
-					this.EnumSizeType = generator.GetEnumSizeTypeName(typeName);
-				}
 				else
 				{
 					this.SerializeType = SerializeType.Struct;
@@ -78,8 +76,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			else
 			{
-				this.SerializeType = SerializeType.Class;
-				this.Initializer = " = new()";
+				if (generator.IsEnum(typeName))
+				{
+					this.SerializeType = SerializeType.Enum;
+					this.EnumSizeTypeName = generator.GetEnumSizeTypeName(typeName);
+					this.Initializer = string.Empty;
+				}
+				else
+				{
+					this.SerializeType = SerializeType.Class;
+					this.Initializer = " = new()";
+				}
 			}
 		}
 
@@ -94,10 +101,55 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			return string.Format(SyncFormat.Parameter, TypeName, PrivateName);
 		}
+
+		public string GetWriterSerialize()
+		{
+			switch (SerializeType)
+			{
+				case SerializeType.Primitive:
+					return string.Format(SyncFormat.WritePut, PrivateName) + NewLine;
+
+				case SerializeType.NetString:
+				case SerializeType.Class:
+				case SerializeType.Struct:
+					return string.Format(SyncFormat.WriteSerialize, PrivateName) + NewLine;
+
+				case SerializeType.Enum:
+					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, PrivateName) + NewLine;
+
+				default:
+					return string.Empty;
+			}
+		}
+
+		public string GetWriterSerializeWithPrefix(string prefix)
+		{
+			string name = prefix + PrivateName;
+
+			switch (SerializeType)
+			{
+				case SerializeType.Primitive:
+					return string.Format(SyncFormat.WritePut, name) + NewLine;
+
+				case SerializeType.NetString:
+				case SerializeType.Class:
+				case SerializeType.Struct:
+					return string.Format(SyncFormat.WriteSerialize, name) + NewLine;
+
+				case SerializeType.Enum:
+					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
+
+				default:
+					return string.Empty;
+			}
+		}
 	}
 
 	public class SyncFunctionToken
 	{
+		public static string NewLine { get; set; } = TextFormat.LF;
+		public static string Indent { get; set; } = TextFormat.Indent;
+
 		/// <summary>동기화 타입입니다.</summary>
 		public SyncType SyncType { get; private set; }
 
@@ -122,6 +174,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GetPartialDeclaraction()
 		{
+			return string.Format(SyncFormat.FunctionPartialDeclaration,
+								 SyncFormat.GetSyncRpcAttribute(SyncType),
+								 FunctionName, GetParameterContent());
+		}
+
+		public string GetParameterContent()
+		{
 			string paramContent = string.Empty;
 
 			for (int i = 0; i < Parameters.Count; i++)
@@ -135,9 +194,36 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 			}
 
-			return string.Format(SyncFormat.FunctionPartialDeclaration,
-								 SyncFormat.GetSyncRpcAttribute(SyncType),
-								 FunctionName, paramContent);
+			return paramContent;
+		}
+
+		public string GetCallStackTupleContent()
+		{
+			string paramContent = string.Empty;
+
+			for (int i = 0; i < Parameters.Count; i++)
+			{
+				var param = Parameters[i];
+				paramContent += param.PrivateName;
+
+				if (i < Parameters.Count - 1)
+				{
+					paramContent += ", ";
+				}
+			}
+
+			return paramContent;
+		}
+
+		public string GetCallstackSerializeContent()
+		{
+			string content = string.Empty;
+			foreach (var param in Parameters)
+			{
+				content += param.GetWriterSerializeWithPrefix("args");
+			}
+
+			return content;
 		}
 	}
 }

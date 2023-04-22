@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using CT.Common.Serialization.Type;
+using CT.CorePatcher.Helper;
 using CT.CorePatcher.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -39,7 +40,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				foreach (var et in enumTypes)
 				{
 					var enumSizeTypeName = Enum.GetUnderlyingType(et).Name;
-					_enumSizeByTypeName.Add(et.Name, enumSizeTypeName);
+					ReflectionHelper.TryGetTypeByCLRType(enumSizeTypeName, out var primitiveType);
+					_enumSizeByTypeName.Add(et.Name, primitiveType);
 				}
 			}
 		}

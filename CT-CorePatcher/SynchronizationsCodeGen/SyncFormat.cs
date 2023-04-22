@@ -1,4 +1,5 @@
 ﻿using CT.CorePatcher.Synchronizations;
+using CT.Tools.Collections;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -25,7 +26,9 @@ namespace {1}
 		/// <summary>
 		/// {0} Object name<br/>
 		/// {1} Inherit type name<br/>
-		/// {2} Content<br/>
+		/// {2} Declaration Content<br/>
+		/// {3} Synchronization Content<br/>
+		/// {4} Serilalize Content<br/>
 		/// </summary>
 		public static readonly string ServerDeclaration =
 @"
@@ -33,6 +36,10 @@ namespace {1}
 public partial class {0} : {1}
 {{
 {2}
+	#region Synchronization
+{3}
+{4}
+	#endregion
 }}
 ";
 
@@ -60,6 +67,173 @@ private {1} {2}{3};";
 		public static readonly string FunctionPartialDeclaration =
 @"[{0}]
 public partial void {1}({2});";
+
+		/// <summary>
+		/// {0} Dirty bits type name<br/>
+		/// {1} Dirty bits name<br/>
+		/// </summary>
+		public static readonly string DeclarationDirtyBits = @"private {0} {1} = new();";
+
+		/// <summary>
+		/// {0} Dirty bits Count<br/>
+		/// </summary>
+		public static readonly string PropertyDirtyBitname = @"_propertyDirty_{0}";
+
+		/// <summary>
+		/// {0} Dirty bits Count<br/>
+		/// </summary>
+		public static readonly string FunctionDirtyBitname = @"_rpcDirty_{0}";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Public property name<br/>
+		/// {2} Private member name<br/>
+		/// {3} Dirty bits name<br/>
+		/// {4} Dirty index<br/>
+		/// </summary>
+		public static readonly string PropertyGetSet =
+@"public {0} {1}
+{{
+	get => {2};
+	set
+	{{
+		if ({2} == value) return;
+		{2} = value;
+		{3}[{4}] = true;
+	}}
+}}
+
+";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Parameter content<br/>
+		/// {2} Callstack tuple content<br/>
+		/// {3} Dirty bits name<br/>
+		/// {4} Dirty index<br/>
+		/// </summary>
+		public static readonly string FunctionCallWithStack =
+@"public partial void {0}({1})
+{{
+	{0}Callstack.Enqueue(({2}));
+	{3}[{4}] = true;
+}}
+private Queue<({1})> {0}Callstack = new();
+
+";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Bitmask type name<br/>
+		/// {2} Check any dirty content<br/>
+		/// {3} Property serialize group content<br/>
+		/// {4} Function serialize group content<br/>
+		/// {5} Dirty bits clear content<br/>
+		/// </summary>
+		public static readonly string SerializeSync =
+@"public override void {0}(PacketWriter writer)
+{{
+	{1} objectDirty = new {1}();
+
+{2}
+
+	objectDirty.Serialize(writer);
+
+	// Serialize Property
+{3}
+
+	// Serialize RPC callstack
+{4}
+
+{5}
+}}
+";
+
+		/// <summary>
+		/// {0} Master dirty bits index<br/>
+		/// {1} Dirty bits name<br/>
+		/// </summary>
+		public static readonly string AnyDirtyBits = @"objectDirty[{0}] = {1}.AnyTrue();";
+
+		/// <summary>
+		/// {0} Master dirty bits index<br/>
+		/// {1} Dirty bits name<br/>
+		/// {2} Serialize content<br/>
+		/// </summary>
+		public static readonly string PropertySerializeGroup =
+@"
+if (objectDirty[{0}])
+{{
+	{1}.Serialize(writer);
+
+{2}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Serialize content<br/>
+		/// </summary>
+		public static readonly string PropertySerializeIfDirty =
+@"if ({0}[{1}])
+{2}
+";
+
+		/// <summary>
+		/// {0} Master dirty bits index<br/>
+		/// {1} Dirty bits name<br/>
+		/// {2} Serialize content<br/>
+		/// </summary>
+		public static readonly string FunctionSerializeGroup =
+@"if (objectDirty[{0}])
+{{
+	{1}.Serialize(writer);
+
+{2}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Function name<br/>
+		/// {3} Callstack serialize content<br/>
+		/// </summary>
+		public static readonly string FunctionSerializeIfDirty =
+@"if ({0}[{1}])
+{{
+	byte count = (byte){2}Callstack.Count;
+	writer.Put(count);
+	for (int i = 0; i < count; i++)
+	{{
+		var args = {2}Callstack.Dequeue();
+{3}
+	}}
+}}
+"
+;
+		
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// </summary>
+		public static readonly string DirtyBitsClear = @"{0}.Clear();";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// </summary>
+		public static readonly string WritePut = @"writer.Put({0});";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// </summary>
+		public static readonly string WriteSerialize = @"{0}.Serialize(writer);";
+
+		/// <summary>
+		/// {0} Enum size type name<br/>
+		/// {1} Private member name<br/>
+		/// </summary>
+		public static readonly string WriteEnum = @"writer(({0}){1});";
 
 		public static string GetSyncVarAttribute(SyncType syncType)
 		{

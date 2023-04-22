@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
 using CT.Tools.Collections;
+using log4net.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore
@@ -78,7 +80,7 @@ namespace CT.Test.NetworkCore
 		public abstract void DeserializeSyncReliable(PacketReader reader);
 	}
 
-	// 서버 선언
+	// 서버 자동 구현부
 	public partial class NetworkObjectServer : S_NetworkObject
 	{
 		[SyncVar]
@@ -90,31 +92,24 @@ namespace CT.Test.NetworkCore
 		[ServerRpc]
 		public partial void Server_Some(int value1, float value2);
 
+		#region Synchronization
+
 		public NetworkObjectServer()
 		{
 			_transform = new();
 			_abc = 0;
 		}
-	}
 
-	// 서버 자동 구현부
-	public partial class NetworkObjectServer
-	{
 		private BitmaskByte _propertyDirty_0 = new();
 		private BitmaskByte _rpcDirty_0 = new();
 
 		public NetTransform Transform
 		{
-			get
-			{
-				return _transform;
-			}
+			get => _transform;
 			set
 			{
 				if (_transform == value)
-				{
 					return;
-				}
 				_transform = value;
 				_propertyDirty_0[0] = true;
 			}
@@ -122,16 +117,11 @@ namespace CT.Test.NetworkCore
 
 		public int ABC
 		{
-			get
-			{
-				return _abc;
-			}
+			get => _abc;
 			set
 			{
 				if (_abc == value)
-				{
 					return;
-				}
 				_abc = value;
 				_propertyDirty_0[1] = true;
 			}
@@ -142,7 +132,7 @@ namespace CT.Test.NetworkCore
 			_someCallstack.Enqueue((value1, value2));
 			_rpcDirty_0[0] = true;
 		}
-		public Queue<(int value1, float value2)> _someCallstack = new();
+		private Queue<(int value1, float value2)> _someCallstack = new();
 
 		public override void SerializeSyncReliable(PacketWriter writer)
 		{
@@ -151,15 +141,16 @@ namespace CT.Test.NetworkCore
 			objectDirty[0] = _propertyDirty_0.AnyTrue();
 			objectDirty[4] = _rpcDirty_0.AnyTrue();
 
-			writer.Put(objectDirty.Mask);
+			objectDirty.Serialize(writer);
 
 			// Property dirty bits
 			if (objectDirty[0])
 			{
-				writer.Put(_propertyDirty_0.Mask);
+				_propertyDirty_0.Serialize(writer);
 
 				// Property
 				if (_propertyDirty_0[0])
+					_transform.Serialize(writer);
 					writer.Put(_transform);
 				if (_propertyDirty_0[1])
 					writer.Put(_abc);
@@ -168,7 +159,7 @@ namespace CT.Test.NetworkCore
 			// Rpc
 			if (objectDirty[4])
 			{
-				writer.Put(_rpcDirty_0.Mask);
+				_rpcDirty_0.Serialize(writer);
 
 				if (_rpcDirty_0[0])
 				{
@@ -186,6 +177,8 @@ namespace CT.Test.NetworkCore
 			_propertyDirty_0.Clear();
 			_rpcDirty_0.Clear();
 		}
+
+		#endregion
 	}
 
 	// 서버 구현부
@@ -213,12 +206,12 @@ namespace CT.Test.NetworkCore
 
 		public override void DeserializeSyncReliable(PacketReader reader)
 		{
-			BitmaskByte objectDirty = new(reader.ReadByte());
+			BitmaskByte objectDirty = reader.ReadBitmaskByte();
 
 			// Property dirty bits
 			if (objectDirty[0])
 			{
-				BitmaskByte propertyDirty_0 = new(reader.ReadByte());
+				BitmaskByte propertyDirty_0 = reader.ReadBitmaskByte();
 
 				// Property
 				if (propertyDirty_0[0])
@@ -238,7 +231,7 @@ namespace CT.Test.NetworkCore
 			// Rpc
 			if (objectDirty[4])
 			{
-				BitmaskByte rpcDirty_0 = new(reader.ReadByte());
+				BitmaskByte rpcDirty_0 = reader.ReadBitmaskByte();
 				if (rpcDirty_0[0])
 				{
 					byte count = reader.ReadByte();
