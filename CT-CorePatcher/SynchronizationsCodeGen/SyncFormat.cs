@@ -77,12 +77,12 @@ public partial void {1}({2});";
 		/// <summary>
 		/// {0} Dirty bits Count<br/>
 		/// </summary>
-		public static readonly string PropertyDirtyBitname = @"_propertyDirty_{0}";
+		public static readonly string PropertyDirtyBitName = @"_propertyDirty_{0}";
 
 		/// <summary>
 		/// {0} Dirty bits Count<br/>
 		/// </summary>
-		public static readonly string FunctionDirtyBitname = @"_rpcDirty_{0}";
+		public static readonly string FunctionDirtyBitName = @"_rpcDirty_{0}";
 
 		/// <summary>
 		/// {0} Type name<br/>
