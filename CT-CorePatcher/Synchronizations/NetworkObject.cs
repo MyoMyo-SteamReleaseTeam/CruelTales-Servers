@@ -14,6 +14,14 @@ namespace CT.CorePatcher.Synchronizations
 		public abstract void SerializeSyncReliable(PacketWriter writer);
 		public abstract void SerializeSyncUnreliable(PacketWriter writer);
 		public abstract void SerializeEveryProperty(PacketWriter writer);
+
+		public void ClearDirtyReliable()
+		{
+		}
+
+		public void ClearDirtyUnreliable()
+		{
+		}
 	}
 
 	public class BBCC : NetworkObject
@@ -42,11 +50,14 @@ namespace CT.CorePatcher.Synchronizations
 		public void SerializeSyncReliable(PacketWriter writer);
 		public void SerializeSyncUnreliable(PacketWriter writer);
 		public void SerializeEveryProperty(PacketWriter writer);
+		public void ClearDirtyReliable();
+		public void ClearDirtyUnreliable();
 	}
 
 	public interface IRemoteSynchronizable
 	{
 		public void DeserializeSyncReliable(PacketReader reader);
+		public void DeserializeSyncUnreliable(PacketReader reader);
 		public void DeserializeEveryProperty(PacketReader reader);
 	}
 
@@ -54,5 +65,6 @@ namespace CT.CorePatcher.Synchronizations
 	{
 		public abstract void DeserializeSyncReliable(PacketReader reader);
 		public abstract void DeserializeEveryProperty(PacketReader reader);
+		public abstract void DeserializeSyncUnreliable(PacketReader reader);
 	}
 }

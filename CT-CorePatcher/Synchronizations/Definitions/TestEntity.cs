@@ -29,6 +29,16 @@ namespace CT.CorePatcher.Synchronizations.Definitions
 	{
 		public bool IsDirty => throw new System.NotImplementedException();
 
+		public void ClearDirtyReliable()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public void ClearDirtyUnreliable()
+		{
+			throw new System.NotImplementedException();
+		}
+
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
 			throw new System.NotImplementedException();
@@ -43,6 +53,40 @@ namespace CT.CorePatcher.Synchronizations.Definitions
 		{
 			throw new System.NotImplementedException();
 		}
+	}
+
+	[SyncNetworkObjectDefinition]
+	public partial class TestUserEntityWithObject
+	{
+		[SyncVar]
+		private UserToken _userToken;
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY2 = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY3 = new();
+
+		[SyncObject(SyncType.Unreliable)]
+		private TestEntity _TEST_ENTITY4 = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY5 = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY6 = new();
+
+		[SyncObject(SyncType.Unreliable)]
+		private TestEntity _TEST_ENTITY7 = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY8 = new();
+
+		[SyncObject]
+		private TestEntity _TEST_ENTITY9 = new();
 	}
 
 	[SyncObjectDefinition]
@@ -70,37 +114,37 @@ namespace CT.CorePatcher.Synchronizations.Definitions
 		}
 	}
 
-	[SyncNetworkObjectDefinition]
-	public partial class TestUserEntity
-	{
-		[SyncVar(SyncType.Reliable)]
-		private UserId _userId;
+	//[SyncNetworkObjectDefinition]
+	//public partial class TestUserEntity
+	//{
+	//	[SyncVar(SyncType.Reliable)]
+	//	private UserId _userId;
 
-		[SyncVar(SyncType.Unreliable)]
-		private UserSessionState _sessionState;
+	//	[SyncVar(SyncType.Unreliable)]
+	//	private UserSessionState _sessionState;
 
-		[SyncVar]
-		private UserToken _userToken;
+	//	[SyncVar]
+	//	private UserToken _userToken;
 
-		[SyncObject]
-		private TestEntity _TEST_ENTITY = new();
+	//	[SyncObject]
+	//	private TestEntity _TEST_ENTITY = new();
 
-		[SyncVar]
-		private int _test1;
+	//	[SyncVar]
+	//	private int _test1;
 
-		[SyncVar]
-		private UserSessionState _test3;
+	//	[SyncVar]
+	//	private UserSessionState _test3;
 
-		[SyncVar]
-		private int _test23;
+	//	[SyncVar]
+	//	private int _test23;
 
-		[SyncVar(SyncType.Unreliable)]
-		private int _test243;
+	//	[SyncVar(SyncType.Unreliable)]
+	//	private int _test243;
 
-		[SyncRpc]
-		public void Server_Some(UserSessionState state, InteractId interactId) { }
+	//	[SyncRpc]
+	//	public void Server_Some(UserSessionState state, InteractId interactId) { }
 
-		[SyncRpc(SyncType.Unreliable)]
-		public void Server_Something() { }
-	}
+	//	[SyncRpc(SyncType.Unreliable)]
+	//	public void Server_Something() { }
+	//}
 }

@@ -64,22 +64,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Get difinition types
-			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>(GetType(), out var netObjDefititionTypes);
 			TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>(GetType(), out var syncObjDefinitionTypes);
+			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>(GetType(), out var netObjDefititionTypes);
 
-			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
 			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
+			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
 
 			List<SyncObjectInfo> syncObjects = new();
-
-			foreach (var st in syncNetObjectTypes)
-			{
-				syncObjects.Add(getSyncObjectInfo(st, true));
-			}
 
 			foreach (var st in syncObjectTypes)
 			{
 				syncObjects.Add(getSyncObjectInfo(st, false));
+			}
+
+			foreach (var st in syncNetObjectTypes)
+			{
+				syncObjects.Add(getSyncObjectInfo(st, true));
 			}
 
 			return syncObjects;
@@ -99,11 +99,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 						SyncPropertyToken token = new(this, syncVarAtt.SyncType, f.Name, f.FieldType);
 						syncObject.AddPropertyToken(token);
 					}
-					//else if (att is SyncObjectAttribute syncObjAtt)
-					//{
-					//	SyncPropertyToken token = new(this, SyncType.None, f.Name, f.FieldType);
-					//	syncObject.Properties.Add(token);
-					//}
+					else if (att is SyncObjectAttribute syncObjAtt)
+					{
+						SyncPropertyToken token = new(this, syncObjAtt.SyncType, f.Name, f.FieldType);
+						token.SetSyncObjectType(SerializeType.SyncObject, syncObjAtt.SyncType, " = new()");
+						syncObject.AddPropertyToken(token);
+					}
 				}
 			}
 

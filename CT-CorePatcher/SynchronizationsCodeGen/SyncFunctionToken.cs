@@ -31,14 +31,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string GeneratePartialDeclaraction()
+		public string GetPartialDeclaraction()
 		{
 			return string.Format(SyncFormat.FunctionPartialDeclaration,
 								 SyncFormat.GetSyncRpcAttribute(SyncType),
-								 FunctionName, GetParameterContent());
+								 FunctionName,
+								 GetParameterContent());
 		}
 
-		public string GenerateFunctionCallWithStack(string dirtyBitsName, int funcIndex)
+		public string GetFunctionCallWithStack(string dirtyBitsName, int funcIndex)
 		{
 			if (Parameters.Count == 0)
 			{
@@ -59,7 +60,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string GenerateSerializeIfDirty(string dirtyBitName, int curFuncIndex)
+		public string GetSerializeIfDirty(string dirtyBitName, int curFuncIndex)
 		{
 			if (Parameters.Count == 0)
 			{
@@ -78,7 +79,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string GenerateDeserializeIfDirty(string dirtyBitName, int curFuncIndex)
+		public string GetFunctionDeserializeIfDirty(string dirtyBitName, int curFuncIndex)
 		{
 			if (Parameters.Count == 0)
 			{
@@ -101,36 +102,28 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string GetParameterContent()
 		{
 			string paramContent = string.Empty;
-
 			for (int i = 0; i < Parameters.Count; i++)
 			{
 				var param = Parameters[i];
 				paramContent += param.GetParameter();
 
 				if (i < Parameters.Count - 1)
-				{
 					paramContent += ", ";
-				}
 			}
-
 			return paramContent;
 		}
 
 		public string GetCallStackTupleContent()
 		{
 			string paramContent = string.Empty;
-
 			for (int i = 0; i < Parameters.Count; i++)
 			{
 				var param = Parameters[i];
 				paramContent += param.PrivateName;
 
 				if (i < Parameters.Count - 1)
-				{
 					paramContent += ", ";
-				}
 			}
-
 			return paramContent;
 		}
 
@@ -138,9 +131,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			string content = string.Empty;
 			foreach (var param in Parameters)
-			{
 				content += param.GetWriterSerializeWithPrefix("args.");
-			}
 
 			return content;
 		}
@@ -149,9 +140,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			string content = string.Empty;
 			foreach (var param in Parameters)
-			{
 				content += param.GetTempReadDeserialize() + NewLine;
-			}
 
 			return content;
 		}

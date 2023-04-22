@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CT.CorePatcher.Helper;
 using CT.CorePatcher.Synchronizations;
+using Microsoft.VisualBasic.FileIO;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -60,11 +62,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					this.Initializer = " = new()";
 				}
 			}
-			else if (baseTpyeName == nameof(IMasterSynchronizable))
-			{
-				this.SerializeType = SerializeType.SyncObject;
-				this.Initializer = " = new()";
-			}
 			else
 			{
 				if (generator.IsEnum(typeName))
@@ -83,23 +80,35 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public void SetSyncObjectType(SerializeType serializeType,
+									  SyncType syncType, 
+									  string initializer)
+		{
+			this.SerializeType = serializeType;
+			this.SyncType = syncType;
+			this.Initializer = initializer;
+		}
+
 		public string GeneratePraivteDeclaration()
 		{
 			return string.Format(SyncFormat.PrivateDeclaration,
-								 SyncFormat.GetSyncVarAttribute(SyncType),
+								 SyncFormat.GetSyncVarAttribute(SyncType, SerializeType),
 								 TypeName, PrivateName, Initializer);
 		}
 
 		public string GenerateRemotePropertyDeclaration()
 		{
 			return string.Format(SyncFormat.RemotePropertyDeclaration,
-								 SyncFormat.GetSyncVarAttribute(SyncType),
+								 SyncFormat.GetSyncVarAttribute(SyncType, SerializeType),
 								 TypeName, PrivateName, GetPublicPropertyName(),
 								 Initializer);
 		}
 
 		public string GeneratePropertyGetSet(string dirtyBitName, int propIndex)
 		{
+			if (SerializeType == SerializeType.SyncObject)
+				return string.Empty;
+
 			return string.Format(SyncFormat.PropertyGetSet,
 								 this.TypeName,
 								 this.GetPublicPropertyName(),
@@ -108,12 +117,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 propIndex);
 		}
 
-		public string GeneratetPropertySerializeIfDirty(string dirtyBitName, int curPropIndex)
+		public string GeneratetPropertySerializeIfDirty(string dirtyBitName, int curPropIndex, [AllowNull] GenerateOption option = null)
 		{
 			return string.Format(SyncFormat.PropertySerializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetWriterSerialize());
+								 this.GetWriterSerialize(option));
 		}
 
 		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex)
@@ -124,6 +133,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 this.GetPublicPropertyName(),
 								 this.PrivateName,
 								 this.GetReadDeserialize());
+		}
+
+		public string GetDirtyCheckIfSyncObject(GenerateOption option, int masterIndex, int dirtyIndex)
+		{
+			if (SerializeType != SerializeType.SyncObject)
+			{
+				return string.Empty;
+			}
+			string dirtyBitName = string.Format(option.PropertyDirtyBitName, masterIndex);
+			return string.Format(option.CheckSyncObjectDirty, dirtyBitName, dirtyIndex, PrivateName) + NewLine;
 		}
 
 		public string GetPublicPropertyName()
@@ -142,7 +161,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return string.Format(SyncFormat.Parameter, TypeName, PrivateName);
 		}
 
-		public string GetWriterSerialize()
+		public string GetWriterSerialize([AllowNull]GenerateOption option = null)
 		{
 			switch (SerializeType)
 			{
@@ -157,12 +176,33 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				case SerializeType.Enum:
 					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, PrivateName) + NewLine;
 
+				case SerializeType.SyncObject:
+					string funcName = string.Empty;
+					SyncType syncType = option == null ? SyncType.None : option.SyncType;
+
+					if (syncType == SyncType.Reliable)
+					{
+						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
+						{
+							funcName = nameof(IMasterSynchronizable.SerializeSyncReliable);
+						}
+					}
+					else if (syncType == SyncType.Unreliable)
+					{
+						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
+						{
+							funcName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
+						}
+					}
+
+					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
+
 				default:
 					return string.Empty;
 			}
 		}
 
-		public string GetReadDeserialize()
+		public string GetReadDeserialize([AllowNull] GenerateOption option = null)
 		{
 			switch (SerializeType)
 			{
@@ -177,12 +217,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				case SerializeType.Enum:
 					return string.Format(SyncFormat.ReadEnum, PrivateName, TypeName, CLRTypeName) + NewLine;
 
+				case SerializeType.SyncObject:
+					string funcName = string.Empty;
+					SyncType syncType = option == null ? SyncType.None : option.SyncType;
+
+					if (syncType == SyncType.Reliable || syncType == SyncType.RelibaleOrUnreliable)
+						funcName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
+					else if (syncType == SyncType.Unreliable || syncType == SyncType.RelibaleOrUnreliable)
+						funcName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
+
+					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
+
 				default:
 					return string.Empty;
 			}
 		}
 
-		public string GetWriterSerializeWithPrefix(string prefix)
+		public string GetWriterSerializeWithPrefix(string prefix, [AllowNull] GenerateOption option = null)
 		{
 			string name = prefix + PrivateName;
 

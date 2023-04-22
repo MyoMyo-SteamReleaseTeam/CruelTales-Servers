@@ -7,6 +7,7 @@ namespace CT.CorePatcher.Synchronizations
 		None = 0,
 		Reliable,
 		Unreliable,
+		RelibaleOrUnreliable,
 	}
 
 	public class SyncNetworkObjectDefinitionAttribute : Attribute
@@ -26,6 +27,12 @@ namespace CT.CorePatcher.Synchronizations
 
 	public class SyncObjectAttribute : Attribute
 	{
+		public SyncType SyncType { get; private set; }
+
+		public SyncObjectAttribute(SyncType syncType = SyncType.Reliable)
+		{
+			SyncType = syncType;
+		}
 	}
 
 	public class SyncVarAttribute : Attribute

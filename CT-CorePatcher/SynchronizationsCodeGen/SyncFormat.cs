@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using CT.CorePatcher.Synchronizations;
 using CT.Tools.Collections;
 
@@ -8,35 +9,55 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		public string ObjectName = string.Empty;
 		public string SerializeFunctionName = string.Empty;
+		public string ClearFunctionName = string.Empty;
 		public string BitmaskTypeName => nameof(BitmaskByte);
+		public SyncType SyncType;
 
 		public List<SyncPropertyToken> Properties { get; private set; }
 		public List<SyncFunctionToken> Functions { get; private set; }
 
 		public GenerateOption(SyncType syncType,
-							  string serializeFunctionName,
 							  List<SyncPropertyToken> properties,
 							  List<SyncFunctionToken> functions)
 		{
-			SerializeFunctionName = serializeFunctionName;
+			SyncType = syncType;
 			Properties = properties;
 			Functions = functions;
 
-			if (syncType == SyncType.Unreliable)
+			switch (SyncType)
+			{
+				case SyncType.Reliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncReliable);
+					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyReliable);
+					break;
+				case SyncType.Unreliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
+					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyUnreliable);
+					break;
+				case SyncType.RelibaleOrUnreliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeEveryProperty);
+					break;
+			}
+
+			if (SyncType == SyncType.Unreliable)
 			{
 				IsDirtyGetter =
-@"public bool IsUnreliableDirty
+@"public bool IsDirtyUnreliable
 {{
 	get
 	{{
-		bool isDirty = false;
+		bool isDirtyUnreliable = false;
 {0}
-		return isDirty;
+		return isDirtyUnreliable;
 	}}
 }}
 ";
+				IsDirtyBinder = @"isDirtyUnreliable |= {0}.AnyTrue();";
+				IsObjectDirtyBinder = @"isDirtyUnreliable |= {0}.IsDirtyUnreliable;";
+
 				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
 				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
+				CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirtyUnreliable;";
 			}
 		}
 
@@ -64,6 +85,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// {0} Dirty bits Count<br/>
 		/// </summary>
 		public readonly string FunctionDirtyBitName = @"_rpcDirty_{0}";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// </summary>
+		public readonly string IsDirtyBinder = @"isDirty |= {0}.AnyTrue();";
+
+		/// <summary>
+		/// {0} Private property name<br/>
+		/// </summary>
+		public readonly string IsObjectDirtyBinder = @"isDirty |= {0}.IsDirty;";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Private name<br/>
+		/// </summary>
+		public readonly string CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirty;";
 	}
 
 	public static class SyncFormat
@@ -79,12 +117,6 @@ namespace {1}
 {{
 {2}
 }}";
-
-		public static readonly string SyncVarReliable = @"SyncVar";
-		public static readonly string SyncVarUnreliable = @"SyncVar(SyncType.Unreliable)";
-
-		public static readonly string SyncRpcReliable = @"SyncRpc";
-		public static readonly string SyncRpcUnreliable = @"SyncRpc(SyncType.Unreliable)";
 
 		/// <summary>
 		/// {0} Object name<br/>
@@ -141,11 +173,6 @@ public partial class {0} : {1}
 	#endregion
 }}
 ";
-
-		/// <summary>
-		/// {0} Dirty bits name<br/>
-		/// </summary>
-		public static readonly string IsDirtyBinder = @"isDirty |= {0}.AnyTrue()";
 
 		/// <summary>
 		/// {0} Type name<br/>
@@ -269,11 +296,14 @@ private byte {0}CallstackCount = 0;
 }}
 ";
 
-		/// {0} Dirty bits clear content<br/>
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Dirty bits clear content<br/>
+		/// </summary>
 		public static readonly string ClearDirtyBitFunction =
-@"public override void ClearDirtyBit()
+@"public override void {0}()
 {{
-{0}
+{1}
 }}";
 
 		/// <summary>
@@ -371,6 +401,12 @@ if (objectDirty[{0}])
 		/// {1} Private member name<br/>
 		/// </summary>
 		public static readonly string WriteEnum = @"writer(({0}){1});";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Write function name<br/>
+		/// </summary>
+		public static readonly string WriteSyncObject = @"{0}.{1}(writer);";
 
 		/// <summary>
 		/// {0} Function name<br/>
@@ -537,32 +573,27 @@ if (objectDirty[{0}])
 }}
 ";
 
-		public static string GetSyncVarAttribute(SyncType syncType)
+		public static string GetSyncVarAttribute(SyncType syncType, SerializeType serializeType)
 		{
-			if (syncType == SyncType.Reliable)
+			if (serializeType == SerializeType.SyncObject)
 			{
-				return SyncVarReliable;
+				return (syncType == SyncType.Reliable) ?
+					$"SyncObject" : 
+					$"SyncObject({nameof(SyncType)}.{syncType})";
 			}
-			else if (syncType == SyncType.Unreliable)
+			else
 			{
-				return SyncVarUnreliable;
+				return (syncType == SyncType.Reliable) ?
+					$"SyncVar" :
+					$"SyncVar({nameof(SyncType)}.{syncType})";
 			}
-
-			return string.Empty;
 		}
 
 		public static string GetSyncRpcAttribute(SyncType syncType)
 		{
-			if (syncType == SyncType.Reliable)
-			{
-				return SyncRpcReliable;
-			}
-			else if (syncType == SyncType.Unreliable)
-			{
-				return SyncRpcUnreliable;
-			}
-
-			return string.Empty;
+			return (syncType == SyncType.Reliable) ?
+				$"SyncRpc" :
+				$"SyncRpc({nameof(SyncType)}.{syncType})";
 		}
 	}
 }
