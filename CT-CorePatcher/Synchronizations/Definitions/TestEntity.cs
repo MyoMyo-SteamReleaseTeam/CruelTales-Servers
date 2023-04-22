@@ -45,30 +45,30 @@ namespace CT.CorePatcher.Synchronizations.Definitions
 		}
 	}
 
-	//[SyncObjectDefinition]
-	//public partial class TestEntity
-	//{
-	//	[SyncVar]
-	//	private NetTransform _transform;
+	[SyncObjectDefinition]
+	public partial class TestEntity
+	{
+		[SyncVar]
+		private NetTransform _transform;
 
-	//	[SyncVar]
-	//	private int _abc = 0;
+		[SyncVar]
+		private int _abc = 0;
 
-	//	[SyncRpc]
-	//	public void Server_Some(int value1, float value2) { }
+		[SyncRpc]
+		public void Server_Some(int value1, float value2) { }
 
-	//	public void SerializeEveryProperty(PacketWriter writer)
-	//	{
-	//		_transform.Serialize(writer);
-	//		writer.Put(_abc);
-	//	}
+		public void SerializeEveryProperty(PacketWriter writer)
+		{
+			_transform.Serialize(writer);
+			writer.Put(_abc);
+		}
 
-	//	public void DeserializeEveryProperty(PacketReader reader)
-	//	{
-	//		_transform.Deserialize(reader);
-	//		_abc = reader.ReadInt32();
-	//	}
-	//}
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
+			_transform.Deserialize(reader);
+			_abc = reader.ReadInt32();
+		}
+	}
 
 	[SyncNetworkObjectDefinition]
 	public partial class TestUserEntity
@@ -82,8 +82,8 @@ namespace CT.CorePatcher.Synchronizations.Definitions
 		[SyncVar]
 		private UserToken _userToken;
 
-		[SyncVar]
-		private int _test;
+		[SyncObject]
+		private TestEntity _TEST_ENTITY = new();
 
 		[SyncVar]
 		private int _test1;

@@ -29,7 +29,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 {{
 	get
 	{{
-		bool isDirty = true;
+		bool isDirty = false;
 {0}
 		return isDirty;
 	}}
@@ -48,7 +48,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 {{
 	get
 	{{
-		bool isDirty = true;
+		bool isDirty = false;
 {0}
 		return isDirty;
 	}}
@@ -89,27 +89,18 @@ namespace {1}
 		/// <summary>
 		/// {0} Object name<br/>
 		/// {1} Inherit type name<br/>
-		/// {2} NetworkObjectType declaration<br/>
-		/// {3} Declaration content<br/>
-		/// {4} Synchronization content<br/>
-		/// {5} Serilalize content<br/>
-		/// {6} Clear dirty bit content<br/>
-		/// {7} Serialize every property content<br/>
+		/// {2} Declaration content<br/>
+		/// {3} Synchronization content<br/>
 		/// </summary>
 		public static readonly string MasterDeclaration =
 @"
 [Serializable]
 public partial class {0} : {1}
 {{
-	{2}
-
+{2}
+#region Synchronization
 {3}
-	#region Synchronization
-{4}
-{5}
-{6}
-{7}
-	#endregion
+#endregion
 }}
 ";
 
@@ -154,7 +145,7 @@ public partial class {0} : {1}
 		/// <summary>
 		/// {0} Dirty bits name<br/>
 		/// </summary>
-		public static readonly string IsDirtyBinder = @"isDirty &= {0}.AnyTrue()";
+		public static readonly string IsDirtyBinder = @"isDirty |= {0}.AnyTrue()";
 
 		/// <summary>
 		/// {0} Type name<br/>

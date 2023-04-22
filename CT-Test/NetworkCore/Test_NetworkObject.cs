@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
+using CT.CorePatcher.Synchronizations;
+using CT.CorePatcher.Synchronizations.Definitions;
 using CT.Tools.Collections;
 using log4net.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore
 {
+
 	[TestClass]
 	public class Test_NetworkObject
 	{
@@ -28,6 +31,7 @@ namespace CT.Test.NetworkCore
 			serverObj.Transform = testTransform;
 			serverObj.Server_Some(50, 10.0f);
 			serverObj.Server_Some(20, 20.0f);
+			serverObj._someDataClass.Test = 66;
 
 			byte[] syncData = new byte[1000];
 			PacketWriter writer = new PacketWriter(syncData);
@@ -40,6 +44,7 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(testTransform, clientObj.Transform);
 			Assert.AreEqual(70, clientObj.Value1);
 			Assert.AreEqual(30.0f, clientObj.Value2);
+			Assert.AreEqual(66, clientObj._someDataClass.Test);
 		}
 	}
 
@@ -48,6 +53,57 @@ namespace CT.Test.NetworkCore
 		None = 0,
 		Reliable,
 		Unreliable,
+	}
+
+	public class SomeDataClass : IMasterSynchronizable
+	{
+		private BitmaskByte _propertyDirty_0 = new();
+
+		private int _test;
+		public int Test
+		{
+			get => _test;
+			set
+			{
+				if (_test == value)
+					return;
+				_test = value;
+				_propertyDirty_0[0] = true;
+			}
+		}
+
+		public bool IsDirty => _propertyDirty_0[0];
+
+		public void SerializeEveryProperty(PacketWriter writer)
+		{
+		}
+
+		public void SerializeSyncReliable(PacketWriter writer)
+		{
+			if (IsDirty)
+			{
+				writer.Put(_test);
+			}
+		}
+
+		public void SerializeSyncUnreliable(PacketWriter writer)
+		{
+		}
+	}
+
+	public class RemoteSomeDataClass : IRemoteSynchronizable
+	{
+		public int Test => _test;
+		private int _test;
+
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
+		}
+
+		public void DeserializeSyncReliable(PacketReader reader)
+		{
+			_test = reader.ReadInt32();
+		}
 	}
 
 	public class SyncVarAttribute : Attribute
@@ -70,19 +126,8 @@ namespace CT.Test.NetworkCore
 		}
 	}
 
-	public abstract class S_NetworkObject
-	{
-		public abstract void SerializeSyncReliable(PacketWriter writer);
-		public abstract void ClearDirtyBit();
-	}
-
-	public abstract class C_NetworkObject
-	{
-		public abstract void DeserializeSyncReliable(PacketReader reader);
-	}
-
 	// 서버 자동 구현부
-	public partial class NetworkObjectServer : S_NetworkObject
+	public partial class NetworkObjectServer : IMasterSynchronizable
 	{
 		[SyncVar]
 		private NetTransform _transform = new();
@@ -92,6 +137,9 @@ namespace CT.Test.NetworkCore
 
 		[ServerRpc]
 		public partial void Server_Some(int value1, float value2);
+
+		[SyncObject]
+		public SomeDataClass _someDataClass = new();
 
 		#region Synchronization
 
@@ -107,9 +155,10 @@ namespace CT.Test.NetworkCore
 		{
 			get
 			{
-				bool isDirty = true;
-				isDirty &= _propertyDirty_0.AnyTrue();
-				isDirty &= _rpcDirty_0.AnyTrue();
+				bool isDirty = false;
+				isDirty |= _someDataClass.IsDirty;
+				isDirty |= _propertyDirty_0.AnyTrue();
+				isDirty |= _rpcDirty_0.AnyTrue();
 				return isDirty;
 			}
 		}
@@ -145,8 +194,11 @@ namespace CT.Test.NetworkCore
 		}
 		private Queue<(int value1, float value2)> _someCallstack = new();
 
-		public override void SerializeSyncReliable(PacketWriter writer)
+		public void SerializeSyncReliable(PacketWriter writer)
 		{
+			// Set sync object dirty
+			_propertyDirty_0[2] = _someDataClass.IsDirty;
+
 			BitmaskByte objectDirty = new BitmaskByte();
 
 			objectDirty[0] = _propertyDirty_0.AnyTrue();
@@ -162,9 +214,10 @@ namespace CT.Test.NetworkCore
 				// Property
 				if (_propertyDirty_0[0])
 					_transform.Serialize(writer);
-					writer.Put(_transform);
 				if (_propertyDirty_0[1])
 					writer.Put(_abc);
+				if (_propertyDirty_0[2])
+					_someDataClass.SerializeSyncReliable(writer);
 			}
 
 			// Rpc
@@ -186,23 +239,25 @@ namespace CT.Test.NetworkCore
 			}
 		}
 
-		public override void ClearDirtyBit()
+		public void ClearDirtyBit()
 		{
 			_propertyDirty_0.Clear();
 			_rpcDirty_0.Clear();
 		}
 
+		public void SerializeSyncUnreliable(PacketWriter writer)
+		{
+		}
+
+		public void SerializeEveryProperty(PacketWriter writer)
+		{
+		}
+
 		#endregion
 	}
 
-	// 서버 구현부
-	public partial class NetworkObjectServer
-	{
-
-	}
-
 	// 클라 자동 구현부
-	public partial class NetworkObjectClient : C_NetworkObject
+	public partial class NetworkObjectClient : IRemoteSynchronizable
 	{
 		[SyncVar]
 		private NetTransform _transform;
@@ -215,7 +270,11 @@ namespace CT.Test.NetworkCore
 		[ServerRpc]
 		public partial void Server_Some(int value1, float value2);
 
-		public override void DeserializeSyncReliable(PacketReader reader)
+		[SyncObject]
+		public RemoteSomeDataClass _someDataClass = new();
+		public event Action<SomeDataClass>? OnSomeDataClassChanged;
+
+		public void DeserializeSyncReliable(PacketReader reader)
 		{
 			BitmaskByte objectDirty = reader.ReadBitmaskByte();
 
@@ -227,15 +286,17 @@ namespace CT.Test.NetworkCore
 				// Property
 				if (propertyDirty_0[0])
 				{
-					//NetTransform transform = new();
 					_transform.Deserialize(reader);
-					//Transform = transform;
 					OnTransformChanged?.Invoke(_transform);
 				}
 				if (propertyDirty_0[1])
 				{
 					_abc = reader.ReadInt32();
 					OnABCChanged?.Invoke(_abc);
+				}
+				if (propertyDirty_0[2])
+				{
+					_someDataClass.DeserializeSyncReliable(reader);
 				}
 			}
 
@@ -249,13 +310,15 @@ namespace CT.Test.NetworkCore
 					for (int i = 0; i < count; i++)
 					{
 						int value1 = reader.ReadInt32();
-						//NetTransform value2 = new();
-						//value2.Deserialize(reader);
 						float value2 = reader.ReadSingle();
 						Server_Some(value1, value2);
 					}
 				}
 			}
+		}
+
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
 		}
 	}
 

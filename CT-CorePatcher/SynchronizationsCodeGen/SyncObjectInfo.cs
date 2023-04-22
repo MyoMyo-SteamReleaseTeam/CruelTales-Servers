@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.AccessControl;
-using System.Xml.Linq;
 using CT.CorePatcher.Synchronizations;
 using CT.Networks.Synchronizations;
 using CT.Tools.Collections;
@@ -20,6 +18,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public List<SyncPropertyToken> UnreliableProperties { get; private set; } = new();
 		public List<SyncFunctionToken> UnreliableFunctions { get; private set; } = new();
 
+		public List<SyncPropertyToken> AllProperties { get; private set; } = new();
+		public List<SyncFunctionToken> AllFunctions { get; private set; } = new();
+
 		public SyncObjectInfo(string objectName, bool isNetworkObject)
 		{
 			ObjectName = objectName;
@@ -28,6 +29,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public void AddPropertyToken(SyncPropertyToken token)
 		{
+			AllProperties.Add(token);
+
 			if (token.SyncType == SyncType.Reliable)
 			{
 				ReliableProperties.Add(token);
@@ -40,6 +43,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public void AddFunctionToken(SyncFunctionToken token)
 		{
+			AllFunctions.Add(token);
+
 			if (token.SyncType == SyncType.Reliable)
 			{
 				ReliableFunctions.Add(token);
@@ -52,12 +57,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GenerateMasterDeclaration()
 		{
-
-			string declarationContent =string.Empty;
-			string synchronizeContent =string.Empty;
-			string serializeFuncContent= string.Empty;
-			string dirtyBitClearContent= string.Empty;
-			string serializeAllContent  =string.Empty;
+			string declarationContent = string.Empty;
+			string synchronizeContent = string.Empty;
+			string serializeFuncContent = string.Empty;
+			string dirtyBitClearContent = string.Empty;
+			string serializeAllContent = string.Empty;
 
 			GenerateOption reliableOption = new(SyncType.Reliable,
 												nameof(IMasterSynchronizable.SerializeSyncReliable),
@@ -73,24 +77,35 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			synchronizeContent += Master_GenPropertySynchronizeContent(reliableOption) + NewLine;
 			serializeFuncContent += Master_GenSerializefunction(reliableOption) + NewLine;
 			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(reliableOption) + NewLine;
-			serializeAllContent += Master_GenMasterSerializeEveryProperty(reliableOption) + NewLine;
 
 			declarationContent += Master_GenDeclaration(unreliableOption);
 			synchronizeContent += Master_GenPropertySynchronizeContent(unreliableOption);
 			serializeFuncContent += Master_GenSerializefunction(unreliableOption);
 			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(unreliableOption);
-			serializeAllContent += Master_GenMasterSerializeEveryProperty(unreliableOption);
 
-			string netTypeEnumName = nameof(NetworkObjectType);
+			GenerateOption allOption = new(SyncType.None, nameof(IMasterSynchronizable.SerializeEveryProperty),
+										   AllProperties, AllFunctions);
+			serializeAllContent += Master_GenMasterSerializeEveryProperty(allOption) + NewLine;
+
+			string synchronization = synchronizeContent + NewLine +
+									 serializeFuncContent + NewLine +
+									 dirtyBitClearContent + NewLine +
+									 serializeAllContent;
+
+			string inheritType = nameof(IMasterSynchronizable);
+
+			if (this.IsNetworkObject)
+			{
+				inheritType = nameof(NetworkObject);
+				string netTypeEnumName = nameof(NetworkObjectType);
+				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};";
+				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
+			}
+
 			return string.Format(SyncFormat.MasterDeclaration,
-								 ObjectName,
-								 nameof(NetworkObject),
-								 $"public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};",
+								 ObjectName, inheritType,
 								 declarationContent,
-								 synchronizeContent,
-								 serializeFuncContent,
-								 dirtyBitClearContent,
-								 serializeAllContent);
+								 synchronization);
 		}
 
 		#region Master side
