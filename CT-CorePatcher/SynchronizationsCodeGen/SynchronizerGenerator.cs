@@ -89,6 +89,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			PatcherConsole.PrintJobInfo("Create sync object code files");
 
+			// Remove existing files
+			foreach (var path in Directory.GetFiles(TargetPath))
+			{
+				File.Delete(path);
+			}
+
+			// Create code files
 			foreach (var info in genCodes)
 			{
 				string targetPath = Path.Combine(TargetPath, info.FileName);
@@ -176,6 +183,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CT.Common.Serialization.Type;",
 				"using CT.Common.Synchronizations;",
 				"using CT.Tools.Collections;",
+				"using CTC.Networks.Synchornizations;",
 			};
 
 			if (MainProcess.IsDebug)

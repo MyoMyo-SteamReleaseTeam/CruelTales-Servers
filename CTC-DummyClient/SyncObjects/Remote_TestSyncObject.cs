@@ -12,6 +12,7 @@ using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Tools.Collections;
+using CTC.Networks.Synchornizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {

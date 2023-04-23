@@ -12,13 +12,14 @@ using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Tools.Collections;
+using CTC.Networks.Synchornizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	[Serializable]
 	public partial class Remote_TestNetworkObject : RemoteNetworkObject
 	{
-		public override MasterNetworkObject Type => MasterNetworkObject.TestNetworkObject;
+		public override NetworkObjectType Type => NetworkObjectType.TestNetworkObject;
 	
 		[SyncVar]
 		private UserToken _userToken = new();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection.PortableExecutable;
 using CT.Common.Serialization;
 using CT.Packets;
 

@@ -17,13 +17,4 @@ namespace CTS.Instance.Synchronizations
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 	}
-
-	public abstract class RemoteNetworkObject : IRemoteSynchronizable
-	{
-		public NetworkIdentity Identity { get; protected set; }
-		public abstract NetworkObjectType Type { get; }
-		public abstract void DeserializeSyncReliable(PacketReader reader);
-		public abstract void DeserializeEveryProperty(PacketReader reader);
-		public abstract void DeserializeSyncUnreliable(PacketReader reader);
-	}
 }

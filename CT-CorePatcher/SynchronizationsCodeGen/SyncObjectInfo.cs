@@ -155,7 +155,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (this.IsNetworkObject)
 			{
 				inheritType = SyncFormat.RemoteNetworkObjectTypeName;
-				string netTypeEnumName = SyncFormat.MasterNetworkObjectTypeName;
+				string netTypeEnumName = SyncFormat.NetworkObjectTypeTypeName;
 				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{OriginObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
 			}

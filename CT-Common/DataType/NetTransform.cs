@@ -23,14 +23,14 @@ namespace CT.Common.DataType
 			Y = reader.ReadSingle();
 		}
 
-		public static bool operator ==(NetVec2 lhs, NetVec2 rhs)
+		public static bool operator ==(NetVec2 lhs, NetVec2 rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
+		public static bool operator !=(NetVec2 lhs, NetVec2 rhs) => lhs.X != rhs.X || lhs.Y != rhs.Y;
+		public override int GetHashCode() => ValueTuple.Create(X, Y).GetHashCode();
+		public override bool Equals(object? obj)
 		{
-			return (lhs.X == rhs.X && lhs.Y == rhs.Y);
-		}
-
-		public static bool operator !=(NetVec2 lhs, NetVec2 rhs)
-		{
-			return (lhs.X != rhs.X || lhs.Y != rhs.Y);
+			if (obj is not NetVec2 lhs)
+				return false;
+			return this == lhs;
 		}
 	}
 
@@ -59,9 +59,9 @@ namespace CT.Common.DataType
 		//public NetVecZ PositionZ = new();
 		public NetVec2 Velocity;
 
-		public NetTransform()
-		{
-		}
+#if NET
+		public NetTransform() {}
+#endif
 
 		public int SerializeSize =>
 			Position.SerializeSize + 
@@ -82,29 +82,17 @@ namespace CT.Common.DataType
 			Velocity.Deserialize(reader);
 		}
 
-		public static bool operator ==(NetTransform lhs, NetTransform rhs)
-		{
-			return (lhs.Position == rhs.Position && lhs.Velocity == rhs.Velocity);
-		}
-
+		public static bool operator ==(NetTransform lhs, NetTransform rhs) 
+			=> lhs.Position == rhs.Position && lhs.Velocity == rhs.Velocity;
 		public static bool operator !=(NetTransform lhs, NetTransform rhs)
-		{
-			return (lhs.Position != rhs.Position || lhs.Velocity != rhs.Velocity);
-		}
-
+			=> lhs.Position != rhs.Position || lhs.Velocity != rhs.Velocity;
+		public override int GetHashCode()
+			=> ValueTuple.Create(Position, Velocity).GetHashCode();
 		public override bool Equals(object? obj)
 		{
 			if (obj is not NetTransform lhs)
-			{
 				return false;
-			}
-
 			return this == lhs;
-		}
-
-		public override int GetHashCode()
-		{
-			return ValueTuple.Create(Position, Velocity).GetHashCode();
 		}
 	}
 }
