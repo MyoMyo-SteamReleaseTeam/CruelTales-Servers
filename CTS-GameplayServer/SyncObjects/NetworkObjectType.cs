@@ -1,4 +1,4 @@
-﻿namespace CT.Networks.Synchronizations
+﻿namespace CT.Common.Synchronizations
 {
 	public enum NetworkObjectType
 	{

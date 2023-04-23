@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using CT.CorePatcher.Synchronizations;
-using CT.Networks.Synchronizations;
+using CT.Common.Synchronizations;
 using CT.Tools.Collections;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -85,14 +84,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				GenerateOption unreliableOption = new(SyncType.Unreliable, UnreliableProperties, UnreliableFunctions);
 
-				declarationContent += Master_GenDeclaration(unreliableOption) + NewLine;
-				synchronizeContent += Master_GenPropertySynchronizeContent(unreliableOption) + NewLine;
-				serializeFuncContent += Master_GenSerializeFunction(unreliableOption) + NewLine;
-				dirtyBitClearContent += Master_GenDirtyBitsClearFunction(unreliableOption) + NewLine;
+				declarationContent += Master_GenDeclaration(unreliableOption);// + NewLine;
+				synchronizeContent += Master_GenPropertySynchronizeContent(unreliableOption);// + NewLine;
+				serializeFuncContent += Master_GenSerializeFunction(unreliableOption);// + NewLine;
+				dirtyBitClearContent += Master_GenDirtyBitsClearFunction(unreliableOption);// + NewLine;
 			}
 
 			GenerateOption allOption = new(SyncType.RelibaleOrUnreliable, AllProperties, AllFunctions);
-			serializeAllContent += Master_GenMasterSerializeEveryProperty(allOption) + NewLine;
+			serializeAllContent += Master_GenMasterSerializeEveryProperty(allOption);
 
 			string synchronization = synchronizeContent + NewLine +
 									 serializeFuncContent + NewLine +
@@ -104,8 +103,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (this.IsNetworkObject)
 			{
-				inheritType = nameof(NetworkObject);
-				string netTypeEnumName = nameof(NetworkObjectType);
+				inheritType = SyncFormat.MasterNetworkObjectTypeName;
+				string netTypeEnumName = SyncFormat.NetworkObjectTypeTypeName;
 				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
 			}
@@ -146,8 +145,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (this.IsNetworkObject)
 			{
-				inheritType = nameof(RemoteNetworkObject);
-				string netTypeEnumName = nameof(NetworkObjectType);
+				inheritType = SyncFormat.RemoteNetworkObjectTypeName;
+				string netTypeEnumName = SyncFormat.MasterNetworkObjectTypeName;
 				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
 			}
@@ -379,7 +378,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
 					string contentGroup = funcSerializeGroup[i];
 					CodeFormat.AddIndent(ref contentGroup);
-					funcSerialize += string.Format(SyncFormat.FunctionSerializeGroup, i, dirtyBitName, contentGroup);
+					funcSerialize += string.Format(SyncFormat.FunctionSerializeGroup, i + 4, dirtyBitName, contentGroup);
 				}
 				CodeFormat.AddIndent(ref funcSerialize);
 			}
@@ -511,7 +510,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
 				string contentGroup = funcDeserializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i, dirtyBitName, nameof(BitmaskByte), contentGroup);
+				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i + 4, dirtyBitName, nameof(BitmaskByte), contentGroup);
 			}
 			CodeFormat.AddIndent(ref funcDeserialize);
 

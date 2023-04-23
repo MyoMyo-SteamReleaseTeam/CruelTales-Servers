@@ -1,0 +1,44 @@
+﻿using CT.Common.DataType;
+using CT.Common.Serialization.Type;
+using CT.Common.Synchronizations;
+
+namespace CTS.Instance.SyncDefinitions
+{
+	[SyncNetworkObjectDefinition]
+	public partial class TestNetworkObject
+	{
+		[SyncVar]
+		private UserToken _userToken;
+
+		[SyncVar]
+		private float _floatValue;
+
+		[SyncObject]
+		private TestSyncObject _testSyncObject = new();
+
+		[SyncObject(SyncType.Unreliable)]
+		private TestSyncObject _testUnreliableObject = new();
+
+		[SyncRpc]
+		public void Server_DoSomethiing() { }
+
+		[SyncRpc(SyncType.Unreliable)]
+		public void Server_SendMessage(NetString message) { }
+
+		[SyncRpc]
+		public void Server_Response(NetString message) { }
+	}
+
+	[SyncObjectDefinition]
+	public partial class TestSyncObject
+	{
+		[SyncVar]
+		private NetTransform _transform;
+
+		[SyncVar]
+		private int _abc = 0;
+
+		[SyncRpc]
+		public void Server_Some(int value1, float value2) { }
+	}
+}

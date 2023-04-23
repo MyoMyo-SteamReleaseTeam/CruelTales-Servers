@@ -14,7 +14,7 @@ namespace CT.Packets
 		SC_Ack_TryJoinGameInstance,
 		SC_OnUserEnter,
 		SC_OnUserLeave,
-		SC_MiniGameData,
+		SC_InitialData,
 		SC_SpawnEntities,
 		CS_Req_UserInput_Movement,
 		CS_Req_UserInput_Action,

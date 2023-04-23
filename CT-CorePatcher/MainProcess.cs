@@ -32,12 +32,25 @@ namespace CT.CorePatcher
 	{
 		private const string PROGRAM_NAME = "programName";
 
-		private const string programSync = "programSync";
-		private const string programXml = "programXml";
-		private const string programFilePatch = "programFilePatch";
+		private const string PROGRAM_SYNC = "programSync";
+		private const string PROGRAM_XML = "programXml";
+		private const string PROGRAM_FILEPATCH = "programFilePatch";
+
+		public static bool IsDebug { get; private set; } = false;
 
 		public static void Main(string[] args)
 		{
+			if (args.Length == 0)
+			{
+				IsDebug = true;
+			}
+
+			if (IsDebug)
+			{
+				RunSynchronizerGenerator(args);
+				return;
+			}
+
 			StringArgumentArray programs = new();
 
 			OptionParser op = new OptionParser();
@@ -48,13 +61,13 @@ namespace CT.CorePatcher
 				return;
 			}
 
-			if (programs.ArgumentArray.Contains(programSync))
+			if (programs.ArgumentArray.Contains(PROGRAM_SYNC))
 				RunSynchronizerGenerator(args);
 
-			if (programs.ArgumentArray.Contains(programXml))
+			if (programs.ArgumentArray.Contains(PROGRAM_XML))
 				RunFilePatch(args);
 
-			if (programs.ArgumentArray.Contains(programFilePatch))
+			if (programs.ArgumentArray.Contains(PROGRAM_FILEPATCH))
 				RunXmlPacketSystemPatch(args);
 
 			Console.Read();
@@ -68,7 +81,7 @@ namespace CT.CorePatcher
 			try
 			{
 				SynchronizerGenerator syncCodeGen = new();
-				Console.WriteLine(syncCodeGen.ParseCode());
+				syncCodeGen.GenerateCode(args);
 			}
 			catch (Exception e)
 			{

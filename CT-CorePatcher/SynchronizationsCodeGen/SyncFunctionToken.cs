@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using CT.CorePatcher.Synchronizations;
+using CT.Common.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {

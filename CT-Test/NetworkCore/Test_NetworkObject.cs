@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
-using CT.CorePatcher.Synchronizations;
-using CT.CorePatcher.Synchronizations.Definitions;
+using CT.Common.Synchronizations;
 using CT.Tools.Collections;
-using log4net.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore
@@ -74,6 +71,16 @@ namespace CT.Test.NetworkCore
 
 		public bool IsDirty => _propertyDirty_0[0];
 
+		public void ClearDirtyReliable()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void ClearDirtyUnreliable()
+		{
+			throw new NotImplementedException();
+		}
+
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
 		}
@@ -103,6 +110,11 @@ namespace CT.Test.NetworkCore
 		public void DeserializeSyncReliable(PacketReader reader)
 		{
 			_test = reader.ReadInt32();
+		}
+
+		public void DeserializeSyncUnreliable(PacketReader reader)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

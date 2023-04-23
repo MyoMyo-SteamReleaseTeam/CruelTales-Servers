@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using CT.Common.Serialization.Type;
+using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
-using CT.CorePatcher.Synchronizations;
+using CT.Tools.Data;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -21,33 +21,111 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		SyncObject,
 	}
 
+	public class SyncGenerateOperation
+	{
+		class CodeGenInfo
+		{
+			public string ObjectName = string.Empty;
+			public string GenCode = string.Empty;
+		}
+
+		public List<string> UsingStatements = new();
+		public List<SyncObjectInfo> SyncObjects = new();
+		public string Namespace = string.Empty;
+		public string TargetPath = string.Empty;
+		public bool IsMaster = false;
+
+		public void Run()
+		{
+			PatcherConsole.PrintJobInfo("Generate sync object definitions");
+
+			string usingStatements = string.Empty;
+
+			foreach (var u in UsingStatements)
+			{
+				usingStatements += u + CodeFormat.NewLine;
+			}
+
+			// Generate Code
+			List<CodeGenInfo> genCodes = new();
+			foreach (var syncObj in SyncObjects)
+			{
+				CodeGenInfo info = new();
+				info.ObjectName = syncObj.ObjectName;
+
+				string code;
+				if (IsMaster)
+					code = syncObj.GenerateMasterDeclaration();
+				else
+					code = syncObj.GenerateRemoteDeclaration();
+
+				CodeFormat.AddIndent(ref code);
+				info.GenCode = string.Format(SyncFormat.FileFormat, usingStatements, Namespace, code);
+				genCodes.Add(info);
+			}
+
+			PatcherConsole.PrintJobInfo("Create sync object code files");
+
+			foreach (var info in genCodes)
+			{
+				string fileName = $"{info.ObjectName}.cs";
+				string targetPath = Path.Combine(TargetPath, fileName);
+				var result = FileHandler.TryWriteText(targetPath, info.GenCode, true);
+				if (result.ResultType == JobResultType.Success)
+				{
+					PatcherConsole.PrintSaveSuccessResult("Sync code gen completed : ", fileName, targetPath);
+				}
+				else
+				{
+					PatcherConsole.PrintError(result.Exception.Message);
+				}
+			}
+		}
+	}
+
 	public class SynchronizerGenerator
 	{
-		public List<Assembly> ReferenceAssemblys { get; set; } = new();
+		public List<Type> _referenceTypes = new()
+		{
+			typeof(NetString), typeof(CTS.Instance.GameplayServer)
+		};
+
+		public List<Assembly> ReferenceAssemblys { get; private set; } = new();
 		private Dictionary<string, string> _enumSizeByTypeName = new();
 
-		public string ParseCode()
+		public void GenerateCode(string[] args)
 		{
 			var syncObjects = parseAssemblys();
 
-			string code = string.Empty;
-
-			foreach (var syncObj in syncObjects)
+			SyncGenerateOperation master = new();
+			master.SyncObjects = syncObjects;
+			master.Namespace = $"CTS.Instance.SyncObjects";
+			master.UsingStatements = new List<string>()
 			{
-				code += syncObj.GenerateMasterDeclaration();
-				code += syncObj.GenerateRemoteDeclaration();
-			}
+				"using System;"
+			};
+			master.TargetPath = "Master";
+			master.IsMaster = true;
+			master.Run();
 
-			return code;
+			SyncGenerateOperation remote = new();
+			remote.SyncObjects = syncObjects;
+			remote.Namespace = $"CTS.Instance.SyncObjects";
+			remote.UsingStatements = new List<string>()
+			{
+				"using System;"
+			};
+			remote.TargetPath = "Remote";
+			remote.IsMaster = false;
+			remote.Run();
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()
 		{
-			// Setup Enums
-			var netcore = Assembly.GetAssembly(typeof(NetString));
-			if (netcore != null)
+			// Add references
+			foreach (var type in _referenceTypes)
 			{
-				ReferenceAssemblys.Add(netcore);
+				addReferenceAssembly(type.Assembly);
 			}
 
 			// Find enums from assemblys
@@ -64,25 +142,37 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Get difinition types
-			TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>(GetType(), out var syncObjDefinitionTypes);
-			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>(GetType(), out var netObjDefititionTypes);
-
-			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
-			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
-
 			List<SyncObjectInfo> syncObjects = new();
 
+			// Sync object
+			TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>
+				(typeof(CTS.Instance.GameplayServer), out var syncObjDefinitionTypes);
+
+			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
 			foreach (var st in syncObjectTypes)
 			{
 				syncObjects.Add(getSyncObjectInfo(st, false));
 			}
 
+			// Sync network object
+			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>
+				(typeof(CTS.Instance.GameplayServer), out var netObjDefititionTypes);
+
+			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
 			foreach (var st in syncNetObjectTypes)
 			{
 				syncObjects.Add(getSyncObjectInfo(st, true));
 			}
 
 			return syncObjects;
+
+			void addReferenceAssembly(Assembly? assembly)
+			{
+				if (assembly == null)
+					return;
+
+				ReferenceAssemblys.Add(assembly);
+			}
 		}
 
 		private SyncObjectInfo getSyncObjectInfo(Type type, bool isNetworkObject)

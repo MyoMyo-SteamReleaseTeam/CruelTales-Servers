@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
-using CT.CorePatcher.Synchronizations;
 using Microsoft.VisualBasic.FileIO;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen

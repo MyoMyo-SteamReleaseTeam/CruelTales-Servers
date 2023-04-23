@@ -20,7 +20,7 @@ namespace CTC.Networks.Packets
 			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
 			{ PacketType.SC_OnUserEnter, PacketHandler.Handle_SC_OnUserEnter },
 			{ PacketType.SC_OnUserLeave, PacketHandler.Handle_SC_OnUserLeave },
-			{ PacketType.SC_MiniGameData, PacketHandler.Handle_SC_MiniGameData },
+			{ PacketType.SC_InitialData, PacketHandler.Handle_SC_InitialData },
 			{ PacketType.SC_SpawnEntities, PacketHandler.Handle_SC_SpawnEntities },
 			
 		};

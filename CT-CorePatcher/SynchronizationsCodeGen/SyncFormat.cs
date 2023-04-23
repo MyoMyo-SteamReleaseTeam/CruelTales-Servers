@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using CT.CorePatcher.Synchronizations;
+using CT.Common.Synchronizations;
 using CT.Tools.Collections;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -110,6 +110,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 	public static class SyncFormat
 	{
+		public static readonly string MasterNetworkObjectTypeName = "MasterNetworkObject";
+		public static readonly string RemoteNetworkObjectTypeName = "RemoteNetworkObject";
+		public static readonly string NetworkObjectTypeTypeName = "NetworkObjectType";
+
 		/// <summary>
 		/// {0} using statements<br/>
 		/// {1} namespace<br/>
@@ -117,6 +121,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// </summary>
 		public static readonly string FileFormat =
 @"{0}
+
 namespace {1}
 {{
 {2}
@@ -171,10 +176,10 @@ public partial class {0} : {1}
 public partial class {0} : {1}
 {{
 {2}
-	#region Synchronization
+#region Synchronization
 {3}
 {4}
-	#endregion
+#endregion
 }}
 ";
 
@@ -292,10 +297,7 @@ private byte {0}CallstackCount = 0;
 
 	objectDirty.Serialize(writer);
 
-	// Serialize Property
 {3}
-
-	// Serialize RPC callstack
 {4}
 }}
 ";
@@ -308,7 +310,8 @@ private byte {0}CallstackCount = 0;
 @"public override void {0}()
 {{
 {1}
-}}";
+}}
+";
 
 		/// <summary>
 		/// {0} Master dirty bits index<br/>
@@ -423,10 +426,7 @@ if (objectDirty[{0}])
 {{
 	{1} objectDirty = reader.Read{1}();
 
-	// Deserialize Property
 {2}
-
-	// Deserialize RPC callstack
 {3}
 }}
 ";
