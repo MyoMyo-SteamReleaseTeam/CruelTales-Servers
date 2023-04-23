@@ -34,5 +34,15 @@ namespace CT.Common.DataType
 		{
 			return Token > 0;
 		}
+
+		public static bool operator ==(UserToken lhs, UserToken rhs) => lhs.Token == rhs.Token;
+		public static bool operator !=(UserToken lhs, UserToken rhs) => lhs.Token != rhs.Token;
+		public override int GetHashCode() => Token.GetHashCode();
+		public override bool Equals(object? obj)
+		{
+			if (obj is not UserToken value)
+				return false;
+			return value == this;
+		}
 	}
 }

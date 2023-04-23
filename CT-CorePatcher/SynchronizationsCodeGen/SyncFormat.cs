@@ -11,6 +11,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string SerializeFunctionName = string.Empty;
 		public string DeserializeFunctionName = string.Empty;
 		public string ClearFunctionName = string.Empty;
+		public string Modifier = string.Empty;
 		public string BitmaskTypeName => nameof(BitmaskByte);
 		public SyncType SyncType;
 
@@ -46,18 +47,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (SyncType == SyncType.Unreliable)
 			{
 				IsDirtyGetter =
-@"public bool IsDirtyUnreliable
+@"public {0}bool IsDirtyUnreliable
 {{
 	get
 	{{
-		bool isDirtyUnreliable = false;
-{0}
-		return isDirtyUnreliable;
+		bool isDirty = false;
+{1}
+		return isDirty;
 	}}
 }}
 ";
-				IsDirtyBinder = @"isDirtyUnreliable |= {0}.AnyTrue();";
-				IsObjectDirtyBinder = @"isDirtyUnreliable |= {0}.IsDirtyUnreliable;";
+				IsDirtyBinder = @"isDirty |= {0}.AnyTrue();";
+				IsObjectDirtyBinder = @"isDirty |= {0}.IsDirtyUnreliable;";
 
 				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
 				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
@@ -66,15 +67,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		}
 
 		/// <summary>
-		/// {0} Dirty bits content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Dirty bits content<br/>
 		/// </summary>
 		public readonly string IsDirtyGetter =
-@"public bool IsDirty
+@"public {0}bool IsDirtyReliable
 {{
 	get
 	{{
 		bool isDirty = false;
-{0}
+{1}
 		return isDirty;
 	}}
 }}
@@ -105,7 +107,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// {1} Dirty bits index<br/>
 		/// {2} Private name<br/>
 		/// </summary>
-		public readonly string CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirty;";
+		public readonly string CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirtyReliable;";
 	}
 
 	public static class SyncFormat
@@ -254,14 +256,15 @@ public event Action<{1}>? On{3}Changed;";
 		/// {2} Callstack tuple content<br/>
 		/// {3} Dirty bits name<br/>
 		/// {4} Dirty index<br/>
+		/// {5} Stack Generic Type<br/>
 		/// </summary>
 		public static readonly string FunctionCallWithStack =
 @"public partial void {0}({1})
 {{
-	{0}Callstack.Enqueue(({2}));
+	{0}Callstack.Enqueue({2});
 	{3}[{4}] = true;
 }}
-private Queue<({1})> {0}Callstack = new();
+private Queue<{5}> {0}Callstack = new();
 
 ";
 
@@ -282,34 +285,36 @@ private byte {0}CallstackCount = 0;
 ";
 
 		/// <summary>
-		/// {0} Function name<br/>
-		/// {1} Bitmask type name<br/>
-		/// {2} Check any dirty content<br/>
-		/// {3} Property serialize group content<br/>
-		/// {4} Function serialize group content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Bitmask type name<br/>
+		/// {3} Check any dirty content<br/>
+		/// {4} Property serialize group content<br/>
+		/// {5} Function serialize group content<br/>
 		/// </summary>
 		public static readonly string SerializeSync =
-@"public override void {0}(PacketWriter writer)
+@"public {0}void {1}(PacketWriter writer)
 {{
-	{1} objectDirty = new {1}();
+	{2} objectDirty = new {2}();
 
-{2}
+{3}
 
 	objectDirty.Serialize(writer);
 
-{3}
 {4}
+{5}
 }}
 ";
 
 		/// <summary>
-		/// {0} Function name<br/>
-		/// {1} Dirty bits clear content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Dirty bits clear content<br/>
 		/// </summary>
 		public static readonly string ClearDirtyBitFunction =
-@"public override void {0}()
+@"public {0}void {1}()
 {{
-{1}
+{2}
 }}
 ";
 
@@ -379,6 +384,25 @@ if (objectDirty[{0}])
 		/// {0} Dirty bits name<br/>
 		/// {1} Dirty bits index<br/>
 		/// {2} Function name<br/>
+		/// {3} Callstack serialize content<br/>
+		/// </summary>
+		public static readonly string FunctionSerializeIfDirtyOneArg =
+@"if ({0}[{1}])
+{{
+	byte count = (byte){2}Callstack.Count;
+	writer.Put(count);
+	for (int i = 0; i < count; i++)
+	{{
+		var arg = {2}Callstack.Dequeue();
+{3}
+	}}
+}}
+";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Dirty bits index<br/>
+		/// {2} Function name<br/>
 		/// </summary>
 		public static readonly string FunctionSerializeIfDirtyVoid =
 @"if ({0}[{1}])
@@ -416,18 +440,19 @@ if (objectDirty[{0}])
 		public static readonly string WriteSyncObject = @"{0}.{1}(writer);";
 
 		/// <summary>
-		/// {0} Function name<br/>
-		/// {1} Bitmask type name<br/>
-		/// {2} Property serialize group content<br/>
-		/// {3} Function serialize group content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Bitmask type name<br/>
+		/// {3} Property serialize group content<br/>
+		/// {4} Function serialize group content<br/>
 		/// </summary>
 		public static readonly string DeserializeSync =
-@"public override void {0}(PacketWriter writer)
+@"public {0}void {1}(PacketReader reader)
 {{
-	{1} objectDirty = reader.Read{1}();
+	{2} objectDirty = reader.Read{2}();
 
-{2}
 {3}
+{4}
 }}
 ";
 
@@ -563,23 +588,26 @@ if (objectDirty[{0}])
 		public static readonly string TempReadEnum = @"{1} {0} = ({1})reader.Read{2}();";
 
 		/// <summary>
-		/// {0} Function name<br/>
-		/// {1} Serialize every property content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Serialize every property content<br/>
 		/// </summary>
 		public static readonly string SerializeEveryProperty =
-@"public override void {0}(PacketWriter writer)
+@"public {0}void {1}(PacketWriter writer)
 {{
-{1}
+{2}
 }}
 ";
+
 		/// <summary>
-		/// {0} Function name<br/>
-		/// {1} Deserialize every property content<br/>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Deserialize every property content<br/>
 		/// </summary>
 		public static readonly string DeserializeEveryProperty =
-@"public override void {0}(PacketWriter reader)
+@"public {0}void {1}(PacketReader reader)
 {{
-{1}
+{2}
 }}
 ";
 

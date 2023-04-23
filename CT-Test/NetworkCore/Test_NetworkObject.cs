@@ -71,6 +71,10 @@ namespace CT.Test.NetworkCore
 
 		public bool IsDirty => _propertyDirty_0[0];
 
+		public bool IsDirtyReliable => throw new NotImplementedException();
+
+		public bool IsDirtyUnreliable => throw new NotImplementedException();
+
 		public void ClearDirtyReliable()
 		{
 			throw new NotImplementedException();
@@ -198,6 +202,10 @@ namespace CT.Test.NetworkCore
 				_propertyDirty_0[1] = true;
 			}
 		}
+
+		public bool IsDirtyReliable => throw new NotImplementedException();
+
+		public bool IsDirtyUnreliable => throw new NotImplementedException();
 
 		public partial void Server_Some(int value1, float value2)
 		{

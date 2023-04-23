@@ -265,6 +265,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public string GetWriterSerializeByName(string name)
+		{
+			switch (SerializeType)
+			{
+				case SerializeType.Primitive:
+					return string.Format(SyncFormat.WritePut, name) + NewLine;
+
+				case SerializeType.NetString:
+				case SerializeType.Class:
+				case SerializeType.Struct:
+					return string.Format(SyncFormat.WriteSerialize, name) + NewLine;
+
+				case SerializeType.Enum:
+					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
+
+				default:
+					return string.Empty;
+			}
+		}
+
 		public string GetTempReadDeserialize()
 		{
 			switch (SerializeType)

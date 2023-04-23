@@ -51,12 +51,30 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			else
 			{
+				string parameterContent;
+				string callStackContent;
+				string genericType;
+
+				if (Parameters.Count > 1)
+				{
+					parameterContent = GetParameterContent();
+					callStackContent = $"({GetCallStackTupleContent()})";
+					genericType = $"({parameterContent})";
+				}
+				else
+				{
+					parameterContent = GetParameterContent();
+					callStackContent = this.GetCallStackTupleContent();
+					genericType = Parameters[0].TypeName;
+				}
+
 				return string.Format(SyncFormat.FunctionCallWithStack,
 									 this.FunctionName,
-									 this.GetParameterContent(),
-									 this.GetCallStackTupleContent(),
+									 parameterContent,
+									 callStackContent,
 									 dirtyBitsName,
-									 funcIndex);
+									 funcIndex,
+									 genericType);
 			}
 		}
 
@@ -67,6 +85,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				return string.Format(SyncFormat.FunctionSerializeIfDirtyVoid,
 									 dirtyBitName, curFuncIndex,
 									 this.FunctionName);
+			}
+			else if (Parameters.Count == 1)
+			{
+				var funcSerializeContent = Parameters[0].GetWriterSerializeByName("arg");
+				CodeFormat.AddIndent(ref funcSerializeContent, 2);
+				return string.Format(SyncFormat.FunctionSerializeIfDirtyOneArg,
+									 dirtyBitName, curFuncIndex,
+									 this.FunctionName,
+									 funcSerializeContent);
 			}
 			else
 			{
@@ -115,6 +142,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GetCallStackTupleContent()
 		{
+			if (Parameters.Count == 1)
+			{
+				return Parameters[0].PrivateName;
+			}
+
 			string paramContent = string.Empty;
 			for (int i = 0; i < Parameters.Count; i++)
 			{

@@ -102,7 +102,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			master.Namespace = $"CTS.Instance.SyncObjects";
 			master.UsingStatements = new List<string>()
 			{
-				"using System;"
+				"using System;",
+				"using System.Collections.Generic;",
+				"using CT.Common.DataType;",
+				"using CT.Common.Serialization;",
+				"using CT.Common.Serialization.Type;",
+				"using CT.Common.Synchronizations;",
+				"using CT.Tools.Collections;",
+				"using CTS.Instance.Synchronizations;",
 			};
 			master.TargetPath = "Master";
 			master.IsMaster = true;
@@ -110,10 +117,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			SyncGenerateOperation remote = new();
 			remote.SyncObjects = syncObjects;
-			remote.Namespace = $"CTS.Instance.SyncObjects";
+			remote.Namespace = $"CTC.Networks.SyncObjects.TestSyncObjects";
 			remote.UsingStatements = new List<string>()
 			{
-				"using System;"
+				"using System;",
+				"using System.Collections.Generic;",
+				"using CT.Common.DataType;",
+				"using CT.Common.Serialization;",
+				"using CT.Common.Serialization.Type;",
+				"using CT.Common.Synchronizations;",
+				"using CT.Tools.Collections;",
 			};
 			remote.TargetPath = "Remote";
 			remote.IsMaster = false;

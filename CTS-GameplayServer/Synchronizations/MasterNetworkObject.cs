@@ -8,7 +8,8 @@ namespace CTS.Instance.Synchronizations
 	{
 		public NetworkIdentity Identity { get; protected set; }
 		public abstract NetworkObjectType Type { get; }
-		public abstract bool IsDirty { get; }
+		public abstract bool IsDirtyReliable { get; }
+		public abstract bool IsDirtyUnreliable { get; }
 		public abstract void SerializeSyncReliable(PacketWriter writer);
 		public abstract void SerializeSyncUnreliable(PacketWriter writer);
 		public abstract void SerializeEveryProperty(PacketWriter writer);

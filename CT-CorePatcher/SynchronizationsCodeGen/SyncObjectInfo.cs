@@ -73,7 +73,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (HasReliable)
 			{
 				GenerateOption reliableOption = new(SyncType.Reliable, ReliableProperties, ReliableFunctions);
-
+				if (IsNetworkObject) reliableOption.Modifier = "override ";
 				declarationContent += Master_GenDeclaration(reliableOption) + NewLine;
 				synchronizeContent += Master_GenPropertySynchronizeContent(reliableOption) + NewLine;
 				serializeFuncContent += Master_GenSerializeFunction(reliableOption) + NewLine;
@@ -83,7 +83,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (HasUnreliable)
 			{
 				GenerateOption unreliableOption = new(SyncType.Unreliable, UnreliableProperties, UnreliableFunctions);
-
+				if (IsNetworkObject) unreliableOption.Modifier = "override ";
 				declarationContent += Master_GenDeclaration(unreliableOption);// + NewLine;
 				synchronizeContent += Master_GenPropertySynchronizeContent(unreliableOption);// + NewLine;
 				serializeFuncContent += Master_GenSerializeFunction(unreliableOption);// + NewLine;
@@ -91,6 +91,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			GenerateOption allOption = new(SyncType.RelibaleOrUnreliable, AllProperties, AllFunctions);
+			if (IsNetworkObject) allOption.Modifier = "override ";
 			serializeAllContent += Master_GenMasterSerializeEveryProperty(allOption);
 
 			string synchronization = synchronizeContent + NewLine +
@@ -124,7 +125,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (HasReliable)
 			{
 				GenerateOption reliableOption = new(SyncType.Reliable, ReliableProperties, ReliableFunctions);
-
+				if (IsNetworkObject) reliableOption.Modifier = "override ";
 				declarationContent += Remote_GenDeclaration(reliableOption) + NewLine;
 				synchronizeContent += Remote_GenPropertyDeserializeContent(reliableOption) + NewLine;
 			}
@@ -132,12 +133,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (HasUnreliable)
 			{
 				GenerateOption unreliableOption = new(SyncType.Unreliable, UnreliableProperties, UnreliableFunctions);
-
+				if (IsNetworkObject) unreliableOption.Modifier = "override ";
 				declarationContent += Remote_GenDeclaration(unreliableOption) + NewLine;
 				synchronizeContent += Remote_GenPropertyDeserializeContent(unreliableOption) + NewLine;
 			}
 
 			GenerateOption allOption = new(SyncType.RelibaleOrUnreliable, AllProperties, AllFunctions);
+			if (IsNetworkObject) allOption.Modifier = "override ";
 			deserializeAllContent += Remote_GenMasterDeserializeEveryProperty(allOption) + NewLine;
 
 			// Combine all contents
@@ -250,7 +252,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			CodeFormat.AddIndent(ref isDirtyContent, 2);
-			isDirtyContent = string.Format(option.IsDirtyGetter, isDirtyContent);
+			isDirtyContent = string.Format(option.IsDirtyGetter, option.Modifier, isDirtyContent);
 
 			syncContent = dirtyBitsContent + NewLine + isDirtyContent + NewLine + syncContent;
 			CodeFormat.AddIndent(ref syncContent);
@@ -295,6 +297,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			generateSerializeCode(option, out var propSerialize, out var funcSerialize);
 
 			string serializeContent = string.Format(SyncFormat.SerializeSync,
+													option.Modifier,
 													option.SerializeFunctionName,
 													option.BitmaskTypeName,
 													anyDirtyBitsContent,
@@ -406,6 +409,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			CodeFormat.AddIndent(ref dirtyBitClearContent);
 			var dirtyBitClearFunction = string.Format(SyncFormat.ClearDirtyBitFunction,
+													  option.Modifier,
 													  option.ClearFunctionName,
 													  dirtyBitClearContent);
 			CodeFormat.AddIndent(ref dirtyBitClearFunction);
@@ -422,6 +426,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			CodeFormat.AddIndent(ref everyContent);
 			everyContent = string.Format(SyncFormat.SerializeEveryProperty,
+										 option.Modifier,
 										 option.SerializeFunctionName,
 										 everyContent) + NewLine;
 			CodeFormat.AddIndent(ref everyContent);
@@ -510,12 +515,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
 				string contentGroup = funcDeserializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i + 4, dirtyBitName, nameof(BitmaskByte), contentGroup);
+				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i + 4, nameof(BitmaskByte), dirtyBitName, contentGroup);
 			}
 			CodeFormat.AddIndent(ref funcDeserialize);
 
 			// Combind
 			var deserializeContent = string.Format(SyncFormat.DeserializeSync,
+												   option.Modifier,
 												   option.DeserializeFunctionName,
 												   option.BitmaskTypeName,
 												   propDeserialize,
@@ -534,6 +540,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			CodeFormat.AddIndent(ref everyContent);
 			everyContent = string.Format(SyncFormat.DeserializeEveryProperty,
+										 option.Modifier,
 										 option.DeserializeFunctionName,
 										 everyContent) + NewLine;
 			CodeFormat.AddIndent(ref everyContent);
