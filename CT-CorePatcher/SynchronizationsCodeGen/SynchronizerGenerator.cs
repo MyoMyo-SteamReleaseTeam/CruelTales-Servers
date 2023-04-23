@@ -25,19 +25,34 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		class CodeGenInfo
 		{
-			public string ObjectName = string.Empty;
+			public string ObjectName { get; private set; }
 			public string GenCode = string.Empty;
+			public string FileName => ObjectName + ".cs";
+
+			public CodeGenInfo(string objectName, bool isMaster)
+			{
+				ObjectName = objectName;
+
+				//if (isMaster)
+				//	ObjectName = SyncFormat.MasterPrefix + ObjectName;
+				//else
+				//	ObjectName = SyncFormat.RemotePrefix + ObjectName;
+			}
 		}
 
 		public List<string> UsingStatements = new();
 		public List<SyncObjectInfo> SyncObjects = new();
 		public string Namespace = string.Empty;
 		public string TargetPath = string.Empty;
-		public bool IsMaster = false;
 
-		public void Run()
+		public void Run(bool isMaster)
 		{
 			PatcherConsole.PrintJobInfo("Generate sync object definitions");
+
+			foreach (var syncObj in SyncObjects)
+			{
+				syncObj.SetSyncDirection(isMaster);
+			}
 
 			string usingStatements = string.Empty;
 
@@ -50,17 +65,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			List<CodeGenInfo> genCodes = new();
 			foreach (var syncObj in SyncObjects)
 			{
-				CodeGenInfo info = new();
-				info.ObjectName = syncObj.ObjectName;
+				CodeGenInfo info = new(syncObj.ObjectName, isMaster);
 
 				string code;
-				if (IsMaster)
+				if (isMaster)
 					code = syncObj.GenerateMasterDeclaration();
 				else
 					code = syncObj.GenerateRemoteDeclaration();
 
 				CodeFormat.AddIndent(ref code);
 				info.GenCode = string.Format(SyncFormat.FileFormat, usingStatements, Namespace, code);
+				info.GenCode = string.Format(CodeFormat.GeneratorMetadata, info.FileName, info.GenCode);
+
 				genCodes.Add(info);
 			}
 
@@ -68,12 +84,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			foreach (var info in genCodes)
 			{
-				string fileName = $"{info.ObjectName}.cs";
-				string targetPath = Path.Combine(TargetPath, fileName);
+				string targetPath = Path.Combine(TargetPath, info.FileName);
 				var result = FileHandler.TryWriteText(targetPath, info.GenCode, true);
 				if (result.ResultType == JobResultType.Success)
 				{
-					PatcherConsole.PrintSaveSuccessResult("Sync code gen completed : ", fileName, targetPath);
+					PatcherConsole.PrintSaveSuccessResult("Sync code gen completed : ", info.FileName, targetPath);
 				}
 				else
 				{
@@ -112,8 +127,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CTS.Instance.Synchronizations;",
 			};
 			master.TargetPath = "Master";
-			master.IsMaster = true;
-			master.Run();
+			master.Run(isMaster: true);
 
 			SyncGenerateOperation remote = new();
 			remote.SyncObjects = syncObjects;
@@ -129,8 +143,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CT.Tools.Collections;",
 			};
 			remote.TargetPath = "Remote";
-			remote.IsMaster = false;
-			remote.Run();
+			remote.Run(isMaster: false);
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()
@@ -193,18 +206,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			SyncObjectInfo syncObject = new(type.Name, isNetworkObject);
 
 			// Parse properties
-			foreach (var f in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
+			foreach (var f in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
 			{
 				foreach (var att in f.GetCustomAttributes())
 				{
 					if (att is SyncVarAttribute syncVarAtt)
 					{
-						SyncPropertyToken token = new(this, syncVarAtt.SyncType, f.Name, f.FieldType);
+						SyncPropertyToken token = new(this, syncVarAtt.SyncType, f.Name, f.FieldType, f.IsPublic);
 						syncObject.AddPropertyToken(token);
 					}
 					else if (att is SyncObjectAttribute syncObjAtt)
 					{
-						SyncPropertyToken token = new(this, syncObjAtt.SyncType, f.Name, f.FieldType);
+						SyncPropertyToken token = new(this, syncObjAtt.SyncType, f.Name, f.FieldType, f.IsPublic);
 						token.SetSyncObjectType(SerializeType.SyncObject, syncObjAtt.SyncType, " = new()");
 						syncObject.AddPropertyToken(token);
 					}

@@ -26,8 +26,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			var paramInfo = methodInfo.GetParameters();
 			foreach (var param in paramInfo)
 			{
-				SyncPropertyToken syncParam = new(generator, SyncType.None, param.Name ?? string.Empty, param.ParameterType);
+				SyncPropertyToken syncParam = new(generator,
+												  SyncType.None,
+												  param.Name ?? string.Empty, 
+												  param.ParameterType, 
+												  isPublic: true);
 				Parameters.Add(syncParam);
+			}
+		}
+
+		public void SetSyncDirection(bool isMaster)
+		{
+			foreach (var param in Parameters)
+			{
+				param.SetSyncDirection(isMaster);
 			}
 		}
 

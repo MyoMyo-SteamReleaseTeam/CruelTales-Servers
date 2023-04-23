@@ -126,6 +126,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static readonly string RemoteNetworkObjectTypeName = "RemoteNetworkObject";
 		public static readonly string NetworkObjectTypeTypeName = "NetworkObjectType";
 
+		public static readonly string MasterPrefix = "Master_";
+		public static readonly string RemotePrefix = "Remote_";
+
 		/// <summary>
 		/// {0} using statements<br/>
 		/// {1} namespace<br/>
@@ -133,7 +136,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// </summary>
 		public static readonly string FileFormat =
 @"{0}
-
 namespace {1}
 {{
 {2}
@@ -152,26 +154,9 @@ public partial class {0} : {1}
 {{
 {2}
 #region Synchronization
+
 {3}
 #endregion
-}}
-";
-
-		/// <summary>
-		/// {0} Reliable or unreliable<br/>
-		/// {1} Declaration content<br/>
-		/// {2} Synchronization content<br/>
-		/// {3} Reliable Serilalize content<br/>
-		/// {4} Clear dirty bit content<br/>
-		/// </summary>
-		public static readonly string SyncSerializeContent =
-@"
-{1}
-	#region {0} Synchronization
-{2}
-{3}
-{4}
-	#endregion
 }}
 ";
 
@@ -189,6 +174,7 @@ public partial class {0} : {1}
 {{
 {2}
 #region Synchronization
+
 {3}
 {4}
 #endregion
@@ -240,21 +226,22 @@ public event Action<{1}>? On{3}Changed;";
 
 
 		/// <summary>
-		/// {0} Type name<br/>
-		/// {1} Public property name<br/>
-		/// {2} Private member name<br/>
-		/// {3} Dirty bits name<br/>
-		/// {4} Dirty index<br/>
+		/// {0} Access modifier<br/>
+		/// {1} Type name<br/>
+		/// {2} Public property name<br/>
+		/// {3} Private member name<br/>
+		/// {4} Dirty bits name<br/>
+		/// {5} Dirty index<br/>
 		/// </summary>
 		public static readonly string PropertyGetSet =
-@"public {0} {1}
+@"{0} {1} {2}
 {{
-	get => {2};
+	get => {3};
 	set
 	{{
-		if ({2} == value) return;
-		{2} = value;
-		{3}[{4}] = true;
+		if ({3} == value) return;
+		{3} = value;
+		{4}[{5}] = true;
 	}}
 }}
 
@@ -622,6 +609,7 @@ if (objectDirty[{0}])
 
 		/// <summary>
 		/// {0} Modifier<br/>
+		/// 
 		/// {1} Function name<br/>
 		/// {2} Serialize every property content<br/>
 		/// </summary>

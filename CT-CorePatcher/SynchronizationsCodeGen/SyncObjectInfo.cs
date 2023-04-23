@@ -10,6 +10,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static string Indent { get; set; } = TextFormat.Indent;
 
 		public bool IsNetworkObject { get; private set; } = false;
+		public string OriginObjectName { get; private set; } = string.Empty;
 		public string ObjectName { get; private set; } = string.Empty;
 
 		public List<SyncPropertyToken> ReliableProperties { get; private set; } = new();
@@ -25,7 +26,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public SyncObjectInfo(string objectName, bool isNetworkObject)
 		{
-			ObjectName = objectName;
+			OriginObjectName = objectName;
 			IsNetworkObject = isNetworkObject;
 		}
 
@@ -59,6 +60,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			else if (token.SyncType == SyncType.Unreliable)
 			{
 				UnreliableFunctions.Add(token);
+			}
+		}
+
+		public void SetSyncDirection(bool isMaster)
+		{
+			if (isMaster)
+				ObjectName = SyncFormat.MasterPrefix + OriginObjectName;
+			else
+				ObjectName = SyncFormat.RemotePrefix + OriginObjectName;
+
+			foreach (var prop in AllProperties)
+			{
+				prop.SetSyncDirection(isMaster);
+			}
+
+			foreach (var func in AllFunctions)
+			{
+				func.SetSyncDirection(isMaster);
 			}
 		}
 
@@ -100,7 +119,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				inheritType = SyncFormat.MasterNetworkObjectTypeName;
 				string netTypeEnumName = SyncFormat.NetworkObjectTypeTypeName;
-				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};";
+				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{OriginObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
 			}
 
@@ -137,7 +156,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				inheritType = SyncFormat.RemoteNetworkObjectTypeName;
 				string netTypeEnumName = SyncFormat.MasterNetworkObjectTypeName;
-				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{ObjectName};";
+				string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{OriginObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
 			}
 
