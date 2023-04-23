@@ -7,11 +7,39 @@ namespace CT.CorePatcher
 	{
 		public static void PrintProgramInfo(string programName)
 		{
-			PrintSeparator();
-			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.DarkGreen);
+			PrintSeparator('#');
+			Console.WriteLine();
+			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.DarkBlue);
+			Console.Write(DateTime.Now + " : ");
 			Console.WriteLine(programName);
 			Console.ResetColor();
+			Console.WriteLine();
+			PrintSeparator('#');
+		}
+
+		public static void PrintProgramCompleted(string programName, bool hasError = false)
+		{
+			PrintSeparator('#');
+			Console.WriteLine();
+			ConsoleColor backColor = hasError ? ConsoleColor.Red : ConsoleColor.DarkBlue;
+			ConsoleHelper.SetColor(ConsoleColor.White, backColor);
+			Console.WriteLine($"{programName} ended!");
+			if (hasError)
+			{
+				Console.WriteLine($"Error occur!");
+			}
+			Console.ResetColor();
+			Console.WriteLine();
+			PrintSeparator('#');
+		}
+
+		public static void PrintJobInfo(string jobName)
+		{
 			PrintSeparator();
+			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.DarkGreen);
+			Console.WriteLine(jobName);
+			Console.ResetColor();
+			PrintSeparator('-');
 		}
 
 		public static void PrintSaveSuccessResult(string message, string fileName, string targetPath)
@@ -60,9 +88,9 @@ namespace CT.CorePatcher
 			PrintSeparator();
 		}
 
-		public static void PrintSeparator()
+		public static void PrintSeparator(char separator = '=')
 		{
-			Console.WriteLine(new string('=', 80));
+			Console.WriteLine(new string(separator, 80));
 		}
 	}
 }

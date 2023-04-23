@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using CT.CorePatcher.FilePatch;
 using CT.CorePatcher.Packets;
 using CT.CorePatcher.SynchronizationsCodeGen;
@@ -28,12 +30,61 @@ namespace CT.CorePatcher
 
 	internal class MainProcess
 	{
+		private const string PROGRAM_NAME = "programName";
+
+		private const string programSync = "programSync";
+		private const string programXml = "programXml";
+		private const string programFilePatch = "programFilePatch";
+
 		public static void Main(string[] args)
 		{
-			SynchronizerGenerator syncCodeGen = new();
-			Console.WriteLine(syncCodeGen.ParseCode());
+			StringArgumentArray programs = new();
 
-			return;
+			OptionParser op = new OptionParser();
+			OptionParser.BindArgumentArray(op, PROGRAM_NAME, 2, programs);
+			if (!op.TryApplyArguments(args))
+			{
+				Console.Read();
+				return;
+			}
+
+			if (programs.ArgumentArray.Contains(programSync))
+				RunSynchronizerGenerator(args);
+
+			if (programs.ArgumentArray.Contains(programXml))
+				RunFilePatch(args);
+
+			if (programs.ArgumentArray.Contains(programFilePatch))
+				RunXmlPacketSystemPatch(args);
+
+			Console.Read();
+		}
+
+		public static void RunSynchronizerGenerator(string[] args)
+		{
+			string programName = nameof(RunSynchronizerGenerator);
+			PatcherConsole.PrintProgramInfo(programName);
+
+			try
+			{
+				SynchronizerGenerator syncCodeGen = new();
+				Console.WriteLine(syncCodeGen.ParseCode());
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintProgramCompleted(programName, true);
+			}
+			finally
+			{
+				PatcherConsole.PrintProgramCompleted(programName);
+			}
+		}
+
+		public static void RunFilePatch(string[] args)
+		{
+			string programName = nameof(RunFilePatch);
+			PatcherConsole.PrintProgramInfo(programName);
 
 			try
 			{
@@ -43,7 +94,25 @@ namespace CT.CorePatcher
 					PatcherConsole.PrintError($"{nameof(PacketGenerator)} error!");
 					return;
 				}
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintProgramCompleted(programName, true);
+			}
+			finally
+			{
+				PatcherConsole.PrintProgramCompleted(programName);
+			}
+		}
 
+		public static void RunXmlPacketSystemPatch(string[] args)
+		{
+			string programName = nameof(RunXmlPacketSystemPatch);
+			PatcherConsole.PrintProgramInfo(programName);
+
+			try
+			{
 				// Check copy count
 				StringArgument patchCountArg = new();
 				OptionParser filePatchOp = new OptionParser();
@@ -101,14 +170,14 @@ namespace CT.CorePatcher
 					}
 				}
 			}
-			catch
+			catch (Exception e)
 			{
-
+				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintProgramCompleted(programName, true);
 			}
 			finally
 			{
-				Console.WriteLine("Finished");
-				Console.Read();
+				PatcherConsole.PrintProgramCompleted(programName);
 			}
 		}
 	}

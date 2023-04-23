@@ -26,7 +26,7 @@ namespace CT.CorePatcher.Packets
 		public static bool Run(string[] args)
 		{
 			// Print program info
-			PatcherConsole.PrintProgramInfo("Packet Generator");
+			PatcherConsole.PrintJobInfo("Packet Generator");
 
 			// Declare arguments
 			StringArgument baseNamespace = new();

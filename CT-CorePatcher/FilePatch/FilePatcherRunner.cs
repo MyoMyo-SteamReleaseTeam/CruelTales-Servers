@@ -4,7 +4,7 @@
 	{
 		public static bool Run(string sourcePath, string targetPath)
 		{
-			PatcherConsole.PrintProgramInfo("File Patcher");
+			PatcherConsole.PrintJobInfo("File Patcher");
 
 			// Check arguments validation
 			bool isValidArguments = true;
