@@ -13,6 +13,11 @@ namespace CTC.Networks
 		{
 		}
 
+		internal static void Handle_SC_InitialData(PacketBase receivedPacket, ServerSession session)
+		{
+			throw new NotImplementedException();
+		}
+
 		internal static void Handle_SC_MiniGameData(PacketBase receivedPacket, ServerSession session)
 		{
 			throw new NotImplementedException();

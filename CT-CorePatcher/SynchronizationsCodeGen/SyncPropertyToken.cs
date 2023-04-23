@@ -178,21 +178,25 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 				case SerializeType.SyncObject:
 					string funcName = string.Empty;
-					SyncType syncType = option == null ? SyncType.None : option.SyncType;
+					SyncType stype = option == null ? SyncType.None : option.SyncType;
 
-					if (syncType == SyncType.Reliable)
+					if (stype == SyncType.Reliable)
 					{
 						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
 							funcName = nameof(IMasterSynchronizable.SerializeSyncReliable);
 						}
 					}
-					else if (syncType == SyncType.Unreliable)
+					else if (stype == SyncType.Unreliable)
 					{
 						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
 							funcName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
 						}
+					}
+					else if (stype == SyncType.RelibaleOrUnreliable)
+					{
+						funcName = nameof(IMasterSynchronizable.SerializeEveryProperty);
 					}
 
 					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
@@ -219,21 +223,25 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 				case SerializeType.SyncObject:
 					string funcName = string.Empty;
-					SyncType syncType = option == null ? SyncType.None : option.SyncType;
+					SyncType stype = option == null ? SyncType.None : option.SyncType;
 
-					if (syncType == SyncType.Reliable)
+					if (stype == SyncType.Reliable)
 					{
 						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
 							funcName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
 						}
 					}
-					else if (syncType == SyncType.Unreliable)
+					else if (stype == SyncType.Unreliable)
 					{
 						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
 							funcName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
 						}
+					}
+					else if (stype == SyncType.RelibaleOrUnreliable)
+					{
+						funcName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
 					}
 
 					return string.Format(SyncFormat.ReadSyncObject, PrivateName, funcName) + NewLine;

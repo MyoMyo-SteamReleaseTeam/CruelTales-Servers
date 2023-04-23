@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 
 namespace CT.Common.DataType
@@ -28,6 +29,16 @@ namespace CT.Common.DataType
 		public override string ToString()
 		{
 			return Id.ToString();
+		}
+
+		public static bool operator ==(UserId left, UserId right) => left.Id == right.Id;
+		public static bool operator !=(UserId left, UserId right) => left.Id != right.Id;
+		public override int GetHashCode() => Id.GetHashCode();
+		public override bool Equals([NotNullWhen(true)] object? obj)
+		{
+			if (obj is not UserId value)
+				return false;
+			return value == this;
 		}
 	}
 }

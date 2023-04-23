@@ -63,8 +63,6 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public bool IsDirtyUnreliable => throw new NotImplementedException();
-
 		public partial void Server_Some(int value1, float value2)
 		{
 			Server_SomeCallstack.Enqueue((value1, value2));
@@ -73,6 +71,7 @@ namespace CTS.Instance.SyncObjects
 		private Queue<(int value1, float value2)> Server_SomeCallstack = new();
 
 
+		public bool IsDirtyUnreliable => false;
 
 		public void SerializeSyncReliable(PacketWriter writer)
 		{
@@ -116,6 +115,7 @@ namespace CTS.Instance.SyncObjects
 
 		}
 
+		public void SerializeSyncUnreliable(PacketWriter writer) { }
 
 		public void ClearDirtyReliable()
 		{
@@ -124,22 +124,13 @@ namespace CTS.Instance.SyncObjects
 
 		}
 
+		public void ClearDirtyUnreliable() { }
 
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
 			_transform.Serialize(writer);
 			writer.Put(_abc);
 
-		}
-
-		public void SerializeSyncUnreliable(PacketWriter writer)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void ClearDirtyUnreliable()
-		{
-			throw new NotImplementedException();
 		}
 
 

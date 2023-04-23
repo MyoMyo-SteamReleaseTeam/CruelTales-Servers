@@ -38,7 +38,23 @@ namespace CTS.Instance.SyncDefinitions
 		[SyncVar]
 		private int _abc = 0;
 
+		[SyncObject]
+		private TestInnerObject _innerObject = new();
+
 		[SyncRpc]
 		public void Server_Some(int value1, float value2) { }
+	}
+
+	[SyncObjectDefinition]
+	public partial class TestInnerObject
+	{
+		[SyncVar]
+		private UserId _userId;
+
+		[SyncVar]
+		private NetStringShort _name;
+
+		[SyncRpc]
+		public void Server_Rename(NetStringShort newName) { }
 	}
 }

@@ -18,6 +18,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public List<SyncPropertyToken> Properties { get; private set; }
 		public List<SyncFunctionToken> Functions { get; private set; }
 
+		public bool HasProperties => Properties.Count > 0;
+		public bool HasFunctions => Functions.Count > 0;
+		public bool HasSyncElement => HasProperties && HasFunctions;
+
 		public GenerateOption(SyncType syncType,
 							  List<SyncPropertyToken> properties,
 							  List<SyncFunctionToken> functions)
@@ -59,6 +63,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 ";
 				IsDirtyBinder = @"isDirty |= {0}.AnyTrue();";
 				IsObjectDirtyBinder = @"isDirty |= {0}.IsDirtyUnreliable;";
+				IsDirtyNoElement = @"public {0}bool IsDirtyUnreliable => false;";
 
 				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
 				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
@@ -81,6 +86,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	}}
 }}
 ";
+
+		/// <summary>
+		/// {0} Modifier<br/>
+		/// </summary>
+		public readonly string IsDirtyNoElement = @"public {0}bool IsDirtyReliable => false;";
 
 		/// <summary>
 		/// {0} Dirty bits Count<br/>
@@ -309,6 +319,13 @@ private byte {0}CallstackCount = 0;
 		/// <summary>
 		/// {0} Modifier<br/>
 		/// {1} Function name<br/>
+		/// </summary>
+		public static readonly string SerializeSyncNoElement = @"public {0}void {1}(PacketWriter writer) {{ }}
+";
+
+		/// <summary>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
 		/// {2} Dirty bits clear content<br/>
 		/// </summary>
 		public static readonly string ClearDirtyBitFunction =
@@ -317,6 +334,15 @@ private byte {0}CallstackCount = 0;
 {2}
 }}
 ";
+
+		/// <summary>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// </summary>
+		public static readonly string ClearDirtyBitFunctionNoElement =
+@"public {0}void {1}() {{}}
+";
+
 
 		/// <summary>
 		/// {0} Master dirty bits index<br/>
@@ -454,6 +480,13 @@ if (objectDirty[{0}])
 {3}
 {4}
 }}
+";
+
+		/// <summary>
+		/// {0} Modifier<br/>
+		/// {1} Function name<br/>
+		/// </summary>
+		public static readonly string DeserializeSyncNoElement = @"public {0}void {1}(PacketReader reader) {{ }}
 ";
 
 		/// <summary>
