@@ -148,8 +148,7 @@ namespace {1}
 		/// {3} Synchronization content<br/>
 		/// </summary>
 		public static readonly string MasterDeclaration =
-@"
-[Serializable]
+@"[Serializable]
 public partial class {0} : {1}
 {{
 {2}
@@ -168,8 +167,7 @@ public partial class {0} : {1}
 		/// {4} Deserialize every property content<br/>
 		/// </summary>
 		public static readonly string RemoteDeclaration =
-@"
-[Serializable]
+@"[Serializable]
 public partial class {0} : {1}
 {{
 {2}

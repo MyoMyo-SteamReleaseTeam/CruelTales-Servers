@@ -6,7 +6,9 @@ using System.Reflection;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
+using CT.Tools.CodeGen;
 using CT.Tools.Data;
+using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -62,9 +64,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Generate Code
+			List<string> enumTypes = new();
 			List<CodeGenInfo> genCodes = new();
 			foreach (var syncObj in SyncObjects)
 			{
+				if (syncObj.IsNetworkObject)
+				{
+					enumTypes.Add(syncObj.OriginObjectName);
+				}
 				CodeGenInfo info = new(syncObj.ObjectName, isMaster);
 
 				string code;
@@ -95,6 +102,25 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					PatcherConsole.PrintError(result.Exception.Message);
 				}
 			}
+
+			{
+				var enumCodeFileName = SyncFormat.NetworkObjectTypeTypeName + ".cs";
+				var enumCode = CodeGenerator_Enumerate.Generate(SyncFormat.NetworkObjectTypeTypeName,
+																Namespace, true, true, new string[0], enumTypes,
+																addUsingAndSemicolon: false);
+				enumCode = string.Format(CodeFormat.GeneratorMetadata, enumCodeFileName, enumCode);
+
+				string targetPath = Path.Combine(TargetPath, enumCodeFileName);
+				var result = FileHandler.TryWriteText(targetPath, enumCode, true);
+				if (result.ResultType == JobResultType.Success)
+				{
+					PatcherConsole.PrintSaveSuccessResult("Sync enum code gen completed : ", enumCodeFileName, targetPath);
+				}
+				else
+				{
+					PatcherConsole.PrintError(result.Exception.Message);
+				}
+			}
 		}
 	}
 
@@ -108,8 +134,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public List<Assembly> ReferenceAssemblys { get; private set; } = new();
 		private Dictionary<string, string> _enumSizeByTypeName = new();
 
+		public const string SYNC_MASTER_PATH = "syncMasterPath";
+		public const string SYNC_REMOTE_PATH = "syncRemotePath";
+
 		public void GenerateCode(string[] args)
 		{
+			StringArgumentArray masterTargetPathList = new();
+			StringArgumentArray remoteTargetPathList = new();
+
+			OptionParser op = new OptionParser();
+			OptionParser.BindArgumentArray(op, SYNC_MASTER_PATH, 2, masterTargetPathList);
+			OptionParser.BindArgumentArray(op, SYNC_REMOTE_PATH, 2, remoteTargetPathList);
+			op.TryApplyArguments(args);
+
 			var syncObjects = parseAssemblys();
 
 			SyncGenerateOperation master = new();
@@ -126,8 +163,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CT.Tools.Collections;",
 				"using CTS.Instance.Synchronizations;",
 			};
-			master.TargetPath = "Master";
-			master.Run(isMaster: true);
 
 			SyncGenerateOperation remote = new();
 			remote.SyncObjects = syncObjects;
@@ -142,8 +177,27 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CT.Common.Synchronizations;",
 				"using CT.Tools.Collections;",
 			};
-			remote.TargetPath = "Remote";
-			remote.Run(isMaster: false);
+
+			if (MainProcess.IsDebug)
+			{
+				master.TargetPath = "Test";
+				master.Run(isMaster: true);
+				remote.TargetPath = "Test";
+				remote.Run(isMaster: false);
+				return;
+			}
+
+			foreach (var path in masterTargetPathList.ArgumentArray)
+			{
+				master.TargetPath = path;
+				master.Run(isMaster: true);
+			}
+
+			foreach (var path in remoteTargetPathList.ArgumentArray)
+			{
+				remote.TargetPath = path;
+				remote.Run(isMaster: false);
+			}
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()

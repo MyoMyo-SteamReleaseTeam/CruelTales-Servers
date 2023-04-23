@@ -5,7 +5,7 @@
  * Do not modify the code arbitrarily.
  */
 
-namespace CTS.Instance.SyncObjects
+namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	public enum NetworkObjectType
 	{

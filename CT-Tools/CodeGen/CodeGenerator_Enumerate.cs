@@ -18,7 +18,7 @@ namespace CT.Tools.CodeGen
 		/// <returns>생성된 코드입니다.</returns>
 		public static string Generate(string enumName, string enumNamespace,
 									  bool hasNone, bool useTab,
-									  IList<string> usingList, IList<string> items)
+									  IList<string> usingList, IList<string> items, bool addUsingAndSemicolon = true)
 		{
 			string indent = useTab ? "\t" : "    ";
 
@@ -26,7 +26,14 @@ namespace CT.Tools.CodeGen
 
 			foreach (var u in usingList)
 			{
-				sb.AppendLine($"using {u};");
+				if (addUsingAndSemicolon)
+				{
+					sb.AppendLine($"using {u};");
+				}
+				else
+				{
+					sb.AppendLine(u);
+				}
 			}
 
 			// Add namespace

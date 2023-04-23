@@ -265,7 +265,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					var prop = option.Properties[i];
 					if (prop.SerializeType == SerializeType.SyncObject)
 					{
-						isDirtyContent += string.Format(option.IsObjectDirtyBinder, dirtyBitName) + NewLine;
+						isDirtyContent += string.Format(option.IsObjectDirtyBinder, prop.PrivateName) + NewLine;
 					}
 					else
 					{

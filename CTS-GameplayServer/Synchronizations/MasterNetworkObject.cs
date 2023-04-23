@@ -1,6 +1,7 @@
 ﻿using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
