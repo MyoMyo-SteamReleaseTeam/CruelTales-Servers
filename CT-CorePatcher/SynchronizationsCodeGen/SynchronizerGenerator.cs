@@ -35,7 +35,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			foreach (var syncObj in syncObjects)
 			{
 				code += syncObj.GenerateMasterDeclaration();
-				//code += syncObj.GenerateRemoteDeclaration();
+				code += syncObj.GenerateRemoteDeclaration();
 			}
 
 			return code;

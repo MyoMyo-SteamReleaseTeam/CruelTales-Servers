@@ -125,14 +125,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 this.GetWriterSerialize(option));
 		}
 
-		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex)
+		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex, [AllowNull] GenerateOption option = null)
 		{
 			return string.Format(SyncFormat.PropertyDeserializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
 								 this.GetPublicPropertyName(),
 								 this.PrivateName,
-								 this.GetReadDeserialize());
+								 this.GetReadDeserialize(option));
 		}
 
 		public string GetDirtyCheckIfSyncObject(GenerateOption option, int masterIndex, int dirtyIndex)
@@ -221,12 +221,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					string funcName = string.Empty;
 					SyncType syncType = option == null ? SyncType.None : option.SyncType;
 
-					if (syncType == SyncType.Reliable || syncType == SyncType.RelibaleOrUnreliable)
-						funcName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
-					else if (syncType == SyncType.Unreliable || syncType == SyncType.RelibaleOrUnreliable)
-						funcName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
+					if (syncType == SyncType.Reliable)
+					{
+						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
+						{
+							funcName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
+						}
+					}
+					else if (syncType == SyncType.Unreliable)
+					{
+						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
+						{
+							funcName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
+						}
+					}
 
-					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
+					return string.Format(SyncFormat.ReadSyncObject, PrivateName, funcName) + NewLine;
 
 				default:
 					return string.Empty;

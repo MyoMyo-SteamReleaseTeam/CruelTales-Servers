@@ -253,6 +253,16 @@ namespace CT.Test.NetworkCore
 		{
 		}
 
+		public void ClearDirtyReliable()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void ClearDirtyUnreliable()
+		{
+			throw new NotImplementedException();
+		}
+
 		#endregion
 	}
 
@@ -319,6 +329,11 @@ namespace CT.Test.NetworkCore
 
 		public void DeserializeEveryProperty(PacketReader reader)
 		{
+		}
+
+		public void DeserializeSyncUnreliable(PacketReader reader)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

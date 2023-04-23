@@ -9,6 +9,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		public string ObjectName = string.Empty;
 		public string SerializeFunctionName = string.Empty;
+		public string DeserializeFunctionName = string.Empty;
 		public string ClearFunctionName = string.Empty;
 		public string BitmaskTypeName => nameof(BitmaskByte);
 		public SyncType SyncType;
@@ -28,14 +29,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				case SyncType.Reliable:
 					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncReliable);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
 					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyReliable);
 					break;
 				case SyncType.Unreliable:
 					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
 					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyUnreliable);
 					break;
 				case SyncType.RelibaleOrUnreliable:
 					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeEveryProperty);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
 					break;
 			}
 
@@ -491,6 +495,12 @@ if (objectDirty[{0}])
 		public static readonly string ReadEnum = @"{0} = ({1})reader.Read{2}();";
 
 		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Read function name<br/>
+		/// </summary>
+		public static readonly string ReadSyncObject = @"{0}.{1}(reader);";
+
+		/// <summary>
 		/// {0} Dirty bits name<br/>
 		/// {1} Dirty bits index<br/>
 		/// {2} Function name<br/>
@@ -567,7 +577,7 @@ if (objectDirty[{0}])
 		/// {1} Deserialize every property content<br/>
 		/// </summary>
 		public static readonly string DeserializeEveryProperty =
-@"public override void {0}(PacketWriter writer)
+@"public override void {0}(PacketWriter reader)
 {{
 {1}
 }}
