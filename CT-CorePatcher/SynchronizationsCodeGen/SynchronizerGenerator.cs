@@ -187,6 +187,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CTC.Networks.Synchornizations;",
 			};
 
+#pragma warning disable CA1416 // Validate platform compatibility
 			if (MainProcess.IsDebug)
 			{
 				master.TargetPath = "Test";
@@ -195,6 +196,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				remote.Run(isMaster: false);
 				return;
 			}
+#pragma warning restore CA1416 // Validate platform compatibility
 
 			foreach (var path in masterTargetPathList.ArgumentArray)
 			{

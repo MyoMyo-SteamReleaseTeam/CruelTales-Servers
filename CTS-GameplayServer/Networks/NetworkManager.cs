@@ -120,9 +120,17 @@ namespace CTS.Instance.Networks
 					while (!packetReader.IsEnd)
 					{
 						PacketType packetType = packetReader.ReadPacketType();
-						var packet = _packetPool.ReadPacket(packetType, packetReader);
-						session.OnReceive(packet);
-						_packetPool.Return(packet);
+
+						if (PacketDispatcher.IsCustomPacket(packetType))
+						{
+							session.OnReceiveRaw(packetType, packetReader);
+						}
+						else
+						{
+							var packet = _packetPool.ReadPacket(packetType, packetReader);
+							session.OnReceive(packet);
+							_packetPool.Return(packet);
+						}
 					}
 				}
 			}

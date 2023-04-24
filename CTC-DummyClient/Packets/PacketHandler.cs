@@ -13,7 +13,12 @@ namespace CTC.Networks
 		{
 		}
 
-		internal static void Handle_SC_ReliableSynchroniation(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_ReliableSynchroniation(PacketReader reader, ServerSession session)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_UnreliableSynchroniation(PacketReader reader, ServerSession session)
 		{
 			throw new NotImplementedException();
 		}

@@ -10,8 +10,11 @@
 	<using>CT.Common.Serialization.Type</using>
 
 	<!-- Declare Data Types -->
-	
+
 	<!-- Declare Packets -->
-	<server name="ReliableSynchroniation" custom="true"/>
-	<server name="UnreliableSynchroniation" custom="true"/>
+	<server name="TestFirstNoTag" custom="true"/>
+	<server name="Test">
+		<Int32 name="Int32Value"/>
+	</server>
+	<server name="TestLastNoTag" custom="true"/>
 </Definition>

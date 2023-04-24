@@ -12,13 +12,27 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, ServerSession session);
+	public delegate void HandlePacketRaw(PacketReader reader, ServerSession session);
 
 	public static class PacketDispatcher
 	{
-		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
+		private static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
 			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
+			
+		};
+
+		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
+		{
 			{ PacketType.SC_ReliableSynchroniation, PacketHandler.Handle_SC_ReliableSynchroniation },
+			{ PacketType.SC_UnreliableSynchroniation, PacketHandler.Handle_SC_UnreliableSynchroniation },
+			
+		};
+
+		private static HashSet<PacketType> _customPacketSet = new()
+		{
+			PacketType.SC_ReliableSynchroniation,
+			PacketType.SC_UnreliableSynchroniation,
 			
 		};
 
@@ -26,5 +40,16 @@ namespace CTC.Networks.Packets
 		{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}
+
+		public static void DispatchRaw(PacketType packetType, PacketReader reader, ServerSession session)
+		{
+			_dispatcherRawTable[packetType](reader, session);
+		}
+
+		public static bool IsCustomPacket(PacketType packetType)
+		{
+			return _customPacketSet.Contains(packetType);
+		}
 	}
+
 }

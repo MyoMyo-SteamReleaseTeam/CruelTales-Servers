@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using CT.Common.Serialization.Type;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.ConsoleHelper;
@@ -25,6 +27,11 @@ namespace CT.CorePatcher.Packets
 
 		public static bool Run(string[] args)
 		{
+			if (MainProcess.IsDebug)
+			{
+				return PacketGenerator.DebugRun();
+			}
+
 			// Print program info
 			PatcherConsole.PrintJobInfo("Packet Generator");
 
@@ -92,7 +99,7 @@ namespace CT.CorePatcher.Packets
 			PatcherConsole.PrintSeparator();
 
 			// Start generate packet codes
-			List<string> packetNames;
+			List<PacketInfo> packetInfos;
 			Console.WriteLine($"# Generate data types...");
 			try
 			{
@@ -101,7 +108,7 @@ namespace CT.CorePatcher.Packets
 							   outputServer.Argument,
 							   packetTypeName.Argument,
 							   baseNamespace.Argument,
-							   out packetNames);
+							   out packetInfos);
 			}
 			catch (Exception e)
 			{
@@ -113,11 +120,69 @@ namespace CT.CorePatcher.Packets
 			// Start generate 
 			try
 			{
-				generatePacketHelpers(packetNames,
+				generatePacketHelpers(packetInfos,
 									  serverDispatcherPaths.ArgumentArray,
 									  clientDispatcherPaths.ArgumentArray,
 									  factoryServerPath.Argument,
 									  factoryClientPath.Argument);
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintException(e);
+				return false;
+			}
+
+			return true;
+		}
+
+		public static bool DebugRun()
+		{
+			string xmlPath = "../../../Packets/Test/";
+			string packetTypePath = "XMLTest/";
+			string outputServer = "XMLTest/Server";
+			string packetTypeName = "PacketType";
+			string baseNamespace = "CT.Packets";
+
+			string[] serverDispatcherPaths = new string[]
+			{
+				"XMLTest/Server",
+			};
+			string[] clientDispatcherPaths = new string[]
+			{
+				"XMLTest/Client",
+			};
+
+			string factoryServerPath = "XMLTest/Server";
+			string factoryClientPath = "XMLTest/Client";
+
+
+			// Start generate packet codes
+			List<PacketInfo> packetInfos;
+			Console.WriteLine($"# Generate data types...");
+			try
+			{
+				generatePacket(xmlPath,
+							   packetTypePath,
+							   outputServer,
+							   packetTypeName,
+							   baseNamespace,
+							   out packetInfos);
+			}
+			catch (Exception e)
+			{
+				PatcherConsole.PrintException(e);
+				return false;
+			}
+
+			Console.WriteLine($"# Generate packet helpers...");
+			// Start generate 
+			try
+			{
+				generatePacketHelpers(packetInfos,
+									  serverDispatcherPaths,
+									  clientDispatcherPaths,
+									  factoryServerPath,
+									  factoryClientPath);
 			}
 			catch (Exception e)
 			{
@@ -133,7 +198,7 @@ namespace CT.CorePatcher.Packets
 										   string outputServer,
 										   string packetTypeName,
 										   string baseNamespace,
-										   out List<string> packetNames)
+										   out List<PacketInfo> packetInfos)
 		{
 			List<JobOption> jobOptionList = new List<JobOption>();
 
@@ -161,7 +226,7 @@ namespace CT.CorePatcher.Packets
 			}
 
 			List<CodeGenOperation> operation = new List<CodeGenOperation>();
-			packetNames = new List<string>();
+			packetInfos = new List<PacketInfo>();
 
 			// Create packet codes
 			foreach (var job in jobOptionList)
@@ -180,7 +245,7 @@ namespace CT.CorePatcher.Packets
 				try
 				{
 					parser.ParseFromXml(job.XmlSourcePath, out var generatedCode, out var pakcetNames);
-					packetNames.AddRange(pakcetNames);
+					packetInfos.AddRange(pakcetNames);
 					var targetPath = job.GetTargetPath();
 					operation.Add(new CodeGenOperation()
 					{ 
@@ -203,7 +268,7 @@ namespace CT.CorePatcher.Packets
 							  baseNamespace,
 							  true, true,
 							  new List<string>(),
-							  packetNames);
+							  packetInfos.Select(p => p.PacketName).ToList());
 
 				enumCode = string.Format(CodeFormat.GeneratorMetadata, enumFileName, enumCode);
 				var packetTypeTarget = Path.Combine(packetTypePath, enumFileName);
@@ -221,10 +286,13 @@ namespace CT.CorePatcher.Packets
 
 			// Generate codes to files
 
-			var removeFiles = Directory.GetFiles(outputServer);
-			foreach (var removeFile in removeFiles)
+			if (Directory.Exists(outputServer))
 			{
-				File.Delete(removeFile);
+				var removeFiles = Directory.GetFiles(outputServer);
+				foreach (var removeFile in removeFiles)
+				{
+					File.Delete(removeFile);
+				}
 			}
 
 			foreach (var op in operation)
@@ -253,7 +321,7 @@ namespace CT.CorePatcher.Packets
 			public bool IsClient;
 		}
 
-		private static void generatePacketHelpers(List<string> packetNames,
+		private static void generatePacketHelpers(List<PacketInfo> packetInfos,
 												  string[] serverDispatcherPaths,
 												  string[] clientDispatcherPaths,
 												  string factoryServerPath,
@@ -292,9 +360,9 @@ namespace CT.CorePatcher.Packets
 			{
 				try
 				{
-					parser.GenerateDispatcherCode(packetNames, out var dispatcherCode, job.IsClient, dispatcherFileName);
+					parser.GenerateDispatcherCode(packetInfos, out var dispatcherCode, job.IsClient, dispatcherFileName);
 					var targetPath = Path.Combine(job.TargetPath, job.FileName);
-					var saveResult = FileHandler.TryWriteText(targetPath, dispatcherCode);
+					var saveResult = FileHandler.TryWriteText(targetPath, dispatcherCode, makeDirectory: true);
 					if (saveResult.ResultType == JobResultType.Success)
 					{
 						PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
@@ -317,9 +385,9 @@ namespace CT.CorePatcher.Packets
 			try
 			{
 				// Server side
-				parser.GenerateFactoryCode(packetNames, out var factoryServerCode, factoryFileName, isServer: true);
+				parser.GenerateFactoryCode(packetInfos, out var factoryServerCode, factoryFileName, isServer: true);
 				factoryServerPath = Path.Combine(factoryServerPath, factoryFileName);
-				var saveResultServer = FileHandler.TryWriteText(factoryServerPath, factoryServerCode);
+				var saveResultServer = FileHandler.TryWriteText(factoryServerPath, factoryServerCode, makeDirectory: true);
 				if (saveResultServer.ResultType == JobResultType.Success)
 				{
 					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
@@ -332,9 +400,9 @@ namespace CT.CorePatcher.Packets
 				}
 
 				// Client side
-				parser.GenerateFactoryCode(packetNames, out var factoryClientCode, factoryFileName, isServer: false);
+				parser.GenerateFactoryCode(packetInfos, out var factoryClientCode, factoryFileName, isServer: false);
 				factoryClientPath = Path.Combine(factoryClientPath, factoryFileName);
-				var saveResultClient = FileHandler.TryWriteText(factoryClientPath, factoryClientCode);
+				var saveResultClient = FileHandler.TryWriteText(factoryClientPath, factoryClientCode, makeDirectory: true);
 				if (saveResultClient.ResultType == JobResultType.Success)
 				{
 					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",

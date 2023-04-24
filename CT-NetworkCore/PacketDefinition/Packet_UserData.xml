@@ -3,13 +3,13 @@
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
-	<!-- Using Segments -->>
-	<using>CT.Packets</using>>
-	<using>CT.Common.DataType</using>>
-	<using>CT.Common.Serialization</using>>
-	<using>CT.Common.Serialization.Type</using>>
+	<!-- Using Segments -->
+	<using>CT.Packets</using>
+	<using>CT.Common.DataType</using>
+	<using>CT.Common.Serialization</using>
+	<using>CT.Common.Serialization.Type</using>
 
-	<!-- Declare Data Types -->>
+	<!-- Declare Data Types -->
 	<struct name="UserDataInfo">
 		<UserId name="UserId"/>
 		<NetStringShort name="Username"/>
@@ -20,5 +20,5 @@
 		<Int32 name="Body"/>
 	</struct>
 	
-	<!-- Declare Packets -->>
+	<!-- Declare Packets -->
 </Definition>

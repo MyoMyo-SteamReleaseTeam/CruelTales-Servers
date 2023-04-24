@@ -3,21 +3,21 @@
 <!-- Packet definition from the server -->
 
 <Definition namespace="CT.Packets">
-	<!-- Using Segments -->>
-	<using>CT.Packets</using>>
-	<using>CT.Common.DataType</using>>
-	<using>CT.Common.Serialization</using>>
-	<using>CT.Common.Serialization.Type</using>>
+	<!-- Using Segments -->
+	<using>CT.Packets</using>
+	<using>CT.Common.DataType</using>
+	<using>CT.Common.Serialization</using>
+	<using>CT.Common.Serialization.Type</using>
 	
-	<!-- Declare Data Types -->>
+	<!-- Declare Data Types -->
 	<class name="UserProfile">
 		<NetStringShort name="Username"/>
 		<NetStringShort name="Clothes"/>
 	</class>
 	
-	<!-- Declare Packets -->>
+	<!-- Declare Packets -->
 	
-	<!-- Try Join Matching -->>
+	<!-- Try Join Matching -->
 	<client name="Req_TryJoinGameInstance">
 		<GameInstanceGuid name="MatchTo"/>
 		<UserDataInfo name="UserDataInfo"/>

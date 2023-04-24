@@ -13,6 +13,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
+	public delegate void HandlePacketRaw(PacketReader reader, UserSession session);
 
 	public static class PacketDispatcher
 	{
@@ -24,9 +25,29 @@ namespace CTS.Instance.Packets
 			
 		};
 
+		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
+		{
+			
+		};
+
+		private static HashSet<PacketType> _customPacketSet = new()
+		{
+			
+		};
+
 		public static void Dispatch(PacketBase receivedPacket, UserSession session)
 		{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
+		}
+
+		public static void DispatchRaw(PacketType packetType, PacketReader reader, UserSession session)
+		{
+			_dispatcherRawTable[packetType](reader, session);
+		}
+
+		public static bool IsCustomPacket(PacketType packetType)
+		{
+			return _customPacketSet.Contains(packetType);
 		}
 	}
 }

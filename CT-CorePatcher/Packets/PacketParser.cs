@@ -11,6 +11,13 @@ using CT.Packets;
 
 namespace CT.CorePatcher.Packets
 {
+	public class PacketInfo
+	{
+		public string PacketName = string.Empty;
+		public bool IsCustom = false;
+		public string PacketEnumName => $"PacketType.{PacketName}";
+	}
+
 	/// <summary>XML 패킷 정의로 부터 C# 코드를 생성합니다.</summary>
 	internal class PacketParser
 	{
@@ -37,41 +44,59 @@ namespace CT.CorePatcher.Packets
 			}
 		}
 
-		public void GenerateDispatcherCode(List<string> packetNames, out string code, bool isClient, string fileName)
+		public void GenerateDispatcherCode(List<PacketInfo> packetInfos, out string code, bool isClient, string fileName)
 		{
-			string content = string.Empty;
+			string handleByTypeContent = string.Empty;
+			string handleRawByTypeContent = string.Empty;
+			string typeEnumerator = string.Empty;
 
-			foreach (var pn in packetNames)
+			foreach (var pInfo in packetInfos)
 			{
-				if (isClient && pn.Contains(PacketFormat.ClientSidePacketPrefix) ||
-					!isClient && pn.Contains(PacketFormat.ServerSidePacketPrefix))
+				if (isClient && pInfo.PacketName.Contains(PacketFormat.ClientSidePacketPrefix) ||
+					!isClient && pInfo.PacketName.Contains(PacketFormat.ServerSidePacketPrefix))
 				{
 					continue;
 				}
 
-				content += string.Format(PacketFormat.PacketDispatcherMember, pn) + NewLine;
+				string element = string.Format(PacketFormat.PacketDispatcherMember, pInfo.PacketName) + NewLine;
+
+				if (pInfo.IsCustom)
+				{
+					typeEnumerator += pInfo.PacketEnumName + "," + NewLine;
+					handleRawByTypeContent += element;
+				}
+				else
+				{
+					handleByTypeContent += element;
+				}
 			}
 
-			for (int i = 0; i < 3; i++)
-				content = addIndent(content);
+			CodeFormat.AddIndent(ref handleByTypeContent, 3);
+			CodeFormat.AddIndent(ref handleRawByTypeContent, 3);
+			CodeFormat.AddIndent(ref typeEnumerator, 3);
 
 			string format = isClient ? 
-				PacketFormat.PacketDispatcherClientFormat : PacketFormat.PacketDispatcherServerFormat;
-			code = string.Format(format, content);
+				PacketFormat.PacketDispatcherClientFormat :
+				PacketFormat.PacketDispatcherServerFormat;
+
+			code = string.Format(format, handleByTypeContent, handleRawByTypeContent, typeEnumerator);
 			code = string.Format(CodeFormat.GeneratorMetadata, fileName, code);
 		}
 
-		public void GenerateFactoryCode(List<string> packetNames, out string code, string fileName, bool isServer)
+		public void GenerateFactoryCode(List<PacketInfo> packetInfos, out string code, string fileName, bool isServer)
 		{
 			string createByEnum = string.Empty;
 			string createByType = string.Empty;
 			string matchTypeEnum = string.Empty;
 
-			foreach (var pn in packetNames)
+			foreach (var pInfo in packetInfos)
 			{
-				createByEnum += string.Format(PacketFormat.PacketCreateByEnumItem, pn) + NewLine;
-				createByType += string.Format(PacketFormat.PacketCreateByTypeItem, pn) + NewLine;
-				matchTypeEnum += string.Format(PacketFormat.PacketMatchTypeEnumItem, pn) + NewLine;
+				if (pInfo.IsCustom)
+					continue;
+
+				createByEnum += string.Format(PacketFormat.PacketCreateByEnumItem, pInfo.PacketName) + NewLine;
+				createByType += string.Format(PacketFormat.PacketCreateByTypeItem, pInfo.PacketName) + NewLine;
+				matchTypeEnum += string.Format(PacketFormat.PacketMatchTypeEnumItem, pInfo.PacketName) + NewLine;
 			}
 
 			for (int i = 0; i < 3; i++)
@@ -89,7 +114,7 @@ namespace CT.CorePatcher.Packets
 			code = string.Format(CodeFormat.GeneratorMetadata, fileName, code);
 		}
 
-		public void ParseFromXml(string path, out string code, out List<string> packetNames)
+		public void ParseFromXml(string path, out string code, out List<PacketInfo> packetInfos)
 		{
 			// Set XML parse option
 			XmlReaderSettings settings = new XmlReaderSettings()
@@ -115,7 +140,7 @@ namespace CT.CorePatcher.Packets
 				throw new WrongDefinitionException();
 
 			// Parse XML packet definition to generate codes
-			packetNames = new List<string>();
+			packetInfos = new List<PacketInfo>();
 			r.Read();
 			while (!r.EOF)
 			{
@@ -143,9 +168,9 @@ namespace CT.CorePatcher.Packets
 					var dataTypeName = parseDataType(r, out string parseContent,
 													 out bool isCustom);
 					if (dataTypeName.Contains(PacketFormat.ServerSidePacketPrefix) ||
-						dataTypeName.Contains(PacketFormat.ClientSidePacketPrefix))
+						dataTypeName.Contains(PacketFormat.ClientSidePacketPrefix) || isCustom)
 					{
-						packetNames.Add(dataTypeName);
+						packetInfos.Add(new PacketInfo() { PacketName = dataTypeName, IsCustom = isCustom });
 					}
 
 					if (parseContent != null && !isCustom)
@@ -210,11 +235,6 @@ namespace CT.CorePatcher.Packets
 			if (!tryParse(r, PacketAttributeType.Name, out className))
 				throw new WrongAttributeException(r, PacketAttributeType.Name);
 
-			if (tryParse(r, PacketAttributeType.Custom, out var custom))
-				isCustom = custom.ToLower() == "true";
-			else
-				isCustom = false;
-
 			// Set class signature
 			if (dataType == PacketDataType.ServerPacket)
 			{
@@ -223,6 +243,19 @@ namespace CT.CorePatcher.Packets
 			else if (dataType == PacketDataType.ClientPacket)
 			{
 				className = PacketFormat.ClientSidePacketPrefix + "_" + className;
+			}
+
+			// Return if it's custom definition
+			if (tryParse(r, PacketAttributeType.Custom, out var custom))
+			{
+				isCustom = custom.ToLower() == "true";
+				content = string.Empty;
+				r.Read();
+				return className;
+			}
+			else
+			{
+				isCustom = false;
 			}
 
 			// Generate data type definition codes

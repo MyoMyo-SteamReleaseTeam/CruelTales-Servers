@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.FilePatch;
 using CT.CorePatcher.Packets;
@@ -28,6 +29,7 @@ namespace CT.CorePatcher
 		}
 	}
 
+	[SupportedOSPlatform("windows")]
 	internal class MainProcess
 	{
 		private const string PROGRAM_NAME = "programName";
@@ -40,6 +42,15 @@ namespace CT.CorePatcher
 
 		public static void Main(string[] args)
 		{
+			try
+			{
+				Console.SetWindowSize(100, 70);
+			}
+			catch
+			{
+
+			}
+
 			if (args.Length == 0)
 			{
 				IsDebug = true;
@@ -47,7 +58,8 @@ namespace CT.CorePatcher
 
 			if (IsDebug)
 			{
-				RunSynchronizerGenerator(args);
+				RunXmlPacketSystemPatch(args);
+				//RunSynchronizerGenerator(args);
 				return;
 			}
 
@@ -65,10 +77,10 @@ namespace CT.CorePatcher
 				RunSynchronizerGenerator(args);
 
 			if (programs.ArgumentArray.Contains(PROGRAM_XML))
-				RunFilePatch(args);
+				RunXmlPacketSystemPatch(args);
 
 			if (programs.ArgumentArray.Contains(PROGRAM_FILEPATCH))
-				RunXmlPacketSystemPatch(args);
+				RunFilePatch(args);
 
 			Console.Read();
 		}
@@ -94,9 +106,9 @@ namespace CT.CorePatcher
 			}
 		}
 
-		public static void RunFilePatch(string[] args)
+		public static void RunXmlPacketSystemPatch(string[] args)
 		{
-			string programName = nameof(RunFilePatch);
+			string programName = nameof(RunXmlPacketSystemPatch);
 			PatcherConsole.PrintProgramInfo(programName);
 
 			try
@@ -119,9 +131,9 @@ namespace CT.CorePatcher
 			}
 		}
 
-		public static void RunXmlPacketSystemPatch(string[] args)
+		public static void RunFilePatch(string[] args)
 		{
-			string programName = nameof(RunXmlPacketSystemPatch);
+			string programName = nameof(RunFilePatch);
 			PatcherConsole.PrintProgramInfo(programName);
 
 			try

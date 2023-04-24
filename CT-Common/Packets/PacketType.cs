@@ -13,6 +13,7 @@ namespace CT.Packets
 		CS_Req_TryJoinGameInstance,
 		SC_Ack_TryJoinGameInstance,
 		SC_ReliableSynchroniation,
+		SC_UnreliableSynchroniation,
 		CS_Req_UserInput_Movement,
 		CS_Req_UserInput_Action,
 	}

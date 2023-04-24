@@ -120,6 +120,11 @@ namespace CTS.Instance.Networks
 			PacketDispatcher.Dispatch(packet, this);
 		}
 
+		public void OnReceiveRaw(PacketType packetType, PacketReader reader)
+		{
+			PacketDispatcher.DispatchRaw(packetType, reader, this);
+		}
+
 		public void SendReliable(PacketWriter writer, byte channelNumber)
 		{
 			_peer?.Send(writer.Buffer.Array,

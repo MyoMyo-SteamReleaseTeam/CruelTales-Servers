@@ -17,13 +17,12 @@ namespace CTS.Instance.Packets
 	public delegate PacketBase ReadPacket(PacketReader reader);
 	public delegate PacketBase CreatePacket();
 
-	public static class PacketFactory
+	public static partial class PacketFactory
 	{
 		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{
 			{ PacketType.CS_Req_TryJoinGameInstance, () => new CS_Req_TryJoinGameInstance() },
 			{ PacketType.SC_Ack_TryJoinGameInstance, () => new SC_Ack_TryJoinGameInstance() },
-			{ PacketType.SC_ReliableSynchroniation, () => new SC_ReliableSynchroniation() },
 			{ PacketType.CS_Req_UserInput_Movement, () => new CS_Req_UserInput_Movement() },
 			{ PacketType.CS_Req_UserInput_Action, () => new CS_Req_UserInput_Action() },
 			
@@ -33,7 +32,6 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), () => new CS_Req_TryJoinGameInstance() },
 			{ typeof(SC_Ack_TryJoinGameInstance), () => new SC_Ack_TryJoinGameInstance() },
-			{ typeof(SC_ReliableSynchroniation), () => new SC_ReliableSynchroniation() },
 			{ typeof(CS_Req_UserInput_Movement), () => new CS_Req_UserInput_Movement() },
 			{ typeof(CS_Req_UserInput_Action), () => new CS_Req_UserInput_Action() },
 			
@@ -43,7 +41,6 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), PacketType.CS_Req_TryJoinGameInstance },
 			{ typeof(SC_Ack_TryJoinGameInstance), PacketType.SC_Ack_TryJoinGameInstance },
-			{ typeof(SC_ReliableSynchroniation), PacketType.SC_ReliableSynchroniation },
 			{ typeof(CS_Req_UserInput_Movement), PacketType.CS_Req_UserInput_Movement },
 			{ typeof(CS_Req_UserInput_Action), PacketType.CS_Req_UserInput_Action },
 			

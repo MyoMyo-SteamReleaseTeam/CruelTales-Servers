@@ -224,7 +224,7 @@ namespace CTS.Instance.Packets
 	public delegate PacketBase ReadPacket(PacketReader reader);
 	public delegate PacketBase CreatePacket();
 
-	public static class PacketFactory
+	public static partial class PacketFactory
 	{{
 		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{{
@@ -281,7 +281,7 @@ namespace CTC.Networks.Packets
 	public delegate PacketBase ReadPacket(PacketReader reader);
 	public delegate PacketBase CreatePacket();
 
-	public static class PacketFactory
+	public static partial class PacketFactory
 	{{
 		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{{
@@ -339,8 +339,9 @@ namespace CTC.Networks.Packets
 			@"{{ typeof({0}), PacketType.{0} }},";
 
 		/// <summary>
-		/// {0} Content<br/>
-		/// {1} SessionType<br/>
+		/// {0} Handle by packet type content<br/>
+		/// {1} Handle raw by packet type content<br/>
+		/// {2} Packet type enumerator<br/>
 		/// </summary>
 		public static readonly string PacketDispatcherServerFormat =
 @"using System.Collections.Generic;
@@ -351,6 +352,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
+	public delegate void HandlePacketRaw(PacketReader reader, UserSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -359,16 +361,37 @@ namespace CTS.Instance.Packets
 {0}
 		}};
 
+		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
+		{{
+{1}
+		}};
+
+		private static HashSet<PacketType> _customPacketSet = new()
+		{{
+{2}
+		}};
+
 		public static void Dispatch(PacketBase receivedPacket, UserSession session)
 		{{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
+		}}
+
+		public static void DispatchRaw(PacketType packetType, PacketReader reader, UserSession session)
+		{{
+			_dispatcherRawTable[packetType](reader, session);
+		}}
+
+		public static bool IsCustomPacket(PacketType packetType)
+		{{
+			return _customPacketSet.Contains(packetType);
 		}}
 	}}
 }}";
 
 		/// <summary>
-		/// {0} Content<br/>
-		/// {1} SessionType<br/>
+		/// {0} Handle by packet type content<br/>
+		/// {1} Handle raw by packet type content<br/>
+		/// {2} Packet type enumerator<br/>
 		/// </summary>
 		public static readonly string PacketDispatcherClientFormat =
 @"using System.Collections.Generic;
@@ -378,19 +401,41 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, ServerSession session);
+	public delegate void HandlePacketRaw(PacketReader reader, ServerSession session);
 
 	public static class PacketDispatcher
 	{{
-		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
+		private static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{{
 {0}
+		}};
+
+		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
+		{{
+{1}
+		}};
+
+		private static HashSet<PacketType> _customPacketSet = new()
+		{{
+{2}
 		}};
 
 		public static void Dispatch(PacketBase receivedPacket, ServerSession session)
 		{{
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}
+
+		public static void DispatchRaw(PacketType packetType, PacketReader reader, ServerSession session)
+		{{
+			_dispatcherRawTable[packetType](reader, session);
+		}}
+
+		public static bool IsCustomPacket(PacketType packetType)
+		{{
+			return _customPacketSet.Contains(packetType);
+		}}
 	}}
+
 }}";
 
 		/// <summary>
