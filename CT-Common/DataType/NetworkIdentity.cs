@@ -7,16 +7,16 @@ namespace CT.Common.DataType
 	[Serializable]
 	public struct NetworkIdentity : IPacketSerializable
 	{
-		public byte Id;
+		public ushort Id;
 
-		public int SerializeSize => sizeof(byte);
+		public int SerializeSize => sizeof(ushort);
 
 		public NetworkIdentity(int value)
 		{
-			Id = (byte)value;
+			Id = (ushort)value;
 		}
 
-		public NetworkIdentity(byte value)
+		public NetworkIdentity(ushort value)
 		{
 			Id = value;
 		}
@@ -28,7 +28,12 @@ namespace CT.Common.DataType
 
 		public void Deserialize(PacketReader reader)
 		{
-			Id = reader.ReadByte();
+			Id = reader.ReadUInt16();
+		}
+
+		public static void Ignore(PacketReader reader)
+		{
+			reader.Ignore(sizeof(ushort));
 		}
 
 		public static bool operator ==(NetworkIdentity left, NetworkIdentity right) => left.Id == right.Id;

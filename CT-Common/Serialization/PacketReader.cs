@@ -53,6 +53,16 @@ namespace CT.Common.Serialization
 			serializeObject.Deserialize(this);
 		}
 
+		public void IgnoreAll()
+		{
+			Position = Capacity;
+		}
+
+		public void Ignore(int count)
+		{
+			Position += count;
+		}
+
 		public T Read<T>() where T : IPacketSerializable, new()
 		{
 			T instance = new();

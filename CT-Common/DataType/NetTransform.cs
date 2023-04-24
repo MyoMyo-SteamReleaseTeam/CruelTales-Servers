@@ -10,7 +10,13 @@ namespace CT.Common.DataType
 		public float Y;
 	
 		public int SerializeSize =>  + 8;
-	
+
+		public NetVec2(float x, float y)
+		{
+			X = x;
+			Y = y;
+		}
+
 		public void Serialize(PacketWriter writer)
 		{
 			writer.Put(X);
@@ -33,6 +39,7 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"({X}, {Y})";
+		public static void Ignore(PacketReader reader) => reader.Ignore(8);
 	}
 
 	[Serializable]

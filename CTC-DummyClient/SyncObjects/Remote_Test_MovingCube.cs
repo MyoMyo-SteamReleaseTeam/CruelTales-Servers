@@ -85,6 +85,42 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
+		public static void IgnoreDeserializeSyncReliable(PacketReader reader)
+		{
+			BitmaskByte objectDirty = reader.ReadBitmaskByte();
+			if (objectDirty[0])
+			{
+				BitmaskByte _propertyDirty_0 = reader.ReadBitmaskByte();
+				if (_propertyDirty_0[0])
+				{
+					NetworkIdentity.Ignore(reader);
+				}
+				if (_propertyDirty_0[1])
+				{
+					reader.Ignore(1);
+				}
+				if (_propertyDirty_0[2])
+				{
+					reader.Ignore(1);
+				}
+				if (_propertyDirty_0[3])
+				{
+					reader.Ignore(1);
+				}
+			}
+			if (objectDirty[4])
+			{
+				BitmaskByte _rpcDirty_0 = reader.ReadBitmaskByte();
+				if (_rpcDirty_0[0])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						NetVec2.Ignore(reader);
+					}
+				}
+			}
+		}
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader)
 		{

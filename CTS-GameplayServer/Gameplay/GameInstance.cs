@@ -32,15 +32,12 @@ namespace CTS.Instance.Gameplay
 		// Managers
 		private GameManager _gameManager;
 
-		// Test buffer
-		private byte[] _packetBuffer = new byte[1024 * 16];
-
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
 			_sessionHandler = new UserSessionHandler(this);
 			_inputHandler = new UserInputHandler(this);
-			_gameManager = new GameManager();
+			_gameManager = new GameManager(this);
 		}
 
 		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
@@ -69,6 +66,8 @@ namespace CTS.Instance.Gameplay
 
 			// Update game logic
 			_gameManager.Update(deltaTime);
+			_gameManager.SyncReliable();
+			_gameManager.SyncUnreliable();
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
@@ -93,16 +92,7 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnterGame(UserSession userSession)
 		{
-			//var _packetPool.GetPacket<SC_Ack_TryJoinGameInstance>();
-
-			// TODO send enter user
-			//SC_OnUserEnter enter = _packetPool.GetPacket<SC_OnUserEnter>();
-			//enter.UserDataInfo = userSession.UserDataInfo;
-			//_packetPool.Return(enter);
-
-			// TODO : Send initial packet
-
-			//SC_SpawnEntities spawnEntities = new SC_SpawnEntities();
+			_gameManager.OnUserEnter(userSession);
 		}
 
 		public void OnUserLeaveGame(UserSession userSession)

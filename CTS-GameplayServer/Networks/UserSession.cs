@@ -119,7 +119,7 @@ namespace CTS.Instance.Networks
 						writer.Buffer.Offset, 
 						writer.Count, 
 						channelNumber, 
-						DeliveryMethod.ReliableSequenced);
+						DeliveryMethod.ReliableOrdered);
 		}
 
 		public void SendUnreliable(PacketWriter writer,

@@ -9,6 +9,12 @@ namespace CTS.Instance.Synchronizations
 	{
 		public NetworkIdentity Identity { get; protected set; }
 		public abstract NetworkObjectType Type { get; }
+
+		public void OnCreated(NetworkIdentity id)
+		{
+			Identity = id;
+		}
+
 		public abstract bool IsDirtyReliable { get; }
 		public abstract bool IsDirtyUnreliable { get; }
 		public abstract void DeserializeSyncReliable(PacketReader reader);

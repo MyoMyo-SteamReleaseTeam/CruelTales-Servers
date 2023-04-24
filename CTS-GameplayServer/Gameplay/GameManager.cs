@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Serialization;
+using CT.Packets;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Gameplay
 {
 	public class GameWorldManager
 	{
-		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObject = new();
+		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObjectById = new();
 		private NetworkIdentity _entityIdCounter;
 
 		public void Clear()
@@ -28,16 +31,28 @@ namespace CTS.Instance.Gameplay
 
 		public void Create(MasterNetworkObject netObject)
 		{
-			_worldObject.Add(netObject.Identity, netObject);
+			_worldObjectById.Add(netObject.Identity, netObject);
 		}
 	}
 
 	public class GameManager
 	{
 		private MiniGameMapData MiniGameMapData { get; set; }
+		private GameInstance _gameInstance;
+		private UserSessionHandler _userSessionHandler;
 
-		public GameManager()
+		// Test buffer
+		private byte[] _packetBuffer = new byte[1024 * 64];
+
+		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObject = new();
+
+		private static ushort _networkIdentityCounter = new();
+
+		public GameManager(GameInstance gameInstance)
 		{
+			_gameInstance = gameInstance;
+			_userSessionHandler = gameInstance.SessionHandler;
+
 			// Temp
 			MiniGameMapData = new()
 			{
@@ -57,14 +72,43 @@ namespace CTS.Instance.Gameplay
 			};
 		}
 
-		public void Update(float deltaTime)
-		{
-
-		}
+		private NetworkIdentity GetNetworkIdentityCounter() 
+			=> new NetworkIdentity(++_networkIdentityCounter);
 
 		public void StartGame()
 		{
+			for (int i = 0; i < 100; i++)
+			{
+				var netId = GetNetworkIdentityCounter();
+				Test_MovingCube cube = new Test_MovingCube();
+				cube.OnCreated(netId);
+				cube.R = (byte)(1 * i);
+				cube.G = (byte)(2 * i);
+				cube.B = (byte)(3 * i);
+				_worldObject.Add(cube.Identity, cube);
+			}
+		}
 
+		float sendTime = 0;
+
+		public void Update(float deltaTime)
+		{
+			sendTime += deltaTime;
+
+			if (sendTime > 0.30f)
+			{
+				Console.WriteLine(sendTime);
+
+				sendTime = 0;
+
+				foreach (var netObj in _worldObject.Values)
+				{
+					if (netObj is Test_MovingCube cube)
+					{
+						cube.Server_MoveTo(new NetVec2(deltaTime, deltaTime * 2));
+					}
+				}
+			}
 		}
 
 		public void CheckEndCondition()
@@ -74,9 +118,71 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnter(UserSession userSession)
 		{
-
+			PacketWriter pw = new(_packetBuffer);
+			pw.Put(PacketType.SC_Sync_LifeCycle);
+			foreach (var netObj in _worldObject.Values)
+			{
+				pw.Put(netObj.Type);
+				pw.Put(netObj.Identity);
+				netObj.SerializeEveryProperty(pw);
+			}
+			userSession.SendReliable(pw);
 		}
 
+		public void SyncReliable()
+		{
+			var netObjs = _worldObject.Values;
+			if (netObjs.Count <= 0)
+				return;
 
+			int syncCount = 0;
+
+			PacketWriter pw = new(_packetBuffer);
+			pw.Put(PacketType.SC_Sync_Reliable);
+			foreach (var netObj in netObjs)
+			{
+				if (!netObj.IsDirtyReliable)
+				{
+					continue;
+				}
+				pw.Put(netObj.Identity);
+				netObj.SerializeSyncReliable(pw);
+				netObj.ClearDirtyReliable();
+				syncCount++;
+			}
+
+			if (syncCount > 0)
+			{
+				_userSessionHandler.SendReliableToAll(pw);
+			}
+		}
+
+		public void SyncUnreliable()
+		{
+			var netObjs = _worldObject.Values;
+			if (netObjs.Count <= 0)
+				return;
+
+			int syncCount = 0;
+
+			PacketWriter pw = new(_packetBuffer);
+			pw.Put(PacketType.SC_Sync_Unreliable);
+			foreach (var netObj in netObjs)
+			{
+				if (!netObj.IsDirtyUnreliable)
+				{
+					continue;
+				}
+				pw.Put(netObj.Identity);
+				netObj.SerializeSyncUnreliable(pw);
+				netObj.ClearDirtyUnreliable();
+				syncCount++;
+			}
+
+			if (syncCount > 0)
+			{
+				_userSessionHandler.SendReliableToAll(pw);
+			}
+		}
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Threading;
 using CT.Common.DataType;
+using CT.Networks.Runtimes;
 using log4net;
 
 namespace CTC.Networks
@@ -33,9 +35,9 @@ namespace CTC.Networks
 		public static readonly int ServerPort = 60128;
 
 		// Dummy client setup
-		private static int _startCounter = 1;
+		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 1;
+		private static int _dummyCount = 700;
 		private static List<ServerSession> _dummyClients = new();
 
 		// Handle test process
@@ -61,7 +63,7 @@ namespace CTC.Networks
 					DummyClientPort = _dummyClientBindPort + i,
 					UserId = new UserId((ulong)i * 100),
 					UserToken = new UserToken((ulong)(i * 10000)),
-					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 9) + 1))
+					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 7) + 1))
 				};
 
 				// Create dummy clinet and add to list
@@ -87,7 +89,7 @@ namespace CTC.Networks
 					{
 						try
 						{
-							client.PollEvents();
+							client.Update(0);
 						}
 						catch (Exception e)
 						{
@@ -102,15 +104,20 @@ namespace CTC.Networks
 			}
 
 			// Start tick thread
-			Thread tickThread = new Thread(ProcessTick);
-			tickThread.Start();
+			TickTimer tickTimer = new TickTimer();
+			TickRunner tickRunner = new TickRunner(16, tickTimer, _log);
+			tickRunner.OnUpdate += ProcessTickByRunner;
+			tickRunner.Run();
+			//Thread tickThread = new Thread(ProcessTick);
+			//tickThread.Start();
 			_log.Info($"Start tick process...");
 
 			// Stop test process
 			while (Console.ReadLine() != "q");
 			_log.Info($"Stop test process...");
 			_shouldStop = true;
-			tickThread.Join();
+			tickRunner.Suspend();
+			//tickThread.Join();
 
 			// Disconnect all connections
 			foreach (var c in _dummyClients)
@@ -121,15 +128,32 @@ namespace CTC.Networks
 			_log.Info($"Success to disconnect all connection");
 		}
 
+		public static void ProcessTickByRunner(float deltaTime)
+		{
+			foreach (var client in _dummyClients)
+			{
+				try
+				{
+					client?.Update(deltaTime);
+				}
+				catch (Exception e)
+				{
+					_log.Error($"Dummy client poll events error! : ", e);
+				}
+			}
+		}
+
 		public static void ProcessTick()
 		{
+			Stopwatch sw = new Stopwatch();
+
 			while (!_shouldStop)
 			{
 				foreach (var client in _dummyClients)
 				{
 					try
 					{
-						client.PollEvents();
+						client?.Update(0.016f);
 					}
 					catch (Exception e)
 					{

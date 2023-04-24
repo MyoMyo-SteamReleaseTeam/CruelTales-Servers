@@ -19,17 +19,20 @@ namespace CTC.Networks
 
 		internal static void Handle_SC_Sync_LifeCycle(PacketReader reader, ServerSession session)
 		{
-			_log.Info(nameof(Handle_SC_Sync_LifeCycle));
+			Console.WriteLine("Initialize");
+			session.GameManager.OnSyncInitialize(reader);
 		}
 
 		internal static void Handle_SC_Sync_Reliable(PacketReader reader, ServerSession session)
 		{
-			_log.Info(nameof(Handle_SC_Sync_Reliable));
+			Console.WriteLine("Reliable");
+			session.GameManager.OnDeserializeReliable(reader);
 		}
-
+			
 		internal static void Handle_SC_Sync_Unreliable(PacketReader reader, ServerSession session)
 		{
-			_log.Info(nameof(Handle_SC_Sync_Unreliable));
+			Console.WriteLine("Unreliable");
+			session.GameManager.OnDeserializeUnreliable(reader);
 		}
 	}
 }

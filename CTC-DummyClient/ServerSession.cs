@@ -1,13 +1,88 @@
 ﻿using System;
+using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Packets;
 using CTC.Networks.Packets;
+using CTC.Networks.Synchornizations;
+using CTC.Networks.SyncObjects.TestSyncObjects;
 using LiteNetLib;
 using log4net;
 
 namespace CTC.Networks
 {
+	public class GameManager
+	{
+		private static readonly ILog _log = LogManager.GetLogger(typeof(GameManager));
+
+		private ServerSession _serverSession;
+
+		private Dictionary<NetworkIdentity, RemoteNetworkObject> _worldObjectById = new();
+
+		public GameManager(ServerSession serverSession)
+		{
+			_serverSession = serverSession;
+		}
+
+		public void OnSyncInitialize(PacketReader reader)
+		{
+			while (reader.CanRead(1))
+			{
+				var type = reader.ReadNetworkObjectType();
+				NetworkIdentity id = new NetworkIdentity();
+				id.Deserialize(reader);
+				Test_MovingCube cube = new();
+				cube.OnCreated(id);
+				cube.DeserializeEveryProperty(reader);
+				_worldObjectById.Add(id, cube);
+			}
+		}
+
+		public void OnDeserializeReliable(PacketReader reader)
+		{
+			while (reader.CanRead(1))
+			{
+				NetworkIdentity id = new NetworkIdentity();
+				id.Deserialize(reader);
+				if (_worldObjectById.TryGetValue(id, out var netObj))
+				{
+					netObj.DeserializeSyncReliable(reader);
+				}
+			}
+		}
+
+		public void OnDeserializeUnreliable(PacketReader reader)
+		{
+			while (reader.CanRead(1))
+			{
+				NetworkIdentity id = new NetworkIdentity();
+				id.Deserialize(reader);
+				if (_worldObjectById.TryGetValue(id, out var netObj))
+				{
+					netObj.DeserializeSyncUnreliable(reader);
+				}
+			}
+		}
+
+		private float _showTime = 0;
+
+		public void Update(float deltaTime)
+		{
+			_showTime += deltaTime;
+			if (_showTime > 3.0f)
+			{
+				_showTime = 0;
+				foreach (var obj in _worldObjectById.Values)
+				{
+					if (obj is Test_MovingCube cube)
+					{
+						_log.Info($"{cube.Identity} : ({cube.R},{cube.G},{cube.B})");
+					}
+				}
+			}
+		}
+	}
+
 	public class ServerSession
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(ServerSession));
@@ -17,12 +92,16 @@ namespace CTC.Networks
 		private NetPeer? _serverPeer;
 		private PacketPool _packetPool = new();
 
+		private GameManager _gameManager;
+		public GameManager GameManager => _gameManager;
+
 		public DummyUserInfo UserInfo { get; private set; }
 
 		public ServerSession(DummyUserInfo info)
 		{
 			UserInfo = info;
 
+			_gameManager = new GameManager(this);
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
 
@@ -45,22 +124,30 @@ namespace CTC.Networks
 
 		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
 		{
-			PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
-
-			while (packetReader.CanRead(sizeof(PacketType)))
+			try
 			{
-				PacketType packetType = packetReader.ReadPacketType();
+				PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
 
-				if (PacketDispatcher.IsCustomPacket(packetType))
+				while (packetReader.CanRead(sizeof(PacketType)))
 				{
-					PacketDispatcher.DispatchRaw(packetType, packetReader, this);
+					PacketType packetType = packetReader.ReadPacketType();
+
+					if (PacketDispatcher.IsCustomPacket(packetType))
+					{
+						PacketDispatcher.DispatchRaw(packetType, packetReader, this);
+					}
+					else
+					{
+						var packet = _packetPool.ReadPacket(packetType, packetReader);
+						PacketDispatcher.Dispatch(packet, this);
+						_packetPool.Return(packet);
+					}
 				}
-				else
-				{
-					var packet = _packetPool.ReadPacket(packetType, packetReader);
-					PacketDispatcher.Dispatch(packet, this);
-					_packetPool.Return(packet);
-				}
+			}
+			catch
+			{
+				System.Console.WriteLine($"Disconnect! Failed to handle packet!");
+				//Disconnect();
 			}
 		}
 
@@ -71,7 +158,7 @@ namespace CTC.Networks
 							  writer.Buffer.Offset,
 							  writer.Count,
 							  channelNumber,
-							  DeliveryMethod.ReliableSequenced);
+							  DeliveryMethod.ReliableOrdered);
 		}
 
 		public void SendUnreliable(PacketWriter writer,
@@ -135,9 +222,10 @@ namespace CTC.Networks
 			_netManager.DisconnectAll();
 		}
 
-		public void PollEvents()
+		public void Update(float deltaTime)
 		{
 			_netManager.PollEvents();
+			_gameManager.Update(deltaTime);
 		}
 
 		internal void ReqTryReadyToSync()

@@ -4,8 +4,8 @@ namespace CT.Networks.Runtimes
 {
 	public class TickTimer
 	{
-		public static readonly float TICK_PER_MS = 1 / (long)(Stopwatch.Frequency / 1000D);
-		public static readonly float TICK_PER_SEC = Stopwatch.Frequency;
+		private static readonly double TICK_PER_MS = 1D / (Stopwatch.Frequency / 1000D);
+		private static readonly double TICK_PER_SEC = 1D / Stopwatch.Frequency;
 
 		private readonly Stopwatch _stopwatch = new Stopwatch();
 		public long CurrentTick => _stopwatch.ElapsedTicks;
@@ -30,13 +30,13 @@ namespace CT.Networks.Runtimes
 			=> GetDeltaTimeMs(CurrentTick, lastTick);
 
 		public static float GetDeltaTimeSec_Float(long curTick, long lastTick)
-			=> (curTick - lastTick) * TICK_PER_SEC;
+			=> (float)((curTick - lastTick) * TICK_PER_SEC);
 
 		public static int GetDeltaTimeSec(long curTick, long lastTick)
 			=> (int)((curTick - lastTick) * TICK_PER_SEC);
 
 		public static float GetDeltaTimeMs_Float(long curTick, long lastTick)
-			=> (curTick - lastTick) * TICK_PER_MS;
+			=> (float)((curTick - lastTick) * TICK_PER_MS);
 
 		public static int GetDeltaTimeMs(long curTick, long lastTick)
 			=> (int)((curTick - lastTick) * TICK_PER_MS);

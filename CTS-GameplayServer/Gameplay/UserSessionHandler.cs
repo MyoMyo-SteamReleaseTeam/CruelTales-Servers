@@ -41,12 +41,13 @@ namespace CTS.Instance.Gameplay
 		private readonly GameInstance _gameInstance;
 
 		// Settings
-		public int MemberCount => _userById.Count;
+		public int MemberCount => _userById.Count + _waitingTable.Count;
 		public int MaxUser { get; private set; }
 
 		// Session Map
 		private readonly BidirectionalMap<UserId, UserSession> _userById = new();
 		private readonly List<UserSession> _userList = new();
+		private readonly BidirectionalMap<UserId, UserSession> _waitingTable = new();
 		public IReadOnlyList<UserSession> UserList => _userList;
 
 		// Job Queue
@@ -90,6 +91,7 @@ namespace CTS.Instance.Gameplay
 		/// <summary>연결 종료된 유저의 정보를 게임에서 제거합니다.</summary>
 		private void Execute_onDisconnected(UserSession userSession)
 		{
+			_waitingTable.TryRemove(userSession.UserId);
 			if (_userById.TryRemove(userSession.UserId))
 			{
 				_log.Info($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
@@ -109,7 +111,8 @@ namespace CTS.Instance.Gameplay
 		/// <summary>유저를 참가시키거나 거부합니다. 참가 후 바로 접속 유저로 집계됩니다.</summary>
 		private void Execute_tryEnterGame(UserSession userSession)
 		{
-			if (_userById.ContainsForward(userSession.UserId))
+			if (_userById.ContainsForward(userSession.UserId) ||
+				_waitingTable.ContainsForward(userSession.UserId))
 			{
 				_log.Warn($"User {userSession} try to join again");
 				userSession.Disconnect(DisconnectReasonType.WrongOperation);
@@ -125,8 +128,7 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
-			_userById.Add(userSession.UserId, userSession);
-			_userList.Add(userSession);
+			_waitingTable.Add(userSession.UserId, userSession);
 
 			// Ack response
 			_log.Info($"User {userSession} has been enter the game instance. [GUID:{_gameInstance.Guid}]");
@@ -144,9 +146,9 @@ namespace CTS.Instance.Gameplay
 		/// </summary>
 		public void Execute_tryReadyToSync(UserSession userSession)
 		{
-			if (!_userById.ContainsForward(userSession.UserId))
+			if (!_waitingTable.ContainsForward(userSession.UserId))
 			{
-				_log.Warn($"There is no {userSession} user in this game! GUID:{_gameInstance.Guid}");
+				_log.Warn($"There is no {userSession} user in waiting table! GUID:{_gameInstance.Guid}");
 				userSession.Disconnect(DisconnectReasonType.WrongOperation);
 				return;
 			}
@@ -154,6 +156,31 @@ namespace CTS.Instance.Gameplay
 			_log.Info($"[Instance:{_gameInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
 			this._gameInstance.OnUserEnterGame(userSession);
+
+			if (!_waitingTable.TryRemove(userSession.UserId))
+			{
+				_log.Error($"Failed to try remove user session from waiting!");
+			}
+			_userById.Add(userSession.UserId, userSession);
+			_userList.Add(userSession);
+		}
+
+		public void SendReliableToAll(PacketWriter writer,
+									  byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
+		{
+			foreach (var user in _userById.ForwardValues)
+			{
+				user.SendReliable(writer, channelNumber);
+			}
+		}
+
+		public void SendUnreliableToAll(PacketWriter writer,
+										byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
+		{
+			foreach (var user in _userById.ForwardValues)
+			{
+				user.SendUnreliable(writer, channelNumber);
+			}
 		}
 
 		public void SendReliable(UserId userId, PacketWriter writer,
