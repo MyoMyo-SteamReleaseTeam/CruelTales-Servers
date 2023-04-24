@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using CT.Packets;
 using CT.Common.Serialization;
 using CT.Common.Tools.Collections;
-using CT.Packets;
 using CTS.Instance.PacketCustom;
 
 namespace CTS.Instance.Packets
@@ -23,10 +23,7 @@ namespace CTS.Instance.Packets
 		{
 			{ PacketType.CS_Req_TryJoinGameInstance, () => new CS_Req_TryJoinGameInstance() },
 			{ PacketType.SC_Ack_TryJoinGameInstance, () => new SC_Ack_TryJoinGameInstance() },
-			{ PacketType.SC_OnUserEnter, () => new SC_OnUserEnter() },
-			{ PacketType.SC_OnUserLeave, () => new SC_OnUserLeave() },
-			{ PacketType.SC_InitialData, () => new SC_InitialData() },
-			{ PacketType.SC_SpawnEntities, () => new SC_SpawnEntities() },
+			{ PacketType.SC_ReliableSynchroniation, () => new SC_ReliableSynchroniation() },
 			{ PacketType.CS_Req_UserInput_Movement, () => new CS_Req_UserInput_Movement() },
 			{ PacketType.CS_Req_UserInput_Action, () => new CS_Req_UserInput_Action() },
 			
@@ -36,10 +33,7 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), () => new CS_Req_TryJoinGameInstance() },
 			{ typeof(SC_Ack_TryJoinGameInstance), () => new SC_Ack_TryJoinGameInstance() },
-			{ typeof(SC_OnUserEnter), () => new SC_OnUserEnter() },
-			{ typeof(SC_OnUserLeave), () => new SC_OnUserLeave() },
-			{ typeof(SC_InitialData), () => new SC_InitialData() },
-			{ typeof(SC_SpawnEntities), () => new SC_SpawnEntities() },
+			{ typeof(SC_ReliableSynchroniation), () => new SC_ReliableSynchroniation() },
 			{ typeof(CS_Req_UserInput_Movement), () => new CS_Req_UserInput_Movement() },
 			{ typeof(CS_Req_UserInput_Action), () => new CS_Req_UserInput_Action() },
 			
@@ -49,10 +43,7 @@ namespace CTS.Instance.Packets
 		{
 			{ typeof(CS_Req_TryJoinGameInstance), PacketType.CS_Req_TryJoinGameInstance },
 			{ typeof(SC_Ack_TryJoinGameInstance), PacketType.SC_Ack_TryJoinGameInstance },
-			{ typeof(SC_OnUserEnter), PacketType.SC_OnUserEnter },
-			{ typeof(SC_OnUserLeave), PacketType.SC_OnUserLeave },
-			{ typeof(SC_InitialData), PacketType.SC_InitialData },
-			{ typeof(SC_SpawnEntities), PacketType.SC_SpawnEntities },
+			{ typeof(SC_ReliableSynchroniation), PacketType.SC_ReliableSynchroniation },
 			{ typeof(CS_Req_UserInput_Movement), PacketType.CS_Req_UserInput_Movement },
 			{ typeof(CS_Req_UserInput_Action), PacketType.CS_Req_UserInput_Action },
 			

@@ -60,3 +60,5 @@ namespace CTS.Instance.SyncDefinitions
 		public void Server_Rename(NetStringShort newName) { }
 	}
 }
+
+#pragma warning restore IDE0051

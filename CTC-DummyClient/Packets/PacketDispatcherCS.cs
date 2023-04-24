@@ -6,8 +6,8 @@
  */
 
 using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
+using CT.Common.Serialization;
 
 namespace CTC.Networks.Packets
 {
@@ -18,10 +18,7 @@ namespace CTC.Networks.Packets
 		public static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
 			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
-			{ PacketType.SC_OnUserEnter, PacketHandler.Handle_SC_OnUserEnter },
-			{ PacketType.SC_OnUserLeave, PacketHandler.Handle_SC_OnUserLeave },
-			{ PacketType.SC_InitialData, PacketHandler.Handle_SC_InitialData },
-			{ PacketType.SC_SpawnEntities, PacketHandler.Handle_SC_SpawnEntities },
+			{ PacketType.SC_ReliableSynchroniation, PacketHandler.Handle_SC_ReliableSynchroniation },
 			
 		};
 

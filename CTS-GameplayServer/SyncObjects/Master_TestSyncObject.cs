@@ -21,23 +21,14 @@ namespace CTS.Instance.SyncObjects
 	{
 		[SyncVar]
 		private NetTransform _transform = new();
-		
 		[SyncVar]
 		private int _abc;
-		
 		[SyncObject]
 		private Master_TestInnerObject _innerObject = new();
-		
 		[SyncRpc]
 		public partial void Server_Some(int value1, float value2);
-		
-		
-		
-	#region Synchronization
-	
 		private BitmaskByte _propertyDirty_0 = new();
 		private BitmaskByte _rpcDirty_0 = new();
-		
 		public bool IsDirtyReliable
 		{
 			get
@@ -45,11 +36,9 @@ namespace CTS.Instance.SyncObjects
 				bool isDirty = false;
 				isDirty |= _propertyDirty_0.AnyTrue();
 				isDirty |= _rpcDirty_0.AnyTrue();
-				
 				return isDirty;
 			}
 		}
-		
 		private NetTransform Transform
 		{
 			get => _transform;
@@ -60,7 +49,6 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[0] = true;
 			}
 		}
-		
 		private int Abc
 		{
 			get => _abc;
@@ -71,44 +59,30 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[1] = true;
 			}
 		}
-		
 		public partial void Server_Some(int value1, float value2)
 		{
 			Server_SomeCallstack.Enqueue((value1, value2));
 			_rpcDirty_0[0] = true;
 		}
 		private Queue<(int value1, float value2)> Server_SomeCallstack = new();
-		
-		
 		public bool IsDirtyUnreliable => false;
-	
 		public void SerializeSyncReliable(PacketWriter writer)
 		{
 			BitmaskByte objectDirty = new BitmaskByte();
-		
 			_propertyDirty_0[2] = _innerObject.IsDirtyReliable;
-			
 			objectDirty[0] = _propertyDirty_0.AnyTrue();
 			objectDirty[4] = _rpcDirty_0.AnyTrue();
-			
-		
 			objectDirty.Serialize(writer);
-		
-			
 			if (objectDirty[0])
 			{
 				_propertyDirty_0.Serialize(writer);
-			
 				if (_propertyDirty_0[0]) _transform.Serialize(writer);
 				if (_propertyDirty_0[1]) writer.Put(_abc);
 				if (_propertyDirty_0[2]) _innerObject.SerializeSyncReliable(writer);
-				
 			}
-			
 			if (objectDirty[4])
 			{
 				_rpcDirty_0.Serialize(writer);
-			
 				if (_rpcDirty_0[0])
 				{
 					byte count = (byte)Server_SomeCallstack.Count;
@@ -118,35 +92,22 @@ namespace CTS.Instance.SyncObjects
 						var args = Server_SomeCallstack.Dequeue();
 						writer.Put(args.value1);
 						writer.Put(args.value2);
-						
 					}
 				}
-				
 			}
-			
 		}
-		
 		public void SerializeSyncUnreliable(PacketWriter writer) { }
-		
 		public void ClearDirtyReliable()
 		{
 			_propertyDirty_0.Clear();
 			_rpcDirty_0.Clear();
-			
 		}
-		
 		public void ClearDirtyUnreliable() {}
-		
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
 			_transform.Serialize(writer);
 			writer.Put(_abc);
 			_innerObject.SerializeEveryProperty(writer);
-			
 		}
-		
-		
-	#endregion
 	}
-	
 }

@@ -91,13 +91,14 @@ namespace CTS.Instance.Gameplay
 		{
 			_log.Info($"[Instance:{Guid}] Session {userSession} enter the game");
 
-			SC_OnUserEnter enter = _packetPool.GetPacket<SC_OnUserEnter>();
-			enter.UserDataInfo = userSession.UserDataInfo;
-			_packetPool.Return(enter);
+			// TODO send enter user
+			//SC_OnUserEnter enter = _packetPool.GetPacket<SC_OnUserEnter>();
+			//enter.UserDataInfo = userSession.UserDataInfo;
+			//_packetPool.Return(enter);
 
 			// TODO : Send initial packet
 
-			SC_SpawnEntities spawnEntities = new SC_SpawnEntities();
+			//SC_SpawnEntities spawnEntities = new SC_SpawnEntities();
 		}
 
 		public void OnUserLeaveGame(UserSession userSession)

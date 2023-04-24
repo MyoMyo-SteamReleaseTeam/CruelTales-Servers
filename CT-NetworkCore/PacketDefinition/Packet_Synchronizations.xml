@@ -10,12 +10,11 @@
 	<using>CT.Common.Serialization.Type</using>>
 
 	<!-- Declare Data Types -->>
-	<class name="EntityPlayerState">
-		<NetEntityId name="Id"/>
-		<NetEntityType name="Type"/>
-		<NetTransform name="Transform"/>
-	</class>
-
-	<!-- Declare Packets -->>
 	
+	<!-- Declare Packets -->>
+	<server name="ReliableSynchroniation" custom="true"/>
+	
+	<server name="UnreliableSynchroniation" custom="true"/>
+	
+	<server name="TestABC" custom="true"/>
 </Definition>

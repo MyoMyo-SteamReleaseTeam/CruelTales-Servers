@@ -12,10 +12,7 @@ namespace CT.Packets
 		None = 0,
 		CS_Req_TryJoinGameInstance,
 		SC_Ack_TryJoinGameInstance,
-		SC_OnUserEnter,
-		SC_OnUserLeave,
-		SC_InitialData,
-		SC_SpawnEntities,
+		SC_ReliableSynchroniation,
 		CS_Req_UserInput_Movement,
 		CS_Req_UserInput_Action,
 	}

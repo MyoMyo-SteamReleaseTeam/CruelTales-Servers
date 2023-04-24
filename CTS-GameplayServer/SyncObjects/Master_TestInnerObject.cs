@@ -21,20 +21,12 @@ namespace CTS.Instance.SyncObjects
 	{
 		[SyncVar]
 		private UserId _userId = new();
-		
 		[SyncVar]
 		private NetStringShort _name = string.Empty;
-		
 		[SyncRpc]
 		public partial void Server_Rename(NetStringShort newName);
-		
-		
-		
-	#region Synchronization
-	
 		private BitmaskByte _propertyDirty_0 = new();
 		private BitmaskByte _rpcDirty_0 = new();
-		
 		public bool IsDirtyReliable
 		{
 			get
@@ -42,11 +34,9 @@ namespace CTS.Instance.SyncObjects
 				bool isDirty = false;
 				isDirty |= _propertyDirty_0.AnyTrue();
 				isDirty |= _rpcDirty_0.AnyTrue();
-				
 				return isDirty;
 			}
 		}
-		
 		private UserId UserId
 		{
 			get => _userId;
@@ -57,7 +47,6 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[0] = true;
 			}
 		}
-		
 		private NetStringShort Name
 		{
 			get => _name;
@@ -68,42 +57,28 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[1] = true;
 			}
 		}
-		
 		public partial void Server_Rename(NetStringShort newName)
 		{
 			Server_RenameCallstack.Enqueue(newName);
 			_rpcDirty_0[0] = true;
 		}
 		private Queue<NetStringShort> Server_RenameCallstack = new();
-		
-		
 		public bool IsDirtyUnreliable => false;
-	
 		public void SerializeSyncReliable(PacketWriter writer)
 		{
 			BitmaskByte objectDirty = new BitmaskByte();
-		
-			
 			objectDirty[0] = _propertyDirty_0.AnyTrue();
 			objectDirty[4] = _rpcDirty_0.AnyTrue();
-			
-		
 			objectDirty.Serialize(writer);
-		
-			
 			if (objectDirty[0])
 			{
 				_propertyDirty_0.Serialize(writer);
-			
 				if (_propertyDirty_0[0]) _userId.Serialize(writer);
 				if (_propertyDirty_0[1]) _name.Serialize(writer);
-				
 			}
-			
 			if (objectDirty[4])
 			{
 				_rpcDirty_0.Serialize(writer);
-			
 				if (_rpcDirty_0[0])
 				{
 					byte count = (byte)Server_RenameCallstack.Count;
@@ -112,34 +87,21 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_RenameCallstack.Dequeue();
 						arg.Serialize(writer);
-						
 					}
 				}
-				
 			}
-			
 		}
-		
 		public void SerializeSyncUnreliable(PacketWriter writer) { }
-		
 		public void ClearDirtyReliable()
 		{
 			_propertyDirty_0.Clear();
 			_rpcDirty_0.Clear();
-			
 		}
-		
 		public void ClearDirtyUnreliable() {}
-		
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
 			_userId.Serialize(writer);
 			_name.Serialize(writer);
-			
 		}
-		
-		
-	#endregion
 	}
-	
 }

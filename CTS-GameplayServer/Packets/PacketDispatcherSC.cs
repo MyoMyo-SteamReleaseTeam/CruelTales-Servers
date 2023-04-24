@@ -6,8 +6,8 @@
  */
 
 using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
+using CT.Common.Serialization;
 using CTS.Instance.Networks;
 
 namespace CTS.Instance.Packets

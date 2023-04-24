@@ -214,9 +214,9 @@ namespace {1}
 		public static readonly string PacketFactoryServerFormat =
 @"using System;
 using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
-using CT.Tools.Collections;
+using CT.Common.Serialization;
+using CT.Common.Tools.Collections;
 using CTS.Instance.PacketCustom;
 
 namespace CTS.Instance.Packets
@@ -271,9 +271,9 @@ namespace CTS.Instance.Packets
 		public static readonly string PacketFactoryClientFormat =
 @"using System;
 using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
-using CT.Tools.Collections;
+using CT.Common.Serialization;
+using CT.Common.Tools.Collections;
 using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
@@ -344,8 +344,8 @@ namespace CTC.Networks.Packets
 		/// </summary>
 		public static readonly string PacketDispatcherServerFormat =
 @"using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
+using CT.Common.Serialization;
 using CTS.Instance.Networks;
 
 namespace CTS.Instance.Packets
@@ -372,8 +372,8 @@ namespace CTS.Instance.Packets
 		/// </summary>
 		public static readonly string PacketDispatcherClientFormat =
 @"using System.Collections.Generic;
-using CT.Common.Serialization;
 using CT.Packets;
+using CT.Common.Serialization;
 
 namespace CTC.Networks.Packets
 {{
