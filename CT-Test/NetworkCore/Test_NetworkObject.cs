@@ -52,7 +52,7 @@ namespace CT.Test.NetworkCore
 		Unreliable,
 	}
 
-	public class SomeDataClass : IMasterSynchronizable
+	public class SomeDataClass : ISynchronizable
 	{
 		private BitmaskByte _propertyDirty_0 = new();
 
@@ -143,7 +143,7 @@ namespace CT.Test.NetworkCore
 	}
 
 	// 서버 자동 구현부
-	public partial class NetworkObjectServer : IMasterSynchronizable
+	public partial class NetworkObjectServer : ISynchronizable
 	{
 		[SyncVar]
 		private NetTransform _transform = new();

@@ -81,18 +81,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			switch (SyncType)
 			{
 				case SyncType.Reliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncReliable);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
-					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyReliable);
+					SerializeFunctionName = nameof(ISynchronizable.SerializeSyncReliable);
+					DeserializeFunctionName = nameof(ISynchronizable.DeserializeSyncReliable);
+					ClearFunctionName = nameof(ISynchronizable.ClearDirtyReliable);
 					break;
 				case SyncType.Unreliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
-					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyUnreliable);
+					SerializeFunctionName = nameof(ISynchronizable.SerializeSyncUnreliable);
+					DeserializeFunctionName = nameof(ISynchronizable.DeserializeSyncUnreliable);
+					ClearFunctionName = nameof(ISynchronizable.ClearDirtyUnreliable);
 					break;
 				case SyncType.RelibaleOrUnreliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeEveryProperty);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
+					SerializeFunctionName = nameof(ISynchronizable.SerializeEveryProperty);
+					DeserializeFunctionName = nameof(ISynchronizable.DeserializeEveryProperty);
 					break;
 			}
 
@@ -669,7 +669,7 @@ if (objectDirty[{0}])
 			{
 				arguments += string.IsNullOrWhiteSpace(arguments) ?
 					$"{nameof(SyncType)}.{syncType}" :
-					$"sync: {nameof(SyncType)}.{syncType}";
+					$", sync: {nameof(SyncType)}.{syncType}";
 			}
 
 			return arguments;

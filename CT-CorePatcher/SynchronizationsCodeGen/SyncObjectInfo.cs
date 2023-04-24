@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
+using CTS.Instance.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -93,41 +94,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		//[Obsolete]
-		//public void AddPropertyToken(SyncPropertyToken token)
-		//{
-		//	Master_AllProperties.Add(token);
-
-		//	if (token.SyncType == SyncType.Reliable)
-		//	{
-		//		Master_ReliableProperties.Add(token);
-		//	}
-		//	else if (token.SyncType == SyncType.Unreliable)
-		//	{
-		//		Master_UnreliableProperties.Add(token);
-		//	}
-		//	else if (token.SyncType == SyncType.RelibaleOrUnreliable)
-		//	{
-		//		Master_ReliableProperties.Add(token);
-		//		Master_UnreliableProperties.Add(token);
-		//	}
-		//}
-
-		//[Obsolete]
-		//public void AddFunctionToken(SyncFunctionToken token)
-		//{
-		//	Master_AllFunctions.Add(token);
-
-		//	if (token.SyncType == SyncType.Reliable)
-		//	{
-		//		Master_ReliableFunctions.Add(token);
-		//	}
-		//	else if (token.SyncType == SyncType.Unreliable)
-		//	{
-		//		Master_UnreliableFunctions.Add(token);
-		//	}
-		//}
-
 		public string GenerateCode(SyncDirection syncDirection)
 		{
 			string fromRegion = $"#region {syncDirection}" + NewLine;
@@ -142,15 +108,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			ObjectName = OriginObjectName;
 
-			if (syncDirection == SyncDirection.FromMaster)
-			{
-				//ObjectName = SyncFormat.MasterPrefix + OriginObjectName;
-			}
-			else
+			if (syncDirection != SyncDirection.FromMaster)
 			{
 				syncFrom = _remoteElementBucket;
 				syncTo = _masterElementBucket;
-				//ObjectName = SyncFormat.RemotePrefix + OriginObjectName;
 			}
 
 			string declarationContent = string.Empty;
@@ -219,20 +180,21 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (this.IsNetworkObject)
 			{
-				inheritType = nameof(IMasterSynchronizable);
 				if (syncDirection == SyncDirection.FromMaster)
 				{
 					inheritType = SyncFormat.MasterNetworkObjectTypeName;
-					inheritType = nameof(IMasterSynchronizable);
 				}
 				else
 				{
 					inheritType = SyncFormat.RemoteNetworkObjectTypeName;
-					inheritType = nameof(IRemoteSynchronizable);
 				}
 				string netTypeName = SyncFormat.NetworkObjectTypeTypeName;
 				string netTypeDeclaration = $"{Indent}public override {netTypeName} Type => {netTypeName}.{OriginObjectName};";
 				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
+			}
+			else
+			{
+				inheritType = nameof(ISynchronizable);
 			}
 
 			// Combine all contents
@@ -245,95 +207,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 declarationContent,
 								 synchronization);
 		}
-
-		//[Obsolete]
-		//public string GenerateMasterDeclaration()
-		//{
-		//	string declarationContent = string.Empty;
-		//	string synchronizeContent = string.Empty;
-		//	string serializeFuncContent = string.Empty;
-		//	string dirtyBitClearContent = string.Empty;
-		//	string serializeAllContent = string.Empty;
-
-		//	GenerateOption reliableOption = new(SyncType.Reliable, Master_ReliableProperties, Master_ReliableFunctions);
-		//	if (IsNetworkObject) reliableOption.Modifier = "override ";
-		//	declarationContent += Master_GenDeclaration(reliableOption) + NewLine;
-		//	synchronizeContent += Master_GenPropertySynchronizeContent(reliableOption) + NewLine;
-		//	serializeFuncContent += Master_GenSerializeFunction(reliableOption) + NewLine;
-		//	dirtyBitClearContent += Master_GenDirtyBitsClearFunction(reliableOption) + NewLine;
-
-		//	GenerateOption unreliableOption = new(SyncType.Unreliable, Master_UnreliableProperties, Master_UnreliableFunctions);
-		//	if (IsNetworkObject) unreliableOption.Modifier = "override ";
-		//	declarationContent += Master_GenDeclaration(unreliableOption);// + NewLine;
-		//	synchronizeContent += Master_GenPropertySynchronizeContent(unreliableOption);// + NewLine;
-		//	serializeFuncContent += Master_GenSerializeFunction(unreliableOption);// + NewLine;
-		//	dirtyBitClearContent += Master_GenDirtyBitsClearFunction(unreliableOption);// + NewLine;
-
-		//	GenerateOption allOption = new(SyncType.RelibaleOrUnreliable, Master_AllProperties, Master_AllFunctions);
-		//	if (IsNetworkObject) allOption.Modifier = "override ";
-		//	serializeAllContent += Common_GenMasterSerializeEveryProperty(allOption);
-
-		//	string synchronization = synchronizeContent + NewLine +
-		//							 serializeFuncContent + NewLine +
-		//							 dirtyBitClearContent + NewLine +
-		//							 serializeAllContent;
-
-		//	// Combine all contents
-		//	string inheritType = nameof(IMasterSynchronizable);
-
-		//	if (this.IsNetworkObject)
-		//	{
-		//		inheritType = SyncFormat.MasterNetworkObjectTypeName;
-		//		string netTypeEnumName = SyncFormat.NetworkObjectTypeTypeName;
-		//		string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{OriginObjectName};";
-		//		declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
-		//	}
-
-		//	return string.Format(SyncFormat.MasterDeclaration,
-		//						 ObjectName, inheritType,
-		//						 declarationContent,
-		//						 synchronization);
-		//}
-
-		//[Obsolete]
-		//public string GenerateRemoteDeclaration()
-		//{
-		//	string declarationContent = string.Empty;
-		//	string synchronizeContent = string.Empty;
-		//	string deserializeAllContent = string.Empty;
-
-		//	GenerateOption reliableOption = new(SyncType.Reliable, Master_ReliableProperties, Master_ReliableFunctions);
-		//	if (IsNetworkObject) reliableOption.Modifier = "override ";
-		//	declarationContent += Remote_GenDeclaration(reliableOption) + NewLine;
-		//	synchronizeContent += Remote_GenPropertyDeserializeContent(reliableOption) + NewLine;
-
-		//	GenerateOption unreliableOption = new(SyncType.Unreliable, Master_UnreliableProperties, Master_UnreliableFunctions);
-		//	if (IsNetworkObject) unreliableOption.Modifier = "override ";
-		//	declarationContent += Remote_GenDeclaration(unreliableOption) + NewLine;
-		//	synchronizeContent += Remote_GenPropertyDeserializeContent(unreliableOption) + NewLine;
-
-		//	GenerateOption allOption = new(SyncType.RelibaleOrUnreliable, Master_AllProperties, Master_AllFunctions);
-		//	if (IsNetworkObject) allOption.Modifier = "override ";
-		//	deserializeAllContent += Remote_GenMasterDeserializeEveryProperty(allOption) + NewLine;
-
-		//	// Combine all contents
-		//	string inheritType = nameof(IRemoteSynchronizable);
-
-		//	if (this.IsNetworkObject)
-		//	{
-		//		inheritType = SyncFormat.RemoteNetworkObjectTypeName;
-		//		string netTypeEnumName = SyncFormat.NetworkObjectTypeTypeName;
-		//		string netTypeDeclaration = $"{Indent}public override {netTypeEnumName} Type => {netTypeEnumName}.{OriginObjectName};";
-		//		declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
-		//	}
-
-		//	return string.Format(SyncFormat.RemoteDeclaration,
-		//						 ObjectName,
-		//						 inheritType,
-		//						 declarationContent,
-		//						 synchronizeContent,
-		//						 deserializeAllContent);
-		//}
 
 		private static string Common_GenMasterSerializeEveryProperty(GenerateOption option)
 		{

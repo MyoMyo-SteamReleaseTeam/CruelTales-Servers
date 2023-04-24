@@ -51,7 +51,7 @@ namespace CT.Test.NetworkCore
 	}
 
 	[Serializable]
-	public partial class TestInnerObjectServer : IMasterSynchronizable
+	public partial class TestInnerObjectServer : ISynchronizable
 	{
 		[SyncVar]
 		private UserId _userId = new();
@@ -181,7 +181,7 @@ namespace CT.Test.NetworkCore
 	}
 
 	[Serializable]
-	public partial class TestSyncObjectServer : IMasterSynchronizable
+	public partial class TestSyncObjectServer : ISynchronizable
 	{
 		[SyncVar]
 		private NetTransform _transform = new();

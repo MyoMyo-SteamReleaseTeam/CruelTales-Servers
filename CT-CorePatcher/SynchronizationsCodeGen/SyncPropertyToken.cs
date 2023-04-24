@@ -37,21 +37,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>Enum의 원시 타입 이름입니다.</summary>
 		public string EnumSizeTypeName { get; private set; } = "int";
 
-		//[Obsolete]
-		//public void SetSyncDirection(bool isMaster)
-		//{
-		//	if (SerializeType != SerializeType.SyncObject)
-		//	{
-		//		TypeName = OriginTypeName;
-		//		return;
-		//	}
-
-		//	if (isMaster)
-		//		TypeName = SyncFormat.MasterPrefix + OriginTypeName;
-		//	else
-		//		TypeName = SyncFormat.RemotePrefix + OriginTypeName;
-		//}
-
 		public SyncPropertyToken(SynchronizerGenerator generator,
 								 SyncType syncType,
 								 SyncDirection syncDirection,
@@ -212,19 +197,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					{
 						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
-							funcName = nameof(IMasterSynchronizable.SerializeSyncReliable);
+							funcName = nameof(ISynchronizable.SerializeSyncReliable);
 						}
 					}
 					else if (stype == SyncType.Unreliable)
 					{
 						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
-							funcName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
+							funcName = nameof(ISynchronizable.SerializeSyncUnreliable);
 						}
 					}
 					else if (stype == SyncType.RelibaleOrUnreliable)
 					{
-						funcName = nameof(IMasterSynchronizable.SerializeEveryProperty);
+						funcName = nameof(ISynchronizable.SerializeEveryProperty);
 					}
 
 					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
@@ -257,19 +242,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					{
 						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
-							funcName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
+							funcName = nameof(ISynchronizable.DeserializeSyncReliable);
 						}
 					}
 					else if (stype == SyncType.Unreliable)
 					{
 						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
 						{
-							funcName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
+							funcName = nameof(ISynchronizable.DeserializeSyncUnreliable);
 						}
 					}
 					else if (stype == SyncType.RelibaleOrUnreliable)
 					{
-						funcName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
+						funcName = nameof(ISynchronizable.DeserializeEveryProperty);
 					}
 
 					return string.Format(SyncFormat.ReadSyncObject, PrivateName, funcName) + NewLine;

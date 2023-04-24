@@ -17,27 +17,106 @@ using CTC.Networks.Synchornizations;
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	[Serializable]
-	public partial class Remote_TestNetworkObject : RemoteNetworkObject
+	public partial class TestNetworkObject : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => NetworkObjectType.TestNetworkObject;
+#region FromRemote
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		private NetTransform _remote_netTransform = new();
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_DoSomethiing();
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_SendMessage(NetString message);
+		[SyncVar(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		private int _remote_Value;
+#endregion
+#region FromRemote
 		[SyncVar]
 		private UserToken _userToken = new();
 		public event Action<UserToken>? OnUserTokenChanged;
-		[SyncVar]
-		private float _floatValue;
-		public event Action<float>? OnFloatValueChanged;
-		[SyncObject]
-		private Remote_TestSyncObject _testSyncObject = new();
-		public event Action<Remote_TestSyncObject>? OnTestSyncObjectChanged;
 		[SyncRpc]
 		public partial void Server_DoSomethiing();
-		[SyncRpc]
-		public partial void Server_Response(NetString message);
-		[SyncObject(SyncType.Unreliable)]
-		private Remote_TestSyncObject _testUnreliableObject = new();
-		public event Action<Remote_TestSyncObject>? OnTestUnreliableObjectChanged;
+		[SyncVar(SyncType.Unreliable)]
+		private float _floatValue;
+		public event Action<float>? OnFloatValueChanged;
 		[SyncRpc(SyncType.Unreliable)]
 		public partial void Server_SendMessage(NetString message);
+#endregion
+		private BitmaskByte _propertyDirty_0 = new();
+		private BitmaskByte _rpcDirty_0 = new();
+		public override bool IsDirtyReliable
+		{
+			get
+			{
+				bool isDirty = false;
+				isDirty |= _propertyDirty_0.AnyTrue();
+				isDirty |= _rpcDirty_0.AnyTrue();
+				return isDirty;
+			}
+		}
+		private NetTransform Remote_netTransform
+		{
+			get => _remote_netTransform;
+			set
+			{
+				if (_remote_netTransform == value) return;
+				_remote_netTransform = value;
+				_propertyDirty_0[0] = true;
+			}
+		}
+		public partial void Client_DoSomethiing()
+		{
+			Client_DoSomethiingCallstackCount++;
+			_rpcDirty_0[0] = true;
+		}
+		private byte Client_DoSomethiingCallstackCount = 0;
+		public partial void Client_SendMessage(NetString message)
+		{
+			Client_SendMessageCallstack.Enqueue(message);
+			_rpcDirty_0[1] = true;
+		}
+		private Queue<NetString> Client_SendMessageCallstack = new();
+		public override bool IsDirtyUnreliable => false;
+#region FromRemote
+		public override void SerializeSyncReliable(PacketWriter writer)
+		{
+			BitmaskByte objectDirty = new BitmaskByte();
+			objectDirty[0] = _propertyDirty_0.AnyTrue();
+			objectDirty[4] = _rpcDirty_0.AnyTrue();
+			objectDirty.Serialize(writer);
+			if (objectDirty[0])
+			{
+				_propertyDirty_0.Serialize(writer);
+				if (_propertyDirty_0[0]) _remote_netTransform.Serialize(writer);
+			}
+			if (objectDirty[4])
+			{
+				_rpcDirty_0.Serialize(writer);
+				if (_rpcDirty_0[0])
+				{
+					writer.Put(Client_DoSomethiingCallstackCount);
+					Client_DoSomethiingCallstackCount = 0;
+				}
+				if (_rpcDirty_0[1])
+				{
+					byte count = (byte)Client_SendMessageCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Client_SendMessageCallstack.Dequeue();
+						arg.Serialize(writer);
+					}
+				}
+			}
+		}
+		public override void SerializeSyncUnreliable(PacketWriter writer) { }
+		public override void SerializeEveryProperty(PacketWriter writer)
+		{
+			_remote_netTransform.Serialize(writer);
+			writer.Put(_remote_Value);
+		}
+#endregion
+#region FromRemote
 		public override void DeserializeSyncReliable(PacketReader reader)
 		{
 			BitmaskByte objectDirty = reader.ReadBitmaskByte();
@@ -48,16 +127,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				{
 					_userToken.Deserialize(reader);
 					OnUserTokenChanged?.Invoke(_userToken);
-				}
-				if (_propertyDirty_0[1])
-				{
-					_floatValue = reader.ReadSingle();
-					OnFloatValueChanged?.Invoke(_floatValue);
-				}
-				if (_propertyDirty_0[2])
-				{
-					_testSyncObject.DeserializeSyncReliable(reader);
-					OnTestSyncObjectChanged?.Invoke(_testSyncObject);
 				}
 			}
 			if (objectDirty[4])
@@ -71,16 +140,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 						Server_DoSomethiing();
 					}
 				}
-				if (_rpcDirty_0[1])
-				{
-					byte count = reader.ReadByte();
-					for (int i = 0; i < count; i++)
-					{
-						NetString message = new();
-						message.Deserialize(reader);
-						Server_Response(message);
-					}
-				}
 			}
 		}
 		public override void DeserializeSyncUnreliable(PacketReader reader)
@@ -91,8 +150,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				BitmaskByte _unreliablePropertyDirty_0 = reader.ReadBitmaskByte();
 				if (_unreliablePropertyDirty_0[0])
 				{
-					_testUnreliableObject.DeserializeSyncUnreliable(reader);
-					OnTestUnreliableObjectChanged?.Invoke(_testUnreliableObject);
+					_floatValue = reader.ReadSingle();
+					OnFloatValueChanged?.Invoke(_floatValue);
 				}
 			}
 			if (objectDirty[4])
@@ -114,8 +173,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			_userToken.Deserialize(reader);
 			_floatValue = reader.ReadSingle();
-			_testSyncObject.DeserializeEveryProperty(reader);
-			_testUnreliableObject.DeserializeEveryProperty(reader);
 		}
+#endregion
+		public override void ClearDirtyReliable()
+		{
+			_propertyDirty_0.Clear();
+			_rpcDirty_0.Clear();
+		}
+		public override void ClearDirtyUnreliable() {}
 	}
 }

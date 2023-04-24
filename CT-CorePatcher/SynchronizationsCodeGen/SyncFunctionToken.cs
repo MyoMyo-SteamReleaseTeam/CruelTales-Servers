@@ -43,16 +43,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				Parameters.Add(syncParam);
 			}
 		}
-
-		//[Obsolete]
-		//public void SetSyncDirection(bool isMaster)
-		//{
-		//	foreach (var param in Parameters)
-		//	{
-		//		param.SetSyncDirection(isMaster);
-		//	}
-		//}
-
+		
 		public string GetPartialDeclaraction()
 		{
 			return string.Format(SyncFormat.FunctionPartialDeclaration,
