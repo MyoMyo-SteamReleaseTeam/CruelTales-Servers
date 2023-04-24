@@ -5,11 +5,14 @@ using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Gameplay.Entities;
 using CTS.Instance.Networks;
+using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.Gameplay
 {
 	public class GameWorldManager
 	{
+		private Dictionary<NetEntityId, MasterNetworkObject> _worldManager = new();
+
 		private NetEntityId _entityIdCounter;
 
 		private Dictionary<NetEntityId, BaseEntity> _entityById = new();

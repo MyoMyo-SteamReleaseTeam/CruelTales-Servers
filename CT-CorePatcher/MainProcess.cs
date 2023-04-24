@@ -58,8 +58,8 @@ namespace CT.CorePatcher
 
 			if (IsDebug)
 			{
-				RunXmlPacketSystemPatch(args);
-				//RunSynchronizerGenerator(args);
+				//RunXmlPacketSystemPatch(args);
+				RunSynchronizerGenerator(args);
 				return;
 			}
 

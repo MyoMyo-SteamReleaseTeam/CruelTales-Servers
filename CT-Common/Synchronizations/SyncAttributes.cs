@@ -40,10 +40,13 @@ namespace CT.Common.Synchronizations
 	public class SyncObjectAttribute : Attribute
 	{
 		public SyncType SyncType { get; private set; }
+		public SyncDirection SyncDirection { get; private set; }
 
-		public SyncObjectAttribute(SyncType syncType = SyncType.Reliable)
+		public SyncObjectAttribute(SyncType sync = SyncType.Reliable,
+								   SyncDirection dir = SyncDirection.FromMaster)
 		{
-			SyncType = syncType;
+			SyncType = sync;
+			SyncDirection = dir;
 		}
 	}
 
@@ -55,10 +58,13 @@ namespace CT.Common.Synchronizations
 	public class SyncVarAttribute : Attribute
 	{
 		public SyncType SyncType { get; private set; }
+		public SyncDirection SyncDirection { get; private set; }
 
-		public SyncVarAttribute(SyncType syncType = SyncType.Reliable)
+		public SyncVarAttribute(SyncType sync = SyncType.Reliable,
+								SyncDirection dir = SyncDirection.FromMaster)
 		{
-			SyncType = syncType;
+			SyncType = sync;
+			SyncDirection = dir;
 		}
 	}
 
@@ -69,10 +75,13 @@ namespace CT.Common.Synchronizations
 	public class SyncRpcAttribute : Attribute
 	{
 		public SyncType SyncType { get; private set; }
+		public SyncDirection SyncDirection { get; private set; }
 
-		public SyncRpcAttribute(SyncType syncType = SyncType.Reliable)
+		public SyncRpcAttribute(SyncType sync = SyncType.Reliable,
+								SyncDirection dir = SyncDirection.FromMaster)
 		{
-			SyncType = syncType;
+			SyncType = sync;
+			SyncDirection = dir;
 		}
 	}
 }

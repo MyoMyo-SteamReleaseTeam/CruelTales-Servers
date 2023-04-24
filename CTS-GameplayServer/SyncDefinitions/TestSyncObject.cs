@@ -12,14 +12,8 @@ namespace CTS.Instance.SyncDefinitions
 		[SyncVar]
 		private UserToken _userToken;
 
-		[SyncVar]
+		[SyncVar(SyncType.Unreliable)]
 		private float _floatValue;
-
-		[SyncObject]
-		private TestSyncObject _testSyncObject = new();
-
-		[SyncObject(SyncType.Unreliable)]
-		private TestSyncObject _testUnreliableObject = new();
 
 		[SyncRpc]
 		public void Server_DoSomethiing() { }
@@ -27,38 +21,72 @@ namespace CTS.Instance.SyncDefinitions
 		[SyncRpc(SyncType.Unreliable)]
 		public void Server_SendMessage(NetString message) { }
 
-		[SyncRpc]
-		public void Server_Response(NetString message) { }
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		private NetTransform _remote_netTransform;
+
+		[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
+		public int _remote_Value;
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_DoSomethiing() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_SendMessage(NetString message) { }
 	}
 
-	[SyncObjectDefinition]
-	public partial class TestSyncObject
-	{
-		[SyncVar]
-		private NetTransform _transform;
+	//[SyncNetworkObjectDefinition]
+	//public partial class TestNetworkObject
+	//{
+	//	[SyncVar]
+	//	private UserToken _userToken;
 
-		[SyncVar]
-		private int _abc = 0;
+	//	[SyncVar]
+	//	private float _floatValue;
 
-		[SyncObject]
-		private TestInnerObject _innerObject = new();
+	//	[SyncObject]
+	//	private TestSyncObject _testSyncObject = new();
 
-		[SyncRpc]
-		public void Server_Some(int value1, float value2) { }
-	}
+	//	[SyncObject(SyncType.Unreliable)]
+	//	private TestSyncObject _testUnreliableObject = new();
 
-	[SyncObjectDefinition]
-	public partial class TestInnerObject
-	{
-		[SyncVar]
-		private UserId _userId;
+	//	[SyncRpc]
+	//	public void Server_DoSomethiing() { }
 
-		[SyncVar]
-		private NetStringShort _name;
+	//	[SyncRpc(SyncType.Unreliable)]
+	//	public void Server_SendMessage(NetString message) { }
 
-		[SyncRpc]
-		public void Server_Rename(NetStringShort newName) { }
-	}
+	//	[SyncRpc]
+	//	public void Server_Response(NetString message) { }
+	//}
+
+	//[SyncObjectDefinition]
+	//public partial class TestSyncObject
+	//{
+	//	[SyncVar]
+	//	private NetTransform _transform;
+
+	//	[SyncVar]
+	//	private int _abc = 0;
+
+	//	[SyncObject]
+	//	private TestInnerObject _innerObject = new();
+
+	//	[SyncRpc]
+	//	public void Server_Some(int value1, float value2) { }
+	//}
+
+	//[SyncObjectDefinition]
+	//public partial class TestInnerObject
+	//{
+	//	[SyncVar]
+	//	private UserId _userId;
+
+	//	[SyncVar]
+	//	private NetStringShort _name;
+
+	//	[SyncRpc]
+	//	public void Server_Rename(NetStringShort newName) { }
+	//}
 }
 
 #pragma warning restore IDE0051

@@ -16,7 +16,10 @@ namespace CT.CorePatcher
 			}
 		}
 
-		public static void RemoveNewLine(ref string content, bool startFromNamespace)
+		/// <summary>불필요한 개행을 없애고 전처리기 들여쓰기를 제거합니다.</summary>
+		/// <param name="content"></param>
+		/// <param name="startFromNamespace"></param>
+		public static void ReformCode(ref string content, bool startFromNamespace)
 		{
 			StringBuilder sb = new();
 
@@ -42,6 +45,17 @@ namespace CT.CorePatcher
 				string line = contents[i];
 				if (string.IsNullOrWhiteSpace(line))
 					continue;
+
+				foreach (char c in line)
+				{
+					if (c == ' ' || c == '\t')
+						continue;
+
+					if (c == '#')
+						line = line.TrimStart();
+
+					break;
+				}
 
 				sb.Append(line + NewLine);
 			}

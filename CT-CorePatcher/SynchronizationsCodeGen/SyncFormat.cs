@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 
@@ -20,55 +21,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public bool HasProperties => Properties.Count > 0;
 		public bool HasFunctions => Functions.Count > 0;
 		public bool HasSyncElement => HasProperties && HasFunctions;
-
-		public GenerateOption(SyncType syncType,
-							  List<SyncPropertyToken> properties,
-							  List<SyncFunctionToken> functions)
-		{
-			SyncType = syncType;
-			Properties = properties;
-			Functions = functions;
-
-			switch (SyncType)
-			{
-				case SyncType.Reliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncReliable);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
-					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyReliable);
-					break;
-				case SyncType.Unreliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
-					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyUnreliable);
-					break;
-				case SyncType.RelibaleOrUnreliable:
-					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeEveryProperty);
-					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
-					break;
-			}
-
-			if (SyncType == SyncType.Unreliable)
-			{
-				IsDirtyGetter =
-@"public {0}bool IsDirtyUnreliable
-{{
-	get
-	{{
-		bool isDirty = false;
-{1}
-		return isDirty;
-	}}
-}}
-";
-				IsDirtyBinder = @"isDirty |= {0}.AnyTrue();";
-				IsObjectDirtyBinder = @"isDirty |= {0}.IsDirtyUnreliable;";
-				IsDirtyNoElement = @"public {0}bool IsDirtyUnreliable => false;";
-
-				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
-				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
-				CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirtyUnreliable;";
-			}
-		}
 
 		/// <summary>
 		/// {0} Modifier<br/>
@@ -117,6 +69,54 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// {2} Private name<br/>
 		/// </summary>
 		public readonly string CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirtyReliable;";
+
+		public GenerateOption(SyncType syncType,
+							  List<SyncPropertyToken> properties,
+							  List<SyncFunctionToken> functions)
+		{
+			SyncType = syncType;
+			Properties = properties;
+			Functions = functions;
+
+			switch (SyncType)
+			{
+				case SyncType.Reliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncReliable);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncReliable);
+					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyReliable);
+					break;
+				case SyncType.Unreliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeSyncUnreliable);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeSyncUnreliable);
+					ClearFunctionName = nameof(IMasterSynchronizable.ClearDirtyUnreliable);
+					break;
+				case SyncType.RelibaleOrUnreliable:
+					SerializeFunctionName = nameof(IMasterSynchronizable.SerializeEveryProperty);
+					DeserializeFunctionName = nameof(IRemoteSynchronizable.DeserializeEveryProperty);
+					break;
+			}
+
+			if (SyncType == SyncType.Unreliable)
+			{
+				IsDirtyGetter =
+@"public {0}bool IsDirtyUnreliable
+{{
+	get
+	{{
+		bool isDirty = false;
+{1}
+		return isDirty;
+	}}
+}}
+";
+				IsObjectDirtyBinder = @"isDirty |= {0}.IsDirtyUnreliable;";
+				IsDirtyNoElement = @"public {0}bool IsDirtyUnreliable => false;";
+
+				PropertyDirtyBitName = @"_unreliablePropertyDirty_{0}";
+				FunctionDirtyBitName = @"_unreliableRpcDirty_{0}";
+				CheckSyncObjectDirty = @"{0}[{1}] = {2}.IsDirtyUnreliable;";
+			}
+		}
 	}
 
 	public static class SyncFormat
@@ -143,9 +143,25 @@ namespace {1}
 		/// <summary>
 		/// {0} Object name<br/>
 		/// {1} Inherit type name<br/>
+		/// {2} From content<br/>
+		/// {3} To content<br/>
+		/// </summary>
+		public static readonly string SyncObjectFormat =
+@"[Serializable]
+public partial class {0} : {1}
+{{
+{2}
+{3}
+}}
+";
+
+		/// <summary>
+		/// {0} Object name<br/>
+		/// {1} Inherit type name<br/>
 		/// {2} Declaration content<br/>
 		/// {3} Synchronization content<br/>
 		/// </summary>
+		[Obsolete]
 		public static readonly string MasterDeclaration =
 @"[Serializable]
 public partial class {0} : {1}
@@ -163,6 +179,7 @@ public partial class {0} : {1}
 		/// {3} Deserilalize Content<br/>
 		/// {4} Deserialize every property content<br/>
 		/// </summary>
+		[Obsolete]
 		public static readonly string RemoteDeclaration =
 @"[Serializable]
 public partial class {0} : {1}
@@ -523,7 +540,7 @@ if (objectDirty[{0}])
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// </summary>
-		public static readonly string ReadByDeserializer= @"{0}.Deserialize(reader);";
+		public static readonly string ReadByDeserializer = @"{0}.Deserialize(reader);";
 
 		/// <summary>
 		/// {0} Private member name<br/>
@@ -625,27 +642,37 @@ if (objectDirty[{0}])
 }}
 ";
 
-		public static string GetSyncVarAttribute(SyncType syncType, SerializeType serializeType)
+		public static string GetSyncVarAttribute(SyncPropertyToken token)
 		{
-			if (serializeType == SerializeType.SyncObject)
-			{
-				return (syncType == SyncType.Reliable) ?
-					$"SyncObject" : 
-					$"SyncObject({nameof(SyncType)}.{syncType})";
-			}
-			else
-			{
-				return (syncType == SyncType.Reliable) ?
-					$"SyncVar" :
-					$"SyncVar({nameof(SyncType)}.{syncType})";
-			}
+			string attributeName = token.SerializeType == SerializeType.SyncObject ? "SyncObject" : "SyncVar";
+			string arguments = GetAttributeArgument(token.SyncType, token.SyncDirection);
+			return string.IsNullOrWhiteSpace(arguments) ? attributeName : $"{attributeName}({arguments})";
 		}
 
-		public static string GetSyncRpcAttribute(SyncType syncType)
+		public static string GetSyncRpcAttribute(SyncFunctionToken token)
 		{
-			return (syncType == SyncType.Reliable) ?
-				$"SyncRpc" :
-				$"SyncRpc({nameof(SyncType)}.{syncType})";
+			string attributeName = "SyncRpc";
+			string arguments = GetAttributeArgument(token.SyncType, token.SyncDirection);
+			return string.IsNullOrWhiteSpace(arguments) ? attributeName : $"{attributeName}({arguments})";
+		}
+
+		public static string GetAttributeArgument(SyncType syncType, SyncDirection direction)
+		{
+			string arguments = string.Empty;
+
+			if (direction != SyncDirection.FromMaster)
+			{
+				arguments += $"dir: {nameof(SyncDirection)}.{direction}";
+			}
+
+			if (syncType != SyncType.Reliable)
+			{
+				arguments += string.IsNullOrWhiteSpace(arguments) ?
+					$"{nameof(SyncType)}.{syncType}" :
+					$"sync: {nameof(SyncType)}.{syncType}";
+			}
+
+			return arguments;
 		}
 	}
 }

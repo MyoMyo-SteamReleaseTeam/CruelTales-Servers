@@ -13,14 +13,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>동기화 타입입니다.</summary>
 		public SyncType SyncType { get; private set; }
 
+		/// <summary>동기화 방향입니다.</summary>
+		public SyncDirection SyncDirection { get; private set; }
+
 		/// <summary>직렬화 타입입니다.</summary>
 		public SerializeType SerializeType { get; private set; }
 
 		/// <summary>Public 여부입니다.</summary>
 		public bool IsPublic { get; private set; }
-
-		/// <summary>최초 설정된 타입 이름입니다. SyncObject 타입인 경우 Master 여부에 따라서 Prefix가 붙습니다.</summary>
-		public string OriginTypeName { get; private set; } = string.Empty;
 
 		/// <summary>적용될 타입 이름입니다. SyncObject 타입인 경우 Master 여부에 따라서 Prefix가 붙습니다.</summary>
 		public string TypeName { get; private set; } = string.Empty;
@@ -37,34 +37,37 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>Enum의 원시 타입 이름입니다.</summary>
 		public string EnumSizeTypeName { get; private set; } = "int";
 
-		public void SetSyncDirection(bool isMaster)
-		{
-			if (SerializeType != SerializeType.SyncObject)
-			{
-				TypeName = OriginTypeName;
-				return;
-			}
+		//[Obsolete]
+		//public void SetSyncDirection(bool isMaster)
+		//{
+		//	if (SerializeType != SerializeType.SyncObject)
+		//	{
+		//		TypeName = OriginTypeName;
+		//		return;
+		//	}
 
-			if (isMaster)
-				TypeName = SyncFormat.MasterPrefix + OriginTypeName;
-			else
-				TypeName = SyncFormat.RemotePrefix + OriginTypeName;
-		}
+		//	if (isMaster)
+		//		TypeName = SyncFormat.MasterPrefix + OriginTypeName;
+		//	else
+		//		TypeName = SyncFormat.RemotePrefix + OriginTypeName;
+		//}
 
 		public SyncPropertyToken(SynchronizerGenerator generator,
-								 SyncType syncType, 
+								 SyncType syncType,
+								 SyncDirection syncDirection,
 								 string propertyName, 
 								 Type fieldType, 
 								 bool isPublic)
 		{
 			this.SyncType = syncType;
+			this.SyncDirection = syncDirection;
 			this.PrivateName = propertyName;
-			this.OriginTypeName = fieldType.Name;
+			this.TypeName = fieldType.Name;
 			this.IsPublic = isPublic;
 
 			// Set serialize type
 			string baseTpyeName = fieldType.BaseType != null ? fieldType.BaseType.Name : string.Empty;
-			string typeName = this.OriginTypeName;
+			string typeName = this.TypeName;
 			if (baseTpyeName == "ValueType")
 			{
 				if (ReflectionHelper.IsCLRPrimitiveType(typeName))
@@ -72,7 +75,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					this.SerializeType = SerializeType.Primitive;
 					this.CLRTypeName = typeName;
 					ReflectionHelper.TryGetTypeByCLRType(this.CLRTypeName, out var primitiveType);
-					this.OriginTypeName = primitiveType;
+					this.TypeName = primitiveType;
 
 				}
 				else if (ReflectionHelper.IsNetString(typeName))
@@ -116,14 +119,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string GeneratePraivteDeclaration()
 		{
 			return string.Format(SyncFormat.PrivateDeclaration,
-								 SyncFormat.GetSyncVarAttribute(SyncType, SerializeType),
+								 SyncFormat.GetSyncVarAttribute(this),
 								 TypeName, PrivateName, Initializer);
 		}
 
 		public string GenerateRemotePropertyDeclaration()
 		{
 			return string.Format(SyncFormat.RemotePropertyDeclaration,
-								 SyncFormat.GetSyncVarAttribute(SyncType, SerializeType),
+								 SyncFormat.GetSyncVarAttribute(this),
 								 TypeName, PrivateName, GetPublicPropertyName(),
 								 Initializer);
 		}

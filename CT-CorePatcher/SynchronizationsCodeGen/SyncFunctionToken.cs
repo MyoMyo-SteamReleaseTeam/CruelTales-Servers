@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using CT.Common.Synchronizations;
 
@@ -12,15 +13,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>동기화 타입입니다.</summary>
 		public SyncType SyncType { get; private set; }
 
+		/// <summary>동기화 방향입니다.</summary>
+		public SyncDirection SyncDirection { get; private set; }
+
 		/// <summary>함수의 이름입니다.</summary>
 		public string FunctionName { get; private set; } = string.Empty;
 
 		/// <summary>인자 목록입니다.</summary>
 		public List<SyncPropertyToken> Parameters { get; private set; } = new();
 
-		public SyncFunctionToken(SynchronizerGenerator generator, SyncType syncType, MethodInfo methodInfo)
+		public SyncFunctionToken(SynchronizerGenerator generator,
+								 SyncType syncType,
+								 SyncDirection syncDirection,
+								 MethodInfo methodInfo)
 		{
 			this.SyncType = syncType;
+			this.SyncDirection = syncDirection;
 			this.FunctionName = methodInfo.Name;
 
 			var paramInfo = methodInfo.GetParameters();
@@ -28,6 +36,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				SyncPropertyToken syncParam = new(generator,
 												  SyncType.None,
+												  SyncDirection.None,
 												  param.Name ?? string.Empty, 
 												  param.ParameterType, 
 												  isPublic: true);
@@ -35,18 +44,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public void SetSyncDirection(bool isMaster)
-		{
-			foreach (var param in Parameters)
-			{
-				param.SetSyncDirection(isMaster);
-			}
-		}
+		//[Obsolete]
+		//public void SetSyncDirection(bool isMaster)
+		//{
+		//	foreach (var param in Parameters)
+		//	{
+		//		param.SetSyncDirection(isMaster);
+		//	}
+		//}
 
 		public string GetPartialDeclaraction()
 		{
 			return string.Format(SyncFormat.FunctionPartialDeclaration,
-								 SyncFormat.GetSyncRpcAttribute(SyncType),
+								 SyncFormat.GetSyncRpcAttribute(this),
 								 FunctionName,
 								 GetParameterContent());
 		}
