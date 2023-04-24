@@ -18,6 +18,16 @@ public static class StringExtension
 		return true;
 	}
 
+	public static bool IsLowerCase(this char c)
+	{
+		return (c >= 'a' && c <= 'z');
+	}
+
+	public static bool IsUpperCase(this char c)
+	{
+		return (c >= 'A' && c <= 'Z');
+	}
+
 	public static string TryFormat(string format, object arg)
 	{
 		try

@@ -19,4 +19,29 @@
 		/// </summary>
 		FromRemote,
 	}
+
+	public static class SyncDirectionExtension
+	{
+		public static string GetDeclarationComment(this SyncDirection value)
+		{
+			switch (value)
+			{
+				case SyncDirection.FromMaster: return $"/// DECLARE MASTER SIDE SYNC ELEMETS ///";
+				case SyncDirection.FromRemote: return $"/// DECLARE REMOTE SIDE SYNC ELEMETS ///";
+			}
+
+			return string.Empty;
+		}
+
+		public static string GetRegionContent(this SyncDirection value) => $"#region {value}";
+
+		public static SyncDirection Reverse(this SyncDirection value)
+		{
+			if (value == SyncDirection.None)
+				return SyncDirection.None;
+
+			return (value == SyncDirection.FromMaster) ?
+				SyncDirection.FromRemote : SyncDirection.FromMaster;
+		}
+	}
 }

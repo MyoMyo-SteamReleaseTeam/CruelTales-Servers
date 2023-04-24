@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
 
@@ -31,7 +32,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// <summary>프로퍼티 초기화 구문 입니다.</summary>
 		public string Initializer { get; private set; } = string.Empty;
 
-		/// <summary>선언된 프로퍼티의 이름입니다.</summary>
+		/// <summary>선언된 프로퍼티의 private 이름입니다.</summary>
 		public string PrivateName { get; private set; } = string.Empty;
 
 		/// <summary>Enum의 원시 타입 이름입니다.</summary>
@@ -46,9 +47,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			this.SyncType = syncType;
 			this.SyncDirection = syncDirection;
-			this.PrivateName = propertyName;
 			this.TypeName = fieldType.Name;
 			this.IsPublic = isPublic;
+
+			if (propertyName[0] != '_')
+			{
+				propertyName = '_' + propertyName;
+			}
+			if (propertyName[1].IsUpperCase())
+			{
+				propertyName = '_' + $"{propertyName[1]}".ToLower() + propertyName[2..];
+			}
+			this.PrivateName = propertyName;
 
 			// Set serialize type
 			string baseTpyeName = fieldType.BaseType != null ? fieldType.BaseType.Name : string.Empty;

@@ -10,6 +10,6 @@ namespace CTS.Instance.SyncObjects
 	public enum NetworkObjectType
 	{
 		None = 0,
-		TestNetworkObject,
+		Test_MovingCube,
 	}
 }

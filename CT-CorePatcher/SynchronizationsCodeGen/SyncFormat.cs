@@ -134,11 +134,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		/// {2} Content<br/>
 		/// </summary>
 		public static readonly string FileFormat =
-@"{0}
+@"#pragma warning disable CS0649
+
+{0}
 namespace {1}
 {{
 {2}
-}}";
+}}
+
+#pragma warning restore CS0649";
 
 		/// <summary>
 		/// {0} Object name<br/>

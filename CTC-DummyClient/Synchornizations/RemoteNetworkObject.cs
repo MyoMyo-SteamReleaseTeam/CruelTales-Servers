@@ -5,7 +5,7 @@ using CTC.Networks.SyncObjects.TestSyncObjects;
 
 namespace CTC.Networks.Synchornizations
 {
-	public abstract class RemoteNetworkObject : IRemoteSynchronizable
+	public abstract class RemoteNetworkObject : ISynchronizable
 	{
 		public NetworkIdentity Identity { get; protected set; }
 		public abstract NetworkObjectType Type { get; }

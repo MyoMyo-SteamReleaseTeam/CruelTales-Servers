@@ -27,10 +27,12 @@ namespace CT.CorePatcher.Packets
 
 		public static bool Run(string[] args)
 		{
+#pragma warning disable CA1416
 			if (MainProcess.IsDebug)
 			{
 				return PacketGenerator.DebugRun();
 			}
+#pragma warning restore CA1416
 
 			// Print program info
 			PatcherConsole.PrintJobInfo("Packet Generator");

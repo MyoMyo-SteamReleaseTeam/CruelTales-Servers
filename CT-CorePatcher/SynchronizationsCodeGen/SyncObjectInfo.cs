@@ -1,54 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
-	public class SyncElementBucket
-	{
-		public List<SyncPropertyToken> ReliableProperties { get; private set; } = new();
-		public List<SyncFunctionToken> ReliableFunctions { get; private set; } = new();
-		public List<SyncPropertyToken> UnreliableProperties { get; private set; } = new();
-		public List<SyncFunctionToken> UnreliableFunctions { get; private set; } = new();
-		public List<SyncPropertyToken> AllProperties { get; private set; } = new();
-		public List<SyncFunctionToken> AllFunctions { get; private set; } = new();
-
-		public void AddPropertyToken(SyncPropertyToken token)
-		{
-			AllProperties.Add(token);
-
-			if (token.SyncType == SyncType.Reliable)
-			{
-				ReliableProperties.Add(token);
-			}
-			else if (token.SyncType == SyncType.Unreliable)
-			{
-				UnreliableProperties.Add(token);
-			}
-			else if (token.SyncType == SyncType.RelibaleOrUnreliable)
-			{
-				ReliableProperties.Add(token);
-				UnreliableProperties.Add(token);
-			}
-		}
-
-		public void AddFunctionToken(SyncFunctionToken token)
-		{
-			AllFunctions.Add(token);
-
-			if (token.SyncType == SyncType.Reliable)
-			{
-				ReliableFunctions.Add(token);
-			}
-			else if (token.SyncType == SyncType.Unreliable)
-			{
-				UnreliableFunctions.Add(token);
-			}
-		}
-	}
-
 	public class SyncObjectInfo
 	{
 		public static string NewLine { get; set; } = TextFormat.LF;
@@ -96,17 +54,21 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GenerateCode(SyncDirection syncDirection)
 		{
-			string fromRegion = $"#region {syncDirection}" + NewLine;
-			string toRegion = $"#region " +
-				(syncDirection == SyncDirection.FromMaster ?
-					SyncDirection.FromRemote :
-					SyncDirection.FromRemote).ToString() + NewLine;
+			// Set name
+			ObjectName = OriginObjectName;
+
+			// Setting extra comments and region
+			string declarFrom = Indent + syncDirection.GetDeclarationComment() + NewLine;
+			string declarTo = Indent + syncDirection.Reverse().GetDeclarationComment() + NewLine;
+
+			string regionFrom = syncDirection.GetRegionContent() + NewLine;
+			string regionTo = syncDirection.Reverse().GetRegionContent() + NewLine;
+
 			string endRegion = @"#endregion" + NewLine;
 
+			// Set element buckets
 			SyncElementBucket syncFrom = _masterElementBucket;
 			SyncElementBucket syncTo = _remoteElementBucket;
-
-			ObjectName = OriginObjectName;
 
 			if (syncDirection != SyncDirection.FromMaster)
 			{
@@ -114,6 +76,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				syncTo = _masterElementBucket;
 			}
 
+			// Initialize content strings
 			string declarationContent = string.Empty;
 			string synchronizeContent = string.Empty;
 			string syncFuncContent = string.Empty;
@@ -124,8 +87,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 													syncFrom.ReliableProperties,
 													syncFrom.ReliableFunctions);
 
-			syncFuncContent += fromRegion; // Start region
-			declarationContent += fromRegion;
+			GenerateOption fromUnreliableOption = new(SyncType.Unreliable,
+													  syncFrom.UnreliableProperties,
+													  syncFrom.UnreliableFunctions);
+
+			GenerateOption fromAllOption = new(SyncType.RelibaleOrUnreliable,
+											   syncFrom.AllProperties,
+											   syncFrom.AllFunctions);
+
+			// Bind separator
+			if (fromAllOption.HasProperties)
+			{
+				syncFuncContent += regionFrom;
+				declarationContent += declarFrom;
+			}
 
 			if (IsNetworkObject) fromReliableOption.Modifier = "override ";
 			declarationContent += Master_GenDeclaration(fromReliableOption) + NewLine;
@@ -133,47 +108,49 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			syncFuncContent += Master_GenSerializeFunction(fromReliableOption) + NewLine;
 			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromReliableOption) + NewLine;
 
-			GenerateOption fromUnreliableOption = new(SyncType.Unreliable,
-													  syncFrom.UnreliableProperties,
-													  syncFrom.UnreliableFunctions);
-
 			if (IsNetworkObject) fromUnreliableOption.Modifier = "override ";
 			declarationContent += Master_GenDeclaration(fromUnreliableOption) + NewLine;
 			synchronizeContent += Master_GenPropertySynchronizeContent(fromUnreliableOption) + NewLine;
 			syncFuncContent += Master_GenSerializeFunction(fromUnreliableOption) + NewLine;
 			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromUnreliableOption) + NewLine;
 
-			GenerateOption fromAllOption = new(SyncType.RelibaleOrUnreliable,
-											   syncFrom.AllProperties,
-											   syncFrom.AllFunctions);
-
 			if (IsNetworkObject) fromAllOption.Modifier = "override ";
-			syncFuncContent += Common_GenMasterSerializeEveryProperty(fromAllOption) + NewLine;
+			syncFuncContent += Master_GenMasterSerializeEveryProperty(fromAllOption) + NewLine;
 
-			syncFuncContent += endRegion; // End region
-			declarationContent += endRegion;
+			if (fromAllOption.HasProperties)
+			{
+				syncFuncContent += endRegion; // End region
+			}
 
 			// Generate backward
-			syncFuncContent += toRegion; // Start region
-			declarationContent += toRegion;
+			GenerateOption toReliableOption = new(SyncType.Reliable, syncTo.ReliableProperties, syncTo.ReliableFunctions);
+			GenerateOption toUnreliableOption = new(SyncType.Unreliable, syncTo.UnreliableProperties, syncTo.UnreliableFunctions);
+			GenerateOption toAllOption = new(SyncType.RelibaleOrUnreliable, syncTo.AllProperties, syncTo.AllFunctions);
+
+			// Bind separator
+			if (toAllOption.HasProperties)
+			{
+				syncFuncContent += regionTo;
+				declarationContent += declarTo;
+			}
 
 			string deserializeAllContent = string.Empty;
 
-			GenerateOption toReliableOption = new(SyncType.Reliable, syncTo.ReliableProperties, syncTo.ReliableFunctions);
 			if (IsNetworkObject) toReliableOption.Modifier = "override ";
 			declarationContent += Remote_GenDeclaration(toReliableOption) + NewLine;
 			syncFuncContent += Remote_GenPropertyDeserializeContent(toReliableOption) + NewLine;
 
-			GenerateOption toUnreliableOption = new(SyncType.Unreliable, syncTo.UnreliableProperties, syncTo.UnreliableFunctions);
 			if (IsNetworkObject) toUnreliableOption.Modifier = "override ";
 			declarationContent += Remote_GenDeclaration(toUnreliableOption) + NewLine;
 			syncFuncContent += Remote_GenPropertyDeserializeContent(toUnreliableOption) + NewLine;
 
-			GenerateOption toAllOption = new(SyncType.RelibaleOrUnreliable, syncTo.AllProperties, syncTo.AllFunctions);
 			if (IsNetworkObject) toAllOption.Modifier = "override ";
 			syncFuncContent += Remote_GenMasterDeserializeEveryProperty(toAllOption) + NewLine;
-			syncFuncContent += endRegion; // End region
-			declarationContent += endRegion;
+
+			if (toAllOption.HasProperties)
+			{
+				syncFuncContent += endRegion; // End region
+			}
 
 			// Set names
 			string inheritType = string.Empty;
@@ -190,38 +167,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 				string netTypeName = SyncFormat.NetworkObjectTypeTypeName;
 				string netTypeDeclaration = $"{Indent}public override {netTypeName} Type => {netTypeName}.{OriginObjectName};";
-				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent;
+				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent + NewLine;
 			}
 			else
 			{
 				inheritType = nameof(ISynchronizable);
 			}
 
+			declarationContent += Indent + "/// DECLARE SYNCHRONIZATIONS ///" + NewLine;
+
 			// Combine all contents
 			string synchronization = synchronizeContent + NewLine +
 									 syncFuncContent + NewLine +
-									 dirtyBitClearContent;
+									 dirtyBitClearContent + NewLine;
 
 			return string.Format(SyncFormat.SyncObjectFormat,
 								 ObjectName, inheritType,
 								 declarationContent,
 								 synchronization);
-		}
-
-		private static string Common_GenMasterSerializeEveryProperty(GenerateOption option)
-		{
-			string everyContent = string.Empty;
-			foreach (var p in option.Properties)
-			{
-				everyContent += p.GetWriterSerialize(option);
-			}
-			CodeFormat.AddIndent(ref everyContent);
-			everyContent = string.Format(SyncFormat.SerializeEveryProperty,
-										 option.Modifier,
-										 option.SerializeFunctionName,
-										 everyContent) + NewLine;
-			CodeFormat.AddIndent(ref everyContent);
-			return everyContent;
 		}
 
 		#region Master side
@@ -243,7 +206,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private static string Master_GenPropertySynchronizeContent(GenerateOption option)
 		{
-			// If there is no element to sync
+			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
 				string isDirtyNoElementContent = string.Format(option.IsDirtyNoElement, option.Modifier);
@@ -336,13 +299,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private static string Master_GenSerializeFunction(GenerateOption option)
 		{
-			// If there is no element to sync
+			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
 				string noElement = string.Format(SyncFormat.SerializeSyncNoElement,
 												 option.Modifier, option.SerializeFunctionName);
 				CodeFormat.AddIndent(ref noElement);
-				return noElement;
+				return noElement + NewLine;
 			}
 
 			// Serialize content
@@ -473,12 +436,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private static string Master_GenDirtyBitsClearFunction(GenerateOption option)
 		{
+			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
 				string noElement = string.Format(SyncFormat.ClearDirtyBitFunctionNoElement,
 												 option.Modifier, option.ClearFunctionName);
 				CodeFormat.AddIndent(ref noElement);
-				return noElement;
+				return noElement + NewLine;
 			}
 
 			string dirtyBitClearContent = string.Empty;
@@ -509,6 +473,32 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return dirtyBitClearFunction;
 		}
 
+		private static string Master_GenMasterSerializeEveryProperty(GenerateOption option)
+		{
+			// If there are no elements to sync
+			if (!option.HasProperties)
+			{
+				var noElement = string.Format(SyncFormat.SerializeSyncNoElement,
+											  option.Modifier,
+											  option.SerializeFunctionName) + NewLine;
+				CodeFormat.AddIndent(ref noElement);
+				return noElement;
+			}
+
+			string everyContent = string.Empty;
+			foreach (var p in option.Properties)
+			{
+				everyContent += p.GetWriterSerialize(option);
+			}
+			CodeFormat.AddIndent(ref everyContent);
+			everyContent = string.Format(SyncFormat.SerializeEveryProperty,
+										 option.Modifier,
+										 option.SerializeFunctionName,
+										 everyContent) + NewLine;
+			CodeFormat.AddIndent(ref everyContent);
+			return everyContent;
+		}
+
 		#endregion
 
 		#region Remote Side
@@ -530,13 +520,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private static string Remote_GenPropertyDeserializeContent(GenerateOption option)
 		{
-			// If there is no element to sync
+			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
 				var noElement = string.Format(SyncFormat.DeserializeSyncNoElement,
 											  option.Modifier, option.DeserializeFunctionName);
 				CodeFormat.AddIndent(ref noElement);
-				return noElement;
+				return noElement + NewLine;
 			}
 
 			// Property deserialize group content
@@ -619,6 +609,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private static string Remote_GenMasterDeserializeEveryProperty(GenerateOption option)
 		{
+			// If there are no elements to sync
+			if (!option.HasProperties)
+			{
+				string noElement = string.Format(SyncFormat.DeserializeSyncNoElement,
+												 option.Modifier,
+												 option.DeserializeFunctionName) + NewLine;
+				CodeFormat.AddIndent(ref noElement);
+				return noElement;
+			}
+
 			string everyContent = string.Empty;
 			foreach (var p in option.Properties)
 			{

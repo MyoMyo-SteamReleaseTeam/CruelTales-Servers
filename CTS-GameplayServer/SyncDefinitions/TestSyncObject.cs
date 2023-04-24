@@ -7,32 +7,51 @@ using CT.Common.Synchronizations;
 namespace CTS.Instance.SyncDefinitions
 {
 	[SyncNetworkObjectDefinition]
-	public partial class TestNetworkObject
+	public class Test_MovingCube
 	{
 		[SyncVar]
-		private UserToken _userToken;
+		public NetworkIdentity NetworkIdentity;
 
-		[SyncVar(SyncType.Unreliable)]
-		private float _floatValue;
+		[SyncVar]
+		public byte R;
+
+		[SyncVar]
+		public byte G;
+
+		[SyncVar]
+		public byte B;
 
 		[SyncRpc]
-		public void Server_DoSomethiing() { }
-
-		[SyncRpc(SyncType.Unreliable)]
-		public void Server_SendMessage(NetString message) { }
-
-		[SyncVar(dir: SyncDirection.FromRemote)]
-		private NetTransform _remote_netTransform;
-
-		[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
-		public int _remote_Value;
-
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_DoSomethiing() { }
-
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_SendMessage(NetString message) { }
+		public void Server_MoveTo(NetVec2 destination) { }
 	}
+
+	//[SyncNetworkObjectDefinition]
+	//public partial class TestNetworkObject
+	//{
+	//	[SyncVar]
+	//	private UserToken _userToken;
+
+	//	[SyncVar(SyncType.Unreliable)]
+	//	private float _floatValue;
+
+	//	[SyncRpc]
+	//	public void Server_DoSomethiing() { }
+
+	//	[SyncRpc(SyncType.Unreliable)]
+	//	public void Server_SendMessage(NetString message) { }
+
+	//	[SyncVar(dir: SyncDirection.FromRemote)]
+	//	private NetTransform _remote_netTransform;
+
+	//	[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
+	//	public int _remote_Value;
+
+	//	[SyncRpc(dir: SyncDirection.FromRemote)]
+	//	public void Client_DoSomethiing() { }
+
+	//	[SyncRpc(dir: SyncDirection.FromRemote)]
+	//	public void Client_SendMessage(NetString message) { }
+	//}
 
 	//[SyncNetworkObjectDefinition]
 	//public partial class TestNetworkObject
