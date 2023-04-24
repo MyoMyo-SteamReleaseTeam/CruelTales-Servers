@@ -117,7 +117,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (IsNetworkObject) fromAllOption.Modifier = "override ";
 			syncFuncContent += Master_GenMasterSerializeEveryProperty(fromAllOption) + NewLine;
 
-
 			// Generate backward
 			GenerateOption toReliableOption = new(SyncType.Reliable, syncTo.ReliableProperties, syncTo.ReliableFunctions);
 			GenerateOption toUnreliableOption = new(SyncType.Unreliable, syncTo.UnreliableProperties, syncTo.UnreliableFunctions);
@@ -162,8 +161,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				inheritType = nameof(ISynchronizable);
 			}
-
-			//declarationContent += Indent + "/// DECLARE SYNCHRONIZATIONS ///" + NewLine;
 
 			// Combine all contents
 			string synchronization = regionFrom + 
