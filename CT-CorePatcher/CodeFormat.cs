@@ -1,4 +1,6 @@
-﻿namespace CT.CorePatcher
+﻿using System.Text;
+
+namespace CT.CorePatcher
 {
 	public static class CodeFormat
 	{
@@ -12,6 +14,39 @@
 			{
 				content = Indent + content.Replace(NewLine, $"{NewLine}{Indent}");
 			}
+		}
+
+		public static void RemoveNewLine(ref string content, bool startFromNamespace)
+		{
+			StringBuilder sb = new();
+
+			var contents = content.Split(NewLine);
+			int startIndex = 0;
+
+			if (startFromNamespace)
+			{
+				for (int i = 0; i < contents.Length; i ++)
+				{
+					string line = contents[i];
+					if (line.Contains($"namespace"))
+					{
+						startIndex = i;
+						break;
+					}
+					sb.AppendLine(line);
+				}
+			}
+
+			for (int i = startIndex; i < contents.Length ; i ++)
+			{
+				string line = contents[i];
+				if (string.IsNullOrWhiteSpace(line))
+					continue;
+
+				sb.Append(line + NewLine);
+			}
+
+			content = sb.ToString();
 		}
 
 		/// <summary>

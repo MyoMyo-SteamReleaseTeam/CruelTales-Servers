@@ -151,10 +151,8 @@ namespace {1}
 public partial class {0} : {1}
 {{
 {2}
-#region Synchronization
 
 {3}
-#endregion
 }}
 ";
 
@@ -170,11 +168,9 @@ public partial class {0} : {1}
 public partial class {0} : {1}
 {{
 {2}
-#region Synchronization
 
 {3}
 {4}
-#endregion
 }}
 ";
 

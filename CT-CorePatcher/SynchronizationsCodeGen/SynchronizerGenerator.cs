@@ -83,7 +83,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				CodeFormat.AddIndent(ref code);
 				info.GenCode = string.Format(SyncFormat.FileFormat, usingStatements, Namespace, code);
 				info.GenCode = string.Format(CodeFormat.GeneratorMetadata, info.FileName, info.GenCode);
-
+				CodeFormat.RemoveNewLine(ref info.GenCode, startFromNamespace: true);
+				
 				genCodes.Add(info);
 			}
 
