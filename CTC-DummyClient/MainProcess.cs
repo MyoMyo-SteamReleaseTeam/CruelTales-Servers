@@ -45,7 +45,7 @@ namespace CTC.Networks
 
 		static void Main(string[] args)
 		{
-			Console.SetWindowSize(160, 25);
+			try { Console.SetWindowSize(160, 30); } catch { }
 
 			//Console.WriteLine($"Start dummy test for press anykey...");
 			//Console.ReadLine();

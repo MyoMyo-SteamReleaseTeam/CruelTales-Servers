@@ -19,7 +19,7 @@ namespace CTS.Instance
 
 		static void Main(string[] args)
 		{
-			Console.SetWindowSize(200, 50);
+			try { Console.SetWindowSize(200, 50); } catch { }
 
 			// Start server
 			_log.Info("Start gameplay server");
