@@ -1,7 +1,7 @@
 ﻿using System;
 using CT.Common.Serialization;
 
-namespace CT.Tools.Collections
+namespace CT.Common.Tools.Collections
 {
 	public struct BitmaskByte : IPacketSerializable
 	{
@@ -26,7 +26,7 @@ namespace CT.Tools.Collections
 		/// <param name="value">초기화 할 값</param>
 		public BitmaskByte(bool value = false)
 		{
-			Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+			Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
 		}
 
 		/// <summary>해당 비트를 참조합니다.</summary>
@@ -53,7 +53,7 @@ namespace CT.Tools.Collections
 
 		/// <summary>모든 비트를 value로 초기화합니다.</summary>
 		/// <param name="value">초기화할 값</param>
-		public void Clear(bool value = false) => Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+		public void Clear(bool value = false) => Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
 
 		/// <summary>모든 비트를 뒤집습니다.</summary>
 		public void Flip() => Mask = (byte)~Mask;
@@ -122,7 +122,7 @@ namespace CT.Tools.Collections
 		/// <param name="value">초기화 할 값</param>
 		public Bitmask32(bool value = false)
 		{
-			Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+			Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
 		}
 
 		/// <summary>해당 비트를 참조합니다.</summary>
@@ -149,10 +149,10 @@ namespace CT.Tools.Collections
 
 		/// <summary>모든 비트를 value로 초기화합니다.</summary>
 		/// <param name="value">초기화할 값</param>
-		public void Clear(bool value = false) => Mask = (value ? ALL_BIT_SET : ALL_BIT_UNSET);
+		public void Clear(bool value = false) => Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
 
 		/// <summary>모든 비트를 뒤집습니다.</summary>
-		public void Flip() => Mask = (uint)~Mask;
+		public void Flip() => Mask = ~Mask;
 
 		/// <summary>해당 index의 비트를 false로 설정합니다.</summary>
 		/// <param name="x">인덱스 x</param>

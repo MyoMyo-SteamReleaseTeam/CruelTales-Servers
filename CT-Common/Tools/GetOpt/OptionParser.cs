@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CT.Tools.GetOpt
+namespace CT.Common.Tools.GetOpt
 {
 	public class StringArgument
 	{
@@ -70,10 +70,10 @@ namespace CT.Tools.GetOpt
 		public void OnArguments(string[] args)
 		{
 			var programOption = Parse(args);
-		
+
 			foreach (var e in _optionEvents)
 			{
-				var options = programOption.Where((p) => p.Name ==  e.Name && p.Level == e.Level);
+				var options = programOption.Where((p) => p.Name == e.Name && p.Level == e.Level);
 				foreach (var op in options)
 				{
 					e.OnOptionCallback?.Invoke(op.Parameters);
@@ -182,7 +182,7 @@ namespace CT.Tools.GetOpt
 			{
 				result.Add(op);
 			}
-			
+
 			return result;
 		}
 	}

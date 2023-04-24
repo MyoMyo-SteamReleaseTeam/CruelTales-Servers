@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
+using CT.Common.Tools.CodeGen;
+using CT.Common.Tools.Data;
+using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
-using CT.Tools.CodeGen;
-using CT.Tools.Data;
-using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {

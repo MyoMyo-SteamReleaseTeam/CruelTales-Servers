@@ -1,5 +1,5 @@
 ﻿using System;
-using CT.Tools.ConsoleHelper;
+using CT.Common.Tools.ConsoleHelper;
 
 namespace CT.CorePatcher
 {

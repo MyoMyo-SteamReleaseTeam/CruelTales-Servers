@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tools.ConsoleHelper
+namespace CT.Common.Tools.ConsoleHelper
 {
 	public static class ConsoleHelper
 	{
@@ -12,7 +12,7 @@ namespace CT.Tools.ConsoleHelper
 		}
 
 		public static void WriteLine(string value,
-									 ConsoleColor foreground, 
+									 ConsoleColor foreground,
 									 ConsoleColor background)
 		{
 			Console.ForegroundColor = foreground;

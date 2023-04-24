@@ -1,4 +1,4 @@
-﻿using CT.Tools.Collections;
+﻿using CT.Common.Tools.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.Tool

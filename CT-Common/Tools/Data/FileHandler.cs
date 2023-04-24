@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CT.Tools.Data
+namespace CT.Common.Tools.Data
 {
 	/// <summary>예외를 발생시키지 않는 파일 입출력 도우미 클래스입니다.</summary>
 	public static class FileHandler
@@ -46,7 +46,7 @@ namespace CT.Tools.Data
 		/// false일 경우 경로가 없다면 예외가 발생합니다.
 		/// </param>
 		/// <returns>성공 여부입니다.</returns>
-		public static async ValueTask<JobResult> TryWriteTextAsync(string filePath, string data, 
+		public static async ValueTask<JobResult> TryWriteTextAsync(string filePath, string data,
 																   bool makeDirectory = false,
 																   CancellationToken cancellationToken = default)
 		{

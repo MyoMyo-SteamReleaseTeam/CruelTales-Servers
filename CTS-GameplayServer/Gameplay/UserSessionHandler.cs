@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Common.Tools.Collections;
 using CT.Networks.Runtimes;
-using CT.Tools.Collections;
 using CTS.Instance.Networks;
 using log4net;
 

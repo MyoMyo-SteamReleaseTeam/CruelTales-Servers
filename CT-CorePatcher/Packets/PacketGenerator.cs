@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using CT.Common.Serialization.Type;
-using CT.Tools.CodeGen;
-using CT.Tools.ConsoleHelper;
-using CT.Tools.Data;
-using CT.Tools.GetOpt;
+using CT.Common.Tools.CodeGen;
+using CT.Common.Tools.ConsoleHelper;
+using CT.Common.Tools.Data;
+using CT.Common.Tools.GetOpt;
 
 namespace CT.CorePatcher.Packets
 {

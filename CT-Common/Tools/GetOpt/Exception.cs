@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tools.GetOpt
+namespace CT.Common.Tools.GetOpt
 {
 	public class NoProcessArgumentsException : Exception
 	{

@@ -4,7 +4,7 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
-using CT.Tools.Collections;
+using CT.Common.Tools.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.NetworkCore

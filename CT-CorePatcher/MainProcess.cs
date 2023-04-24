@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.FilePatch;
 using CT.CorePatcher.Packets;
 using CT.CorePatcher.SynchronizationsCodeGen;
-using CT.Tools.GetOpt;
 
 namespace CT.CorePatcher
 {

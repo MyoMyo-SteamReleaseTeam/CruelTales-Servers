@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tools.Data
+namespace CT.Common.Tools.Data
 {
 	public enum JobResultType
 	{

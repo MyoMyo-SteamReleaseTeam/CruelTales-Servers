@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CT.Tools.Collections
+namespace CT.Common.Tools.Collections
 {
 	/// <summary>
 	/// 두 값을 양방향으로 짝 지은 Map 입니다.

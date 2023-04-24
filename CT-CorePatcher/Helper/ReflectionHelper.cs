@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CT.Common.Serialization.Type;
-using CT.Tools.Collections;
+using CT.Common.Tools.Collections;
 
 namespace CT.CorePatcher.Helper
 {

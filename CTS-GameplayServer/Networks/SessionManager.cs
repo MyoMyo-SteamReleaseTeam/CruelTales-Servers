@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using CT.Tools.Collections;
+using CT.Common.Tools.Collections;
 using log4net;
 
 namespace CTS.Instance.Networks

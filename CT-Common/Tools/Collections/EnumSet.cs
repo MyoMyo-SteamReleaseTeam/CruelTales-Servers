@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace CT.Tools.Collections
+namespace CT.Common.Tools.Collections
 {
 	public class EnumFlag<T> : IEnumerable<T> where T : Enum
 	{

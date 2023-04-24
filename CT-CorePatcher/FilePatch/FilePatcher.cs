@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CT.Tools.Data;
+using CT.Common.Tools.Data;
 
 namespace CT.CorePatcher.FilePatch
 {

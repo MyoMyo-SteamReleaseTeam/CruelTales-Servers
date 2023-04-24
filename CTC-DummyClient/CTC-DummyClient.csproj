@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CT-Common\CT-Common.csproj" />
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
-    <ProjectReference Include="..\CT-Tools\CT-Tools.csproj" />
     <ProjectReference Include="..\CTC-Networks\CTC-Networks.csproj" />
   </ItemGroup>
 

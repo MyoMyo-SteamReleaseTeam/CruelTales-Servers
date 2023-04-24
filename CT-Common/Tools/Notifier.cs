@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CT.Tools
+namespace CT.Common.Tools
 {
 	public class Notifier<T> where T : struct
 	{

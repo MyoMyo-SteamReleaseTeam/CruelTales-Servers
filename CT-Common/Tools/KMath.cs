@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace CT.Tools
+namespace CT.Common.Tools
 {
 	public static class KMath
 	{

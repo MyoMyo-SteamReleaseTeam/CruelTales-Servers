@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using CT.Common.Serialization;
+using CT.Common.Tools.Collections;
 using CT.Packets;
-using CT.Tools.Collections;
 using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets

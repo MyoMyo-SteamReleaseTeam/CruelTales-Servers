@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CT.Tools.GetOpt
+namespace CT.Common.Tools.GetOpt
 {
 	public class ProgramOption : IEnumerable<string>
 	{
@@ -64,7 +64,7 @@ namespace CT.Tools.GetOpt
 			}
 			else
 			{
-				return this.ToString();
+				return ToString();
 			}
 		}
 	}

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace CT.Tools.Data
+namespace CT.Common.Tools.Data
 {
 	public static class JsonHandler
 	{

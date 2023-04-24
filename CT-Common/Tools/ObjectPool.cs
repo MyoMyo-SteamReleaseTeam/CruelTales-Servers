@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CT.Tools
+namespace CT.Common.Tools
 {
 	public class ManageableObjectPool<T> where T : IManageable, new()
 	{
