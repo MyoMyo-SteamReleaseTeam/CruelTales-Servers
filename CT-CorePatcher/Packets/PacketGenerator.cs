@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CT.Common.Serialization;
 using CT.Common.Serialization.Type;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.ConsoleHelper;
@@ -268,9 +269,12 @@ namespace CT.CorePatcher.Packets
 				var enumCode = CodeGenerator_Enumerate
 					.Generate(packetTypeName,
 							  baseNamespace,
-							  true, true,
-							  new List<string>(),
-							  packetInfos.Select(p => p.PacketName).ToList());
+							  hasNone: true,
+							  useTab: true,
+							  usingList: new List<string>(),
+							  packetInfos.Select(p => p.PacketName).ToList(),
+							  addUsingAndSemicolon: true,
+							  PacketTypeExtension.SIZE_TYPE);
 
 				enumCode = string.Format(CodeFormat.GeneratorMetadata, enumFileName, enumCode);
 				var packetTypeTarget = Path.Combine(packetTypePath, enumFileName);

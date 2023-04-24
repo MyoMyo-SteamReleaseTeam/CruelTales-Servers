@@ -16,9 +16,14 @@ namespace CT.Common.Tools.CodeGen
 		/// <param name="usingList">using 목록입니다.</param>
 		/// <param name="items">Enum 요소 리스트입니다.</param>
 		/// <returns>생성된 코드입니다.</returns>
-		public static string Generate(string enumName, string enumNamespace,
-									  bool hasNone, bool useTab,
-									  IList<string> usingList, IList<string> items, bool addUsingAndSemicolon = true)
+		public static string Generate(string enumName,
+									  string enumNamespace,
+									  bool hasNone,
+									  bool useTab,
+									  IList<string> usingList,
+									  IList<string> items,
+									  bool addUsingAndSemicolon = true,
+									  string sizeType = "")
 		{
 			string indent = useTab ? "\t" : "    ";
 
@@ -46,7 +51,14 @@ namespace CT.Common.Tools.CodeGen
 			sb.AppendLine("{");
 
 			// Add declaration
-			sb.AppendLine($"{indent}public enum {enumName}");
+			if (string.IsNullOrWhiteSpace(sizeType))
+			{
+				sb.AppendLine($"{indent}public enum {enumName}");
+			}
+			else
+			{
+				sb.AppendLine($"{indent}public enum {enumName} : {sizeType}");
+			}
 			sb.AppendLine(indent + "{");
 
 			// Add items

@@ -32,6 +32,7 @@ namespace CT.Common.DataType
 				return false;
 			return this == lhs;
 		}
+		public override string ToString() => $"({X}, {Y})";
 	}
 
 	[Serializable]
@@ -94,5 +95,6 @@ namespace CT.Common.DataType
 				return false;
 			return this == lhs;
 		}
+		public override string ToString() => $"([{nameof(Position)}:{Position}][{nameof(Velocity)}:{Velocity}])";
 	}
 }

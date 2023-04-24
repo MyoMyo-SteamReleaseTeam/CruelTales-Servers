@@ -18,12 +18,16 @@
 	<!-- Declare Packets -->
 	
 	<!-- Try Join Matching -->
-	<client name="Req_TryJoinGameInstance">
+	<client name="Req_TryEnterGameInstance">
 		<GameInstanceGuid name="MatchTo"/>
 		<UserDataInfo name="UserDataInfo"/>
 		<UserToken name="Token"/>
 	</client>
-	<server name="Ack_TryJoinGameInstance">
+	
+	<server name="Ack_TryEnterGameInstance">
 		<AckJoinMatch name="AckResult"/>
 	</server>
+	
+	<client name="Req_ReadyToSync">
+	</client>
 </Definition>

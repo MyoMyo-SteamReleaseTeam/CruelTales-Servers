@@ -33,7 +33,7 @@ namespace CTS.Instance.SyncObjects
 		private byte _b;
 		[SyncRpc]
 		public partial void Server_MoveTo(NetVec2 _destination);
-		/// DECLARE SYNCHRONIZATIONS ///
+#region SYNCHRONIZATIONS
 		private BitmaskByte _propertyDirty_0 = new();
 		private BitmaskByte _rpcDirty_0 = new();
 		public override bool IsDirtyReliable
@@ -93,7 +93,6 @@ namespace CTS.Instance.SyncObjects
 		}
 		private Queue<NetVec2> Server_MoveToCallstack = new();
 		public override bool IsDirtyUnreliable => false;
-#region FromMaster
 		public override void SerializeSyncReliable(PacketWriter writer)
 		{
 			BitmaskByte objectDirty = new BitmaskByte();
@@ -131,7 +130,6 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_g);
 			writer.Put(_b);
 		}
-#endregion
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader) { }
@@ -141,6 +139,7 @@ namespace CTS.Instance.SyncObjects
 			_rpcDirty_0.Clear();
 		}
 		public override void ClearDirtyUnreliable() {}
+#endregion
 	}
 }
 #pragma warning restore CS0649

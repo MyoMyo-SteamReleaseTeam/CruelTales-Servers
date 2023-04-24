@@ -18,21 +18,23 @@ namespace CTC.Networks.Packets
 	{
 		private static Dictionary<PacketType, HandlePacket> _dispatcherTable = new()
 		{
-			{ PacketType.SC_Ack_TryJoinGameInstance, PacketHandler.Handle_SC_Ack_TryJoinGameInstance },
+			{ PacketType.SC_Ack_TryEnterGameInstance, PacketHandler.Handle_SC_Ack_TryEnterGameInstance },
 			
 		};
 
 		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
 		{
-			{ PacketType.SC_ReliableSynchroniation, PacketHandler.Handle_SC_ReliableSynchroniation },
-			{ PacketType.SC_UnreliableSynchroniation, PacketHandler.Handle_SC_UnreliableSynchroniation },
+			{ PacketType.SC_Sync_LifeCycle, PacketHandler.Handle_SC_Sync_LifeCycle },
+			{ PacketType.SC_Sync_Reliable, PacketHandler.Handle_SC_Sync_Reliable },
+			{ PacketType.SC_Sync_Unreliable, PacketHandler.Handle_SC_Sync_Unreliable },
 			
 		};
 
 		private static HashSet<PacketType> _customPacketSet = new()
 		{
-			PacketType.SC_ReliableSynchroniation,
-			PacketType.SC_UnreliableSynchroniation,
+			PacketType.SC_Sync_LifeCycle,
+			PacketType.SC_Sync_Reliable,
+			PacketType.SC_Sync_Unreliable,
 			
 		};
 

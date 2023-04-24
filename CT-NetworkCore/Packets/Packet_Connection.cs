@@ -31,9 +31,9 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed partial class CS_Req_TryJoinGameInstance : PacketBase
+	public sealed partial class CS_Req_TryEnterGameInstance : PacketBase
 	{
-		public override PacketType PacketType => PacketType.CS_Req_TryJoinGameInstance;
+		public override PacketType PacketType => PacketType.CS_Req_TryEnterGameInstance;
 	
 		public GameInstanceGuid MatchTo = new();
 		public UserDataInfo UserDataInfo = new();
@@ -57,9 +57,9 @@ namespace CT.Packets
 		}
 	}
 	
-	public sealed partial class SC_Ack_TryJoinGameInstance : PacketBase
+	public sealed partial class SC_Ack_TryEnterGameInstance : PacketBase
 	{
-		public override PacketType PacketType => PacketType.SC_Ack_TryJoinGameInstance;
+		public override PacketType PacketType => PacketType.SC_Ack_TryEnterGameInstance;
 	
 		public AckJoinMatch AckResult;
 	
@@ -74,6 +74,26 @@ namespace CT.Packets
 		public override void Deserialize(PacketReader reader)
 		{
 			AckResult = reader.ReadAckJoinMatch();
+		}
+	}
+	
+	public sealed partial class CS_Req_ReadyToSync : PacketBase
+	{
+		public override PacketType PacketType => PacketType.CS_Req_ReadyToSync;
+	
+	
+	
+		public override int SerializeSize =>  + 2;
+	
+		public override void Serialize(PacketWriter writer)
+		{
+			writer.Put(PacketType);
+			
+		}
+	
+		public override void Deserialize(PacketReader reader)
+		{
+			
 		}
 	}
 }

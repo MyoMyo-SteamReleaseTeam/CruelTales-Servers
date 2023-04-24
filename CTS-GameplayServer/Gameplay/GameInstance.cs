@@ -30,17 +30,17 @@ namespace CTS.Instance.Gameplay
 		private UserInputHandler _inputHandler;
 
 		// Managers
-		private MiniGameManager _miniGameManager;
+		private GameManager _gameManager;
 
-		// Packets
-		private PacketPool _packetPool = new();
+		// Test buffer
+		private byte[] _packetBuffer = new byte[1024 * 16];
 
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
 			_sessionHandler = new UserSessionHandler(this);
 			_inputHandler = new UserInputHandler(this);
-			_miniGameManager = new MiniGameManager();
+			_gameManager = new GameManager();
 		}
 
 		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
@@ -52,6 +52,9 @@ namespace CTS.Instance.Gameplay
 
 			_sessionHandler.Initialize(_option);
 			_inputHandler.Clear();
+
+			// TEST
+			_gameManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>
@@ -64,7 +67,8 @@ namespace CTS.Instance.Gameplay
 			// Handle received input
 			_inputHandler.Flush(deltaTime);
 
-			// Update mini game
+			// Update game logic
+			_gameManager.Update(deltaTime);
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
@@ -89,7 +93,7 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnterGame(UserSession userSession)
 		{
-			_log.Info($"[Instance:{Guid}] Session {userSession} enter the game");
+			//var _packetPool.GetPacket<SC_Ack_TryJoinGameInstance>();
 
 			// TODO send enter user
 			//SC_OnUserEnter enter = _packetPool.GetPacket<SC_OnUserEnter>();

@@ -7,13 +7,15 @@
 
 namespace CT.Packets
 {
-	public enum PacketType
+	public enum PacketType : byte
 	{
 		None = 0,
-		CS_Req_TryJoinGameInstance,
-		SC_Ack_TryJoinGameInstance,
-		SC_ReliableSynchroniation,
-		SC_UnreliableSynchroniation,
+		CS_Req_TryEnterGameInstance,
+		SC_Ack_TryEnterGameInstance,
+		CS_Req_ReadyToSync,
+		SC_Sync_LifeCycle,
+		SC_Sync_Reliable,
+		SC_Sync_Unreliable,
 		CS_Req_UserInput_Movement,
 		CS_Req_UserInput_Action,
 	}

@@ -12,6 +12,7 @@
 	<!-- Declare Data Types -->
 	
 	<!-- Declare Packets -->
-	<server name="ReliableSynchroniation" custom="true"/>
-	<server name="UnreliableSynchroniation" custom="true"/>
+	<server name="Sync_LifeCycle" custom="true"/>
+	<server name="Sync_Reliable" custom="true"/>
+	<server name="Sync_Unreliable" custom="true"/>
 </Definition>

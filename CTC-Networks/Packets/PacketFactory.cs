@@ -21,8 +21,9 @@ namespace CTC.Networks.Packets
 	{
 		private static Dictionary<PacketType, CreatePacket> _packetCreateByEnum = new()
 		{
-			{ PacketType.CS_Req_TryJoinGameInstance, () => new CS_Req_TryJoinGameInstance() },
-			{ PacketType.SC_Ack_TryJoinGameInstance, () => new SC_Ack_TryJoinGameInstance() },
+			{ PacketType.CS_Req_TryEnterGameInstance, () => new CS_Req_TryEnterGameInstance() },
+			{ PacketType.SC_Ack_TryEnterGameInstance, () => new SC_Ack_TryEnterGameInstance() },
+			{ PacketType.CS_Req_ReadyToSync, () => new CS_Req_ReadyToSync() },
 			{ PacketType.CS_Req_UserInput_Movement, () => new CS_Req_UserInput_Movement() },
 			{ PacketType.CS_Req_UserInput_Action, () => new CS_Req_UserInput_Action() },
 			
@@ -30,8 +31,9 @@ namespace CTC.Networks.Packets
 
 		private static Dictionary<Type, CreatePacket> _packetCreateByType = new()
 		{
-			{ typeof(CS_Req_TryJoinGameInstance), () => new CS_Req_TryJoinGameInstance() },
-			{ typeof(SC_Ack_TryJoinGameInstance), () => new SC_Ack_TryJoinGameInstance() },
+			{ typeof(CS_Req_TryEnterGameInstance), () => new CS_Req_TryEnterGameInstance() },
+			{ typeof(SC_Ack_TryEnterGameInstance), () => new SC_Ack_TryEnterGameInstance() },
+			{ typeof(CS_Req_ReadyToSync), () => new CS_Req_ReadyToSync() },
 			{ typeof(CS_Req_UserInput_Movement), () => new CS_Req_UserInput_Movement() },
 			{ typeof(CS_Req_UserInput_Action), () => new CS_Req_UserInput_Action() },
 			
@@ -39,8 +41,9 @@ namespace CTC.Networks.Packets
 
 		private static BidirectionalMap<Type, PacketType> _packetTypeTable = new()
 		{
-			{ typeof(CS_Req_TryJoinGameInstance), PacketType.CS_Req_TryJoinGameInstance },
-			{ typeof(SC_Ack_TryJoinGameInstance), PacketType.SC_Ack_TryJoinGameInstance },
+			{ typeof(CS_Req_TryEnterGameInstance), PacketType.CS_Req_TryEnterGameInstance },
+			{ typeof(SC_Ack_TryEnterGameInstance), PacketType.SC_Ack_TryEnterGameInstance },
+			{ typeof(CS_Req_ReadyToSync), PacketType.CS_Req_ReadyToSync },
 			{ typeof(CS_Req_UserInput_Movement), PacketType.CS_Req_UserInput_Movement },
 			{ typeof(CS_Req_UserInput_Action), PacketType.CS_Req_UserInput_Action },
 			

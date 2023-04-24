@@ -21,8 +21,16 @@ namespace CT.Common.DataType
 
 		// CT Network's DisconnectReason
 		Unknown,
-		AuthenticationTimeout,
+
+		// Authentication Timeout
+		Timeout_Authentication,
+		Timeout_FailedToEnterGameInstance,
+		Timeout_FailedToReadyToSync,
+		Timeout_GameCannotHandleYourSession,
+
+
 		WrongPacket,
+		WrongOperation,
 
 		ThereIsNoSuchGameInstance,
 		GameInstanceIsAlreadyFull,

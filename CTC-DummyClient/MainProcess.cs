@@ -33,9 +33,10 @@ namespace CTC.Networks
 		public static readonly int ServerPort = 60128;
 
 		// Dummy client setup
+		private static int _startCounter = 1;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 4000;
-		private static List<DummyClientSession> _dummyClients = new();
+		private static int _dummyCount = 1;
+		private static List<ServerSession> _dummyClients = new();
 
 		// Handle test process
 		private static bool _shouldStop = false;
@@ -47,7 +48,7 @@ namespace CTC.Networks
 			//Console.WriteLine($"Start dummy test for press anykey...");
 			//Console.ReadLine();
 
-			for (int i = 1; i >= 0; i--)
+			for (int i = _startCounter; i >= 0; i--)
 			{
 				_log.Info($"Start dummy client test in {i}");
 				Thread.Sleep(1000);
@@ -64,8 +65,8 @@ namespace CTC.Networks
 				};
 
 				// Create dummy clinet and add to list
-				var dummyClient = new DummyClientSession(info);
-				_dummyClients.Add(new DummyClientSession(info));
+				var dummyClient = new ServerSession(info);
+				_dummyClients.Add(new ServerSession(info));
 			}
 
 			_log.Info($"Create dummy clients success. Count : {_dummyCount}");

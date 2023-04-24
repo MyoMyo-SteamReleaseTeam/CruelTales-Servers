@@ -28,7 +28,7 @@ namespace CTS.Instance.Networks
 		private readonly TickTimer _serverTimer;
 
 		// Constant
-		public const byte CHANNEL_CONNECTION = 1;
+		public const byte CHANNEL_CONNECTION = 0;
 
 		// Packets
 		private readonly PacketPool _packetPool = new PacketPool();
@@ -88,7 +88,7 @@ namespace CTS.Instance.Networks
 			}
 
 			var session = _sessionManager.Create(peer.Id);
-			if (!session.TryConnected(peer))
+			if (!session.OnTryConnecting(peer))
 			{
 				peer.Disconnect();
 				_log.Error($"Connection error from {peer.EndPoint.ToString()}");
@@ -117,7 +117,7 @@ namespace CTS.Instance.Networks
 				{
 					PacketReader packetReader = new(reader.GetRemainingBytesSegment());
 
-					while (!packetReader.IsEnd)
+					while (packetReader.CanRead(sizeof(PacketType)))
 					{
 						PacketType packetType = packetReader.ReadPacketType();
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
-using CTS.Instance.Gameplay.Entities;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
 
@@ -11,31 +10,33 @@ namespace CTS.Instance.Gameplay
 {
 	public class GameWorldManager
 	{
-		private Dictionary<NetEntityId, MasterNetworkObject> _worldManager = new();
-
-		private NetEntityId _entityIdCounter;
-
-		private Dictionary<NetEntityId, BaseEntity> _entityById = new();
+		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObject = new();
+		private NetworkIdentity _entityIdCounter;
 
 		public void Clear()
 		{
-			_entityById.Clear();
+			//_entityById.Clear();
 		}
 
 		public void AddPlayer(UserSession session)
 		{
-			_entityIdCounter = new NetEntityId(_entityIdCounter.ID + 1);
-			var playerEntity = new Entity_Player();
-			playerEntity.BindClient(session.UserId);
-			_entityById.Add(_entityIdCounter, playerEntity);
+			//_entityIdCounter = new NetEntityId(_entityIdCounter.ID + 1);
+			//var playerEntity = new Entity_Player();
+			//playerEntity.BindClient(session.UserId);
+			//_entityById.Add(_entityIdCounter, playerEntity);
+		}
+
+		public void Create(MasterNetworkObject netObject)
+		{
+			_worldObject.Add(netObject.Identity, netObject);
 		}
 	}
 
-	public class MiniGameManager
+	public class GameManager
 	{
 		private MiniGameMapData MiniGameMapData { get; set; }
 
-		public MiniGameManager()
+		public GameManager()
 		{
 			// Temp
 			MiniGameMapData = new()
@@ -70,5 +71,12 @@ namespace CTS.Instance.Gameplay
 		{
 
 		}
+
+		public void OnUserEnter(UserSession userSession)
+		{
+
+		}
+
+
 	}
 }

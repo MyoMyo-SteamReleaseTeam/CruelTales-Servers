@@ -14,8 +14,9 @@ namespace CTS.Instance.Gameplay
 	public enum UserSessionJobType
 	{
 		None = 0,
-		TryJoin,
 		OnDisconnected,
+		TryEnterGame,
+		TryReadyToSync,
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
@@ -23,6 +24,12 @@ namespace CTS.Instance.Gameplay
 	{
 		public UserSessionJobType Type;
 		public UserSession UserSession;
+
+		public SessionJob(UserSessionJobType type, UserSession session)
+		{
+			Type = type;
+			UserSession = session;
+		}
 	}
 
 	public class UserSessionHandler : IJobHandler
@@ -64,8 +71,9 @@ namespace CTS.Instance.Gameplay
 		{
 			switch (job.Type)
 			{
-				case UserSessionJobType.TryJoin: Execute_tryJoinGame(job.UserSession); break;
 				case UserSessionJobType.OnDisconnected: Execute_onDisconnected(job.UserSession); break;
+				case UserSessionJobType.TryEnterGame: Execute_tryEnterGame(job.UserSession); break;
+				case UserSessionJobType.TryReadyToSync: Execute_tryReadyToSync(job.UserSession); break;
 
 				default:
 					_log.Error($"Unknown user session job detected!");
@@ -74,20 +82,37 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void Push_TryJoinGame(UserSession userSession)
+		public void Push_OnDisconnected(UserSession userSession)
 		{
-			_jobQueue.Push(new SessionJob()
-			{
-				Type = UserSessionJobType.TryJoin,
-				UserSession = userSession,
-			});
+			_jobQueue.Push(new(UserSessionJobType.OnDisconnected, userSession));
 		}
 
-		private void Execute_tryJoinGame(UserSession userSession)
+		/// <summary>연결 종료된 유저의 정보를 게임에서 제거합니다.</summary>
+		private void Execute_onDisconnected(UserSession userSession)
+		{
+			if (_userById.TryRemove(userSession.UserId))
+			{
+				_log.Info($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
+				_gameInstance.OnUserLeaveGame(userSession);
+			}
+			else
+			{
+				_log.Error($"Player disconnected warning! There is no user {userSession.UserId}!");
+			}
+		}
+
+		public void Push_TryEnterGame(UserSession userSession)
+		{
+			_jobQueue.Push(new(UserSessionJobType.TryEnterGame, userSession));
+		}
+
+		/// <summary>유저를 참가시키거나 거부합니다. 참가 후 바로 접속 유저로 집계됩니다.</summary>
+		private void Execute_tryEnterGame(UserSession userSession)
 		{
 			if (_userById.ContainsForward(userSession.UserId))
 			{
-				_log.Warn($"User {userSession.UserId} try to join again");
+				_log.Warn($"User {userSession} try to join again");
+				userSession.Disconnect(DisconnectReasonType.WrongOperation);
 				return;
 			}
 
@@ -103,30 +128,32 @@ namespace CTS.Instance.Gameplay
 			_userById.Add(userSession.UserId, userSession);
 			_userList.Add(userSession);
 
+			// Ack response
+			_log.Info($"User {userSession} has been enter the game instance. [GUID:{_gameInstance.Guid}]");
+			userSession.AckTryEnterGameInstance();
+		}
+
+		public void Push_TryReadyToSync(UserSession userSession)
+		{
+			_jobQueue.Push(new(UserSessionJobType.TryReadyToSync, userSession));
+		}
+
+		/// <summary>
+		/// 동기화 준비가 된 유저 이벤트를 발생시킵니다.
+		/// 월드 메니져에서 초기화 패킷을 전송합니다.
+		/// </summary>
+		public void Execute_tryReadyToSync(UserSession userSession)
+		{
+			if (!_userById.ContainsForward(userSession.UserId))
+			{
+				_log.Warn($"There is no {userSession} user in this game! GUID:{_gameInstance.Guid}");
+				userSession.Disconnect(DisconnectReasonType.WrongOperation);
+				return;
+			}
+
+			_log.Info($"[Instance:{_gameInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
-			_gameInstance.OnUserEnterGame(userSession);
-		}
-
-		public void Push_OnDisconnected(UserSession userSession)
-		{
-			_jobQueue.Push(new SessionJob()
-			{
-				Type = UserSessionJobType.OnDisconnected,
-				UserSession = userSession,
-			});
-		}
-
-		private void Execute_onDisconnected(UserSession userSession)
-		{
-			if (_userById.TryRemove(userSession.UserId))
-			{
-				_log.Info($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
-				_gameInstance.OnUserLeaveGame(userSession);
-			}
-			else
-			{
-				_log.Error($"Player disconnected warning! There is no user {userSession.UserId}!");
-			}
+			this._gameInstance.OnUserEnterGame(userSession);
 		}
 
 		public void SendReliable(UserId userId, PacketWriter writer,
