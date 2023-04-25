@@ -32,9 +32,9 @@ namespace CTS.Instance.SyncObjects
 			Y = Y + ((Dest - Y) * deltaTime * Speed);
 
 			_moveDelay += deltaTime;
-			if (_moveDelay > 5.0f)
+			if (_moveDelay > 3f)
 			{
-				_moveDelay = 0;
+				_moveDelay -= 3f;
 				Move = -Move;
 				Dest = Pivot + Move;
 			}
