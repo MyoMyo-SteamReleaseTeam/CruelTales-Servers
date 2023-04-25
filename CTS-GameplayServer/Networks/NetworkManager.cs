@@ -32,7 +32,7 @@ namespace CTS.Instance.Networks
 
 		// Packets
 		private readonly PacketPool _packetPool = new PacketPool();
-		private readonly byte[] _wrongPacketDisconnectInfo = new byte[1] { (byte)DisconnectReasonType.WrongPacket };
+		private readonly byte[] _wrongPacketDisconnectInfo = new byte[1] { (byte)DisconnectReasonType.ServerError_CannotHandlePacket };
 
 		public NetworkManager(ServerOption serverOption, TickTimer serverTimer)
 		{
@@ -143,7 +143,7 @@ namespace CTS.Instance.Networks
 				}
 				else
 				{
-					session.Disconnect(DisconnectReasonType.WrongPacket);
+					session.Disconnect(DisconnectReasonType.ServerError_CannotHandlePacket);
 				}
 				return;
 			}

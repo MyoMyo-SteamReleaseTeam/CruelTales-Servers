@@ -1,5 +1,5 @@
 ﻿using CT.Common.DataType;
-using CTC.Networks.Synchornizations;
+using CTC.Networks.Synchronizations;
 using log4net;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
@@ -14,7 +14,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 		public partial void Server_MoveTo(NetVec2 _destination)
 		{
-			_log.Info(_destination);
+			//_log.Info(_destination);
 		}
 	}
 }

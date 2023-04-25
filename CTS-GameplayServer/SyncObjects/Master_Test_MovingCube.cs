@@ -5,6 +5,7 @@
  * Do not modify the code arbitrarily.
  */
 
+#nullable enable
 #pragma warning disable CS0649
 
 using System;
@@ -31,10 +32,19 @@ namespace CTS.Instance.SyncObjects
 		private byte _g;
 		[SyncVar]
 		private byte _b;
+		[SyncVar]
+		private float _speed;
+		[SyncVar]
+		private float _x;
+		[SyncVar]
+		private float _y;
+		[SyncVar]
+		private float _z;
 		[SyncRpc]
-		public partial void Server_MoveTo(NetVec2 _destination);
+		public partial void Server_MoveTo(float _y);
 #region SYNCHRONIZATIONS
 		private BitmaskByte _propertyDirty_0 = new();
+		private BitmaskByte _propertyDirty_1 = new();
 		private BitmaskByte _rpcDirty_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -42,6 +52,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				bool isDirty = false;
 				isDirty |= _propertyDirty_0.AnyTrue();
+				isDirty |= _propertyDirty_1.AnyTrue();
 				isDirty |= _rpcDirty_0.AnyTrue();
 				return isDirty;
 			}
@@ -86,17 +97,58 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[3] = true;
 			}
 		}
-		public partial void Server_MoveTo(NetVec2 _destination)
+		public float Speed
 		{
-			Server_MoveToCallstack.Enqueue(_destination);
+			get => _speed;
+			set
+			{
+				if (_speed == value) return;
+				_speed = value;
+				_propertyDirty_0[4] = true;
+			}
+		}
+		public float X
+		{
+			get => _x;
+			set
+			{
+				if (_x == value) return;
+				_x = value;
+				_propertyDirty_0[5] = true;
+			}
+		}
+		public float Y
+		{
+			get => _y;
+			set
+			{
+				if (_y == value) return;
+				_y = value;
+				_propertyDirty_0[6] = true;
+			}
+		}
+		public float Z
+		{
+			get => _z;
+			set
+			{
+				if (_z == value) return;
+				_z = value;
+				_propertyDirty_0[7] = true;
+			}
+		}
+		public partial void Server_MoveTo(float _y)
+		{
+			Server_MoveToCallstack.Enqueue(_y);
 			_rpcDirty_0[0] = true;
 		}
-		private Queue<NetVec2> Server_MoveToCallstack = new();
+		private Queue<float> Server_MoveToCallstack = new();
 		public override bool IsDirtyUnreliable => false;
 		public override void SerializeSyncReliable(PacketWriter writer)
 		{
 			BitmaskByte objectDirty = new BitmaskByte();
 			objectDirty[0] = _propertyDirty_0.AnyTrue();
+			objectDirty[1] = _propertyDirty_1.AnyTrue();
 			objectDirty[4] = _rpcDirty_0.AnyTrue();
 			objectDirty.Serialize(writer);
 			if (objectDirty[0])
@@ -106,6 +158,10 @@ namespace CTS.Instance.SyncObjects
 				if (_propertyDirty_0[1]) writer.Put(_r);
 				if (_propertyDirty_0[2]) writer.Put(_g);
 				if (_propertyDirty_0[3]) writer.Put(_b);
+				if (_propertyDirty_0[4]) writer.Put(_speed);
+				if (_propertyDirty_0[5]) writer.Put(_x);
+				if (_propertyDirty_0[6]) writer.Put(_y);
+				if (_propertyDirty_0[7]) writer.Put(_z);
 			}
 			if (objectDirty[4])
 			{
@@ -117,7 +173,7 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = Server_MoveToCallstack.Dequeue();
-						arg.Serialize(writer);
+						writer.Put(arg);
 					}
 				}
 			}
@@ -129,6 +185,10 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_r);
 			writer.Put(_g);
 			writer.Put(_b);
+			writer.Put(_speed);
+			writer.Put(_x);
+			writer.Put(_y);
+			writer.Put(_z);
 		}
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
@@ -136,6 +196,7 @@ namespace CTS.Instance.SyncObjects
 		public override void ClearDirtyReliable()
 		{
 			_propertyDirty_0.Clear();
+			_propertyDirty_1.Clear();
 			_rpcDirty_0.Clear();
 		}
 		public override void ClearDirtyUnreliable() {}

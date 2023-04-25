@@ -3,7 +3,7 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTC.Networks.SyncObjects.TestSyncObjects;
 
-namespace CTC.Networks.Synchornizations
+namespace CTC.Networks.Synchronizations
 {
 	public abstract class RemoteNetworkObject : ISynchronizable
 	{

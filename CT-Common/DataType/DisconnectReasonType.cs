@@ -28,12 +28,18 @@ namespace CT.Common.DataType
 		Timeout_FailedToReadyToSync,
 		Timeout_GameCannotHandleYourSession,
 
+		// Client error
+		ClientError_CannotHandlePacket,
 
-		WrongPacket,
-		WrongOperation,
+		// Server error
+		ServerError_CannotHandlePacket,
+		ServerError_WrongOperation,
+		ServerError_YouTryRejoin,
+		ServerError_YouAreNotInTheWaitingQueue,
 
-		ThereIsNoSuchGameInstance,
-		GameInstanceIsAlreadyFull,
+		// Reject from server
+		Reject_ThereIsNoSuchGameInstance,
+		Reject_GameInstanceIsAlreadyFull,
 	}
 
 	public static class DisconnectReasonTypeExtension

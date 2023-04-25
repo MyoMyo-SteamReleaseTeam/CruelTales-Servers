@@ -400,8 +400,8 @@ using CT.Common.Serialization;
 
 namespace CTC.Networks.Packets
 {{
-	public delegate void HandlePacket(PacketBase receivedPacket, ServerSession session);
-	public delegate void HandlePacketRaw(PacketReader reader, ServerSession session);
+	public delegate void HandlePacket(PacketBase receivedPacket, NetworkManager networkManager);
+	public delegate void HandlePacketRaw(PacketReader reader, NetworkManager networkManager);
 
 	public static class PacketDispatcher
 	{{
@@ -420,14 +420,14 @@ namespace CTC.Networks.Packets
 {2}
 		}};
 
-		public static void Dispatch(PacketBase receivedPacket, ServerSession session)
+		public static void Dispatch(PacketBase receivedPacket, NetworkManager networkManager)
 		{{
-			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
+			_dispatcherTable[receivedPacket.PacketType](receivedPacket, networkManager);
 		}}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader reader, ServerSession session)
+		public static void DispatchRaw(PacketType packetType, PacketReader reader, NetworkManager networkManager)
 		{{
-			_dispatcherRawTable[packetType](reader, session);
+			_dispatcherRawTable[packetType](reader, networkManager);
 		}}
 
 		public static bool IsCustomPacket(PacketType packetType)

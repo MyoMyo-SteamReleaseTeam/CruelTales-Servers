@@ -5,23 +5,35 @@ using CT.Common.Synchronizations;
 
 namespace CTS.Instance.SyncDefinitions
 {
-	[SyncNetworkObjectDefinition]
+	[DEF_SyncNetworkObjectDefinition]
 	public class Test_MovingCube
 	{
-		[SyncVar]
+		[DEF_SyncVar]
 		public NetworkIdentity NetworkIdentity;
 
-		[SyncVar]
+		[DEF_SyncVar]
 		public byte R;
 
-		[SyncVar]
+		[DEF_SyncVar]
 		public byte G;
 
-		[SyncVar]
+		[DEF_SyncVar]
 		public byte B;
 
-		[SyncRpc]
-		public void Server_MoveTo(NetVec2 destination) { }
+		[DEF_SyncVar]
+		public float _speed;
+
+		[DEF_SyncVar]
+		public float _x;
+
+		[DEF_SyncVar]
+		public float _y;
+
+		[DEF_SyncVar]
+		public float _z;
+
+		[DEF_SyncRpc]
+		public void Server_MoveTo(float y) { }
 	}
 }
 

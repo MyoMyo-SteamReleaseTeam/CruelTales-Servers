@@ -99,7 +99,7 @@ namespace CTS.Instance.Gameplay
 			}
 			else
 			{
-				_log.Error($"Player disconnected warning! There is no user {userSession.UserId}!");
+				_log.Warn($"Player disconnected warning! There is no user {userSession.UserId}!");
 			}
 		}
 
@@ -115,16 +115,16 @@ namespace CTS.Instance.Gameplay
 				_waitingTable.ContainsForward(userSession.UserId))
 			{
 				_log.Warn($"User {userSession} try to join again");
-				userSession.Disconnect(DisconnectReasonType.WrongOperation);
+				userSession.Disconnect(DisconnectReasonType.ServerError_YouTryRejoin);
 				return;
 			}
 
 			if (MemberCount >= MaxUser)
 			{
 				_log.Warn($"User {userSession} fail to join GameInstance {_gameInstance.Guid}. " +
-					$"Reason : {DisconnectReasonType.GameInstanceIsAlreadyFull}");
+					$"Reason : {DisconnectReasonType.Reject_GameInstanceIsAlreadyFull}");
 
-				userSession.Disconnect(DisconnectReasonType.GameInstanceIsAlreadyFull);
+				userSession.Disconnect(DisconnectReasonType.Reject_GameInstanceIsAlreadyFull);
 				return;
 			}
 
@@ -149,7 +149,7 @@ namespace CTS.Instance.Gameplay
 			if (!_waitingTable.ContainsForward(userSession.UserId))
 			{
 				_log.Warn($"There is no {userSession} user in waiting table! GUID:{_gameInstance.Guid}");
-				userSession.Disconnect(DisconnectReasonType.WrongOperation);
+				userSession.Disconnect(DisconnectReasonType.ServerError_YouAreNotInTheWaitingQueue);
 				return;
 			}
 

@@ -37,8 +37,8 @@ namespace CTC.Networks
 		// Dummy client setup
 		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 700;
-		private static List<ServerSession> _dummyClients = new();
+		private static int _dummyCount = 100;
+		private static List<NetworkManager> _dummyClients = new();
 
 		// Handle test process
 		private static bool _shouldStop = false;
@@ -67,8 +67,8 @@ namespace CTC.Networks
 				};
 
 				// Create dummy clinet and add to list
-				var dummyClient = new ServerSession(info);
-				_dummyClients.Add(new ServerSession(info));
+				var dummyClient = new NetworkManager(info);
+				_dummyClients.Add(new NetworkManager(info));
 			}
 
 			_log.Info($"Create dummy clients success. Count : {_dummyCount}");

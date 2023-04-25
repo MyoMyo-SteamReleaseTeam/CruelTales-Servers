@@ -4,22 +4,22 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Packets;
 using CTC.Networks.Packets;
-using CTC.Networks.Synchornizations;
+using CTC.Networks.Synchronizations;
 using CTC.Networks.SyncObjects.TestSyncObjects;
 using LiteNetLib;
 using log4net;
 
 namespace CTC.Networks
 {
-	public class GameManager
+	public class GameSynchronizer
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof(GameManager));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(GameSynchronizer));
 
-		private ServerSession _serverSession;
+		private NetworkManager _serverSession;
 
 		private Dictionary<NetworkIdentity, RemoteNetworkObject> _worldObjectById = new();
 
-		public GameManager(ServerSession serverSession)
+		public GameSynchronizer(NetworkManager serverSession)
 		{
 			_serverSession = serverSession;
 		}
@@ -83,25 +83,25 @@ namespace CTC.Networks
 		}
 	}
 
-	public class ServerSession
+	public class NetworkManager
 	{
-		private static ILog _log = LogManager.GetLogger(typeof(ServerSession));
+		private static ILog _log = LogManager.GetLogger(typeof(NetworkManager));
 		private UserSessionState _sessionState = UserSessionState.NoConnection;
 		private EventBasedNetListener _listener;
 		private NetManager _netManager;
 		private NetPeer? _serverPeer;
 		private PacketPool _packetPool = new();
 
-		private GameManager _gameManager;
-		public GameManager GameManager => _gameManager;
+		private GameSynchronizer _gameSynchronizer;
+		public GameSynchronizer GameSynchronizer => _gameSynchronizer;
 
 		public DummyUserInfo UserInfo { get; private set; }
 
-		public ServerSession(DummyUserInfo info)
+		public NetworkManager(DummyUserInfo info)
 		{
 			UserInfo = info;
 
-			_gameManager = new GameManager(this);
+			_gameSynchronizer = new GameSynchronizer(this);
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
 
@@ -116,10 +116,42 @@ namespace CTC.Networks
 			_sessionState = UserSessionState.NoConnection;
 		}
 
+		public void Update(float deltaTime)
+		{
+			_netManager.PollEvents();
+			_gameSynchronizer.Update(deltaTime);
+		}
+
 		public void TryConnect(string address, int port)
 		{
 			_netManager.Connect(address, port, "TestServer");
 			_sessionState = UserSessionState.NoConnection;
+		}
+
+		public void Disconnect()
+		{
+			_serverPeer?.Disconnect();
+			_netManager.DisconnectAll();
+		}
+
+		public void SendReliable(PacketWriter writer,
+								 byte channelNumber = 0)
+		{
+			_serverPeer?.Send(writer.Buffer.Array,
+							  writer.Buffer.Offset,
+							  writer.Count,
+							  channelNumber,
+							  DeliveryMethod.ReliableOrdered);
+		}
+
+		public void SendUnreliable(PacketWriter writer,
+								   byte channelNumber = 0)
+		{
+			_serverPeer?.Send(writer.Buffer.Array,
+							  writer.Buffer.Offset,
+							  writer.Count,
+							  channelNumber,
+							  DeliveryMethod.Unreliable);
 		}
 
 		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
@@ -146,29 +178,9 @@ namespace CTC.Networks
 			}
 			catch
 			{
-				System.Console.WriteLine($"Disconnect! Failed to handle packet!");
-				//Disconnect();
+				_log.Error($"Disconnect! Failed to handle packet!");
+				Disconnect();
 			}
-		}
-
-		public void SendReliable(PacketWriter writer,
-								 byte channelNumber = 0)
-		{
-			_serverPeer?.Send(writer.Buffer.Array,
-							  writer.Buffer.Offset,
-							  writer.Count,
-							  channelNumber,
-							  DeliveryMethod.ReliableOrdered);
-		}
-
-		public void SendUnreliable(PacketWriter writer,
-								   byte channelNumber = 0)
-		{
-			_serverPeer?.Send(writer.Buffer.Array,
-							  writer.Buffer.Offset,
-							  writer.Count,
-							  channelNumber,
-							  DeliveryMethod.Unreliable);
 		}
 
 		private void OnConnected(NetPeer peer)
@@ -197,7 +209,7 @@ namespace CTC.Networks
 			PacketWriter pw = new PacketWriter(new PacketSegment(1000));
 			pw.Put(enterPacket);
 
-			_serverPeer.Send(pw.Buffer.Array, 0, pw.Count, DeliveryMethod.ReliableOrdered);
+			SendReliable(pw);
 			_packetPool.Return(enterPacket);
 		}
 
@@ -214,18 +226,6 @@ namespace CTC.Networks
 				var disconnectReason = (DisconnectReasonType)disconnectInfo.AdditionalData.GetByte();
 				_log.Warn($"Disconnected from the server. Disconnect reason : {disconnectReason}");
 			}
-		}
-
-		public void Disconnect()
-		{
-			_serverPeer?.Disconnect();
-			_netManager.DisconnectAll();
-		}
-
-		public void Update(float deltaTime)
-		{
-			_netManager.PollEvents();
-			_gameManager.Update(deltaTime);
 		}
 
 		internal void ReqTryReadyToSync()

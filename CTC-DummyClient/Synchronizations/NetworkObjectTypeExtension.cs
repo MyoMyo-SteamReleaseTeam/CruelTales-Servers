@@ -1,7 +1,7 @@
 ﻿using CT.Common.Serialization;
 using CTC.Networks.SyncObjects.TestSyncObjects;
 
-namespace CTC.Networks.Synchornizations
+namespace CTC.Networks.Synchronizations
 {
 	public static class NetworkObjectTypeExtension
 	{

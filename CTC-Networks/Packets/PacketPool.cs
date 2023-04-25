@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using CT.Common.Serialization;
 using CT.Packets;
+#if NET
 using log4net;
+#elif UNITY_2021
+using CT.Logger;
+#endif
 
 namespace CTC.Networks.Packets
 {

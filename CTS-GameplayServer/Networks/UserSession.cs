@@ -187,7 +187,7 @@ namespace CTS.Instance.Networks
 				if (CurrentState != UserSessionState.TryConnecting)
 				{
 					_log.Warn($"User {this} request {nameof(OnReqTryEnterGameInstance)} when current state is {CurrentState}");
-					Disconnect(DisconnectReasonType.WrongOperation);
+					Disconnect(DisconnectReasonType.ServerError_WrongOperation);
 					return;
 				}
 
@@ -200,12 +200,13 @@ namespace CTS.Instance.Networks
 				_log.Info($"User {this} has been verified. Try to enter game [Target GUID:{GameInstanceGuid}]");
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					instance.SessionHandler.Push_TryEnterGame(this);
+					SessionHandler = instance.SessionHandler;
+					SessionHandler.Push_TryEnterGame(this);
 					return;
 				}
 
 				_log.Error($"There is no GameInstance with GUID {GameInstanceGuid}");
-				Disconnect(DisconnectReasonType.ThereIsNoSuchGameInstance);
+				Disconnect(DisconnectReasonType.Reject_ThereIsNoSuchGameInstance);
 				return;
 			}
 		}
@@ -220,7 +221,7 @@ namespace CTS.Instance.Networks
 				if (CurrentState != UserSessionState.TryEnterGameInstance)
 				{
 					_log.Warn($"Wrong {nameof(AckTryEnterGameInstance)} to user {this}, when current state is {CurrentState}");
-					Disconnect(DisconnectReasonType.WrongOperation);
+					Disconnect(DisconnectReasonType.ServerError_WrongOperation);
 					return;
 				}
 
@@ -245,7 +246,7 @@ namespace CTS.Instance.Networks
 				if (CurrentState != UserSessionState.TryReadyToSync)
 				{
 					_log.Warn($"User {this} request {nameof(OnReqReadyToEnter)} when current state is {CurrentState}");
-					Disconnect(DisconnectReasonType.WrongOperation);
+					Disconnect(DisconnectReasonType.ServerError_WrongOperation);
 					return;
 				}
 
@@ -257,14 +258,21 @@ namespace CTS.Instance.Networks
 				}
 
 				_log.Error($"There is no GameInstance with GUID {GameInstanceGuid}");
-				Disconnect(DisconnectReasonType.ThereIsNoSuchGameInstance);
+				Disconnect(DisconnectReasonType.Reject_ThereIsNoSuchGameInstance);
 				return;
 			}
 		}
 
 		public void OnEnterGame(UserSessionHandler sessionHandler)
 		{
-			SessionHandler = sessionHandler;
+			// 알 수 없는 이유로 세션 헨들러가 서로 다르다면 접속을 종료한다.
+			if (SessionHandler != sessionHandler)
+			{
+				sessionHandler.Push_OnDisconnected(this);
+				SessionHandler?.Push_OnDisconnected(this);
+				SessionHandler = null;
+				Disconnect(DisconnectReasonType.ServerError_WrongOperation);
+			}
 			CurrentState = UserSessionState.InGameplay;
 		}
 

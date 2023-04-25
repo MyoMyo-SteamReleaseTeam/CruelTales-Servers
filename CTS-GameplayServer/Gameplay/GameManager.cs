@@ -77,15 +77,23 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
-			for (int i = 0; i < 100; i++)
+			for (int z = 0; z < 20; z++)
 			{
-				var netId = GetNetworkIdentityCounter();
-				Test_MovingCube cube = new Test_MovingCube();
-				cube.OnCreated(netId);
-				cube.R = (byte)(1 * i);
-				cube.G = (byte)(2 * i);
-				cube.B = (byte)(3 * i);
-				_worldObject.Add(cube.Identity, cube);
+				for (int x = 0; x < 20; x++)
+				{
+					var netId = GetNetworkIdentityCounter();
+					Test_MovingCube cube = new Test_MovingCube();
+					cube.OnCreated(netId);
+					cube.X = x;
+					cube.Y = 5;
+					cube.Z = z;
+					cube.R = 1;
+					cube.G = 1;
+					cube.B = 1;
+					cube.Speed = 2.5f;
+					_worldObject.Add(cube.Identity, cube);
+					cube.SetMoveTime((x * z + 1) * 0.0125f);
+				}
 			}
 		}
 
@@ -93,20 +101,11 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-			sendTime += deltaTime;
-
-			if (sendTime > 0.30f)
+			foreach (var netObj in _worldObject.Values)
 			{
-				Console.WriteLine(sendTime);
-
-				sendTime = 0;
-
-				foreach (var netObj in _worldObject.Values)
+				if (netObj is Test_MovingCube cube)
 				{
-					if (netObj is Test_MovingCube cube)
-					{
-						cube.Server_MoveTo(new NetVec2(deltaTime, deltaTime * 2));
-					}
+					cube.Update(deltaTime);
 				}
 			}
 		}

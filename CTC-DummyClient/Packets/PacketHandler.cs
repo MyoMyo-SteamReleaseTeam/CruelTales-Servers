@@ -12,27 +12,27 @@ namespace CTC.Networks
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(PacketHandler));
 
-		internal static void Handle_SC_Ack_TryEnterGameInstance(PacketBase receivedPacket, ServerSession session)
+		internal static void Handle_SC_Ack_TryEnterGameInstance(PacketBase receivedPacket, NetworkManager networkManager)
 		{
-			session.ReqTryReadyToSync();
+			networkManager.ReqTryReadyToSync();
 		}
 
-		internal static void Handle_SC_Sync_LifeCycle(PacketReader reader, ServerSession session)
+		internal static void Handle_SC_Sync_LifeCycle(PacketReader reader, NetworkManager networkManager)
 		{
-			Console.WriteLine("Initialize");
-			session.GameManager.OnSyncInitialize(reader);
+			//Console.WriteLine("Initialize");
+			networkManager.GameSynchronizer.OnSyncInitialize(reader);
 		}
 
-		internal static void Handle_SC_Sync_Reliable(PacketReader reader, ServerSession session)
+		internal static void Handle_SC_Sync_Reliable(PacketReader reader, NetworkManager networkManager)
 		{
-			Console.WriteLine("Reliable");
-			session.GameManager.OnDeserializeReliable(reader);
+			_log.Info("Reliable");
+			networkManager.GameSynchronizer.OnDeserializeReliable(reader);
 		}
 			
-		internal static void Handle_SC_Sync_Unreliable(PacketReader reader, ServerSession session)
+		internal static void Handle_SC_Sync_Unreliable(PacketReader reader, NetworkManager networkManager)
 		{
-			Console.WriteLine("Unreliable");
-			session.GameManager.OnDeserializeUnreliable(reader);
+			//Console.WriteLine("Unreliable");
+			networkManager.GameSynchronizer.OnDeserializeUnreliable(reader);
 		}
 	}
 }

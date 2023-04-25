@@ -74,7 +74,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				"using CT.Common.Serialization.Type;",
 				"using CT.Common.Synchronizations;",
 				"using CT.Common.Tools.Collections;",
-				"using CTC.Networks.Synchornizations;",
+				"using CTC.Networks.Synchronizations;",
 			};
 
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -126,7 +126,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			List<SyncObjectInfo> syncObjects = new();
 
 			// Sync object
-			TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>
+			TryGetSyncDifinitionTypes<DEF_SyncObjectDefinitionAttribute>
 				(typeof(CTS.Instance.GameplayServer), out var syncObjDefinitionTypes);
 
 			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
@@ -136,7 +136,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Sync network object
-			TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>
+			TryGetSyncDifinitionTypes<DEF_SyncNetworkObjectDefinitionAttribute>
 				(typeof(CTS.Instance.GameplayServer), out var netObjDefititionTypes);
 
 			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
@@ -168,13 +168,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					SyncType syncType = SyncType.None;
 					SyncDirection syncDirection = SyncDirection.None;
 
-					if (att is SyncVarAttribute syncVarAtt)
+					if (att is DEF_SyncVarAttribute syncVarAtt)
 					{
 						syncType = syncVarAtt.SyncType;
 						syncDirection = syncVarAtt.SyncDirection;
 
 					}
-					else if (att is SyncObjectAttribute syncObjAtt)
+					else if (att is DEF_SyncObjectAttribute syncObjAtt)
 					{
 						syncType = syncObjAtt.SyncType;
 						syncDirection = syncObjAtt.SyncDirection;
@@ -194,7 +194,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				foreach (var att in f.GetCustomAttributes())
 				{
-					if (att is SyncRpcAttribute syncAtt)
+					if (att is DEF_SyncRpcAttribute syncAtt)
 					{
 						SyncFunctionToken token = new(this, syncAtt.SyncType, syncAtt.SyncDirection, f);
 						syncObject.AddFunctionToken(token);
