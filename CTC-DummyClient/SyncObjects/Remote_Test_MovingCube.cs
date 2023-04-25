@@ -48,6 +48,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private float _z;
 		public event Action<float>? OnZChanged;
+		[SyncVar]
+		private float _dest;
+		public event Action<float>? OnDestChanged;
 		[SyncRpc]
 		public partial void Server_MoveTo(float _y);
 #region SYNCHRONIZATIONS
@@ -103,6 +106,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					OnZChanged?.Invoke(_z);
 				}
 			}
+			if (objectDirty[1])
+			{
+				BitmaskByte _propertyDirty_1 = reader.ReadBitmaskByte();
+				if (_propertyDirty_1[0])
+				{
+					_dest = reader.ReadSingle();
+					OnDestChanged?.Invoke(_dest);
+				}
+			}
 			if (objectDirty[4])
 			{
 				BitmaskByte _rpcDirty_0 = reader.ReadBitmaskByte();
@@ -128,6 +140,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_x = reader.ReadSingle();
 			_y = reader.ReadSingle();
 			_z = reader.ReadSingle();
+			_dest = reader.ReadSingle();
 		}
 		public override void ClearDirtyReliable() {}
 		public override void ClearDirtyUnreliable() {}

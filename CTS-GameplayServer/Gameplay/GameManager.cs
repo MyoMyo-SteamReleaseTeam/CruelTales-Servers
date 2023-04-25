@@ -90,6 +90,7 @@ namespace CTS.Instance.Gameplay
 					cube.R = 1;
 					cube.G = 1;
 					cube.B = 1;
+					cube.Dest = 8;
 					cube.Speed = 2.5f;
 					_worldObject.Add(cube.Identity, cube);
 					cube.SetMoveTime((x * z + 1) * 0.0125f);

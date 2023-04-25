@@ -40,6 +40,8 @@ namespace CTS.Instance.SyncObjects
 		private float _y;
 		[SyncVar]
 		private float _z;
+		[SyncVar]
+		private float _dest;
 		[SyncRpc]
 		public partial void Server_MoveTo(float _y);
 #region SYNCHRONIZATIONS
@@ -137,6 +139,16 @@ namespace CTS.Instance.SyncObjects
 				_propertyDirty_0[7] = true;
 			}
 		}
+		public float Dest
+		{
+			get => _dest;
+			set
+			{
+				if (_dest == value) return;
+				_dest = value;
+				_propertyDirty_1[0] = true;
+			}
+		}
 		public partial void Server_MoveTo(float _y)
 		{
 			Server_MoveToCallstack.Enqueue(_y);
@@ -162,6 +174,11 @@ namespace CTS.Instance.SyncObjects
 				if (_propertyDirty_0[5]) writer.Put(_x);
 				if (_propertyDirty_0[6]) writer.Put(_y);
 				if (_propertyDirty_0[7]) writer.Put(_z);
+			}
+			if (objectDirty[1])
+			{
+				_propertyDirty_1.Serialize(writer);
+				if (_propertyDirty_1[0]) writer.Put(_dest);
 			}
 			if (objectDirty[4])
 			{
@@ -189,6 +206,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_x);
 			writer.Put(_y);
 			writer.Put(_z);
+			writer.Put(_dest);
 		}
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }

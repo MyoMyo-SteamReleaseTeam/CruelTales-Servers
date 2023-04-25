@@ -32,6 +32,9 @@ namespace CTS.Instance.SyncDefinitions
 		[DEF_SyncVar]
 		public float _z;
 
+		[DEF_SyncVar]
+		public float _dest;
+
 		[DEF_SyncRpc]
 		public void Server_MoveTo(float y) { }
 	}
