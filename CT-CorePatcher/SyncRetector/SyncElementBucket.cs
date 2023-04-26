@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SynchronizationsCodeGen
+namespace CT.CorePatcher.SyncRetector
 {
-	[Obsolete]
 	public class SyncElementBucket
 	{
 		public List<SyncPropertyToken> ReliableProperties { get; private set; } = new();
@@ -14,34 +13,44 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public List<SyncPropertyToken> AllProperties { get; private set; } = new();
 		public List<SyncFunctionToken> AllFunctions { get; private set; } = new();
 
-		public void AddPropertyToken(SyncPropertyToken token)
+		public void AddPropertyToken(SyncPropertyToken token, SyncType syncType)
 		{
+			if (syncType == SyncType.RelibaleOrUnreliable)
+			{
+				throw new ArgumentException("Property는 Reliable 혹은 Unrealiable 둘 중 하나의 동기화 속성만 가능합니다.");
+			}
+
 			AllProperties.Add(token);
 
-			if (token.SyncType == SyncType.Reliable)
+			if (syncType == SyncType.Reliable)
 			{
 				ReliableProperties.Add(token);
 			}
-			else if (token.SyncType == SyncType.Unreliable)
+			else if (syncType == SyncType.Unreliable)
 			{
 				UnreliableProperties.Add(token);
 			}
-			else if (token.SyncType == SyncType.RelibaleOrUnreliable)
+			else if (syncType == SyncType.RelibaleOrUnreliable)
 			{
 				ReliableProperties.Add(token);
 				UnreliableProperties.Add(token);
 			}
 		}
 
-		public void AddFunctionToken(SyncFunctionToken token)
+		public void AddFunctionToken(SyncFunctionToken token, SyncType syncType)
 		{
+			if (syncType == SyncType.RelibaleOrUnreliable)
+			{
+				throw new ArgumentException("Function은 Reliable 혹은 Unrealiable 둘 중 하나의 동기화 속성만 가능합니다.");
+			}
+
 			AllFunctions.Add(token);
 
-			if (token.SyncType == SyncType.Reliable)
+			if (syncType == SyncType.Reliable)
 			{
 				ReliableFunctions.Add(token);
 			}
-			else if (token.SyncType == SyncType.Unreliable)
+			else if (syncType == SyncType.Unreliable)
 			{
 				UnreliableFunctions.Add(token);
 			}

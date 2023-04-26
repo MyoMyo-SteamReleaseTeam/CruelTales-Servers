@@ -9,9 +9,8 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
 
-namespace CT.CorePatcher.SynchronizationsCodeGen
+namespace CT.CorePatcher.SyncRetector
 {
-	[Obsolete]
 	public enum SerializeType
 	{
 		None = 0,
@@ -23,7 +22,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		SyncObject,
 	}
 
-	[Obsolete]
 	public class SynchronizerGenerator
 	{
 		public List<Type> _referenceTypes = new()
@@ -168,26 +166,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				foreach (var att in f.GetCustomAttributes())
 				{
 					SyncType syncType = SyncType.None;
-					SyncDirection syncDirection = SyncDirection.None;
+					SyncDirection direction = SyncDirection.None;
 
 					if (att is DEF_SyncVarAttribute syncVarAtt)
 					{
 						syncType = syncVarAtt.SyncType;
-						syncDirection = syncVarAtt.SyncDirection;
+						direction = syncVarAtt.SyncDirection;
 
 					}
 					else if (att is DEF_SyncObjectAttribute syncObjAtt)
 					{
 						syncType = syncObjAtt.SyncType;
-						syncDirection = syncObjAtt.SyncDirection;
+						direction = syncObjAtt.SyncDirection;
 					}
 					else
 					{
 						continue;
 					}
 
-					SyncPropertyToken token = new(this, syncType, syncDirection, f.Name, f.FieldType, f.IsPublic);
-					syncObject.AddPropertyToken(token);
+					SyncPropertyToken token = new(this, f.Name, f.FieldType, f.IsPublic);
+					syncObject.AddPropertyToken(token, syncType, direction);
 				}
 			}
 
@@ -198,8 +196,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				{
 					if (att is DEF_SyncRpcAttribute syncAtt)
 					{
-						SyncFunctionToken token = new(this, syncAtt.SyncType, syncAtt.SyncDirection, f);
-						syncObject.AddFunctionToken(token);
+						SyncFunctionToken token = new(this, f);
+						syncObject.AddFunctionToken(token, syncAtt.SyncType, syncAtt.SyncDirection);
 					}
 				}
 			}

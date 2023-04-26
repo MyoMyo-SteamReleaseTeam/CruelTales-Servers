@@ -1,22 +1,13 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
 
-namespace CT.CorePatcher.SynchronizationsCodeGen
+namespace CT.CorePatcher.SyncRetector
 {
-	[Obsolete]
 	public class SyncPropertyToken
 	{
 		public static string NewLine { get; set; } = TextFormat.LF;
 		public static string Indent { get; set; } = TextFormat.Indent;
-
-		/// <summary>동기화 타입입니다.</summary>
-		public SyncType SyncType { get; private set; }
-
-		/// <summary>동기화 방향입니다.</summary>
-		public SyncDirection SyncDirection { get; private set; }
 
 		/// <summary>직렬화 타입입니다.</summary>
 		public SerializeType SerializeType { get; private set; }
@@ -40,14 +31,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string EnumSizeTypeName { get; private set; } = "int";
 
 		public SyncPropertyToken(SynchronizerGenerator generator,
-								 SyncType syncType,
-								 SyncDirection syncDirection,
 								 string propertyName, 
 								 Type fieldType, 
 								 bool isPublic)
 		{
-			this.SyncType = syncType;
-			this.SyncDirection = syncDirection;
 			this.TypeName = fieldType.Name;
 			this.IsPublic = isPublic;
 
@@ -104,25 +91,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		}
 
 		public void SetSyncObjectType(SerializeType serializeType,
-									  SyncType syncType,
 									  string initializer)
 		{
 			this.SerializeType = serializeType;
-			this.SyncType = syncType;
 			this.Initializer = initializer;
 		}
 
-		public string GeneratePraivteDeclaration()
+		public string GenDeclaration(SyncType syncType, SyncDirection syncDirection)
 		{
-			return string.Format(SyncFormat.PrivateDeclaration,
-								 SyncFormat.GetSyncVarAttribute(this),
+			return string.Format(PropertyFormat.Declaration,
+								 SyncFormat.GetSyncVarAttribute(SerializeType, syncType, syncDirection),
 								 TypeName, PrivateName, Initializer);
 		}
 
-		public string GenerateRemotePropertyDeclaration()
+		public string GenerateRemotePropertyDeclaration(SyncType syncType, SyncDirection syncDirection)
 		{
-			return string.Format(SyncFormat.RemotePropertyDeclaration,
-								 SyncFormat.GetSyncVarAttribute(this),
+			return string.Format(PropertyFormat.RemoteDeclaration,
+								 SyncFormat.GetSyncVarAttribute(SerializeType, syncType, syncDirection),
 								 TypeName, PrivateName, GetPublicPropertyName(),
 								 Initializer);
 		}
@@ -132,7 +117,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (SerializeType == SerializeType.SyncObject)
 				return string.Empty;
 
-			return string.Format(SyncFormat.PropertyGetSet,
+			return string.Format(PropertyFormat.GetterSetter,
 								 IsPublic ? "public" : "private",
 								 this.TypeName,
 								 this.GetPublicPropertyName(),
@@ -141,22 +126,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								 propIndex);
 		}
 
-		public string GeneratetPropertySerializeIfDirty(string dirtyBitName, int curPropIndex, [AllowNull] GenerateOption option = null)
+		public string GeneratetPropertySerializeIfDirty(string dirtyBitName, int curPropIndex, SyncType syncType)
 		{
-			return string.Format(SyncFormat.PropertySerializeIfDirty,
+			return string.Format(PropertyFormat.SerializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetWriterSerialize(option));
+								 this.GetWriterSerialize(syncType));
 		}
 
-		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex, [AllowNull] GenerateOption option = null)
+		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex, SyncType syncType)
 		{
-			return string.Format(SyncFormat.PropertyDeserializeIfDirty,
+			return string.Format(PropertyFormat.DeserializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
 								 this.GetPublicPropertyName(),
 								 this.PrivateName,
-								 this.GetReadDeserialize(option));
+								 this.GetReadDeserialize(syncType));
 		}
 
 		public string GetDirtyCheckIfSyncObject(GenerateOption option, int masterIndex, int dirtyIndex)
@@ -182,115 +167,73 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GetParameter()
 		{
-			return string.Format(SyncFormat.Parameter, TypeName, PrivateName);
+			return string.Format(PropertyFormat.Parameter, TypeName, PrivateName);
 		}
 
-		public string GetWriterSerialize([AllowNull]GenerateOption option = null)
+		public string GetWriterSerialize(SyncType syncType)
 		{
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.WritePut, PrivateName) + NewLine;
+					return string.Format(PropertyFormat.WritePut, PrivateName) + NewLine;
 
 				case SerializeType.NetString:
 				case SerializeType.Class:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.WriteSerialize, PrivateName) + NewLine;
+					return string.Format(PropertyFormat.WriteSerialize, PrivateName) + NewLine;
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, PrivateName) + NewLine;
+					return string.Format(PropertyFormat.WriteEnum, EnumSizeTypeName, PrivateName) + NewLine;
 
 				case SerializeType.SyncObject:
-					string funcName = string.Empty;
-					SyncType stype = option == null ? SyncType.None : option.SyncType;
-
-					if (stype == SyncType.Reliable)
-					{
-						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
-						{
-							funcName = nameof(ISynchronizable.SerializeSyncReliable);
-						}
-					}
-					else if (stype == SyncType.Unreliable)
-					{
-						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
-						{
-							funcName = nameof(ISynchronizable.SerializeSyncUnreliable);
-						}
-					}
-					else if (stype == SyncType.RelibaleOrUnreliable)
-					{
-						funcName = nameof(ISynchronizable.SerializeEveryProperty);
-					}
-
-					return string.Format(SyncFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
+					string funcName = (syncType == SyncType.None) ? "SerializeEveryProperty" : $"SerializeSync{syncType}";
+					return string.Format(PropertyFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
 
 				default:
 					return string.Empty;
 			}
 		}
 
-		public string GetReadDeserialize([AllowNull] GenerateOption option = null)
+		public string GetReadDeserialize(SyncType syncType)
 		{
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.ReadEmbededTypeProperty, PrivateName, CLRTypeName) + NewLine;
+					return string.Format(PropertyFormat.ReadEmbededTypeProperty, PrivateName, CLRTypeName) + NewLine;
 
 				case SerializeType.NetString:
 				case SerializeType.Class:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.ReadByDeserializer, PrivateName) + NewLine;
+					return string.Format(PropertyFormat.ReadByDeserializer, PrivateName) + NewLine;
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.ReadEnum, PrivateName, TypeName, CLRTypeName) + NewLine;
+					return string.Format(PropertyFormat.ReadEnum, PrivateName, TypeName, CLRTypeName) + NewLine;
 
 				case SerializeType.SyncObject:
-					string funcName = string.Empty;
-					SyncType stype = option == null ? SyncType.None : option.SyncType;
-
-					if (stype == SyncType.Reliable)
-					{
-						if (this.SyncType == SyncType.Reliable || this.SyncType == SyncType.RelibaleOrUnreliable)
-						{
-							funcName = nameof(ISynchronizable.DeserializeSyncReliable);
-						}
-					}
-					else if (stype == SyncType.Unreliable)
-					{
-						if (this.SyncType == SyncType.Unreliable || this.SyncType == SyncType.RelibaleOrUnreliable)
-						{
-							funcName = nameof(ISynchronizable.DeserializeSyncUnreliable);
-						}
-					}
-					else if (stype == SyncType.RelibaleOrUnreliable)
-					{
-						funcName = nameof(ISynchronizable.DeserializeEveryProperty);
-					}
-
-					return string.Format(SyncFormat.ReadSyncObject, PrivateName, funcName) + NewLine;
+					string funcName = (syncType == SyncType.None) ? "DeserializeEveryProperty" : $"DeserializeSync{syncType}";
+					return string.Format(PropertyFormat.ReadSyncObject, PrivateName, funcName) + NewLine;
 
 				default:
 					return string.Empty;
 			}
 		}
 
-		public string GetWriterSerializeWithPrefix(string prefix, [AllowNull] GenerateOption option = null)
+		public string GetWriterSerializeWithPrefix(string prefix)
 		{
 			string name = prefix + PrivateName;
 
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.WritePut, name) + NewLine;
+					return string.Format(PropertyFormat.WritePut, name) + NewLine;
 
 				case SerializeType.NetString:
 				case SerializeType.Class:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.WriteSerialize, name) + NewLine;
+					return string.Format(PropertyFormat.WriteSerialize, name) + NewLine;
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
+					return string.Format(PropertyFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
 
 				default:
 					return string.Empty;
@@ -302,15 +245,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.WritePut, name) + NewLine;
+					return string.Format(PropertyFormat.WritePut, name) + NewLine;
 
 				case SerializeType.NetString:
 				case SerializeType.Class:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.WriteSerialize, name) + NewLine;
+					return string.Format(PropertyFormat.WriteSerialize, name) + NewLine;
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
+					return string.Format(PropertyFormat.WriteEnum, EnumSizeTypeName, name) + NewLine;
 
 				default:
 					return string.Empty;
@@ -322,17 +265,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			switch (SerializeType)
 			{
 				case SerializeType.Primitive:
-					return string.Format(SyncFormat.TempReadEmbededTypeProperty, TypeName, PrivateName, CLRTypeName);
+					return string.Format(PropertyFormat.TempReadEmbededTypeProperty, TypeName, PrivateName, CLRTypeName);
 
 				case SerializeType.Class:
-					return string.Format(SyncFormat.TempReadByDeserializerClass, PrivateName);
+					return string.Format(PropertyFormat.TempReadByDeserializerClass, PrivateName);
 
 				case SerializeType.NetString:
 				case SerializeType.Struct:
-					return string.Format(SyncFormat.TempReadByDeserializerStruct, TypeName, PrivateName);
+					return string.Format(PropertyFormat.TempReadByDeserializerStruct, TypeName, PrivateName);
 
 				case SerializeType.Enum:
-					return string.Format(SyncFormat.TempReadEnum, PrivateName, TypeName, CLRTypeName);
+					return string.Format(PropertyFormat.TempReadEnum, PrivateName, TypeName, CLRTypeName);
 
 				default:
 					return string.Empty;

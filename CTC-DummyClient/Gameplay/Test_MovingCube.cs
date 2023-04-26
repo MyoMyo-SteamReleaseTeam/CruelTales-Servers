@@ -12,7 +12,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public float G => _r;
 		public float B => _r;
 
-		public partial void Server_MoveTo(NetVec2 _destination)
+		public void Server_MoveTo(NetVec2 _destination)
 		{
 			//_log.Info(_destination);
 		}

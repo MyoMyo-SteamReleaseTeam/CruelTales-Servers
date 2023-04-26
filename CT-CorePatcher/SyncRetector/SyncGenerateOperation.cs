@@ -5,9 +5,8 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Data;
 
-namespace CT.CorePatcher.SynchronizationsCodeGen
+namespace CT.CorePatcher.SyncRetector
 {
-	[Obsolete]
 	public class SyncGenerateOperation
 	{
 		class CodeGenInfo

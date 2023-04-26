@@ -5,6 +5,7 @@ using CT.Common.Tools.Collections;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	[Obsolete]
 	public class GenerateOption
 	{
 		public string ObjectName = string.Empty;
@@ -119,6 +120,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		}
 	}
 
+	[Obsolete]
 	public static class SyncFormat
 	{
 		public static readonly string MasterNetworkObjectTypeName = "MasterNetworkObject";

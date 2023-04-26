@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using CTS.Instance.Synchronizations;
 
-namespace CT.CorePatcher.SynchronizationsCodeGen
+namespace CT.CorePatcher.SyncRetector
 {
-	[Obsolete]
 	public class SyncObjectInfo
 	{
 		public static string NewLine { get; set; } = TextFormat.LF;
@@ -29,165 +26,173 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			IsNetworkObject = isNetworkObject;
 		}
 
-		public void AddPropertyToken(SyncPropertyToken token)
+		public void AddPropertyToken(SyncPropertyToken token, SyncType syncType, SyncDirection direction)
 		{
-			if (token.SyncDirection == SyncDirection.FromMaster)
+			if (direction == SyncDirection.FromMaster)
 			{
-				_masterElementBucket.AddPropertyToken(token);
+				_masterElementBucket.AddPropertyToken(token, syncType);
 			}
-			else if (token.SyncDirection == SyncDirection.FromRemote)
+			else if (direction == SyncDirection.FromRemote)
 			{
-				_remoteElementBucket.AddPropertyToken(token);
+				_remoteElementBucket.AddPropertyToken(token, syncType);
 			}
 		}
 
-		public void AddFunctionToken(SyncFunctionToken token)
+		public void AddFunctionToken(SyncFunctionToken token, SyncType syncType, SyncDirection direction)
 		{
-			if (token.SyncDirection == SyncDirection.FromMaster)
+			if (direction == SyncDirection.FromMaster)
 			{
-				_masterElementBucket.AddFunctionToken(token);
+				_masterElementBucket.AddFunctionToken(token, syncType);
 			}
-			else if (token.SyncDirection == SyncDirection.FromRemote)
+			else if (direction == SyncDirection.FromRemote)
 			{
-				_remoteElementBucket.AddFunctionToken(token);
+				_remoteElementBucket.AddFunctionToken(token, syncType);
 			}
 		}
 
 		public string GenerateCode(SyncDirection syncDirection)
 		{
-			// Set name
-			ObjectName = OriginObjectName;
+			return string.Empty;
 
-			// Setting extra comments and region
-			string declarFrom = Indent + syncDirection.GetDeclarationComment() + NewLine;
-			string declarTo = Indent + syncDirection.Reverse().GetDeclarationComment() + NewLine;
+			//			// Set name
+			//			ObjectName = OriginObjectName;
 
-			string regionFrom = @"#region SYNCHRONIZATIONS" + NewLine;
-			string regionTo = syncDirection.Reverse().GetRegionContent() + NewLine;
+			//			// Setting extra comments and region
+			//			string declarFrom = Indent + syncDirection.GetDeclarationComment() + NewLine;
+			//			string declarTo = Indent + syncDirection.Reverse().GetDeclarationComment() + NewLine;
 
-			string endRegion = @"#endregion" + NewLine;
+			//			string regionFrom = @"#region SYNCHRONIZATIONS" + NewLine;
+			//			string regionTo = syncDirection.Reverse().GetRegionContent() + NewLine;
 
-			// Set element buckets
-			SyncElementBucket syncFrom = _masterElementBucket;
-			SyncElementBucket syncTo = _remoteElementBucket;
+			//			string endRegion = @"#endregion" + NewLine;
 
-			if (syncDirection != SyncDirection.FromMaster)
-			{
-				syncFrom = _remoteElementBucket;
-				syncTo = _masterElementBucket;
-			}
+			//			// Set element buckets
+			//			SyncElementBucket syncFrom = _masterElementBucket;
+			//			SyncElementBucket syncTo = _remoteElementBucket;
 
-			// Initialize content strings
-			string declarationContent = string.Empty;
-			string synchronizeContent = string.Empty;
-			string syncFuncContent = string.Empty;
-			string dirtyBitClearContent = string.Empty;
+			//			if (syncDirection != SyncDirection.FromMaster)
+			//			{
+			//				syncFrom = _remoteElementBucket;
+			//				syncTo = _masterElementBucket;
+			//			}
 
-			// Generate forward
-			GenerateOption fromReliableOption = new(SyncType.Reliable,
-													syncFrom.ReliableProperties,
-													syncFrom.ReliableFunctions);
+			//			// Initialize content strings
+			//			string declarationContent = string.Empty;
+			//			string synchronizeContent = string.Empty;
+			//			string syncFuncContent = string.Empty;
+			//			string dirtyBitClearContent = string.Empty;
 
-			GenerateOption fromUnreliableOption = new(SyncType.Unreliable,
-													  syncFrom.UnreliableProperties,
-													  syncFrom.UnreliableFunctions);
+			//			// Generate forward
+			//			GenerateOption fromReliableOption = new(SyncType.Reliable,
+			//													syncFrom.ReliableProperties,
+			//													syncFrom.ReliableFunctions);
 
-			GenerateOption fromAllOption = new(SyncType.RelibaleOrUnreliable,
-											   syncFrom.AllProperties,
-											   syncFrom.AllFunctions);
+			//			GenerateOption fromUnreliableOption = new(SyncType.Unreliable,
+			//													  syncFrom.UnreliableProperties,
+			//													  syncFrom.UnreliableFunctions);
 
-// Bind separator
-			if (fromAllOption.HasProperties)
-			{
-				declarationContent += declarFrom;
-			}
+			//			GenerateOption fromAllOption = new(SyncType.RelibaleOrUnreliable,
+			//											   syncFrom.AllProperties,
+			//											   syncFrom.AllFunctions);
 
-			// Create content
-			if (IsNetworkObject) fromReliableOption.Modifier = "override ";
-			declarationContent += Master_GenDeclaration(fromReliableOption) + NewLine;
-			synchronizeContent += Master_GenPropertySynchronizeContent(fromReliableOption) + NewLine;
-			syncFuncContent += Master_GenSerializeFunction(fromReliableOption) + NewLine;
-			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromReliableOption) + NewLine;
+			//// Bind separator
+			//			if (fromAllOption.HasProperties)
+			//			{
+			//				declarationContent += declarFrom;
+			//			}
 
-			if (IsNetworkObject) fromUnreliableOption.Modifier = "override ";
-			declarationContent += Master_GenDeclaration(fromUnreliableOption) + NewLine;
-			synchronizeContent += Master_GenPropertySynchronizeContent(fromUnreliableOption) + NewLine;
-			syncFuncContent += Master_GenSerializeFunction(fromUnreliableOption) + NewLine;
-			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromUnreliableOption) + NewLine;
+			//			// Create content
+			//			if (IsNetworkObject) fromReliableOption.Modifier = "override ";
+			//			declarationContent += Master_GenDeclaration(fromReliableOption) + NewLine;
+			//			synchronizeContent += Master_GenPropertySynchronizeContent(fromReliableOption) + NewLine;
+			//			syncFuncContent += Master_GenSerializeFunction(fromReliableOption) + NewLine;
+			//			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromReliableOption) + NewLine;
 
-			if (IsNetworkObject) fromAllOption.Modifier = "override ";
-			syncFuncContent += Master_GenMasterSerializeEveryProperty(fromAllOption) + NewLine;
+			//			if (IsNetworkObject) fromUnreliableOption.Modifier = "override ";
+			//			declarationContent += Master_GenDeclaration(fromUnreliableOption) + NewLine;
+			//			synchronizeContent += Master_GenPropertySynchronizeContent(fromUnreliableOption) + NewLine;
+			//			syncFuncContent += Master_GenSerializeFunction(fromUnreliableOption) + NewLine;
+			//			dirtyBitClearContent += Master_GenDirtyBitsClearFunction(fromUnreliableOption) + NewLine;
 
-			// Generate backward
-			GenerateOption toReliableOption = new(SyncType.Reliable, syncTo.ReliableProperties, syncTo.ReliableFunctions);
-			GenerateOption toUnreliableOption = new(SyncType.Unreliable, syncTo.UnreliableProperties, syncTo.UnreliableFunctions);
-			GenerateOption toAllOption = new(SyncType.RelibaleOrUnreliable, syncTo.AllProperties, syncTo.AllFunctions);
+			//			if (IsNetworkObject) fromAllOption.Modifier = "override ";
+			//			syncFuncContent += Master_GenMasterSerializeEveryProperty(fromAllOption) + NewLine;
 
-// Bind separator
-			if (toAllOption.HasProperties)
-			{
-				declarationContent += declarTo;
-			}
+			//			// Generate backward
+			//			GenerateOption toReliableOption = new(SyncType.Reliable, syncTo.ReliableProperties, syncTo.ReliableFunctions);
+			//			GenerateOption toUnreliableOption = new(SyncType.Unreliable, syncTo.UnreliableProperties, syncTo.UnreliableFunctions);
+			//			GenerateOption toAllOption = new(SyncType.RelibaleOrUnreliable, syncTo.AllProperties, syncTo.AllFunctions);
 
-			// Create content
-			if (IsNetworkObject) toReliableOption.Modifier = "override ";
-			declarationContent += Remote_GenDeclaration(toReliableOption) + NewLine;
-			syncFuncContent += Remote_GenPropertyDeserializeContent(toReliableOption) + NewLine;
+			//// Bind separator
+			//			if (toAllOption.HasProperties)
+			//			{
+			//				declarationContent += declarTo;
+			//			}
 
-			if (IsNetworkObject) toUnreliableOption.Modifier = "override ";
-			declarationContent += Remote_GenDeclaration(toUnreliableOption) + NewLine;
-			syncFuncContent += Remote_GenPropertyDeserializeContent(toUnreliableOption) + NewLine;
+			//			// Create content
+			//			if (IsNetworkObject) toReliableOption.Modifier = "override ";
+			//			declarationContent += Remote_GenDeclaration(toReliableOption) + NewLine;
+			//			syncFuncContent += Remote_GenPropertyDeserializeContent(toReliableOption) + NewLine;
 
-			if (IsNetworkObject) toAllOption.Modifier = "override ";
-			syncFuncContent += Remote_GenMasterDeserializeEveryProperty(toAllOption) + NewLine;
+			//			if (IsNetworkObject) toUnreliableOption.Modifier = "override ";
+			//			declarationContent += Remote_GenDeclaration(toUnreliableOption) + NewLine;
+			//			syncFuncContent += Remote_GenPropertyDeserializeContent(toUnreliableOption) + NewLine;
 
-			// Set names
-			string inheritType = string.Empty;
+			//			if (IsNetworkObject) toAllOption.Modifier = "override ";
+			//			syncFuncContent += Remote_GenMasterDeserializeEveryProperty(toAllOption) + NewLine;
 
-			if (this.IsNetworkObject)
-			{
-				if (syncDirection == SyncDirection.FromMaster)
-				{
-					inheritType = SyncFormat.MasterNetworkObjectTypeName;
-				}
-				else
-				{
-					inheritType = SyncFormat.RemoteNetworkObjectTypeName;
-				}
-				string netTypeName = SyncFormat.NetworkObjectTypeTypeName;
-				string netTypeDeclaration = $"{Indent}public override {netTypeName} Type => {netTypeName}.{OriginObjectName};";
-				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent + NewLine;
-			}
-			else
-			{
-				inheritType = nameof(ISynchronizable);
-			}
+			//			// Set names
+			//			string inheritType = string.Empty;
 
-			// Combine all contents
-			string synchronization = regionFrom + 
-									 synchronizeContent + NewLine +
-									 syncFuncContent + NewLine +
-									 dirtyBitClearContent + NewLine + 
-									 endRegion;
+			//			if (this.IsNetworkObject)
+			//			{
+			//				if (syncDirection == SyncDirection.FromMaster)
+			//				{
+			//					inheritType = SyncFormat.MasterNetworkObjectTypeName;
+			//				}
+			//				else
+			//				{
+			//					inheritType = SyncFormat.RemoteNetworkObjectTypeName;
+			//				}
+			//				string netTypeName = SyncFormat.NetworkObjectTypeTypeName;
+			//				string netTypeDeclaration = $"{Indent}public override {netTypeName} Type => {netTypeName}.{OriginObjectName};";
+			//				declarationContent = netTypeDeclaration + NewLine + NewLine + declarationContent + NewLine;
+			//			}
+			//			else
+			//			{
+			//				inheritType = nameof(ISynchronizable);
+			//			}
 
-			return string.Format(SyncFormat.SyncObjectFormat,
-								 ObjectName, inheritType,
-								 declarationContent,
-								 synchronization);
+			//			// Combine all contents
+			//			string synchronization = regionFrom + 
+			//									 synchronizeContent + NewLine +
+			//									 syncFuncContent + NewLine +
+			//									 dirtyBitClearContent + NewLine + 
+			//									 endRegion;
+
+			//			return string.Format(ObjectFormat.SyncObjectFormat,
+			//								 ObjectName, inheritType,
+			//								 declarationContent,
+			//								 synchronization);
 		}
+	}
+
+	public static class SyncCodeGenerator
+	{
+		public static string NewLine { get; set; } = TextFormat.LF;
+		public static string Indent { get; set; } = TextFormat.Indent;
 
 		#region Master side
 
-		private static string Master_GenDeclaration(GenerateOption option)
+		private static string Master_GenDeclaration(GenerateOption option, SyncType syncType, SyncDirection direction)
 		{
 			string declarationContent = string.Empty;
 			foreach (var prop in option.Properties)
 			{
-				declarationContent += prop.GeneratePraivteDeclaration() + NewLine + NewLine;
+				declarationContent += prop.GenDeclaration(syncType, direction) + NewLine + NewLine;
 			}
 			foreach (var func in option.Functions)
 			{
-				declarationContent += func.GetPartialDeclaraction() + NewLine + NewLine;
+				declarationContent += func.GetPartialDeclaraction(syncType, direction) + NewLine + NewLine;
 			}
 			CodeFormat.AddIndent(ref declarationContent);
 			return declarationContent;
@@ -251,7 +256,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Properties.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.PropertyDirtyBitName, i);
-					dirtyBitsContent += string.Format(SyncFormat.DeclarationDirtyBits,
+					dirtyBitsContent += string.Format(ObjectFormat.DeclarationDirtyBits,
 													  nameof(BitmaskByte), dirtyBitName) + NewLine;
 
 					var prop = option.Properties[i];
@@ -271,7 +276,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Functions.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
-					dirtyBitsContent += string.Format(SyncFormat.DeclarationDirtyBits,
+					dirtyBitsContent += string.Format(ObjectFormat.DeclarationDirtyBits,
 													  nameof(BitmaskByte), dirtyBitName) + NewLine;
 					isDirtyContent += string.Format(option.IsDirtyBinder, dirtyBitName) + NewLine;
 				}
@@ -286,12 +291,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return syncContent;
 		}
 
-		private static string Master_GenSerializeFunction(GenerateOption option)
+		private static string Master_GenSerializeFunction(GenerateOption option, SyncType syncType)
 		{
 			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
-				string noElement = string.Format(SyncFormat.SerializeSyncNoElement,
+				string noElement = string.Format(ObjectFormat.SerializeSyncNoElement,
 												 option.Modifier, option.SerializeFunctionName);
 				CodeFormat.AddIndent(ref noElement);
 				return noElement + NewLine;
@@ -305,7 +310,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Properties.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.PropertyDirtyBitName, i);
-					anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i, dirtyBitName) + NewLine;
+					anyDirtyBitsContent += string.Format(ObjectFormat.AnyDirtyBits, i, dirtyBitName) + NewLine;
 				}
 				for (int i = 0; i < option.Properties.Count; i++)
 				{
@@ -321,7 +326,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Functions.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
-					anyDirtyBitsContent += string.Format(SyncFormat.AnyDirtyBits, i + 4, dirtyBitName) + NewLine;
+					anyDirtyBitsContent += string.Format(ObjectFormat.AnyDirtyBits, i + 4, dirtyBitName) + NewLine;
 				}
 			}
 
@@ -330,9 +335,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			CodeFormat.AddIndent(ref anyDirtyBitsContent);
 
 			// Serialize reliable
-			generateSerializeCode(option, out var propSerialize, out var funcSerialize);
+			generateSerializeCode(syncType, out var propSerialize, out var funcSerialize);
 
-			string serializeContent = string.Format(SyncFormat.SerializeSync,
+			string serializeContent = string.Format(ObjectFormat.SerializeSync,
 													option.Modifier,
 													option.SerializeFunctionName,
 													option.BitmaskTypeName,
@@ -343,7 +348,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			CodeFormat.AddIndent(ref serializeContent);
 			return serializeContent;
 
-			void generateSerializeCode(GenerateOption option,
+			void generateSerializeCode(SyncType syncType,
 									   out string propSerialize,
 									   out string funcSerialize)
 			{
@@ -362,12 +367,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					}
 					var prop = option.Properties[i];
 
-					if (prop.SyncType == option.SyncType)
-					{
-						string dirtyBitName = string.Format(option.PropertyDirtyBitName, propDirtyBitsCounter);
-						string serializePropContent = prop.GeneratetPropertySerializeIfDirty(dirtyBitName, curPropIndex, option);
-						propSerializeGroup[propDirtyBitsCounter] += serializePropContent;
-					}
+					string dirtyBitName = string.Format(option.PropertyDirtyBitName, propDirtyBitsCounter);
+					string serializePropContent = prop.GeneratetPropertySerializeIfDirty(dirtyBitName, curPropIndex, syncType);
+					propSerializeGroup[propDirtyBitsCounter] += serializePropContent;
 
 					curPropIndex++;
 					if (curPropIndex >= 8)
@@ -382,7 +384,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					string dirtyBitName = string.Format(option.PropertyDirtyBitName, i);
 					string contentGroup = propSerializeGroup[i];
 					CodeFormat.AddIndent(ref contentGroup);
-					propSerialize += string.Format(SyncFormat.PropertySerializeGroup, i, dirtyBitName, contentGroup);
+					propSerialize += string.Format(ObjectFormat.PropertySerializeGroup, i, dirtyBitName, contentGroup);
 				}
 				CodeFormat.AddIndent(ref propSerialize);
 
@@ -398,11 +400,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					}
 					var func = option.Functions[i];
 
-					if (func.SyncType == option.SyncType)
-					{
-						string dirtyBitName = string.Format(option.FunctionDirtyBitName, funcDirtyBitsCounter);
-						funcSerializeGroup[funcDirtyBitsCounter] += func.GetSerializeIfDirty(dirtyBitName, curFuncIndex);
-					}
+					string dirtyBitName = string.Format(option.FunctionDirtyBitName, funcDirtyBitsCounter);
+					funcSerializeGroup[funcDirtyBitsCounter] += func.GetSerializeIfDirty(dirtyBitName, curFuncIndex);
 
 					curFuncIndex++;
 					if (curFuncIndex >= 8)
@@ -417,7 +416,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
 					string contentGroup = funcSerializeGroup[i];
 					CodeFormat.AddIndent(ref contentGroup);
-					funcSerialize += string.Format(SyncFormat.FunctionSerializeGroup, i + 4, dirtyBitName, contentGroup);
+					funcSerialize += string.Format(ObjectFormat.FunctionSerializeGroup, i + 4, dirtyBitName, contentGroup);
 				}
 				CodeFormat.AddIndent(ref funcSerialize);
 			}
@@ -428,7 +427,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
-				string noElement = string.Format(SyncFormat.ClearDirtyBitFunctionNoElement,
+				string noElement = string.Format(ObjectFormat.ClearDirtyBitFunctionNoElement,
 												 option.Modifier, option.ClearFunctionName);
 				CodeFormat.AddIndent(ref noElement);
 				return noElement + NewLine;
@@ -440,7 +439,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Properties.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.PropertyDirtyBitName, i);
-					dirtyBitClearContent += string.Format(SyncFormat.DirtyBitsClear, dirtyBitName) + NewLine;
+					dirtyBitClearContent += string.Format(ObjectFormat.DirtyBitsClear, dirtyBitName) + NewLine;
 				}
 			}
 			if (option.HasFunctions)
@@ -448,12 +447,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				for (int i = 0; i <= option.Functions.Count / 8; i++)
 				{
 					string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
-					dirtyBitClearContent += string.Format(SyncFormat.DirtyBitsClear, dirtyBitName) + NewLine;
+					dirtyBitClearContent += string.Format(ObjectFormat.DirtyBitsClear, dirtyBitName) + NewLine;
 				}
 			}
 
 			CodeFormat.AddIndent(ref dirtyBitClearContent);
-			var dirtyBitClearFunction = string.Format(SyncFormat.ClearDirtyBitFunction,
+			var dirtyBitClearFunction = string.Format(ObjectFormat.ClearDirtyBitFunction,
 													  option.Modifier,
 													  option.ClearFunctionName,
 													  dirtyBitClearContent);
@@ -462,12 +461,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return dirtyBitClearFunction;
 		}
 
-		private static string Master_GenMasterSerializeEveryProperty(GenerateOption option)
+		private static string Master_GenMasterSerializeEveryProperty(GenerateOption option, SyncType syncType)
 		{
 			// If there are no elements to sync
 			if (!option.HasProperties)
 			{
-				var noElement = string.Format(SyncFormat.SerializeSyncNoElement,
+				var noElement = string.Format(ObjectFormat.SerializeSyncNoElement,
 											  option.Modifier,
 											  option.SerializeFunctionName) + NewLine;
 				CodeFormat.AddIndent(ref noElement);
@@ -477,10 +476,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string everyContent = string.Empty;
 			foreach (var p in option.Properties)
 			{
-				everyContent += p.GetWriterSerialize(option);
+				everyContent += p.GetWriterSerialize(syncType);
 			}
 			CodeFormat.AddIndent(ref everyContent);
-			everyContent = string.Format(SyncFormat.SerializeEveryProperty,
+			everyContent = string.Format(ObjectFormat.SerializeEveryProperty,
 										 option.Modifier,
 										 option.SerializeFunctionName,
 										 everyContent) + NewLine;
@@ -492,27 +491,27 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		#region Remote Side
 
-		private static string Remote_GenDeclaration(GenerateOption option)
+		private static string Remote_GenDeclaration(GenerateOption option, SyncType syncType, SyncDirection direction)
 		{
 			string declarationContent = string.Empty;
 			foreach (var prop in option.Properties)
 			{
-				declarationContent += prop.GenerateRemotePropertyDeclaration() + NewLine + NewLine;
+				declarationContent += prop.GenerateRemotePropertyDeclaration(syncType, direction) + NewLine + NewLine;
 			}
 			foreach (var func in option.Functions)
 			{
-				declarationContent += func.GetPartialDeclaraction() + NewLine + NewLine;
+				declarationContent += func.GetPartialDeclaraction(syncType, direction) + NewLine + NewLine;
 			}
 			CodeFormat.AddIndent(ref declarationContent);
 			return declarationContent;
 		}
 
-		private static string Remote_GenPropertyDeserializeContent(GenerateOption option)
+		private static string Remote_GenPropertyDeserializeContent(GenerateOption option, SyncType syncType)
 		{
 			// If there are no elements to sync
 			if (!option.HasSyncElement)
 			{
-				var noElement = string.Format(SyncFormat.DeserializeSyncNoElement,
+				var noElement = string.Format(ObjectFormat.DeserializeSyncNoElement,
 											  option.Modifier, option.DeserializeFunctionName);
 				CodeFormat.AddIndent(ref noElement);
 				return noElement + NewLine;
@@ -531,7 +530,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				var prop = option.Properties[i];
 
 				string dirtyBitName = string.Format(option.PropertyDirtyBitName, propDirtyBitsCounter);
-				string deserializePropContent = prop.GeneratetPropertyDeserializeIfDirty(dirtyBitName, curPropIndex, option);
+				string deserializePropContent = prop.GeneratetPropertyDeserializeIfDirty(dirtyBitName, curPropIndex, syncType);
 				propDeserializeGroup[propDirtyBitsCounter] += deserializePropContent;
 				curPropIndex++;
 				if (curPropIndex >= 8)
@@ -547,7 +546,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				string dirtyBitName = string.Format(option.PropertyDirtyBitName, i);
 				string contentGroup = propDeserializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				propDeserialize += string.Format(SyncFormat.PropertyDeserializeGroup, i,
+				propDeserialize += string.Format(ObjectFormat.PropertyDeserializeGroup, i,
 												 nameof(BitmaskByte), dirtyBitName, contentGroup);
 			}
 			CodeFormat.AddIndent(ref propDeserialize);
@@ -580,12 +579,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				string dirtyBitName = string.Format(option.FunctionDirtyBitName, i);
 				string contentGroup = funcDeserializeGroup[i];
 				CodeFormat.AddIndent(ref contentGroup);
-				funcDeserialize += string.Format(SyncFormat.FunctionDeserializeGroup, i + 4, nameof(BitmaskByte), dirtyBitName, contentGroup);
+				funcDeserialize += string.Format(ObjectFormat.FunctionDeserializeGroup, i + 4, nameof(BitmaskByte), dirtyBitName, contentGroup);
 			}
 			CodeFormat.AddIndent(ref funcDeserialize);
 
 			// Combind
-			var deserializeContent = string.Format(SyncFormat.DeserializeSync,
+			var deserializeContent = string.Format(ObjectFormat.DeserializeSync,
 												   option.Modifier,
 												   option.DeserializeFunctionName,
 												   option.BitmaskTypeName,
@@ -596,12 +595,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return deserializeContent;
 		}
 
-		private static string Remote_GenMasterDeserializeEveryProperty(GenerateOption option)
+		private static string Remote_GenMasterDeserializeEveryProperty(GenerateOption option, SyncType syncType)
 		{
 			// If there are no elements to sync
 			if (!option.HasProperties)
 			{
-				string noElement = string.Format(SyncFormat.DeserializeSyncNoElement,
+				string noElement = string.Format(ObjectFormat.DeserializeSyncNoElement,
 												 option.Modifier,
 												 option.DeserializeFunctionName) + NewLine;
 				CodeFormat.AddIndent(ref noElement);
@@ -611,10 +610,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string everyContent = string.Empty;
 			foreach (var p in option.Properties)
 			{
-				everyContent += p.GetReadDeserialize(option);
+				everyContent += p.GetReadDeserialize(syncType);
 			}
 			CodeFormat.AddIndent(ref everyContent);
-			everyContent = string.Format(SyncFormat.DeserializeEveryProperty,
+			everyContent = string.Format(ObjectFormat.DeserializeEveryProperty,
 										 option.Modifier,
 										 option.DeserializeFunctionName,
 										 everyContent) + NewLine;
