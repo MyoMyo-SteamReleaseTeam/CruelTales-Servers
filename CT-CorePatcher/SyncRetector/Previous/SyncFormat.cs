@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class GenerateOption
 	{
@@ -637,7 +637,7 @@ namespace {1}
 			if (name[0] == '_')
 				name = name[1..];
 
-			return ($"{name[0]}").ToUpper() + name[1..];
+			return $"{name[0]}".ToUpper() + name[1..];
 		}
 
 		public static string GetSyncVarAttribute(SerializeType serializeType, SyncType syncType, SyncDirection syncDirection)

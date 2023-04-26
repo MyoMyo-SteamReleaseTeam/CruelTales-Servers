@@ -8,6 +8,7 @@ using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
+using CT.CorePatcher.SyncRetector.Previous;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -29,7 +30,6 @@ namespace CT.CorePatcher.SyncRetector
 			typeof(NetString), typeof(CTS.Instance.GameplayServer)
 		};
 
-		public List<Assembly> ReferenceAssemblys { get; private set; } = new();
 		private Dictionary<string, string> _enumSizeByTypeName = new();
 
 		public const string SYNC_MASTER_PATH = "syncMasterPath";
@@ -45,64 +45,66 @@ namespace CT.CorePatcher.SyncRetector
 			OptionParser.BindArgumentArray(op, SYNC_REMOTE_PATH, 2, remoteTargetPathList);
 			op.TryApplyArguments(args);
 
-			var syncObjects = parseAssemblys();
+//			var syncObjects = parseAssemblys();
 
-			SyncGenerateOperation master = new();
-			master.SyncObjects = syncObjects;
-			master.Namespace = $"CTS.Instance.SyncObjects";
-			master.UsingStatements = new List<string>()
-			{
-				"using System;",
-				"using System.Collections.Generic;",
-				"using CT.Common.DataType;",
-				"using CT.Common.Serialization;",
-				"using CT.Common.Serialization.Type;",
-				"using CT.Common.Synchronizations;",
-				"using CT.Common.Tools.Collections;",
-				"using CTS.Instance.Synchronizations;",
-			};
+//			SyncGenerateOperation master = new();
+//			master.SyncObjects = syncObjects;
+//			master.Namespace = $"CTS.Instance.SyncObjects";
+//			master.UsingStatements = new List<string>()
+//			{
+//				"using System;",
+//				"using System.Collections.Generic;",
+//				"using CT.Common.DataType;",
+//				"using CT.Common.Serialization;",
+//				"using CT.Common.Serialization.Type;",
+//				"using CT.Common.Synchronizations;",
+//				"using CT.Common.Tools.Collections;",
+//				"using CTS.Instance.Synchronizations;",
+//			};
 
-			SyncGenerateOperation remote = new();
-			remote.SyncObjects = syncObjects;
-			remote.Namespace = $"CTC.Networks.SyncObjects.TestSyncObjects";
-			remote.UsingStatements = new List<string>()
-			{
-				"using System;",
-				"using System.Collections.Generic;",
-				"using CT.Common.DataType;",
-				"using CT.Common.Serialization;",
-				"using CT.Common.Serialization.Type;",
-				"using CT.Common.Synchronizations;",
-				"using CT.Common.Tools.Collections;",
-				"using CTC.Networks.Synchronizations;",
-			};
+//			SyncGenerateOperation remote = new();
+//			remote.SyncObjects = syncObjects;
+//			remote.Namespace = $"CTC.Networks.SyncObjects.TestSyncObjects";
+//			remote.UsingStatements = new List<string>()
+//			{
+//				"using System;",
+//				"using System.Collections.Generic;",
+//				"using CT.Common.DataType;",
+//				"using CT.Common.Serialization;",
+//				"using CT.Common.Serialization.Type;",
+//				"using CT.Common.Synchronizations;",
+//				"using CT.Common.Tools.Collections;",
+//				"using CTC.Networks.Synchronizations;",
+//			};
 
-#pragma warning disable CA1416 // Validate platform compatibility
-			if (MainProcess.IsDebug)
-			{
-				master.TargetPath = "Master";
-				master.Run(SyncDirection.FromMaster);
-				remote.TargetPath = "Remote";
-				remote.Run(SyncDirection.FromRemote);
-				return;
-			}
-#pragma warning restore CA1416 // Validate platform compatibility
+//#pragma warning disable CA1416 // Validate platform compatibility
+//			if (MainProcess.IsDebug)
+//			{
+//				master.TargetPath = "Master";
+//				master.Run(SyncDirection.FromMaster);
+//				remote.TargetPath = "Remote";
+//				remote.Run(SyncDirection.FromRemote);
+//				return;
+//			}
+//#pragma warning restore CA1416 // Validate platform compatibility
 
-			foreach (var path in masterTargetPathList.ArgumentArray)
-			{
-				master.TargetPath = path;
-				master.Run(SyncDirection.FromMaster);
-			}
+//			foreach (var path in masterTargetPathList.ArgumentArray)
+//			{
+//				master.TargetPath = path;
+//				master.Run(SyncDirection.FromMaster);
+//			}
 
-			foreach (var path in remoteTargetPathList.ArgumentArray)
-			{
-				remote.TargetPath = path;
-				remote.Run(SyncDirection.FromRemote);
-			}
+//			foreach (var path in remoteTargetPathList.ArgumentArray)
+//			{
+//				remote.TargetPath = path;
+//				remote.Run(SyncDirection.FromRemote);
+//			}
 		}
 
-		public List<SyncObjectInfo> parseAssemblys()
+		public List<Previous.SyncObjectInfo> parseAssemblys()
 		{
+			List<Assembly> referenceAssemblys = new();
+
 			// Add references
 			foreach (var type in _referenceTypes)
 			{
@@ -110,7 +112,7 @@ namespace CT.CorePatcher.SyncRetector
 			}
 
 			// Find enums from assemblys
-			foreach (var a in ReferenceAssemblys)
+			foreach (var a in referenceAssemblys)
 			{
 				var enumTypes = ReflectionExtension.GetTypeNamesBy(a, typeof(Enum));
 
@@ -123,7 +125,7 @@ namespace CT.CorePatcher.SyncRetector
 			}
 
 			// Get difinition types
-			List<SyncObjectInfo> syncObjects = new();
+			List<Previous.SyncObjectInfo> syncObjects = new();
 
 			// Sync object
 			TryGetSyncDifinitionTypes<DEF_SyncObjectDefinitionAttribute>
@@ -152,13 +154,14 @@ namespace CT.CorePatcher.SyncRetector
 				if (assembly == null)
 					return;
 
-				ReferenceAssemblys.Add(assembly);
+				referenceAssemblys.Add(assembly);
 			}
 		}
 
 		private SyncObjectInfo getSyncObjectInfo(Type type, bool isNetworkObject)
 		{
-			SyncObjectInfo syncObject = new(type.Name, isNetworkObject);
+			List<MemberToken> masterMember = new();
+			List<MemberToken> remoteMember = new();
 
 			// Parse properties
 			foreach (var f in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
@@ -202,7 +205,7 @@ namespace CT.CorePatcher.SyncRetector
 				}
 			}
 
-			return syncObject;
+			return new SyncObjectInfo(type.Name, masterMember, remoteMember, isNetworkObject);
 		}
 
 		public bool IsEnum(string typeName)

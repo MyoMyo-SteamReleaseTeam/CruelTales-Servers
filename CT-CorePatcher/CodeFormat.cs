@@ -8,6 +8,29 @@ namespace CT.CorePatcher
 		public static string Indent { get; set; } = TextFormat.Indent;
 
 		/// <summary>입력된 문자열에 들여쓰기를 합니다.</summary>
+		public static void AddIndent(StringBuilder content, int repeat = 1)
+		{
+			string ctn = content.ToString();
+			for (int i = 0; i < repeat; i++)
+			{
+				ctn = Indent + ctn.Replace("\n", $"\n{Indent}");
+			}
+			content.Clear();
+			content.Append(ctn);
+		}
+
+		/// <summary>입력된 문자열에 들여쓰기를 합니다.</summary>
+		public static string AddIndent(string content, int repeat = 1)
+		{
+			for (int i = 0; i < repeat; i++)
+			{
+				content = Indent + content.Replace(NewLine, $"{NewLine}{Indent}");
+			}
+
+			return content;
+		}
+
+		/// <summary>입력된 문자열에 들여쓰기를 합니다.</summary>
 		public static void AddIndent(ref string content, int repeat = 1)
 		{
 			for (int i = 0; i < repeat; i ++)

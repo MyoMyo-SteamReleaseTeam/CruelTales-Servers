@@ -1,7 +1,7 @@
 ﻿using System;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class SyncObjectToken
 	{
@@ -23,13 +23,13 @@ namespace CT.CorePatcher.SyncRetector
 		/// <summary>선언된 프로퍼티의 private 이름입니다.</summary>
 		public string PrivateName { get; private set; } = string.Empty;
 
-		public SyncObjectToken(string propertyName, 
-							   Type fieldType, 
+		public SyncObjectToken(string propertyName,
+							   Type fieldType,
 							   bool isPublic)
 		{
-			this.TypeName = fieldType.Name;
-			this.IsPublic = isPublic;
-			this.PrivateName = SyncFormat.GetPrivateName(propertyName);
+			TypeName = fieldType.Name;
+			IsPublic = isPublic;
+			PrivateName = SyncFormat.GetPrivateName(propertyName);
 		}
 
 		public string GeneratePraivteDeclaration(SyncType syncType, SyncDirection syncDirection)
@@ -54,9 +54,9 @@ namespace CT.CorePatcher.SyncRetector
 
 			return string.Format(PropertyFormat.GetterSetter,
 								 IsPublic ? "public" : "private",
-								 this.TypeName,
-								 this.GetPublicPropertyName(),
-								 this.PrivateName,
+								 TypeName,
+								 GetPublicPropertyName(),
+								 PrivateName,
 								 dirtyBitName,
 								 propIndex);
 		}
@@ -66,7 +66,7 @@ namespace CT.CorePatcher.SyncRetector
 			return string.Format(PropertyFormat.SerializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetWriterSerialize(syncType));
+								 GetWriterSerialize(syncType));
 		}
 
 		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex, SyncType syncType)
@@ -74,9 +74,9 @@ namespace CT.CorePatcher.SyncRetector
 			return string.Format(PropertyFormat.DeserializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetPublicPropertyName(),
-								 this.PrivateName,
-								 this.GetReadDeserialize(syncType));
+								 GetPublicPropertyName(),
+								 PrivateName,
+								 GetReadDeserialize(syncType));
 		}
 
 		public string GetDirtyCheckIf(GenerateOption option, int masterIndex, int dirtyIndex)
@@ -97,13 +97,13 @@ namespace CT.CorePatcher.SyncRetector
 
 		public string GetWriterSerialize(SyncType syncType)
 		{
-			string funcName = (syncType == SyncType.None) ? "SerializeEveryProperty" : $"SerializeSync{syncType}";
+			string funcName = syncType == SyncType.None ? "SerializeEveryProperty" : $"SerializeSync{syncType}";
 			return string.Format(PropertyFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
 		}
 
 		public string GetReadDeserialize(SyncType syncType)
 		{
-			string funcName = (syncType == SyncType.None) ? "DeserializeEveryProperty" : $"DeserializeSync{syncType}";
+			string funcName = syncType == SyncType.None ? "DeserializeEveryProperty" : $"DeserializeSync{syncType}";
 			return string.Format(PropertyFormat.ReadSyncObject, PrivateName, funcName) + NewLine;
 		}
 

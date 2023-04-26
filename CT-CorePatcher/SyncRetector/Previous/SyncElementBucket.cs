@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class SyncElementBucket
 	{

@@ -5,7 +5,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Data;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class SyncGenerateOperation
 	{

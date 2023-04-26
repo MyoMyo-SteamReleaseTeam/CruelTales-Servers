@@ -2,7 +2,7 @@
 using System.Reflection;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class SyncFunctionToken
 	{
@@ -18,19 +18,19 @@ namespace CT.CorePatcher.SyncRetector
 		public SyncFunctionToken(SynchronizerGenerator generator,
 								 MethodInfo methodInfo)
 		{
-			this.FunctionName = methodInfo.Name;
+			FunctionName = methodInfo.Name;
 
 			var paramInfo = methodInfo.GetParameters();
 			foreach (var param in paramInfo)
 			{
 				SyncPropertyToken syncParam = new(generator,
-												  param.Name ?? string.Empty, 
-												  param.ParameterType, 
+												  param.Name ?? string.Empty,
+												  param.ParameterType,
 												  isPublic: true);
 				Parameters.Add(syncParam);
 			}
 		}
-		
+
 		public string GetPartialDeclaraction(SyncType syncType, SyncDirection syncDirection)
 		{
 			return string.Format(FunctionFormat.Declaration,
@@ -44,8 +44,8 @@ namespace CT.CorePatcher.SyncRetector
 			if (Parameters.Count == 0)
 			{
 				return string.Format(FunctionFormat.CallWithStackVoid,
-									 this.FunctionName,
-									 this.GetParameterContent(),
+									 FunctionName,
+									 GetParameterContent(),
 									 dirtyBitsName,
 									 funcIndex);
 			}
@@ -64,12 +64,12 @@ namespace CT.CorePatcher.SyncRetector
 				else
 				{
 					parameterContent = GetParameterContent();
-					callStackContent = this.GetCallStackTupleContent();
+					callStackContent = GetCallStackTupleContent();
 					genericType = Parameters[0].TypeName;
 				}
 
 				return string.Format(FunctionFormat.CallWithStack,
-									 this.FunctionName,
+									 FunctionName,
 									 parameterContent,
 									 callStackContent,
 									 dirtyBitsName,
@@ -84,7 +84,7 @@ namespace CT.CorePatcher.SyncRetector
 			{
 				return string.Format(FunctionFormat.SerializeIfDirtyVoid,
 									 dirtyBitName, curFuncIndex,
-									 this.FunctionName);
+									 FunctionName);
 			}
 			else if (Parameters.Count == 1)
 			{
@@ -92,16 +92,16 @@ namespace CT.CorePatcher.SyncRetector
 				CodeFormat.AddIndent(ref funcSerializeContent, 2);
 				return string.Format(FunctionFormat.SerializeIfDirtyOneArg,
 									 dirtyBitName, curFuncIndex,
-									 this.FunctionName,
+									 FunctionName,
 									 funcSerializeContent);
 			}
 			else
 			{
-				var funcSerializeContent = this.GetCallstackSerializeContent();
+				var funcSerializeContent = GetCallstackSerializeContent();
 				CodeFormat.AddIndent(ref funcSerializeContent, 2);
 				return string.Format(FunctionFormat.SerializeIfDirty,
 									 dirtyBitName, curFuncIndex,
-									 this.FunctionName,
+									 FunctionName,
 									 funcSerializeContent);
 			}
 		}
@@ -112,17 +112,17 @@ namespace CT.CorePatcher.SyncRetector
 			{
 				return string.Format(FunctionFormat.DeserializeIfDirtyVoid,
 									 dirtyBitName, curFuncIndex,
-									 this.FunctionName);
+									 FunctionName);
 			}
 			else
 			{
-				var funcDeserializeContent = this.GetCallstackDeserializeContent();
+				var funcDeserializeContent = GetCallstackDeserializeContent();
 				CodeFormat.AddIndent(ref funcDeserializeContent, 2);
 				return string.Format(FunctionFormat.DeserializeIfDirty,
 									 dirtyBitName, curFuncIndex,
-									 this.FunctionName,
+									 FunctionName,
 									 funcDeserializeContent,
-									 this.GetCallStackTupleContent());
+									 GetCallStackTupleContent());
 			}
 		}
 

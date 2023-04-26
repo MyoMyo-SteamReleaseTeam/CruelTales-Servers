@@ -2,7 +2,7 @@
 using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SyncRetector.Previous
 {
 	public class SyncPropertyToken
 	{
@@ -31,12 +31,12 @@ namespace CT.CorePatcher.SyncRetector
 		public string EnumSizeTypeName { get; private set; } = "int";
 
 		public SyncPropertyToken(SynchronizerGenerator generator,
-								 string propertyName, 
-								 Type fieldType, 
+								 string propertyName,
+								 Type fieldType,
 								 bool isPublic)
 		{
-			this.TypeName = fieldType.Name;
-			this.IsPublic = isPublic;
+			TypeName = fieldType.Name;
+			IsPublic = isPublic;
 
 			if (propertyName[0] != '_')
 			{
@@ -46,46 +46,46 @@ namespace CT.CorePatcher.SyncRetector
 			{
 				propertyName = '_' + $"{propertyName[1]}".ToLower() + propertyName[2..];
 			}
-			this.PrivateName = propertyName;
+			PrivateName = propertyName;
 
 			// Set serialize type
 			string baseTpyeName = fieldType.BaseType != null ? fieldType.BaseType.Name : string.Empty;
-			string typeName = this.TypeName;
+			string typeName = TypeName;
 			if (baseTpyeName == "ValueType")
 			{
 				if (ReflectionHelper.IsCLRPrimitiveType(typeName))
 				{
-					this.SerializeType = SerializeType.Primitive;
-					this.CLRTypeName = typeName;
-					ReflectionHelper.TryGetTypeByCLRType(this.CLRTypeName, out var primitiveType);
-					this.TypeName = primitiveType;
+					SerializeType = SerializeType.Primitive;
+					CLRTypeName = typeName;
+					ReflectionHelper.TryGetTypeByCLRType(CLRTypeName, out var primitiveType);
+					TypeName = primitiveType;
 
 				}
 				else if (ReflectionHelper.IsNetString(typeName))
 				{
-					this.SerializeType = SerializeType.NetString;
-					this.Initializer = " = string.Empty";
+					SerializeType = SerializeType.NetString;
+					Initializer = " = string.Empty";
 				}
 				else
 				{
-					this.SerializeType = SerializeType.Struct;
-					this.Initializer = " = new()";
+					SerializeType = SerializeType.Struct;
+					Initializer = " = new()";
 				}
 			}
 			else
 			{
 				if (generator.IsEnum(typeName))
 				{
-					this.SerializeType = SerializeType.Enum;
-					this.EnumSizeTypeName = generator.GetEnumSizeTypeName(typeName);
-					ReflectionHelper.TryGetCLRTypeByPrimitive(this.EnumSizeTypeName, out string clrType);
-					this.CLRTypeName = clrType;
-					this.Initializer = string.Empty;
+					SerializeType = SerializeType.Enum;
+					EnumSizeTypeName = generator.GetEnumSizeTypeName(typeName);
+					ReflectionHelper.TryGetCLRTypeByPrimitive(EnumSizeTypeName, out string clrType);
+					CLRTypeName = clrType;
+					Initializer = string.Empty;
 				}
 				else
 				{
-					this.SerializeType = SerializeType.Class;
-					this.Initializer = " = new()";
+					SerializeType = SerializeType.Class;
+					Initializer = " = new()";
 				}
 			}
 		}
@@ -93,8 +93,8 @@ namespace CT.CorePatcher.SyncRetector
 		public void SetSyncObjectType(SerializeType serializeType,
 									  string initializer)
 		{
-			this.SerializeType = serializeType;
-			this.Initializer = initializer;
+			SerializeType = serializeType;
+			Initializer = initializer;
 		}
 
 		public string GenDeclaration(SyncType syncType, SyncDirection syncDirection)
@@ -119,9 +119,9 @@ namespace CT.CorePatcher.SyncRetector
 
 			return string.Format(PropertyFormat.GetterSetter,
 								 IsPublic ? "public" : "private",
-								 this.TypeName,
-								 this.GetPublicPropertyName(),
-								 this.PrivateName,
+								 TypeName,
+								 GetPublicPropertyName(),
+								 PrivateName,
 								 dirtyBitName,
 								 propIndex);
 		}
@@ -131,7 +131,7 @@ namespace CT.CorePatcher.SyncRetector
 			return string.Format(PropertyFormat.SerializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetWriterSerialize(syncType));
+								 GetWriterSerialize(syncType));
 		}
 
 		public string GeneratetPropertyDeserializeIfDirty(string dirtyBitName, int curPropIndex, SyncType syncType)
@@ -139,9 +139,9 @@ namespace CT.CorePatcher.SyncRetector
 			return string.Format(PropertyFormat.DeserializeIfDirty,
 								 dirtyBitName,
 								 curPropIndex,
-								 this.GetPublicPropertyName(),
-								 this.PrivateName,
-								 this.GetReadDeserialize(syncType));
+								 GetPublicPropertyName(),
+								 PrivateName,
+								 GetReadDeserialize(syncType));
 		}
 
 		public string GetDirtyCheckIfSyncObject(GenerateOption option, int masterIndex, int dirtyIndex)
@@ -162,7 +162,7 @@ namespace CT.CorePatcher.SyncRetector
 				publicName = publicName[1..];
 			}
 
-			return ($"{publicName[0]}").ToUpper() + publicName[1..];
+			return $"{publicName[0]}".ToUpper() + publicName[1..];
 		}
 
 		public string GetParameter()
@@ -186,7 +186,7 @@ namespace CT.CorePatcher.SyncRetector
 					return string.Format(PropertyFormat.WriteEnum, EnumSizeTypeName, PrivateName) + NewLine;
 
 				case SerializeType.SyncObject:
-					string funcName = (syncType == SyncType.None) ? "SerializeEveryProperty" : $"SerializeSync{syncType}";
+					string funcName = syncType == SyncType.None ? "SerializeEveryProperty" : $"SerializeSync{syncType}";
 					return string.Format(PropertyFormat.WriteSyncObject, PrivateName, funcName) + NewLine;
 
 				default:
@@ -210,7 +210,7 @@ namespace CT.CorePatcher.SyncRetector
 					return string.Format(PropertyFormat.ReadEnum, PrivateName, TypeName, CLRTypeName) + NewLine;
 
 				case SerializeType.SyncObject:
-					string funcName = (syncType == SyncType.None) ? "DeserializeEveryProperty" : $"DeserializeSync{syncType}";
+					string funcName = syncType == SyncType.None ? "DeserializeEveryProperty" : $"DeserializeSync{syncType}";
 					return string.Format(PropertyFormat.ReadSyncObject, PrivateName, funcName) + NewLine;
 
 				default:
