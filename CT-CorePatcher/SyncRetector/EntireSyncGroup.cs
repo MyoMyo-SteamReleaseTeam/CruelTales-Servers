@@ -21,16 +21,22 @@ namespace CT.CorePatcher.SyncRetector
 		public string Master_SerializeSyncAll()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier, _syncType));
+			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier, 
+									SyncGroupFormat.EntireFunctionSuffix));
 
 			if (_members.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();
 			foreach (var m in _members)
+			{
+				if (m is FunctionMemberToken)
+					continue;
 				contents.AppendLine(m.Master_SerializeByWriter());
+			}
 			CodeFormat.AddIndent(contents);
 
+			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(contents.ToString());
 			sb.AppendLine("}");
@@ -55,16 +61,22 @@ namespace CT.CorePatcher.SyncRetector
 		public string Remote_DeserializeSyncAll()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.EntireDeserializeFunctionDeclaration, _modifier, _syncType));
+			sb.Append(string.Format(SyncGroupFormat.EntireDeserializeFunctionDeclaration, _modifier,
+									SyncGroupFormat.EntireFunctionSuffix));
 
 			if (_members.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();
 			foreach (var m in _members)
+			{
+				if (m is FunctionMemberToken)
+					continue;
 				contents.AppendLine(m.Remote_DeserializeByReader());
+			}
 			CodeFormat.AddIndent(contents);
 
+			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(contents.ToString());
 			sb.AppendLine("}");

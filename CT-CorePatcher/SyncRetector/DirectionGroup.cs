@@ -39,8 +39,12 @@ namespace CT.CorePatcher.SyncRetector
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(_reliableGruop.Master_BitmaskDeclarations());
-			sb.AppendLine(_reliableGruop.Master_GetterSetter());
 			sb.AppendLine(_unreliableGruop.Master_BitmaskDeclarations());
+
+			sb.AppendLine(_reliableGruop.Master_DirtyProperty());
+			sb.AppendLine(_unreliableGruop.Master_DirtyProperty());
+
+			sb.AppendLine(_reliableGruop.Master_GetterSetter());
 			sb.AppendLine(_unreliableGruop.Master_GetterSetter());
 			return sb.ToString();
 		}
@@ -50,6 +54,7 @@ namespace CT.CorePatcher.SyncRetector
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(_reliableGruop.Master_ClearDirty());
 			sb.AppendLine(_unreliableGruop.Master_ClearDirty());
+
 			sb.AppendLine(_reliableGruop.Master_SerializeSync());
 			sb.AppendLine(_unreliableGruop.Master_SerializeSync());
 			sb.AppendLine(_entireGroup.Master_SerializeSyncAll());

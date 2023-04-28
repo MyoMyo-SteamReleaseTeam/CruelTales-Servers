@@ -6,6 +6,7 @@ using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
 using CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments;
 using CT.CorePatcher.SyncRetector.PropertyDefine;
+using CT.Common.Tools.Data;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -27,63 +28,31 @@ namespace CT.CorePatcher.SyncRetector
 
 			var syncObjects = parseAssemblys();
 
-			foreach (var syncObj in syncObjects)
+#pragma warning disable CA1416 // Validate platform compatibility
+			if (MainProcess.IsDebug)
 			{
-				Console.WriteLine(syncObj.Gen_MasterCode());
+				foreach (var syncObj in syncObjects)
+				{
+					var masterContent = syncObj.Gen_MasterCode();
+					var remoteContent = syncObj.Gen_RemoteCode();
+					FileHandler.TryWriteText($"Test/Master_{syncObj.ObjectName}.cs", masterContent, makeDirectory: true);
+					FileHandler.TryWriteText($"Test/Remote_{syncObj.ObjectName}.cs", remoteContent, makeDirectory: true);
+				}
+				return;
 			}
+#pragma warning restore CA1416 // Validate platform compatibility
 
-//			SyncGenerateOperation master = new();
-//			master.SyncObjects = syncObjects;
-//			master.Namespace = $"CTS.Instance.SyncObjects";
-//			master.UsingStatements = new List<string>()
-//			{
-//				"using System;",
-//				"using System.Collections.Generic;",
-//				"using CT.Common.DataType;",
-//				"using CT.Common.Serialization;",
-//				"using CT.Common.Serialization.Type;",
-//				"using CT.Common.Synchronizations;",
-//				"using CT.Common.Tools.Collections;",
-//				"using CTS.Instance.Synchronizations;",
-//			};
+			//foreach (var path in masterTargetPathList.ArgumentArray)
+			//{
+			//	master.TargetPath = path;
+			//	master.Run(SyncDirection.FromMaster);
+			//}
 
-//			SyncGenerateOperation remote = new();
-//			remote.SyncObjects = syncObjects;
-//			remote.Namespace = $"CTC.Networks.SyncObjects.TestSyncObjects";
-//			remote.UsingStatements = new List<string>()
-//			{
-//				"using System;",
-//				"using System.Collections.Generic;",
-//				"using CT.Common.DataType;",
-//				"using CT.Common.Serialization;",
-//				"using CT.Common.Serialization.Type;",
-//				"using CT.Common.Synchronizations;",
-//				"using CT.Common.Tools.Collections;",
-//				"using CTC.Networks.Synchronizations;",
-//			};
-
-//#pragma warning disable CA1416 // Validate platform compatibility
-//			if (MainProcess.IsDebug)
-//			{
-//				master.TargetPath = "Master";
-//				master.Run(SyncDirection.FromMaster);
-//				remote.TargetPath = "Remote";
-//				remote.Run(SyncDirection.FromRemote);
-//				return;
-//			}
-//#pragma warning restore CA1416 // Validate platform compatibility
-
-//			foreach (var path in masterTargetPathList.ArgumentArray)
-//			{
-//				master.TargetPath = path;
-//				master.Run(SyncDirection.FromMaster);
-//			}
-
-//			foreach (var path in remoteTargetPathList.ArgumentArray)
-//			{
-//				remote.TargetPath = path;
-//				remote.Run(SyncDirection.FromRemote);
-//			}
+			//foreach (var path in remoteTargetPathList.ArgumentArray)
+			//{
+			//	remote.TargetPath = path;
+			//	remote.Run(SyncDirection.FromRemote);
+			//}
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()

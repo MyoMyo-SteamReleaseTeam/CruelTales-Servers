@@ -42,8 +42,9 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 
 		public override string Master_SerializeByWriter()
 		{
-			return string.Format(FuncMemberFormat.SerializeIfDirty,
-								 _functionName, _argGroup.GetWriteParameterContent());
+			string content = _argGroup.GetWriteParameterContent();
+			CodeFormat.AddIndent(ref content);
+			return string.Format(FuncMemberFormat.SerializeIfDirty, _functionName, content);
 		}
 
 		public override string Master_CheckDirty() => string.Empty;
@@ -59,13 +60,14 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 		public override string Remote_DeserializeByReader()
 		{
 			if (_argGroup.Count == 0)
-			{
 				return string.Format(FuncMemberFormat.DeserializeIfDirtyVoid, _functionName);
-			}
+
+			string paramContent = _argGroup.GetReadParameterContent();
+			CodeFormat.AddIndent(ref paramContent);
 
 			return string.Format(FuncMemberFormat.DeserializeIfDirty,
 								 _functionName,
-								 _argGroup.GetReadParameterContent(),
+								 paramContent,
 								 _argGroup.GetCallParameters());
 		}
 	}

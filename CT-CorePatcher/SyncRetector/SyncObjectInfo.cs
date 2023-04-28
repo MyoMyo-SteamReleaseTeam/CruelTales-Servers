@@ -6,6 +6,7 @@ namespace CT.CorePatcher.SyncRetector
 {
 	public class SyncObjectInfo
 	{
+		public string ObjectName => _objectName;
 		private string _objectName;
 		private string _modifier;
 		private bool _isNetworkObject = false;
@@ -28,8 +29,8 @@ namespace CT.CorePatcher.SyncRetector
 							  bool isNetworkObject)
 		{
 			_objectName = objectName;
-			_modifier = _isNetworkObject ? "override" : string.Empty;
 			_isNetworkObject = isNetworkObject;
+			_modifier = _isNetworkObject ? "override " : string.Empty;
 
 			_masterSideMembers = masterSideMembers;
 			_remoteSideMembers = remoteSideMembers;
@@ -51,60 +52,75 @@ namespace CT.CorePatcher.SyncRetector
 
 		public string Gen_MasterCode()
 		{
-			StringBuilder sb = new();
-			AddNetworkTypeDefinition(sb);
+			string genCode = gnerateCode(CommonFormat.MasterUsingStatements,
+										 CommonFormat.MasterNamespace,
+										 SyncDirection.FromMaster,
+										 _masterSideMembers,
+										 _remoteSideMembers,
+										 _masterSerializeGroup,
+										 _masterDeserializeGroup,
+										 _masterInheritName);
 
-			string declaration = gnerateDeclarationCode(SyncDirection.FromMaster, _masterSideMembers, _remoteSideMembers);
-			sb.AppendLine(declaration);
-
-			string content = generateContentCode(_masterSerializeGroup, _masterDeserializeGroup);
-			return sb.AppendLine(string.Format(CommonFormat.SyncObjectFormat,
-											   _objectName, _masterInheritName, content)).ToString();
+			CodeFormat.ReformCode(ref genCode, startFromNamespace: true);
+			return genCode;
 		}
 
 		public string Gen_RemoteCode()
 		{
-			StringBuilder sb = new();
-			AddNetworkTypeDefinition(sb);
+			string genCode = gnerateCode(CommonFormat.RemoteUsingStatements,
+										 CommonFormat.RemoteNamespace,
+										 SyncDirection.FromRemote,
+										 _remoteSideMembers,
+										 _masterSideMembers,
+										 _remoteSerializeGroup,
+										 _remoteDeserializeGroup,
+										 _remoteInheritName);
 
-			string declaration = gnerateDeclarationCode(SyncDirection.FromRemote, _remoteSideMembers, _masterSideMembers);
-			sb.AppendLine(declaration);
-
-			string content = generateContentCode(_remoteSerializeGroup, _remoteDeserializeGroup);
-			return sb.AppendLine(string.Format(CommonFormat.SyncObjectFormat,
-											   _objectName, _remoteInheritName, content)).ToString();
+			CodeFormat.ReformCode(ref genCode, startFromNamespace: true);
+			return genCode;
 		}
 
-		private string gnerateDeclarationCode(SyncDirection direction,
-											  List<MemberToken> serializeSideMembers,
-											  List<MemberToken> deserializeSideMembers)
+		private string getNetworkTypeDefinition()
 		{
-			StringBuilder sb = new();
-			foreach (var m in serializeSideMembers)
-				sb.AppendLine(m.Member.Master_Declaration(direction));
-			foreach (var m in deserializeSideMembers)
-				sb.AppendLine(m.Member.Remote_Declaration(direction));
-			return sb.ToString();
+			if (!_isNetworkObject)
+				return string.Empty;
+
+			return string.Format(CommonFormat.NetworkTypeDeclaration,
+								 CommonFormat.NetworkObjectTypeTypeName, _objectName);
 		}
 
-		private string generateContentCode(SerializeDirectionGroup serialize,
-										   DeserializeDirectionGroup deserialize)
+		private string gnerateCode(string usingStatements,
+								   string namespaceName,
+								   SyncDirection direction,
+								   List<MemberToken> forwardMember,
+								   List<MemberToken> backwardMember,
+								   SerializeDirectionGroup forward,
+								   DeserializeDirectionGroup backward,
+								   string inheritName)
 		{
 			StringBuilder sb = new();
-			sb.AppendLine(serialize.Gen_SynchronizerProperties());
-			sb.AppendLine(serialize.Gen_SerializeSyncFuntions());
-			sb.AppendLine(deserialize.Gen_SerializeSyncFuntions());
-			CodeFormat.AddIndent(sb);
-			return sb.ToString();
-		}
+			sb.AppendLine(getNetworkTypeDefinition());
 
-		private void AddNetworkTypeDefinition(StringBuilder sb)
-		{
-			if (_isNetworkObject)
+			SyncDirection reverseDirection = SyncDirection.FromRemote;
+			if (direction == SyncDirection.FromRemote)
 			{
-				sb.AppendLine(string.Format(CommonFormat.NetworkTypeDeclaration,
-											CommonFormat.NetworkObjectTypeTypeName, _objectName));
+				reverseDirection = SyncDirection.FromMaster;
 			}
+
+			foreach (var m in forwardMember)
+				sb.AppendLine(m.Member.Master_Declaration(direction));
+			foreach (var m in backwardMember)
+				sb.AppendLine(m.Member.Remote_Declaration(reverseDirection));
+
+			sb.AppendLine(forward.Gen_SynchronizerProperties());
+			sb.AppendLine(forward.Gen_SerializeSyncFuntions());
+			sb.AppendLine(backward.Gen_SerializeSyncFuntions());
+			CodeFormat.AddIndent(sb);
+
+			var content = string.Format(CommonFormat.SyncObjectFormat, _objectName, inheritName, sb.ToString());
+			CodeFormat.AddIndent(ref content);
+
+			return string.Format(CommonFormat.FileFormat, usingStatements, namespaceName, content);
 		}
 	}
 }

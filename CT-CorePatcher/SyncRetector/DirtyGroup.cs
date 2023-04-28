@@ -2,6 +2,7 @@
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SyncRetector.PropertyDefine;
+using Microsoft.VisualBasic;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -29,10 +30,12 @@ namespace CT.CorePatcher.SyncRetector
 		public string Master_MemberSerializeIfDirtys()
 		{
 			StringBuilder sb = new();
+			int index = 0;
 			foreach (var m in _members)
 			{
-				string content = string.Format(CommonFormat.IfDirty, GetName(), _dirtyIndex,
-											   m.Master_SerializeByWriter());
+				string serialize = m.Master_SerializeByWriter();
+				CodeFormat.AddIndent(ref serialize);
+				string content = string.Format(CommonFormat.IfDirty, GetName(), index++, serialize);
 				sb.AppendLine(content);
 			}
 			return sb.ToString();
@@ -61,8 +64,14 @@ namespace CT.CorePatcher.SyncRetector
 		public string Remote_MemberDeserializeIfDirtys()
 		{
 			StringBuilder sb = new();
+			int index = 0;
+			sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
 			foreach (var m in _members)
-				sb.AppendLine(m.Remote_DeserializeByReader());
+			{
+				string content = m.Remote_DeserializeByReader();
+				CodeFormat.AddIndent(ref content);
+				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
+			}
 			return sb.ToString();
 		}
 	}

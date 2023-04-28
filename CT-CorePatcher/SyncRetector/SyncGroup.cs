@@ -15,7 +15,6 @@ namespace CT.CorePatcher.SyncRetector
 		{
 			_syncType = syncType;
 			_modifier = modifier;
-
 			_dirtyGroups = new();
 
 			int m = 0;
@@ -52,9 +51,15 @@ namespace CT.CorePatcher.SyncRetector
 
 		public string Master_DirtyProperty()
 		{
+			if (_dirtyGroups.Count == 0)
+				return string.Format(SyncGroupFormat.IsDirtyIfNoElement, _modifier, _syncType);
+
 			StringBuilder sb = new();
 			foreach (var g in _dirtyGroups)
+			{
 				sb.AppendLine(g.Master_MemberCheckDirtys());
+				sb.AppendLine(string.Format(SyncGroupFormat.IsBitmaskDirty, g.GetName()));
+			}
 
 			string content = sb.ToString();
 			CodeFormat.AddIndent(ref content, 2);
@@ -72,6 +77,7 @@ namespace CT.CorePatcher.SyncRetector
 			// TODO : 개수에 따라서 다르게 분배
 			var content = CodeFormat.AddIndent(master_SerializeSyncMultipleDirtyGroup());
 
+			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(content);
 			sb.AppendLine("}");
@@ -107,11 +113,14 @@ namespace CT.CorePatcher.SyncRetector
 
 		public string Master_ClearDirty()
 		{
+			if (_dirtyGroups.Count == 0)
+				return string.Format(SyncGroupFormat.ClearDirtyFunctionIfEmpty, _modifier, _syncType);
+
 			StringBuilder sb = new();
 			foreach (var d in _dirtyGroups)
 				sb.AppendLine(d.Master_ClearDirtys());
 			CodeFormat.AddIndent(sb);
-			return sb.ToString();
+			return string.Format(SyncGroupFormat.ClearDirtyFunction, _modifier, _syncType, sb.ToString());
 		}
 	}
 
@@ -125,7 +134,6 @@ namespace CT.CorePatcher.SyncRetector
 		{
 			_syncType = syncType;
 			_modifier = modifier;
-
 			_dirtyGroups = new();
 
 			int m = 0;
@@ -156,6 +164,7 @@ namespace CT.CorePatcher.SyncRetector
 			var content = remote_DeserializeSyncMultipleDirtyGroup();
 			CodeFormat.AddIndent(ref content);
 
+			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(content);
 			sb.AppendLine("}");
@@ -171,12 +180,9 @@ namespace CT.CorePatcher.SyncRetector
 			StringBuilder contents = new();
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
-
-				var dirtyGroup = _dirtyGroups[i];
-				var c = dirtyGroup.Remote_MemberDeserializeIfDirtys();
-				CodeFormat.AddIndent(ref c);
-				contents.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, dirtyGroup.GetName()));
-				contents.AppendLine(string.Format(CommonFormat.IfDirty, dirtyGroup, i, c));
+				string content = _dirtyGroups[i].Remote_MemberDeserializeIfDirtys();
+				CodeFormat.AddIndent(ref content);
+				contents.AppendLine(string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, content));
 			}
 			headers.AppendLine(contents.ToString());
 			return headers.ToString();

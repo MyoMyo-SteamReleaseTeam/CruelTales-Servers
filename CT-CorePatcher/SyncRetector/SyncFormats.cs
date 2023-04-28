@@ -1,10 +1,34 @@
-﻿using CT.Common.Synchronizations;
+﻿using System.Security.Cryptography.X509Certificates;
+using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen;
 
 namespace CT.CorePatcher.SyncRetector
 {
 	public static class CommonFormat
 	{
+		public static string MasterUsingStatements =>
+@"using System;
+using System.Collections.Generic;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
+using CT.Common.Synchronizations;
+using CT.Common.Tools.Collections;
+using CTS.Instance.Synchronizations;";
+
+		public static string RemoteUsingStatements =>
+@"using System;
+using System.Collections.Generic;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Serialization.Type;
+using CT.Common.Synchronizations;
+using CT.Common.Tools.Collections;
+using CTC.Networks.Synchronizations;";
+
+		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
+		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
+
 		public static string MasterNetworkObjectTypeName => "MasterNetworkObject";
 		public static string RemoteNetworkObjectTypeName => "RemoteNetworkObject";
 		public static string NetworkObjectTypeTypeName => "NetworkObjectType";
@@ -14,7 +38,7 @@ namespace CT.CorePatcher.SyncRetector
 		/// {0} NetworkObjectType type name<br/>
 		/// {1} Object name<br/>
 		/// </summary>
-		public static string NetworkTypeDeclaration => @"public override {0} Type => {0}.{1});";
+		public static string NetworkTypeDeclaration => @"public override {0} Type => {0}.{1};";
 
 		public static string MasterPrefix => "Master_";
 		public static string RemotePrefix => "Remote_";
@@ -29,6 +53,7 @@ namespace CT.CorePatcher.SyncRetector
 #pragma warning disable CS0649
 
 {0}
+
 namespace {1}
 {{
 {2}
@@ -68,7 +93,7 @@ public partial class {0} : {1}
 		/// {1} SyncType<br/>
 		/// {2} Content<br/>
 		public static string IsDirty =>
-@"public {1}bool IsDirty{2}
+@"public {0}bool IsDirty{1}
 {{
 	get
 	{{
@@ -77,6 +102,16 @@ public partial class {0} : {1}
 		return isDirty;
 	}}
 }}";
+
+		/// <summary>
+		/// {0} Dirty bit name<br/>
+		/// </summary>
+		public static string IsBitmaskDirty => @"isDirty |= {0}.AnyTrue();";
+
+		/// <summary>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
+		public static string IsDirtyIfNoElement => @"public {0}bool IsDirty{1} => false;";
 
 		/// <summary>
 		/// {0} Master index<br/>
@@ -95,6 +130,8 @@ public partial class {0} : {1}
 		/// {1} SyncType<br/>
 		/// </summary>
 		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(PacketReader reader)";
+
+		public static string EntireFunctionSuffix => "Property";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -136,16 +173,13 @@ public partial class {0} : {1}
 {{
 {2}
 }}";
-	}
-
-	public static class DirtyGroupFormat
-	{
 
 		/// <summary>
-		/// {0} SyncType<br/>
-		/// {1} Index<br/>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
+		/// {2} Content<br/>
 		/// </summary>
-		public static string BitmaskDeclaration => @"private BitmaskByte _dirty{0}_{1} = new();";
+		public static string ClearDirtyFunctionIfEmpty => @"public {0}void ClearDirty{1}() {{ }}";
 	}
 
 	public static class FuncMemberFormat
@@ -344,7 +378,7 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Public property name<br/>
 		/// {1} Private property name<br/>
 		/// </summary>
-		public static string CallbackEvent => @"On{0}Changed?.Invoke{1};";
+		public static string CallbackEvent => @"On{0}Changed?.Invoke({1});";
 
 		/// <summary>
 		/// {0} Private member name<br/>
