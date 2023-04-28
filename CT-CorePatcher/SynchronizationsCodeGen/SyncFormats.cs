@@ -1,8 +1,6 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using CT.Common.Synchronizations;
-using CT.CorePatcher.SynchronizationsCodeGen;
+﻿using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public static class CommonFormat
 	{
@@ -77,12 +75,22 @@ public partial class {0} : {1}
 		/// <summary>
 		/// {0} Dirty bits name<br/>
 		/// {1} Index<br/>
-		/// {0} Content<br/>
+		/// {2} Content<br/>
 		/// </summary>
 		public static string IfDirty =>
 @"if ({0}[{1}])
 {{
 {2}
+}}";
+
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Content<br/>
+		/// </summary>
+		public static string IfDirtyAny =>
+@"if ({0}.AnyTrue())
+{{
+{1}
 }}";
 	}
 
@@ -113,11 +121,17 @@ public partial class {0} : {1}
 		/// {1} SyncType<br/>
 		public static string IsDirtyIfNoElement => @"public {0}bool IsDirty{1} => false;";
 
+		public static string MasterDirtyBitName => @"masterDirty";
+
 		/// <summary>
 		/// {0} Master index<br/>
-		/// {1} Content<br/>
+		/// {1} Dirty bit name<br/>
 		/// </summary>
-		public static string MasterDirtyBitName => @"masterDirty";
+		public static string MasterDirtyAnyTrue => @"masterDirty[{0}] = {1}.AnyTrue();";
+
+		public static string MasterDirtySerialize => @"masterDirty.Serialize(writer);";
+
+		public static string MasterDirtyBitInstantiate => @"BitmaskByte masterDirty = new BitmaskByte();";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -144,14 +158,6 @@ public partial class {0} : {1}
 		/// {1} SyncType<br/>
 		/// </summary>
 		public static string EntireDeserializeFunctionDeclaration => @"public {0}void DeserializeEvery{1}(PacketReader reader)";
-
-		/// <summary>
-		/// {0} Master index<br/>
-		/// {1} Dirty bit name<br/>
-		/// </summary>
-		public static string MasterDirtyAnyTrue => @"masterDirty[{0}] = {1}.AnyTrue();";
-
-		public static string MasterDirtySerialize => @"masterDirty.Serialize(writer);";
 
 		/// <summary>
 		/// {0} Dirty bit name<br/>
@@ -236,6 +242,15 @@ for (int i = 0; i < count; i++)
 	var arg = {0}Callstack.Dequeue();
 {1}
 }}";
+
+		public static string TempArgumentName => @"arg";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string SerializeIfDirtyVoid =>
+@"byte count = (byte){0}Callstack.Count;
+writer.Put(count);";
 
 		/// <summary>
 		/// {0} Function name<br/>

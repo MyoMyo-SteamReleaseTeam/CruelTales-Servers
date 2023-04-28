@@ -4,7 +4,7 @@ using System.Reflection;
 using CT.Common.Serialization.Type;
 using CT.CorePatcher.Helper;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public class ProjectReference
 	{

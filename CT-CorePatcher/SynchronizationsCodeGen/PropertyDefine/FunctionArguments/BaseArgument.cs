@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
+﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public abstract class BaseArgument
 	{
@@ -22,5 +20,6 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
 
 		public abstract string GetTempReadParameter();
 		public abstract string GetWriteParameter();
+		public abstract string GetWriteParameterByName(string name);
 	}
 }

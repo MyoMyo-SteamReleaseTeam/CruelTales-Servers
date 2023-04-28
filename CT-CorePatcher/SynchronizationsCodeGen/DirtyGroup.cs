@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.SyncRetector.PropertyDefine;
-using Microsoft.VisualBasic;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public class DirtyGroup
 	{
@@ -27,10 +26,14 @@ namespace CT.CorePatcher.SyncRetector
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys()
+		public string Master_MemberSerializeIfDirtys(bool putDrityBitSerialize = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
+			if (putDrityBitSerialize)
+			{
+				sb.AppendLine(string.Format(MemberFormat.WriteSerialize, GetName()));
+			}
 			foreach (var m in _members)
 			{
 				string serialize = m.Master_SerializeByWriter();

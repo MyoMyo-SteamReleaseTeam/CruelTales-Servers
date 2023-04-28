@@ -92,7 +92,7 @@ namespace CT.CorePatcher
 
 			try
 			{
-				SyncRetector.SynchronizerGenerator syncCodeGen = new();
+				SynchronizerGenerator syncCodeGen = new();
 				syncCodeGen.GenerateCode(args);
 			}
 			catch (Exception e)

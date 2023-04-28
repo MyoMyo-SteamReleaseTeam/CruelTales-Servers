@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.SyncRetector.PropertyDefine;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public class EntireSerializeSyncGroup
 	{
@@ -21,7 +21,7 @@ namespace CT.CorePatcher.SyncRetector
 		public string Master_SerializeSyncAll()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier, 
+			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier,
 									SyncGroupFormat.EntireFunctionSuffix));
 
 			if (_members.Count == 0)

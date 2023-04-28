@@ -1,4 +1,4 @@
-﻿namespace CT.CorePatcher.SyncRetector
+﻿namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public enum SerializeType
 	{

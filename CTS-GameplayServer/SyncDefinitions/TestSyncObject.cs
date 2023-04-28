@@ -41,46 +41,226 @@ namespace CTS.Instance.SyncDefinitions
 	//}
 }
 
-[DEF_SyncNetworkObjectDefinition]
-public partial class TestNetworkObjectWith3Prop
+[SyncNetworkObjectDefinition]
+public partial class TestValue64
 {
-	[DEF_SyncVar]
-	private UserToken _userToken;
+	[SyncVar] public int v0;
+	[SyncVar] public int v1;
+	[SyncVar] public int v2;
+	[SyncRpc] public void f3(int a) { }
+	[SyncVar] public int v4;
+	[SyncVar] public int v5;
+	[SyncVar] public int v6;
+	[SyncVar] public int v7;
+	[SyncVar] public int v8;
+	[SyncVar] public int v9;
+	[SyncVar] public int v10;
+	[SyncVar] public int v12;
+	[SyncVar] public int v13;
+	[SyncRpc] public void f14(int a) { }
+	[SyncVar] public int v15;
+	[SyncVar] public int v16;
+	[SyncRpc] public void f17(int a) { }
+	[SyncVar] public int v18;
+	[SyncVar] public int v19;
+	[SyncVar] public int v20;
+	[SyncVar] public int v21;
+	[SyncRpc] public void f22(int a) { }
+	[SyncVar] public int v23;
+	[SyncRpc] public void f24(int a) { }
+	[SyncVar] public int v25;
+	[SyncVar] public int v26;
+	[SyncVar] public int v27;
+	[SyncRpc] public void f28(int a) { }
+	[SyncVar] public int v29;
+	[SyncVar] public int v30;
+	[SyncVar] public int v31;
 
-	//[DEF_SyncVar(SyncType.Unreliable)]
-	//private float _floatValue;
+	[SyncVar] public int v32;
+	[SyncVar] public int v33;
+	[SyncRpc] public void f34(int a) { }
+	[SyncVar] public int v35;
+	[SyncVar] public int v36;
+	[SyncVar] public int v37;
+	[SyncVar] public int v38;
+	[SyncVar] public int v39;
+	[SyncVar] public int v40;
+	[SyncRpc] public void f41(int a) { }
+	[SyncRpc] public void f42(int a) { }
+	[SyncVar] public int v43;
+	[SyncVar] public int v44;
+	[SyncVar] public int v45;
+	[SyncVar] public int v46;
+	[SyncVar] public int v47;
+	[SyncVar] public int v48;
+	[SyncRpc] public void f49(int a) { }
+	[SyncVar] public int v50;
+	[SyncVar] public int v51;
+	[SyncVar] public int v52;
+	[SyncVar] public int v53;
+	[SyncRpc] public void f54(int a) { }
+	[SyncVar] public int v55;
+	[SyncVar] public int v56;
+	[SyncVar] public int v57;
+	[SyncVar] public int v58;
+	[SyncVar] public int v59;
+	[SyncVar] public int v60;
+	[SyncRpc] public void f61(int a) { }
+	[SyncVar] public int v62;
+	[SyncVar] public int v63;
 
-	[DEF_SyncRpc]
-	public void Server_SendMessage(NetString message) { }
+	[SyncVar(SyncType.Unreliable)] public int uv0;
+	[SyncVar(SyncType.Unreliable)] public int uv1;
+	[SyncVar(SyncType.Unreliable)] public int uv2;
+	[SyncRpc(SyncType.Unreliable)] public void uf3(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv4;
+	[SyncVar(SyncType.Unreliable)] public int uv5;
+	[SyncVar(SyncType.Unreliable)] public int uv6;
+	[SyncVar(SyncType.Unreliable)] public int uv7;
+	[SyncVar(SyncType.Unreliable)] public int uv8;
+	[SyncVar(SyncType.Unreliable)] public int uv9;
+	[SyncVar(SyncType.Unreliable)] public int uv10;
+	[SyncVar(SyncType.Unreliable)] public int uv12;
+	[SyncVar(SyncType.Unreliable)] public int uv13;
+	[SyncRpc(SyncType.Unreliable)] public void uf14(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv15;
+	[SyncVar(SyncType.Unreliable)] public int uv16;
+	[SyncRpc(SyncType.Unreliable)] public void uf17(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv18;
+	[SyncVar(SyncType.Unreliable)] public int uv19;
+	[SyncVar(SyncType.Unreliable)] public int uv20;
+	[SyncVar(SyncType.Unreliable)] public int uv21;
+	[SyncRpc(SyncType.Unreliable)] public void uf22(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv23;
+	[SyncRpc(SyncType.Unreliable)] public void uf24(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv25;
+	[SyncVar(SyncType.Unreliable)] public int uv26;
+	[SyncVar(SyncType.Unreliable)] public int uv27;
+	[SyncRpc(SyncType.Unreliable)] public void uf28(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv29;
+	[SyncVar(SyncType.Unreliable)] public int uv30;
+	[SyncVar(SyncType.Unreliable)] public int uv31;
+
+	[SyncVar(SyncType.Unreliable)] public int uv32;
+	[SyncVar(SyncType.Unreliable)] public int uv33;
+	[SyncRpc(SyncType.Unreliable)] public void uf34(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv35;
+	[SyncVar(SyncType.Unreliable)] public int uv36;
+	[SyncVar(SyncType.Unreliable)] public int uv37;
+	[SyncVar(SyncType.Unreliable)] public int uv38;
+	[SyncVar(SyncType.Unreliable)] public int uv39;
+	[SyncVar(SyncType.Unreliable)] public int uv40;
+	[SyncRpc(SyncType.Unreliable)] public void uf41(int a) { }
+	[SyncRpc(SyncType.Unreliable)] public void uf42(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv43;
+	[SyncVar(SyncType.Unreliable)] public int uv44;
+	[SyncVar(SyncType.Unreliable)] public int uv45;
+	[SyncVar(SyncType.Unreliable)] public int uv46;
+	[SyncVar(SyncType.Unreliable)] public int uv47;
+	[SyncVar(SyncType.Unreliable)] public int uv48;
+	[SyncRpc(SyncType.Unreliable)] public void uf49(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv50;
+	[SyncVar(SyncType.Unreliable)] public int uv51;
+	[SyncVar(SyncType.Unreliable)] public int uv52;
+	[SyncVar(SyncType.Unreliable)] public int uv53;
+	[SyncRpc(SyncType.Unreliable)] public void uf54(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv55;
+	[SyncVar(SyncType.Unreliable)] public int uv56;
+	[SyncVar(SyncType.Unreliable)] public int uv57;
+	[SyncVar(SyncType.Unreliable)] public int uv58;
+	[SyncVar(SyncType.Unreliable)] public int uv59;
+	[SyncVar(SyncType.Unreliable)] public int uv60;
+	[SyncRpc(SyncType.Unreliable)] public void uf61(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv62;
+	[SyncVar(SyncType.Unreliable)] public int uv63;
 }
 
-//[DEF_SyncNetworkObjectDefinition]
-//public partial class TestNetworkObject
-//{
-//	[DEF_SyncVar]
-//	private UserToken _userToken;
+[SyncNetworkObjectDefinition]
+public partial class TestValue16
+{
+	[SyncVar] public int v0;
+	[SyncVar] public int v1;
+	[SyncVar] public int v2;
+	[SyncRpc] public void f3(int a) { }
+	[SyncVar] public int v4;
+	[SyncVar] public int v5;
+	[SyncVar] public int v6;
+	[SyncVar] public int v7;
+	[SyncVar] public int v8;
+	[SyncVar] public int v9;
+	[SyncVar] public int v10;
+	[SyncVar] public int v12;
+	[SyncVar] public int v13;
+	[SyncRpc] public void f14(int a) { }
+	[SyncVar] public int v15;
 
-//	[DEF_SyncVar(SyncType.Unreliable)]
-//	private float _floatValue;
+	[SyncVar(SyncType.Unreliable)] public int uv0;
+	[SyncVar(SyncType.Unreliable)] public int uv1;
+	[SyncVar(SyncType.Unreliable)] public int uv2;
+	[SyncRpc(SyncType.Unreliable)] public void uf3(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv4;
+	[SyncVar(SyncType.Unreliable)] public int uv5;
+	[SyncVar(SyncType.Unreliable)] public int uv6;
+	[SyncVar(SyncType.Unreliable)] public int uv7;
+	[SyncVar(SyncType.Unreliable)] public int uv8;
+	[SyncVar(SyncType.Unreliable)] public int uv9;
+	[SyncVar(SyncType.Unreliable)] public int uv10;
+	[SyncVar(SyncType.Unreliable)] public int uv12;
+	[SyncVar(SyncType.Unreliable)] public int uv13;
+	[SyncRpc(SyncType.Unreliable)] public void uf14(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv15;
+}
 
-//	[DEF_SyncRpc]
-//	public void Server_DoSomethiing() { }
+[SyncNetworkObjectDefinition]
+public partial class TestValue8
+{
+	[SyncVar] public int v0;
+	[SyncVar] public int v1;
+	[SyncVar] public int v2;
+	[SyncRpc] public void f3(int a) { }
+	[SyncVar] public int v4;
+	[SyncVar] public int v5;
+	[SyncVar] public int v6;
+	[SyncVar] public int v7;
 
-//	[DEF_SyncRpc(SyncType.Unreliable)]
-//	public void Server_SendMessage(NetString message) { }
+	[SyncVar(SyncType.Unreliable)] public int uv0;
+	[SyncVar(SyncType.Unreliable)] public int uv1;
+	[SyncVar(SyncType.Unreliable)] public int uv2;
+	[SyncRpc(SyncType.Unreliable)] public void uf3(int a) { }
+	[SyncVar(SyncType.Unreliable)] public int uv4;
+	[SyncVar(SyncType.Unreliable)] public int uv5;
+	[SyncVar(SyncType.Unreliable)] public int uv6;
+	[SyncVar(SyncType.Unreliable)] public int uv7;
+}
 
-//	[DEF_SyncVar(dir: SyncDirection.FromRemote)]
-//	private NetTransform _remote_netTransform;
 
-//	[DEF_SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
-//	public int _remote_Value;
+[SyncNetworkObjectDefinition]
+public partial class TestNetworkObject
+{
+	[SyncVar]
+	private UserToken _userToken;
 
-//	[DEF_SyncRpc(dir: SyncDirection.FromRemote)]
-//	public void Client_DoSomethiing() { }
+	[SyncVar(SyncType.Unreliable)]
+	private float _floatValue;
 
-//	[DEF_SyncRpc(dir: SyncDirection.FromRemote)]
-//	public void Client_SendMessage(NetString message) { }
-//}
+	[SyncRpc]
+	public void Server_DoSomethiing() { }
+
+	[SyncRpc(SyncType.Unreliable)]
+	public void Server_SendMessage(NetString message) { }
+
+	[SyncVar(dir: SyncDirection.FromRemote)]
+	private NetTransform _remote_netTransform;
+
+	[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
+	public int _remote_Value;
+
+	[SyncRpc(dir: SyncDirection.FromRemote)]
+	public void Client_DoSomethiing() { }
+
+	[SyncRpc(dir: SyncDirection.FromRemote)]
+	public void Client_SendMessage(NetString message) { }
+}
 
 //[SyncNetworkObjectDefinition]
 //public partial class TestNetworkObject

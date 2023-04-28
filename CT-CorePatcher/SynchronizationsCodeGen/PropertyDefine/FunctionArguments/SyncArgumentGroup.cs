@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
-	public class SychArgumentGroup
+	public class SyncArgumentGroup
 	{
 		private List<BaseArgument> _args;
 
 		public int Count => _args.Count;
 
-		public SychArgumentGroup(List<BaseArgument> args)
+		public SyncArgumentGroup(List<BaseArgument> args)
 		{
 			_args = args;
 		}
@@ -84,6 +84,9 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
 
 		public string GetWriteParameterContent()
 		{
+			if (Count == 1)
+				return _args[0].GetWriteParameterByName(FuncMemberFormat.TempArgumentName);
+
 			StringBuilder sb = new();
 			foreach (var arg in _args)
 				sb.AppendLine(arg.GetWriteParameter());

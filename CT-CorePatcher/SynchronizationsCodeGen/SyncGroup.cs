@@ -1,10 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.SyncRetector.PropertyDefine;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	/// <summary>
+	/// Dirty Group은 1 바이트의 Bitmask로 8개 요소의 변경사항을 감지할 수 있다.
+	/// - 8개 이하의 요소는 1 바이트로 Dirty 상태를 표현한다.
+	/// - 16개 이하의 요소는 2 바이트로 Dirty 상태를 표현한다.
+	/// - 16개를 초과하는 요소는 1 바이트의 Master Dirty Bitmask로 각각 8개의 Bitmask를 표현한다.
+	///   이 경우 최대 64개의 요소를 포함할 수 있다.
+	///   최소 2 바이트의 Bitmaks가 필요하고 최대 5 바이트의 Bitmask로 상태를 표현한다.
+	/// </summary>
 	public class SerializeSyncGroup
 	{
 		private List<DirtyGroup> _dirtyGroups;
@@ -18,6 +26,7 @@ namespace CT.CorePatcher.SyncRetector
 			_dirtyGroups = new();
 
 			int m = 0;
+			int groupCount = 0;
 			while (m < memberTokens.Count)
 			{
 				List<BaseMemberToken> members = new();
@@ -29,13 +38,14 @@ namespace CT.CorePatcher.SyncRetector
 					members.Add(memberTokens[m]);
 					m++;
 				}
-				_dirtyGroups.Add(new DirtyGroup(members, _syncType, m / 8));
+				_dirtyGroups.Add(new DirtyGroup(members, _syncType, groupCount++));
 			}
 		}
 
 		public string Master_BitmaskDeclarations()
 		{
 			StringBuilder sb = new();
+
 			foreach (var g in _dirtyGroups)
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeclaration, g.GetName()));
 			return sb.ToString();
@@ -71,11 +81,23 @@ namespace CT.CorePatcher.SyncRetector
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.SerializeFunctionDeclaration, _modifier, _syncType));
 
-			if (_dirtyGroups.Count == 0 )
+			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
-			// TODO : 개수에 따라서 다르게 분배
-			var content = CodeFormat.AddIndent(master_SerializeSyncMultipleDirtyGroup());
+			string content;
+
+			if (_dirtyGroups.Count == 1)
+			{
+				content = CodeFormat.AddIndent(master_SerializeSyncOneDirtyGroup());
+			}
+			else if (_dirtyGroups.Count == 2)
+			{
+				content = CodeFormat.AddIndent(master_SerializeSyncTwoDirtyGroup());
+			}
+			else
+			{
+				content = CodeFormat.AddIndent(master_SerializeSyncMultipleDirtyGroup());
+			}
 
 			sb.AppendLine("");
 			sb.AppendLine("{");
@@ -86,18 +108,28 @@ namespace CT.CorePatcher.SyncRetector
 
 		private string master_SerializeSyncOneDirtyGroup()
 		{
-			return "";
+			return _dirtyGroups[0].Master_MemberSerializeIfDirtys();
 		}
 
 		private string master_SerializeSyncTwoDirtyGroup()
 		{
-			return "";
+			StringBuilder sb = new();
+			for (int i = 0; i < 2; i++)
+			{
+				var group = _dirtyGroups[i];
+				sb.AppendLine(string.Format(MemberFormat.WriteSerialize, group.GetName()));
+				string content = group.Master_MemberSerializeIfDirtys(false);
+				CodeFormat.AddIndent(ref content);
+				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
+			}
+			return sb.ToString();
 		}
 
 		private string master_SerializeSyncMultipleDirtyGroup()
 		{
 			StringBuilder headers = new();
 			StringBuilder contents = new();
+			headers.AppendLine(SyncGroupFormat.MasterDirtyBitInstantiate);
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
 				var dirtyGroup = _dirtyGroups[i];
@@ -137,6 +169,7 @@ namespace CT.CorePatcher.SyncRetector
 			_dirtyGroups = new();
 
 			int m = 0;
+			int groupCount = 0;
 			while (m < memberTokens.Count)
 			{
 				List<BaseMemberToken> members = new();
@@ -148,7 +181,7 @@ namespace CT.CorePatcher.SyncRetector
 					members.Add(memberTokens[m]);
 					m++;
 				}
-				_dirtyGroups.Add(new DirtyGroup(members, _syncType, m / 8));
+				_dirtyGroups.Add(new DirtyGroup(members, _syncType, groupCount++));
 			}
 		}
 
@@ -160,14 +193,44 @@ namespace CT.CorePatcher.SyncRetector
 			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
-			// TODO : 개수에 따라서 다르게 분배
-			var content = remote_DeserializeSyncMultipleDirtyGroup();
+			string content;
+			if (_dirtyGroups.Count == 1)
+			{
+				content = remote_DeserializeSyncOneDirtyGroup();
+			}
+			else if (_dirtyGroups.Count == 2)
+			{
+				content = remote_DeserializeSyncTwoDirtyGroup();
+			}
+			else
+			{
+				content = remote_DeserializeSyncMultipleDirtyGroup();
+			}
+
 			CodeFormat.AddIndent(ref content);
 
 			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(content);
 			sb.AppendLine("}");
+			return sb.ToString();
+		}
+
+		private string remote_DeserializeSyncOneDirtyGroup()
+		{
+			return _dirtyGroups[0].Remote_MemberDeserializeIfDirtys();
+		}
+
+		private string remote_DeserializeSyncTwoDirtyGroup()
+		{
+			StringBuilder sb = new();
+			for (int i = 0; i < 2; i++)
+			{
+				var group = _dirtyGroups[i];
+				string content = group.Remote_MemberDeserializeIfDirtys();
+				CodeFormat.AddIndent(ref content);
+				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
+			}
 			return sb.ToString();
 		}
 

@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments;
 
-namespace CT.CorePatcher.SyncRetector.PropertyDefine
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class FunctionMemberToken : BaseMemberToken
 	{
 		private string _functionName;
-		private SychArgumentGroup _argGroup;
+		private SyncArgumentGroup _argGroup;
 
 		public FunctionMemberToken(SyncType syncType, string functionName, bool isPublic, List<BaseArgument> args)
 			: base(syncType, string.Empty, functionName, isPublic)
 		{
 			_syncType = syncType;
 			_functionName = functionName;
-			_argGroup = new SychArgumentGroup(args);
+			_argGroup = new SyncArgumentGroup(args);
 		}
 
 		public override string Master_Declaration(SyncDirection direction)
@@ -42,6 +42,9 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 
 		public override string Master_SerializeByWriter()
 		{
+			if (_argGroup.Count == 0)
+				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);
+
 			string content = _argGroup.GetWriteParameterContent();
 			CodeFormat.AddIndent(ref content);
 			return string.Format(FuncMemberFormat.SerializeIfDirty, _functionName, content);

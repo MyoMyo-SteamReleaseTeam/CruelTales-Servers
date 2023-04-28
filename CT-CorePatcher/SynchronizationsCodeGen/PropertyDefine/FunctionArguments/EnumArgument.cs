@@ -1,4 +1,4 @@
-﻿namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
+﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public class EnumArgument : BaseArgument
 	{
@@ -24,6 +24,11 @@
 		public override string GetWriteParameter()
 		{
 			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, _parameterName);
+		}
+
+		public override string GetWriteParameterByName(string name)
+		{
+			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, FuncMemberFormat.TempArgumentName);
 		}
 	}
 }

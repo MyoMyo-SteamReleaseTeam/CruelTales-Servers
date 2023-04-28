@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.SyncRetector.PropertyDefine;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
-namespace CT.CorePatcher.SyncRetector
+namespace CT.CorePatcher.SynchronizationsCodeGen
 {
 	public class SerializeDirectionGroup
 	{

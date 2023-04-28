@@ -1,19 +1,17 @@
 ﻿using System.Text;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector.PropertyDefine
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
-	public class EnumMemberToken : BaseMemberToken
+	public class ValueTypeMemberToken : BaseMemberToken
 	{
-		private string _enumSizeTypeName;
-		private string _clrEnumSizeTypeName;
-
-		public EnumMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic,
-							   string enumSizeTypeName, string clrEnumSizeTypeName)
+		public ValueTypeMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 			: base(syncType, typeName, memberName, isPublic)
 		{
-			_enumSizeTypeName = enumSizeTypeName;
-			_clrEnumSizeTypeName = clrEnumSizeTypeName;
+			_syncType = syncType;
+			_typeName = typeName;
+			_privateMemberName = MemberFormat.GetPrivateName(memberName);
+			_publicMemberName = MemberFormat.GetPublicName(memberName);
 		}
 
 		public override string Master_Declaration(SyncDirection direction)
@@ -31,7 +29,7 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 
 		public override string Master_SerializeByWriter()
 		{
-			return string.Format(MemberFormat.WriteEnum, _enumSizeTypeName, _privateMemberName);
+			return string.Format(MemberFormat.WriteSerialize, _privateMemberName);
 		}
 
 		public override string Master_CheckDirty() => string.Empty;
@@ -41,13 +39,13 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _privateMemberName, _publicMemberName, string.Empty);
+								 _privateMemberName, _publicMemberName, MemberFormat.NewInitializer);
 		}
 
 		public override string Remote_DeserializeByReader()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _enumSizeTypeName, _clrEnumSizeTypeName));
+			sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}

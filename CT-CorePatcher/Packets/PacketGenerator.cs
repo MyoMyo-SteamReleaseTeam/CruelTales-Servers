@@ -291,15 +291,7 @@ namespace CT.CorePatcher.Packets
 			}
 
 			// Generate codes to files
-
-			if (Directory.Exists(outputServer))
-			{
-				var removeFiles = Directory.GetFiles(outputServer);
-				foreach (var removeFile in removeFiles)
-				{
-					File.Delete(removeFile);
-				}
-			}
+			FileHandler.TryDeleteFilesIn(outputServer, out _);
 
 			foreach (var op in operation)
 			{

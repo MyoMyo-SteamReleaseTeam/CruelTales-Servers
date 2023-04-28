@@ -1,6 +1,6 @@
 ﻿using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector.PropertyDefine
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class SyncObjectMemberToken : BaseMemberToken
 	{

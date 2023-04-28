@@ -1,4 +1,4 @@
-﻿namespace CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments
+﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public class ValueTypeArgument : BaseArgument
 	{
@@ -19,6 +19,11 @@
 		public override string GetWriteParameter()
 		{
 			return string.Format(MemberFormat.WriteSerialize, _parameterName);
+		}
+
+		public override string GetWriteParameterByName(string name)
+		{
+			return string.Format(MemberFormat.WriteSerialize, FuncMemberFormat.TempArgumentName);
 		}
 	}
 }

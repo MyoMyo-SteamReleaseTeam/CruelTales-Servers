@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using CT.Common.Synchronizations;
 
-namespace CT.CorePatcher.SyncRetector.PropertyDefine
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class PrimitivePropertyToken : BaseMemberToken
 	{
@@ -48,7 +48,7 @@ namespace CT.CorePatcher.SyncRetector.PropertyDefine
 		public override string Remote_DeserializeByReader()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName , _clrTypeName));
+			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _clrTypeName));
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}

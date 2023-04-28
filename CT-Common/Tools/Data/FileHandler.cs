@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,6 +99,37 @@ namespace CT.Common.Tools.Data
 			{
 				return new JobResult(result: JobResultType.Failed, exception: e);
 			}
+		}
+
+		public static bool TryDeleteFilesIn(string path, out string[] removeFiles)
+		{
+			if (Directory.Exists(path))
+			{
+				removeFiles = Directory.GetFiles(path);
+				foreach (var removeFile in removeFiles)
+				{
+					File.Delete(removeFile);
+				}
+				return true;
+			}
+
+			removeFiles = new string[0];
+			return false;
+		}
+
+		public static bool TryDeleteFilesIncludeDirectoies(string path)
+		{
+			if (!Directory.Exists(path))
+			{
+				return false;
+			}
+
+			foreach (var removeDir in Directory.GetDirectories(path))
+			{
+				Directory.Delete(removeDir, true);
+			}
+
+			return true;
 		}
 	}
 }
