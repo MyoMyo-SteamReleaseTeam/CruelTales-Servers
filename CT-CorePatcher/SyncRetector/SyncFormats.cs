@@ -148,6 +148,107 @@ public partial class {0} : {1}
 		public static string BitmaskDeclaration => @"private BitmaskByte _dirty{0}_{1} = new();";
 	}
 
+	public static class FuncMemberFormat
+	{
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Function name<br/>
+		/// {2} Parameter declaration <br/>
+		/// </summary>
+		public static string Declaration =>
+@"[{0}]
+public partial void {1}({2});";
+
+		/// <summary>
+		/// {0} Access modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Parameter declaration<br/>
+		/// {3} Callstack tuple enqueue value<br/>
+		/// {4} Callstack tuple declaration<br/>
+		/// {5} Dirty bits name<br/>
+		/// {6} Dirty index<br/>
+		/// </summary>
+		public static string CallWithStack =>
+@"{0} partial void {1}({2})
+{{
+	{1}Callstack.Enqueue({3});
+	{5}[{6}] = true;
+}}
+private Queue<{4}> {1}Callstack = new();";
+
+		/// <summary>
+		/// {0} Access modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Member index<br/>
+		/// </summary>
+		public static string CallWithStackVoid =>
+@"{0} partial void {1}()
+{{
+	{1}CallstackCount++;
+	{2}[{3}] = true;
+}}
+private byte {1}CallstackCount = 0;";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Callstack serialize content<br/>
+		/// </summary>
+		public static string SerializeIfDirty =>
+@"byte count = (byte){0}Callstack.Count;
+writer.Put(count);
+for (int i = 0; i < count; i++)
+{{
+	var arg = {0}Callstack.Dequeue();
+{1}
+}}";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Read parameters content<br/>
+		/// {2} Call parameters<br/>
+		/// </summary>
+		public static string DeserializeIfDirty =>
+@"byte count = reader.ReadByte();
+for (int i = 0; i < count; i++)
+{{
+{1}
+	{0}({2});
+}}";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string DeserializeIfDirtyVoid =>
+@"byte count = reader.ReadByte();
+for (int i = 0; i < count; i++)
+{{
+	{0}();
+}}";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Parameter name<br/>
+		/// {2} CLR type name<br/>
+		/// </summary>
+		public static string TempReadPrimitiveTypeProperty => @"{0} {1} = reader.Read{2}();";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Parameter name<br/>
+		/// </summary>
+		public static string TempReadByDeserializerStruct =>
+@"{0} {1} = new();
+{1}.Deserialize(reader);";
+
+		/// <summary>
+		/// {0} Enum type name<br/>
+		/// {1} Parameter name<br/>
+		/// {2} CLR enum size type name<br/>
+		/// </summary>
+		public static string TempReadEnum => @"{0} {1} = ({0})reader.Read{2}();";
+	}
+
 	public static class MemberFormat
 	{
 		/// <summary>
@@ -212,9 +313,9 @@ public event Action<{1}>? On{3}Changed;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
-		/// {1} Write function name<br/>
+		/// {1} SyncType<br/>
 		/// </summary>
-		public static string WriteSyncObject => @"{0}.{1}(writer);";
+		public static string WriteSyncObject => @"{0}.SerializeSync{1}(writer);";
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// {1} CLR type name<br/>
@@ -237,40 +338,25 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} Read function name<br/>
 		/// </summary>
-		public static string ReadSyncObject => @"{0}.{1}(reader);";
-
-		/// <summary>
-		/// {0} Type name<br/>
-		/// {1} Private member name<br/>
-		/// {2} CLR type name<br/>
-		/// </summary>
-		public static string TempReadEmbededTypeProperty => @"{0} {1} = reader.Read{2}();";
-
-		/// <summary>
-		/// {0} Type name<br/>
-		/// {1} Argument name<br/>
-		/// </summary>
-		public static string TempReadByDeserializerStruct =>
-@"{0} {1} = new();
-{1}.Deserialize(reader);";
-
-		/// <summary>
-		/// {0} Private member name<br/>
-		/// </summary>
-		public static string TempReadByDeserializerClass => @"{0}.Deserialize(reader);";
-
-		/// <summary>
-		/// {0} Private member name<br/>
-		/// {1} Enum type name<br/>
-		/// {2} CLR enum size type name<br/>
-		/// </summary>
-		public static string TempReadEnum => @"{1} {0} = ({1})reader.Read{2}();";
+		public static string ReadSyncObject => @"{0}.DeserializeSync{1}(reader);";
 
 		/// <summary>
 		/// {0} Public property name<br/>
 		/// {1} Private property name<br/>
 		/// </summary>
 		public static string CallbackEvent => @"On{0}Changed?.Invoke{1};";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string IsDirtyBinder => @"isDirty |= {0}.IsDirty{1};";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string ClearDirty => @"{0}.ClearDirty{1}();";
 
 		public static string GetPrivateName(string name)
 		{

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.SyncRetector.PropertyDefine;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -10,7 +11,7 @@ namespace CT.CorePatcher.SyncRetector
 		private SyncType _syncType;
 		private string _modifier;
 
-		public SerializeSyncGroup(List<ISynchronizeMember> memberTokens, SyncType syncType, string modifier)
+		public SerializeSyncGroup(List<BaseMemberToken> memberTokens, SyncType syncType, string modifier)
 		{
 			_syncType = syncType;
 			_modifier = modifier;
@@ -20,7 +21,7 @@ namespace CT.CorePatcher.SyncRetector
 			int m = 0;
 			while (m < memberTokens.Count)
 			{
-				List<ISynchronizeMember> members = new();
+				List<BaseMemberToken> members = new();
 				for (int i = 0; i < 8; i++)
 				{
 					if (m >= memberTokens.Count)
@@ -120,7 +121,7 @@ namespace CT.CorePatcher.SyncRetector
 		private SyncType _syncType;
 		private string _modifier;
 
-		public DeserializeSyncGroup(List<ISynchronizeMember> memberTokens, SyncType syncType, string modifier)
+		public DeserializeSyncGroup(List<BaseMemberToken> memberTokens, SyncType syncType, string modifier)
 		{
 			_syncType = syncType;
 			_modifier = modifier;
@@ -130,7 +131,7 @@ namespace CT.CorePatcher.SyncRetector
 			int m = 0;
 			while (m < memberTokens.Count)
 			{
-				List<ISynchronizeMember> members = new();
+				List<BaseMemberToken> members = new();
 				for (int i = 0; i < 8; i++)
 				{
 					if (m >= memberTokens.Count)

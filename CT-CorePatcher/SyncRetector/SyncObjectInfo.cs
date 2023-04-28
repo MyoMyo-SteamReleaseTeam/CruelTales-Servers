@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using CT.Common.Synchronizations;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -7,14 +8,13 @@ namespace CT.CorePatcher.SyncRetector
 	{
 		private string _objectName;
 		private string _modifier;
+		private bool _isNetworkObject = false;
 
 		private SerializeDirectionGroup _masterSerializeGroup;
 		private DeserializeDirectionGroup _masterDeserializeGroup;
 
 		private SerializeDirectionGroup _remoteSerializeGroup;
 		private DeserializeDirectionGroup _remoteDeserializeGroup;
-
-		private bool _isNetworkObject = false;
 
 		private string _masterInheritName = CommonFormat.InterfaceName;
 		private string _remoteInheritName = CommonFormat.InterfaceName;
@@ -23,13 +23,13 @@ namespace CT.CorePatcher.SyncRetector
 		private List<MemberToken> _remoteSideMembers;
 
 		public SyncObjectInfo(string objectName,
-						  List<MemberToken> masterSideMembers,
-						  List<MemberToken> remoteSideMembers,
-						  bool isNetworkObject)
+							  List<MemberToken> masterSideMembers,
+							  List<MemberToken> remoteSideMembers,
+							  bool isNetworkObject)
 		{
 			_objectName = objectName;
-			_isNetworkObject = isNetworkObject;
 			_modifier = _isNetworkObject ? "override" : string.Empty;
+			_isNetworkObject = isNetworkObject;
 
 			_masterSideMembers = masterSideMembers;
 			_remoteSideMembers = remoteSideMembers;
@@ -54,7 +54,7 @@ namespace CT.CorePatcher.SyncRetector
 			StringBuilder sb = new();
 			AddNetworkTypeDefinition(sb);
 
-			string declaration = gnerateDeclarationCode(_masterSideMembers, _remoteSideMembers);
+			string declaration = gnerateDeclarationCode(SyncDirection.FromMaster, _masterSideMembers, _remoteSideMembers);
 			sb.AppendLine(declaration);
 
 			string content = generateContentCode(_masterSerializeGroup, _masterDeserializeGroup);
@@ -67,7 +67,7 @@ namespace CT.CorePatcher.SyncRetector
 			StringBuilder sb = new();
 			AddNetworkTypeDefinition(sb);
 
-			string declaration = gnerateDeclarationCode(_remoteSideMembers, _masterSideMembers);
+			string declaration = gnerateDeclarationCode(SyncDirection.FromRemote, _remoteSideMembers, _masterSideMembers);
 			sb.AppendLine(declaration);
 
 			string content = generateContentCode(_remoteSerializeGroup, _remoteDeserializeGroup);
@@ -75,14 +75,15 @@ namespace CT.CorePatcher.SyncRetector
 											   _objectName, _remoteInheritName, content)).ToString();
 		}
 
-		private string gnerateDeclarationCode(List<MemberToken> serializeSideMembers,
+		private string gnerateDeclarationCode(SyncDirection direction,
+											  List<MemberToken> serializeSideMembers,
 											  List<MemberToken> deserializeSideMembers)
 		{
 			StringBuilder sb = new();
 			foreach (var m in serializeSideMembers)
-				sb.AppendLine(m.Member.Master_Declaration());
+				sb.AppendLine(m.Member.Master_Declaration(direction));
 			foreach (var m in deserializeSideMembers)
-				sb.AppendLine(m.Member.Remote_Declaration());
+				sb.AppendLine(m.Member.Remote_Declaration(direction));
 			return sb.ToString();
 		}
 

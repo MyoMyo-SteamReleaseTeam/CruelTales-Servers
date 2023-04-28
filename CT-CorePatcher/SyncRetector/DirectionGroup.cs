@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.SyncRetector.PropertyDefine;
 
 namespace CT.CorePatcher.SyncRetector
 {
@@ -18,15 +19,15 @@ namespace CT.CorePatcher.SyncRetector
 		{
 			_modifier = modifier;
 
-			List<ISynchronizeMember> sReliableMembers = serializeMembers
+			List<BaseMemberToken> sReliableMembers = serializeMembers
 				.Where(m => m.SyncType == SyncType.Reliable)
 				.Select(m => m.Member).ToList();
 
-			List<ISynchronizeMember> sUnreliableMembers = serializeMembers
+			List<BaseMemberToken> sUnreliableMembers = serializeMembers
 				.Where(m => m.SyncType == SyncType.Unreliable)
 				.Select(m => m.Member).ToList();
 
-			List<ISynchronizeMember> sAllMembers = serializeMembers
+			List<BaseMemberToken> sAllMembers = serializeMembers
 				.Select(m => m.Member).ToList();
 
 			_reliableGruop = new SerializeSyncGroup(sReliableMembers, SyncType.Reliable, _modifier);
@@ -68,15 +69,15 @@ namespace CT.CorePatcher.SyncRetector
 		{
 			_modifier = modifier;
 
-			List<ISynchronizeMember> dReliableMembers = deserializeMembers
+			List<BaseMemberToken> dReliableMembers = deserializeMembers
 				.Where(m => m.SyncType == SyncType.Reliable)
 				.Select(m => m.Member).ToList();
 
-			List<ISynchronizeMember> dUnreliableMembers = deserializeMembers
+			List<BaseMemberToken> dUnreliableMembers = deserializeMembers
 				.Where(m => m.SyncType == SyncType.Unreliable)
 				.Select(m => m.Member).ToList();
 
-			List<ISynchronizeMember> dAllMembers = deserializeMembers
+			List<BaseMemberToken> dAllMembers = deserializeMembers
 				.Select(m => m.Member).ToList();
 
 			_reliableGruop = new DeserializeSyncGroup(dReliableMembers, SyncType.Reliable, _modifier);

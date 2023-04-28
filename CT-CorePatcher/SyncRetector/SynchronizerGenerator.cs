@@ -1,37 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Security.AccessControl;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
-using CT.CorePatcher.SyncRetector.Previous;
+using CT.CorePatcher.SyncRetector.PropertyDefine.FunctionArguments;
+using CT.CorePatcher.SyncRetector.PropertyDefine;
 
 namespace CT.CorePatcher.SyncRetector
 {
-	public enum SerializeType
-	{
-		None = 0,
-		Primitive,
-		NetString,
-		Class,
-		Struct,
-		Enum,
-		SyncObject,
-	}
 
 	public class SynchronizerGenerator
 	{
-		public List<Type> _referenceTypes = new()
-		{
-			typeof(NetString), typeof(CTS.Instance.GameplayServer)
-		};
-
-		private Dictionary<string, string> _enumSizeByTypeName = new();
-
 		public const string SYNC_MASTER_PATH = "syncMasterPath";
 		public const string SYNC_REMOTE_PATH = "syncRemotePath";
 
@@ -45,7 +25,12 @@ namespace CT.CorePatcher.SyncRetector
 			OptionParser.BindArgumentArray(op, SYNC_REMOTE_PATH, 2, remoteTargetPathList);
 			op.TryApplyArguments(args);
 
-//			var syncObjects = parseAssemblys();
+			var syncObjects = parseAssemblys();
+
+			foreach (var syncObj in syncObjects)
+			{
+				Console.WriteLine(syncObj.Gen_MasterCode());
+			}
 
 //			SyncGenerateOperation master = new();
 //			master.SyncObjects = syncObjects;
@@ -101,143 +86,242 @@ namespace CT.CorePatcher.SyncRetector
 //			}
 		}
 
-		public List<Previous.SyncObjectInfo> parseAssemblys()
+		public List<SyncObjectInfo> parseAssemblys()
 		{
-			List<Assembly> referenceAssemblys = new();
-
-			// Add references
-			foreach (var type in _referenceTypes)
-			{
-				addReferenceAssembly(type.Assembly);
-			}
-
-			// Find enums from assemblys
-			foreach (var a in referenceAssemblys)
-			{
-				var enumTypes = ReflectionExtension.GetTypeNamesBy(a, typeof(Enum));
-
-				foreach (var et in enumTypes)
-				{
-					var enumSizeTypeName = Enum.GetUnderlyingType(et).Name;
-					ReflectionHelper.TryGetTypeByCLRType(enumSizeTypeName, out var primitiveType);
-					_enumSizeByTypeName.Add(et.Name, primitiveType);
-				}
-			}
-
 			// Get difinition types
-			List<Previous.SyncObjectInfo> syncObjects = new();
+			List<SyncObjectInfo> syncObjects = new();
 
 			// Sync object
-			TryGetSyncDifinitionTypes<DEF_SyncObjectDefinitionAttribute>
+			ReflectionExtension.TryGetSyncDifinitionTypes<DEF_SyncObjectDefinitionAttribute>
 				(typeof(CTS.Instance.GameplayServer), out var syncObjDefinitionTypes);
 
-			List<Type> syncObjectTypes = new(syncObjDefinitionTypes ?? new Type[0]);
-			foreach (var st in syncObjectTypes)
+			if (syncObjDefinitionTypes != null && syncObjDefinitionTypes.Count > 0)
 			{
-				syncObjects.Add(getSyncObjectInfo(st, false));
+				var syncObjs = parseTypeToSyncObjectInfo(syncObjDefinitionTypes, false);
+				syncObjects.AddRange(syncObjs);
 			}
 
 			// Sync network object
-			TryGetSyncDifinitionTypes<DEF_SyncNetworkObjectDefinitionAttribute>
+			ReflectionExtension.TryGetSyncDifinitionTypes<DEF_SyncNetworkObjectDefinitionAttribute>
 				(typeof(CTS.Instance.GameplayServer), out var netObjDefititionTypes);
 
-			List<Type> syncNetObjectTypes = new(netObjDefititionTypes ?? new Type[0]);
-			foreach (var st in syncNetObjectTypes)
+			if (netObjDefititionTypes != null && netObjDefititionTypes.Count > 0)
 			{
-				syncObjects.Add(getSyncObjectInfo(st, true));
+				var syncObjs = parseTypeToSyncObjectInfo(netObjDefititionTypes, true);
+				syncObjects.AddRange(syncObjs);
 			}
 
 			return syncObjects;
-
-			void addReferenceAssembly(Assembly? assembly)
-			{
-				if (assembly == null)
-					return;
-
-				referenceAssemblys.Add(assembly);
-			}
 		}
 
-		private SyncObjectInfo getSyncObjectInfo(Type type, bool isNetworkObject)
+		private List<SyncObjectInfo> parseTypeToSyncObjectInfo(IEnumerable<Type> types, bool isNetworkObject)
 		{
-			List<MemberToken> masterMember = new();
-			List<MemberToken> remoteMember = new();
+			List<SyncObjectInfo> syncObjects = new();
+
+			foreach (var t in types)
+			{
+				List<MemberToken> masterMembers = new();
+				List<MemberToken> remoteMembers = new();
+
+				if (TryParseProperty(t, out var masterPropMembers, out var remotePropMembers))
+				{
+					masterMembers.AddRange(masterPropMembers);
+					remoteMembers.AddRange(remotePropMembers);
+				}
+
+				if (TryParseFunctions(t, out var masterFuncMambers, out var remoteFuncMembers))
+				{
+					masterMembers.AddRange(masterFuncMambers);
+					remoteMembers.AddRange(remoteFuncMembers);
+				}
+
+				syncObjects.Add(new(t.Name, masterMembers, remoteMembers, isNetworkObject));
+			}
+
+			return syncObjects;
+		}
+
+		public static bool TryParseFunctions(Type type,
+											 out List<MemberToken> masterMembers,
+											 out List<MemberToken> remoteMembers)
+		{
+			masterMembers = new();
+			remoteMembers = new();
+
+			// Parse functions
+			foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+			{
+				foreach (var att in method.GetCustomAttributes())
+				{
+					SyncType syncType;
+					SyncDirection direction;
+
+					if (att is not DEF_SyncRpcAttribute syncAtt)
+						continue;
+
+					syncType = syncAtt.SyncType;
+					direction = syncAtt.SyncDirection;
+
+					MemberToken member = parseSyncFunction(method, syncType);
+
+					if (direction == SyncDirection.FromMaster)
+					{
+						masterMembers.Add(member);
+					}
+					else if (direction == SyncDirection.FromRemote)
+					{
+						remoteMembers.Add(member);
+					}
+
+					break;
+				}
+			}
+
+			return masterMembers.Count != 0 || remoteMembers.Count != 0;
+		}
+
+		public static bool TryParseProperty(Type type,
+											out List<MemberToken> masterMembers,
+											out List<MemberToken> remoteMembers)
+		{
+			masterMembers = new();
+			remoteMembers = new();
 
 			// Parse properties
-			foreach (var f in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+			FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			foreach (var field in fieldInfos)
 			{
-				foreach (var att in f.GetCustomAttributes())
+				foreach (var att in field.GetCustomAttributes())
 				{
-					SyncType syncType = SyncType.None;
-					SyncDirection direction = SyncDirection.None;
+					SyncType syncType;
+					SyncDirection direction;
+					MemberToken member;
 
 					if (att is DEF_SyncVarAttribute syncVarAtt)
 					{
 						syncType = syncVarAtt.SyncType;
 						direction = syncVarAtt.SyncDirection;
-
+						member = parseValueField(field, syncType);
 					}
 					else if (att is DEF_SyncObjectAttribute syncObjAtt)
 					{
 						syncType = syncObjAtt.SyncType;
 						direction = syncObjAtt.SyncDirection;
+						member = parseSyncObjectField(field, syncType);
 					}
 					else
 					{
 						continue;
 					}
 
-					SyncPropertyToken token = new(this, f.Name, f.FieldType, f.IsPublic);
-					syncObject.AddPropertyToken(token, syncType, direction);
-				}
-			}
-
-			// Parse functions
-			foreach (var f in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
-			{
-				foreach (var att in f.GetCustomAttributes())
-				{
-					if (att is DEF_SyncRpcAttribute syncAtt)
+					if (direction == SyncDirection.FromMaster)
 					{
-						SyncFunctionToken token = new(this, f);
-						syncObject.AddFunctionToken(token, syncAtt.SyncType, syncAtt.SyncDirection);
+						masterMembers.Add(member);
 					}
+					else if (direction == SyncDirection.FromRemote)
+					{
+						remoteMembers.Add(member);
+					}
+
+					break;
 				}
 			}
 
-			return new SyncObjectInfo(type.Name, masterMember, remoteMember, isNetworkObject);
+			return masterMembers.Count != 0 || remoteMembers.Count != 0;
 		}
 
-		public bool IsEnum(string typeName)
+		private static MemberToken parseValueField(FieldInfo fieldInfo, SyncType syncType)
 		{
-			return _enumSizeByTypeName.TryGetValue(typeName, out _);
-		}
+			bool isPublic = fieldInfo.IsPublic;
+			string typeName = fieldInfo.FieldType.Name;
+			string memberName = fieldInfo.Name;
 
-		public string GetEnumSizeTypeName(string typeName)
-		{
-			return _enumSizeByTypeName[typeName];
-		}
+			MemberToken member = new();
+			member.SyncType = syncType;
 
-		public static bool TryGetSyncDifinitionTypes<T>(Type typeInAssembly, out IEnumerable<Type>? types)
-			where T : Attribute
-		{
-			types = null;
-			var assemTypes = Assembly.GetAssembly(typeInAssembly)?.GetTypes();
-			if (assemTypes == null)
+			if (fieldInfo.FieldType.IsEnum)
 			{
-				return false;
+				var sizeTypeName = ProjectReference.Instance.GetEnumSizeTypeName(typeName);
+				if (ReflectionHelper.TryGetCLRTypeByPrimitive(sizeTypeName, out string clrEnumSizeType))
+				{
+					var memberToken = new EnumMemberToken(syncType, typeName, memberName, isPublic, sizeTypeName, clrEnumSizeType);
+					member.Member = memberToken;
+				}
+			}
+			else if (fieldInfo.FieldType.IsPrimitive)
+			{
+				if (ReflectionHelper.TryGetTypeByCLRType(typeName, out string nonClrType))
+				{
+					member.Member = new PrimitivePropertyToken(syncType, nonClrType, memberName, typeName, isPublic);
+				}
+			}
+			else if (fieldInfo.FieldType.IsValueType)
+			{
+				member.Member = new ValueTypeMemberToken(syncType, typeName, memberName, isPublic);
 			}
 
-			var findTypes = Assembly
-				.GetAssembly(typeInAssembly)?
-				.GetTypes()
-				.Where((t) => t.GetCustomAttributes<T>().Count() > 0);
+			return member;
+		}
 
-			if (findTypes == null)
-				return false;
+		private static MemberToken parseSyncObjectField(FieldInfo fieldInfo, SyncType syncType)
+		{
+			bool isPublic = fieldInfo.IsPublic;
+			string typeName = fieldInfo.FieldType.Name;
+			string memberName = fieldInfo.Name;
+			MemberToken member = new();
+			member.SyncType = syncType;
+			member.Member = new SyncObjectMemberToken(syncType, typeName, memberName, isPublic);
+			return member;
+		}
 
-			types = findTypes;
-			return true;
+		private static MemberToken parseSyncFunction(MethodInfo methodInfo, SyncType syncType)
+		{
+			bool isPublic = methodInfo.IsPublic;
+			string functionName = methodInfo.Name;
+			MemberToken member = new();
+			member.SyncType = syncType;
+
+			List<BaseArgument> arguments = new();
+			var parameters = methodInfo.GetParameters();
+
+			int index = 0;
+			foreach (var p in parameters)
+			{
+				Type pType = p.ParameterType;
+				string parameterName = p.Name == null ? string.Empty : $"value_{index++}";
+				string parameterTypeName = pType.Name;
+
+				if (pType.IsEnum)
+				{
+					if (!ProjectReference.Instance.IsEnum(parameterTypeName))
+						throw new Exception($"프로젝트에 정의되지 않은 enum type입니다.\n{pType.FullName}");
+
+					string sizeTypeName = ProjectReference.Instance.GetEnumSizeTypeName(parameterTypeName);
+
+					if (!ReflectionHelper.TryGetCLRTypeByPrimitive(sizeTypeName, out var clrSizeTypeName))
+						throw new Exception($"알 수 없는 크기로 정의된 enum type입니다.\n{pType.FullName}");
+
+					arguments.Add(new EnumArgument(parameterTypeName, parameterName, sizeTypeName, clrSizeTypeName));
+				}
+				else if (pType.IsPrimitive)
+				{
+					if (!ReflectionHelper.TryGetTypeByCLRType(parameterTypeName, out var nonClrType))
+						throw new Exception($"잘못된 Primitive 타입입니다.\n{pType.FullName}");
+
+					arguments.Add(new PrimitiveArgument(nonClrType, parameterName, parameterTypeName));
+				}
+				else if (pType.IsValueType)
+				{
+					arguments.Add(new ValueTypeArgument(parameterTypeName, parameterName));
+				}
+				else
+				{
+					throw new Exception($"알 수 없는 인자 타입입니다.\n{pType.FullName}");
+				}
+			}
+
+			member.Member = new FunctionMemberToken(syncType, functionName, isPublic, arguments);
+			return member;
 		}
 	}
 }

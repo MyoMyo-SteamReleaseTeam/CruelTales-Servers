@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.SyncRetector.PropertyDefine;
 
 namespace CT.CorePatcher.SyncRetector
 {
 	public class EntireSerializeSyncGroup
 	{
-		List<ISynchronizeMember> _members;
+		List<BaseMemberToken> _members;
 		private SyncType _syncType;
 		private string _modifier;
 
-		public EntireSerializeSyncGroup(List<ISynchronizeMember> members, SyncType syncType, string modifier)
+		public EntireSerializeSyncGroup(List<BaseMemberToken> members, SyncType syncType, string modifier)
 		{
 			_members = members;
 			_syncType = syncType;
@@ -40,11 +41,11 @@ namespace CT.CorePatcher.SyncRetector
 
 	public class EntireDeserializeSyncGroup
 	{
-		List<ISynchronizeMember> _members;
+		List<BaseMemberToken> _members;
 		private SyncType _syncType;
 		private string _modifier;
 
-		public EntireDeserializeSyncGroup(List<ISynchronizeMember> members, SyncType syncType, string modifier)
+		public EntireDeserializeSyncGroup(List<BaseMemberToken> members, SyncType syncType, string modifier)
 		{
 			_members = members;
 			_syncType = syncType;

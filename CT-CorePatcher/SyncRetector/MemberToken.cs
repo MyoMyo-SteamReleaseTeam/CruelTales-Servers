@@ -1,13 +1,14 @@
 ﻿using CT.Common.Synchronizations;
+using CT.CorePatcher.SyncRetector.PropertyDefine;
 
 namespace CT.CorePatcher.SyncRetector
 {
 	public struct MemberToken
 	{
-		public ISynchronizeMember Member;
+		public BaseMemberToken Member;
 		public SyncType SyncType;
 
-		public MemberToken(ISynchronizeMember member, SyncType syncType)
+		public MemberToken(BaseMemberToken member, SyncType syncType)
 		{
 			Member = member;
 			SyncType = syncType;
