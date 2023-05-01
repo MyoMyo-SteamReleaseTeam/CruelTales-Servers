@@ -19,8 +19,8 @@
 		public abstract string GetParameterName();
 
 		public abstract string GetTempReadParameter();
-		public abstract string GetWriteParameter();
-		public abstract string GetWriteParameterByName(string name);
+		public abstract string GetWriteParameter(string paramName);
+		public abstract string GetWriteParameterInTuple(string tupleArgName);
 
 		/// <summary>arg.valueName</summary>
 		public string GetArgTuplePropertyName()

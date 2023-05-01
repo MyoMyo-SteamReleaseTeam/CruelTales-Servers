@@ -192,12 +192,13 @@ public partial class {0} : {1}
 	{
 		/// <summary>
 		/// {0} Attribute<br/>
-		/// {1} Function name<br/>
-		/// {2} Parameter declaration <br/>
+		/// {1} Access modifier<br/>
+		/// {2} Function name<br/>
+		/// {3} Parameter declaration <br/>
 		/// </summary>
 		public static string Declaration =>
 @"[{0}]
-public partial void {1}({2});";
+{1} partial void {2}({3});";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -249,8 +250,7 @@ for (int i = 0; i < count; i++)
 		/// {0} Function name<br/>
 		/// </summary>
 		public static string SerializeIfDirtyVoid =>
-@"byte count = (byte){0}Callstack.Count;
-writer.Put(count);";
+@"writer.Put((byte){0}CallstackCount);";
 
 		/// <summary>
 		/// {0} Function name<br/>

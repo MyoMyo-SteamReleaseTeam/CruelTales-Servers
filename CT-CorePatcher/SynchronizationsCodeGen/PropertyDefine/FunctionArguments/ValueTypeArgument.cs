@@ -16,12 +16,13 @@
 			return string.Format(FuncMemberFormat.TempReadByDeserializerStruct,
 								 _typeName, _parameterName);
 		}
-		public override string GetWriteParameter()
+		public override string GetWriteParameter(string paramName = "")
 		{
-			return string.Format(MemberFormat.WriteSerialize, _parameterName);
+			string name = string.IsNullOrWhiteSpace(paramName) ? _parameterName : paramName;
+			return string.Format(MemberFormat.WriteSerialize, name);
 		}
 
-		public override string GetWriteParameterByName(string name)
+		public override string GetWriteParameterInTuple(string name)
 		{
 			return string.Format(MemberFormat.WriteSerialize, GetArgTuplePropertyName());
 		}

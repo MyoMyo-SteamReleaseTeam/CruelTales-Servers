@@ -19,11 +19,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_dirtyIndex = dirtyIndex;
 		}
 
-		public bool HasProperty()
-		{
-			return _members.Where(m => m is not FunctionMemberToken).Any();
-		}
-
 		public string Master_MemberCheckDirtys()
 		{
 			StringBuilder sb = new();
@@ -70,11 +65,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
 
-		public string Remote_MemberDeserializeIfDirtys()
+		public string Remote_MemberDeserializeIfDirtys(bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
-			sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
+			if (readDirtyBit)
+			{
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
+			}
 			foreach (var m in _members)
 			{
 				string content = m.Remote_DeserializeByReader(_syncType);

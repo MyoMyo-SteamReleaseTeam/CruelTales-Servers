@@ -43,11 +43,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public bool HasProperty()
-		{
-			return _dirtyGroups.Where(g =>  g.HasProperty()).Any() && _dirtyGroups.Count != 0;
-		}
-
 		public string Master_BitmaskDeclarations()
 		{
 			StringBuilder sb = new();
@@ -87,7 +82,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.SerializeFunctionDeclaration, _modifier, _syncType));
 
-			if (!this.HasProperty())
+			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
 			string content;
@@ -191,17 +186,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public bool HasProperty()
-		{
-			return _dirtyGroups.Where(g => g.HasProperty()).Any();
-		}
-
 		public string Remote_DeserializeSync()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.DeserializeFunctionDeclaration, _modifier, _syncType));
 
-			if (!this.HasProperty())
+			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();
 
 			string content;
@@ -238,7 +228,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			for (int i = 0; i < 2; i++)
 			{
 				var group = _dirtyGroups[i];
-				string content = group.Remote_MemberDeserializeIfDirtys();
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, group.GetName()));
+				string content = group.Remote_MemberDeserializeIfDirtys(false);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
 			}

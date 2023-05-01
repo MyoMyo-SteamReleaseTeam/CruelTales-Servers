@@ -19,12 +19,13 @@
 			return string.Format(FuncMemberFormat.TempReadPrimitiveTypeProperty,
 								 _typeName, _parameterName, _clrTypeName);
 		}
-		public override string GetWriteParameter()
+		public override string GetWriteParameter(string paramName = "")
 		{
-			return string.Format(MemberFormat.WritePut, _parameterName);
+			string name = string.IsNullOrWhiteSpace(paramName) ? _parameterName : paramName;
+			return string.Format(MemberFormat.WritePut, name);
 		}
 
-		public override string GetWriteParameterByName(string name)
+		public override string GetWriteParameterInTuple(string name)
 		{
 			return string.Format(MemberFormat.WritePut, GetArgTuplePropertyName());
 		}

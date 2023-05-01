@@ -20,7 +20,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
-			return string.Format(FuncMemberFormat.Declaration, attribute, _functionName, _argGroup.GetParameterDeclaration());
+			return string.Format(FuncMemberFormat.Declaration,
+								 attribute, AccessModifier, _functionName,
+								 _argGroup.GetParameterDeclaration());
 		}
 
 		public override string Master_GetterSetter(string dirtyBitname, int memberIndex)
@@ -56,7 +58,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
-			return string.Format(FuncMemberFormat.Declaration, attribute, _functionName,
+			return string.Format(FuncMemberFormat.Declaration,
+								 attribute, AccessModifier, _functionName,
 								 _argGroup.GetParameterDeclaration());
 		}
 

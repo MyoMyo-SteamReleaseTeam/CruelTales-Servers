@@ -85,11 +85,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		public string GetWriteParameterContent()
 		{
 			if (Count == 1)
-				return _args[0].GetWriteParameterByName(FuncMemberFormat.TempArgumentName);
+				return _args[0].GetWriteParameter(FuncMemberFormat.TempArgumentName);
 
 			StringBuilder sb = new();
 			foreach (var arg in _args)
-				sb.AppendLine(arg.GetWriteParameterByName("arg"));
+				sb.AppendLine(arg.GetWriteParameterInTuple(FuncMemberFormat.TempArgumentName));
 			return sb.ToString();
 		}
 

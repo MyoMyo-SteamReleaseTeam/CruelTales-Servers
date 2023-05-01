@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using CT.Common.Serialization.Type;
+using CT.Common.Definitions;
 using CT.CorePatcher.Helper;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -23,7 +23,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private ProjectReference()
 		{
-			_referenceTypes = new() { typeof(NetString), typeof(CTS.Instance.GameplayServer) };
+			_referenceTypes = new() { typeof(CommonDefinition) };
 			List<Assembly> referenceAssemblys = new();
 
 			// Add references

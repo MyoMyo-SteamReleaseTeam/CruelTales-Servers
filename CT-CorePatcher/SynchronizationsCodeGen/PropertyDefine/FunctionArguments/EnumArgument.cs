@@ -21,12 +21,13 @@
 			return string.Format(FuncMemberFormat.TempReadEnum,
 								 _typeName, _parameterName, _clrSizeTypeName);
 		}
-		public override string GetWriteParameter()
+		public override string GetWriteParameter(string paramName = "")
 		{
-			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, _parameterName);
+			string name = string.IsNullOrWhiteSpace(paramName) ? _parameterName : paramName;
+			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, name);
 		}
 
-		public override string GetWriteParameterByName(string name)
+		public override string GetWriteParameterInTuple(string name)
 		{
 			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, GetArgTuplePropertyName());
 		}
