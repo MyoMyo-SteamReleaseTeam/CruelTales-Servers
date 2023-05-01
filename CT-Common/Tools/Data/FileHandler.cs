@@ -120,9 +120,9 @@ namespace CT.Common.Tools.Data
 		public static bool TryDeleteFilesIncludeDirectoies(string path)
 		{
 			if (!Directory.Exists(path))
-			{
 				return false;
-			}
+
+			TryDeleteFilesIn(path, out _);
 
 			foreach (var removeDir in Directory.GetDirectories(path))
 			{
