@@ -27,13 +27,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter()
+		public override string Master_SerializeByWriter(SyncType syncType)
 		{
 			return string.Format(MemberFormat.WriteSerialize, _privateMemberName);
 		}
 
-		public override string Master_CheckDirty() => string.Empty;
-		public override string Master_ClearDirty() => string.Empty;
+		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
+		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
@@ -42,7 +42,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, _publicMemberName, MemberFormat.NewInitializer);
 		}
 
-		public override string Remote_DeserializeByReader()
+		public override string Remote_DeserializeByReader(SyncType syncType)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));

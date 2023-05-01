@@ -32,7 +32,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m is FunctionMemberToken)
 					continue;
-				contents.AppendLine(m.Master_SerializeByWriter());
+				contents.AppendLine(m.Master_SerializeByWriter(_syncType));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -72,7 +72,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m is FunctionMemberToken)
 					continue;
-				contents.AppendLine(m.Remote_DeserializeByReader());
+				contents.AppendLine(m.Remote_DeserializeByReader(_syncType));
 			}
 			CodeFormat.AddIndent(contents);
 

@@ -145,19 +145,19 @@ public partial class {0} : {1}
 		/// </summary>
 		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(PacketReader reader)";
 
-		public static string EntireFunctionSuffix => "Property";
+		public static string EntireFunctionSuffix => "EveryProperty";
 
 		/// <summary>
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string EntireSerializeFunctionDeclaration => @"public {0}void SerializeEvery{1}(PacketWriter writer)";
+		public static string EntireSerializeFunctionDeclaration => @"public {0}void Serialize{1}(PacketWriter writer)";
 
 		/// <summary>
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string EntireDeserializeFunctionDeclaration => @"public {0}void DeserializeEvery{1}(PacketReader reader)";
+		public static string EntireDeserializeFunctionDeclaration => @"public {0}void Deserialize{1}(PacketReader reader)";
 
 		/// <summary>
 		/// {0} Dirty bit name<br/>
@@ -358,7 +358,7 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Enum size type name<br/>
 		/// {1} Private member name<br/>
 		/// </summary>
-		public static string WriteEnum => @"writer(({0}){1});";
+		public static string WriteEnum => @"writer.Put(({0}){1});";
 
 		/// <summary>
 		/// {0} Private member name<br/>

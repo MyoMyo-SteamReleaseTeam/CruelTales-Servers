@@ -22,7 +22,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			StringBuilder sb = new();
 			foreach (var m in _members)
-				sb.AppendLine(m.Master_CheckDirty());
+				sb.AppendLine(m.Master_CheckDirty(_syncType));
 			return sb.ToString();
 		}
 
@@ -36,7 +36,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			foreach (var m in _members)
 			{
-				string serialize = m.Master_SerializeByWriter();
+				string serialize = m.Master_SerializeByWriter(_syncType);
 				CodeFormat.AddIndent(ref serialize);
 				string content = string.Format(CommonFormat.IfDirty, GetName(), index++, serialize);
 				sb.AppendLine(content);
@@ -58,7 +58,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 			sb.AppendLine($"{GetName()}.Clear();");
 			foreach (var m in _members)
-				sb.AppendLine(m.Master_ClearDirty());
+				sb.AppendLine(m.Master_ClearDirty(_syncType));
 			return sb.ToString();
 		}
 
@@ -71,7 +71,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
 			foreach (var m in _members)
 			{
-				string content = m.Remote_DeserializeByReader();
+				string content = m.Remote_DeserializeByReader(_syncType);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
 			}

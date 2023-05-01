@@ -40,7 +40,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter()
+		public override string Master_SerializeByWriter(SyncType syncType)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);
@@ -50,8 +50,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(FuncMemberFormat.SerializeIfDirty, _functionName, content);
 		}
 
-		public override string Master_CheckDirty() => string.Empty;
-		public override string Master_ClearDirty() => string.Empty;
+		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
+		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
@@ -60,7 +60,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _argGroup.GetParameterDeclaration());
 		}
 
-		public override string Remote_DeserializeByReader()
+		public override string Remote_DeserializeByReader(SyncType syncType)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.DeserializeIfDirtyVoid, _functionName);

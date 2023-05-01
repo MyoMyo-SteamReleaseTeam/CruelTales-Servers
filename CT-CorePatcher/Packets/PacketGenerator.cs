@@ -302,7 +302,7 @@ namespace CT.CorePatcher.Packets
 				{
 					//fileName = Path.GetFileNameWithoutExtension(op.TargetPath) + ".cs";
 					PatcherConsole.PrintSaveSuccessResult("Generate code completed : ",
-															fileName, op.TargetPath);
+														  fileName, op.TargetPath);
 				}
 				else
 				{

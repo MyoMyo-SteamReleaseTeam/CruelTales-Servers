@@ -19,11 +19,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 
 			List<BaseMemberToken> sReliableMembers = serializeMembers
-				.Where(m => m.SyncType == SyncType.Reliable)
+				.Where(m => m.SyncType == SyncType.Reliable || m.SyncType == SyncType.RelibaleOrUnreliable)
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> sUnreliableMembers = serializeMembers
-				.Where(m => m.SyncType == SyncType.Unreliable)
+				.Where(m => m.SyncType == SyncType.Unreliable || m.SyncType == SyncType.RelibaleOrUnreliable)
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> sAllMembers = serializeMembers
@@ -74,11 +74,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 
 			List<BaseMemberToken> dReliableMembers = deserializeMembers
-				.Where(m => m.SyncType == SyncType.Reliable)
+				.Where(m => m.SyncType == SyncType.Reliable || m.SyncType == SyncType.RelibaleOrUnreliable)
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> dUnreliableMembers = deserializeMembers
-				.Where(m => m.SyncType == SyncType.Unreliable)
+				.Where(m => m.SyncType == SyncType.Unreliable || m.SyncType == SyncType.RelibaleOrUnreliable)
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> dAllMembers = deserializeMembers
