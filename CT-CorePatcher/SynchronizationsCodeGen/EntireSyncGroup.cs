@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
@@ -18,13 +19,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 		}
 
+		public bool HasProperty()
+		{
+			return _members.Where(m => m is not FunctionMemberToken).Any();
+		}
+
 		public string Master_SerializeSyncAll()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier,
 									SyncGroupFormat.EntireFunctionSuffix));
 
-			if (_members.Count == 0)
+			if (!HasProperty())
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();
@@ -58,13 +64,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 		}
 
+		public bool HasProperty()
+		{
+			return _members.Where(m => m is not FunctionMemberToken).Any();
+		}
+
 		public string Remote_DeserializeSyncAll()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.EntireDeserializeFunctionDeclaration, _modifier,
 									SyncGroupFormat.EntireFunctionSuffix));
 
-			if (_members.Count == 0)
+			if (!HasProperty())
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();

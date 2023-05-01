@@ -28,7 +28,7 @@
 
 		public override string GetWriteParameterByName(string name)
 		{
-			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, FuncMemberFormat.TempArgumentName);
+			return string.Format(MemberFormat.WriteEnum, _sizeTypeName, GetArgTuplePropertyName());
 		}
 	}
 }

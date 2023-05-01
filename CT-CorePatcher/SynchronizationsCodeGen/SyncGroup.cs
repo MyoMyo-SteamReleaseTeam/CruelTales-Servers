@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
@@ -42,6 +43,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public bool HasProperty()
+		{
+			return _dirtyGroups.Where(g =>  g.HasProperty()).Any() && _dirtyGroups.Count != 0;
+		}
+
 		public string Master_BitmaskDeclarations()
 		{
 			StringBuilder sb = new();
@@ -81,7 +87,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.SerializeFunctionDeclaration, _modifier, _syncType));
 
-			if (_dirtyGroups.Count == 0)
+			if (!this.HasProperty())
 				return sb.AppendLine(" { }").ToString();
 
 			string content;
@@ -185,12 +191,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
+		public bool HasProperty()
+		{
+			return _dirtyGroups.Where(g => g.HasProperty()).Any();
+		}
+
 		public string Remote_DeserializeSync()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.DeserializeFunctionDeclaration, _modifier, _syncType));
 
-			if (_dirtyGroups.Count == 0)
+			if (!this.HasProperty())
 				return sb.AppendLine(" { }").ToString();
 
 			string content;

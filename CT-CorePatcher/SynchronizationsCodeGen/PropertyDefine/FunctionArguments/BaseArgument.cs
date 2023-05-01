@@ -21,5 +21,11 @@
 		public abstract string GetTempReadParameter();
 		public abstract string GetWriteParameter();
 		public abstract string GetWriteParameterByName(string name);
+
+		/// <summary>arg.valueName</summary>
+		public string GetArgTuplePropertyName()
+		{
+			return $"{FuncMemberFormat.TempArgumentName}.{_parameterName}";
+		}
 	}
 }

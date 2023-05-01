@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
@@ -16,6 +17,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_members = members;
 			_syncType = syncType;
 			_dirtyIndex = dirtyIndex;
+		}
+
+		public bool HasProperty()
+		{
+			return _members.Where(m => m is not FunctionMemberToken).Any();
 		}
 
 		public string Master_MemberCheckDirtys()

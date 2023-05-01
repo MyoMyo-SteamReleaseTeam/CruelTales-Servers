@@ -23,7 +23,7 @@
 
 		public override string GetWriteParameterByName(string name)
 		{
-			return string.Format(MemberFormat.WriteSerialize, FuncMemberFormat.TempArgumentName);
+			return string.Format(MemberFormat.WriteSerialize, GetArgTuplePropertyName());
 		}
 	}
 }

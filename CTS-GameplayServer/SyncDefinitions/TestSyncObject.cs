@@ -3,6 +3,7 @@
 using CT.Common.DataType;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.SyncDefinitions
 {
@@ -270,8 +271,19 @@ namespace CTS.Instance.SyncDefinitions
 	[SyncObjectDefinition]
 	public partial class TestFuntionObject
 	{
-		[SyncRpc]
-		public void Server_FloatValue() { }
+		[SyncRpc] public void Server_VoidArg() { }
+		[SyncRpc] public void Server_PrimitiveArg_1(float v0) { }
+		[SyncRpc] public void Server_PrimitiveArg_2(float v0, int v1) { }
+		[SyncRpc] public void Server_PrimitiveArg_3(float v0, int v1, double v2) { }
+		[SyncRpc] public void Server_ValueTypeArg_1(NetVec2 v0) { }
+		[SyncRpc] public void Server_ValueTypeArg_2(NetVec2 v0, NetString v1) { }
+		[SyncRpc] public void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2) { }
+		[SyncRpc] public void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1) { }
+		[SyncRpc] public void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1) { }
+		[SyncRpc] public void Server_EnumTypeArg_3(NetworkObjectType v0, DisconnectReasonType v1, AckJoinMatch v2) { }
+		[SyncRpc] public void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1) { }
+		[SyncRpc] public void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1) { }
+		[SyncRpc] public void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2) { }
 	}
 }
 #pragma warning restore IDE0051

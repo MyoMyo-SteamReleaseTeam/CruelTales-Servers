@@ -26,7 +26,7 @@
 
 		public override string GetWriteParameterByName(string name)
 		{
-			return string.Format(MemberFormat.WritePut, FuncMemberFormat.TempArgumentName);
+			return string.Format(MemberFormat.WritePut, GetArgTuplePropertyName());
 		}
 	}
 }

@@ -89,7 +89,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 
 			StringBuilder sb = new();
 			foreach (var arg in _args)
-				sb.AppendLine(arg.GetWriteParameter());
+				sb.AppendLine(arg.GetWriteParameterByName("arg"));
 			return sb.ToString();
 		}
 
