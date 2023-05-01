@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
+using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Data;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.Helper;
@@ -82,6 +84,36 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				{
 					operations.Add(new GenOperation(targetPath, remoteFileName, remoteContent));
 				}
+			}
+
+			// Create network object enum types
+			var networkEnums = syncObjects.Select(obj => obj.ObjectName).ToList();
+			var netTypeFileName = CommonFormat.NetworkObjectTypeTypeName + ".cs";
+
+			var masterEnumContent = CodeGenerator_Enumerate
+				.Generate(CommonFormat.NetworkObjectTypeTypeName,
+							CommonFormat.MasterNamespace,
+							hasNone: true, useTab: true,
+							usingList: new List<string>(),
+							networkEnums);
+			var masterEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, masterEnumContent);
+
+			var remoteEnumContent = CodeGenerator_Enumerate
+				.Generate(CommonFormat.NetworkObjectTypeTypeName,
+							CommonFormat.RemoteNamespace,
+							hasNone: true, useTab: true,
+							usingList: new List<string>(),
+							networkEnums);
+			var remoteEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, remoteEnumContent);
+
+			foreach (var targetPath in masterTargetPathList.ArgumentArray)
+			{
+				operations.Add(new GenOperation(targetPath, netTypeFileName, masterEumeCode));
+			}
+
+			foreach (var targetPath in remoteTargetPathList.ArgumentArray)
+			{
+				operations.Add(new GenOperation(targetPath, netTypeFileName, remoteEumeCode));
 			}
 
 			// Remove previous files

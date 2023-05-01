@@ -486,8 +486,8 @@ namespace CT.CorePatcher.Packets
 		{
 			/// <summary>멤버의 타입 이름입니다.</summary>
 			public string Type;
-			/// <summary>데이터 타입입니다.</summary>
-			public PacketDataType DataType;
+			///// <summary>데이터 타입입니다.</summary>
+			//public PacketDataType DataType;
 			/// <summary>멤버 변수의 이름입니다.</summary>
 			public string MemeberName;
 			/// <summary>원시 타입이거나 enum 타입인지 여부입니다.</summary>

@@ -3,10 +3,10 @@ using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
-	public enum NetworkObjectType
-	{
-		None = 0,
-	}
+	//public enum NetworkObjectType
+	//{
+	//	None = 0,
+	//}
 
 	public static class NetworkObjectTypeExtension
 	{
