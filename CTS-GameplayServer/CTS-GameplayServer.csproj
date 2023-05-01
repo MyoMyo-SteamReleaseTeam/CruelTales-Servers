@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SyncObjects\fwfw\**" />
+    <EmbeddedResource Remove="SyncObjects\fwfw\**" />
+    <None Remove="SyncObjects\fwfw\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.15" />
   </ItemGroup>
 
@@ -41,6 +47,10 @@
 	  <AssemblyAttribute Include="log4net.Config.XmlConfigurator">
 	    <ConfigFile>log4net.config</ConfigFile>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SyncObjects\" />
   </ItemGroup>
 
 </Project>

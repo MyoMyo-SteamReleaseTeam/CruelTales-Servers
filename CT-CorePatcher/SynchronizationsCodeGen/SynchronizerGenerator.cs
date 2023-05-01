@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Data;
 using CT.Common.Tools.GetOpt;
@@ -115,7 +116,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			// Sync object
 			ReflectionExtension.TryGetSyncDifinitionTypes<SyncObjectDefinitionAttribute>
-				(typeof(CTS.Instance.GameplayServer), out var syncObjDefinitionTypes);
+				(typeof(CommonDefinition), out var syncObjDefinitionTypes);
 
 			if (syncObjDefinitionTypes != null && syncObjDefinitionTypes.Count > 0)
 			{
@@ -125,7 +126,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			// Sync network object
 			ReflectionExtension.TryGetSyncDifinitionTypes<SyncNetworkObjectDefinitionAttribute>
-				(typeof(CTS.Instance.GameplayServer), out var netObjDefititionTypes);
+				(typeof(CommonDefinition), out var netObjDefititionTypes);
 
 			if (netObjDefititionTypes != null && netObjDefititionTypes.Count > 0)
 			{

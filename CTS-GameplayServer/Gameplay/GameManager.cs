@@ -76,38 +76,38 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
-			for (int z = 0; z < 20; z++)
-			{
-				for (int x = 0; x < 20; x++)
-				{
-					var netId = GetNetworkIdentityCounter();
-					Test_MovingCube cube = new Test_MovingCube();
-					cube.OnCreated(netId);
-					cube.X = x;
-					cube.Y = 5;
-					cube.Z = z;
-					cube.R = 1;
-					cube.G = 1;
-					cube.B = 1;
-					cube.Dest = 8;
-					cube.Speed = 2.5f;
-					_worldObject.Add(cube.Identity, cube);
-					cube.SetMoveTime((x * z + 1) * 0.0125f);
-				}
-			}
+			//for (int z = 0; z < 20; z++)
+			//{
+			//	for (int x = 0; x < 20; x++)
+			//	{
+			//		var netId = GetNetworkIdentityCounter();
+			//		Test_MovingCube cube = new Test_MovingCube();
+			//		cube.OnCreated(netId);
+			//		cube.X = x;
+			//		cube.Y = 5;
+			//		cube.Z = z;
+			//		cube.R = 1;
+			//		cube.G = 1;
+			//		cube.B = 1;
+			//		cube.Dest = 8;
+			//		cube.Speed = 2.5f;
+			//		_worldObject.Add(cube.Identity, cube);
+			//		cube.SetMoveTime((x * z + 1) * 0.0125f);
+			//	}
+			//}
 		}
 
 		float sendTime = 0;
 
 		public void Update(float deltaTime)
 		{
-			foreach (var netObj in _worldObject.Values)
-			{
-				if (netObj is Test_MovingCube cube)
-				{
-					cube.Update(deltaTime);
-				}
-			}
+			//foreach (var netObj in _worldObject.Values)
+			//{
+			//	if (netObj is Test_MovingCube cube)
+			//	{
+			//		cube.Update(deltaTime);
+			//	}
+			//}
 		}
 
 		public void CheckEndCondition()

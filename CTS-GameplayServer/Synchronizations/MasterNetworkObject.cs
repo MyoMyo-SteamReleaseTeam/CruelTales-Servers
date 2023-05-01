@@ -5,6 +5,7 @@ using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
+
 	public abstract class MasterNetworkObject : ISynchronizable
 	{
 		public NetworkIdentity Identity { get; protected set; }

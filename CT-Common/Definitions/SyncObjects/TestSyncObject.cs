@@ -3,9 +3,8 @@
 using CT.Common.DataType;
 using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
-using CTS.Instance.SyncObjects;
 
-namespace CTS.Instance.SyncDefinitions
+namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition]
 	public partial class TestValue64
@@ -212,7 +211,7 @@ namespace CTS.Instance.SyncDefinitions
 		public void Server_DoSomethiing() { }
 
 		[SyncRpc(SyncType.Unreliable)]
-		public void Server_SendMessage(NetString message) { }
+		private void Server_SendMessage(NetString message) { }
 
 		[SyncVar(dir: SyncDirection.FromRemote)]
 		private NetTransform _remote_netTransform;
@@ -280,7 +279,7 @@ namespace CTS.Instance.SyncDefinitions
 		[SyncRpc] public void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2) { }
 		[SyncRpc] public void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1) { }
 		[SyncRpc] public void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1) { }
-		[SyncRpc] public void Server_EnumTypeArg_3(NetworkObjectType v0, DisconnectReasonType v1, AckJoinMatch v2) { }
+		[SyncRpc] public void Server_EnumTypeArg_3(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2) { }
 		[SyncRpc] public void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1) { }
 		[SyncRpc] public void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1) { }
 		[SyncRpc] public void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2) { }

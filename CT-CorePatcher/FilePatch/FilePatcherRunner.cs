@@ -30,7 +30,7 @@
 
 			filePatcher.SetupGuardExtension(".asmdef");
 			filePatcher.SetupIncludeExtension(".cs");
-			filePatcher.SetupExcludeFolderName("obj", "bin", "debug", "build", "Legacy");
+			filePatcher.SetupExcludeFolderName("obj", "bin", "debug", "build", "Legacy", "Definitions");
 
 			filePatcher.SetupSourceDirectory(sourcePath);
 			filePatcher.SetupTargetDirectory(targetPath);
