@@ -145,6 +145,8 @@ public partial class {0} : {1}
 		/// </summary>
 		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(PacketReader reader)";
 
+		public static string IgnoreSyncFunctionDeclaration => @"public {0}void IgnoreSync{1}(PacketReader reader)";
+
 		public static string EntireFunctionSuffix => "EveryProperty";
 
 		/// <summary>
@@ -273,6 +275,18 @@ for (int i = 0; i < count; i++)
 for (int i = 0; i < count; i++)
 {{
 	{0}();
+}}";
+
+		public static string IgnoreVoid => @"reader.Ignore(1);";
+
+		/// <summary>
+		/// {0} Ignore contents<br/>
+		/// </summary>
+		public static string IgnoreFunction =>
+@"byte count = reader.ReadByte();
+for (int i = 0; i < count; i++)
+{{
+{0}
 }}";
 
 		/// <summary>
@@ -406,6 +420,22 @@ public event Action<{1}>? On{3}Changed;";
 		/// {1} SyncType<br/>
 		/// </summary>
 		public static string ClearDirty => @"{0}.ClearDirty{1}();";
+
+		/// <summary>
+		/// {0} Primitive data size constant<br/>
+		/// </summary>
+		public static string IgnorePrimitive => @"reader.Ignore({0});";
+
+		/// <summary>
+		/// {0} Value type name<br/>
+		/// </summary>
+		public static string IgnoreValueType => @"{0}.Ignore(reader);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string IgnoreObjectType => @"{0}.IgnoreSync{1}(reader);";
 
 		public static string GetPrivateName(string name)
 		{

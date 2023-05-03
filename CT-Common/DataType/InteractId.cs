@@ -29,5 +29,6 @@ namespace CT.Common.DataType
 		{
 			return Id.ToString();
 		}
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 }

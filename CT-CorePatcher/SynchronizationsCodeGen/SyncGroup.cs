@@ -252,5 +252,72 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			headers.AppendLine(contents.ToString());
 			return headers.ToString();
 		}
+
+		public string Remote_IgnoreSync()
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclaration, _modifier, _syncType));
+
+			if (_dirtyGroups.Count == 0)
+				return sb.AppendLine(" { }").ToString();
+
+			string content;
+			if (_dirtyGroups.Count == 1)
+			{
+				content = remote_IgnoreSyncOneDirtyGroup();
+			}
+			else if (_dirtyGroups.Count == 2)
+			{
+				content = remote_IgnoreSyncTwoDirtyGroup();
+			}
+			else
+			{
+				content = remote_IgnoreSyncMultipleDirtyGroup();
+			}
+
+			CodeFormat.AddIndent(ref content);
+
+			sb.AppendLine("");
+			sb.AppendLine("{");
+			sb.AppendLine(content);
+			sb.AppendLine("}");
+			return sb.ToString();
+		}
+
+		private string remote_IgnoreSyncOneDirtyGroup()
+		{
+			return _dirtyGroups[0].Remote_IgnoreMembers(_syncType);
+		}
+
+		private string remote_IgnoreSyncTwoDirtyGroup()
+		{
+			StringBuilder sb = new();
+			for (int i = 0; i < 2; i++)
+			{
+				var group = _dirtyGroups[i];
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, group.GetName()));
+				string content = group.Remote_IgnoreMembers(_syncType, false);
+				CodeFormat.AddIndent(ref content);
+				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
+			}
+			return sb.ToString();
+		}
+
+		private string remote_IgnoreSyncMultipleDirtyGroup()
+		{
+			StringBuilder headers = new();
+			headers.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize,
+											 SyncGroupFormat.MasterDirtyBitName));
+
+			StringBuilder contents = new();
+			for (int i = 0; i < _dirtyGroups.Count; i++)
+			{
+				string content = _dirtyGroups[i].Remote_IgnoreMembers(_syncType);
+				CodeFormat.AddIndent(ref content);
+				contents.AppendLine(string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, content));
+			}
+			headers.AppendLine(contents.ToString());
+			return headers.ToString();
+		}
 	}
 }

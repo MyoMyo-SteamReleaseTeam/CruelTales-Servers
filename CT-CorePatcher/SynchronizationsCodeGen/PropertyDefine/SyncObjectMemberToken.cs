@@ -56,5 +56,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}
+
+		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		{
+			return string.Format(MemberFormat.IgnoreObjectType, _privateMemberName, syncType);
+		}
 	}
 }

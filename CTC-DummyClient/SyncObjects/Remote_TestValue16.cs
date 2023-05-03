@@ -304,6 +304,164 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
+		public override void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0.AnyTrue())
+			{
+				if (_dirtyReliable_0[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			BitmaskByte _dirtyReliable_1 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_1.AnyTrue())
+			{
+				if (_dirtyReliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_1[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+		}
+		public override void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0.AnyTrue())
+			{
+				if (_dirtyUnreliable_0[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			BitmaskByte _dirtyUnreliable_1 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_1.AnyTrue())
+			{
+				if (_dirtyUnreliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_1[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+		}
 		public override void DeserializeEveryProperty(PacketReader reader)
 		{
 			_v0 = reader.ReadInt32();

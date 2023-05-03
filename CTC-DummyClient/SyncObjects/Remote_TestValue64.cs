@@ -1182,6 +1182,678 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
+		public override void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte masterDirty = reader.ReadBitmaskByte();
+			if (masterDirty[0])
+			{
+				BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_0[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[1])
+			{
+				BitmaskByte _dirtyReliable_1 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_1[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[2])
+			{
+				BitmaskByte _dirtyReliable_2 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_2[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_2[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[3])
+			{
+				BitmaskByte _dirtyReliable_3 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_3[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_3[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[4])
+			{
+				BitmaskByte _dirtyReliable_4 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_4[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_4[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[5])
+			{
+				BitmaskByte _dirtyReliable_5 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_5[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_5[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[6])
+			{
+				BitmaskByte _dirtyReliable_6 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_6[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_6[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_6[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyReliable_6[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_6[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_6[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_6[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_6[7])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+			if (masterDirty[7])
+			{
+				BitmaskByte _dirtyReliable_7 = reader.ReadBitmaskByte();
+				if (_dirtyReliable_7[0])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[1])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[2])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_7[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+		}
+		public override void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte masterDirty = reader.ReadBitmaskByte();
+			if (masterDirty[0])
+			{
+				BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_0[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_0[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[1])
+			{
+				BitmaskByte _dirtyUnreliable_1 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_1[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[2])
+			{
+				BitmaskByte _dirtyUnreliable_2 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_2[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_2[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[3])
+			{
+				BitmaskByte _dirtyUnreliable_3 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_3[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_3[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[4])
+			{
+				BitmaskByte _dirtyUnreliable_4 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_4[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_4[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[5])
+			{
+				BitmaskByte _dirtyUnreliable_5 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_5[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[3])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[4])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[5])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[6])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_5[7])
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (masterDirty[6])
+			{
+				BitmaskByte _dirtyUnreliable_6 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_6[0])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_6[1])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_6[2])
+				{
+					reader.Ignore(4);
+				}
+				if (_dirtyUnreliable_6[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_6[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_6[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_6[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_6[7])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+			if (masterDirty[7])
+			{
+				BitmaskByte _dirtyUnreliable_7 = reader.ReadBitmaskByte();
+				if (_dirtyUnreliable_7[0])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[1])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[2])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyUnreliable_7[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+			}
+		}
 		public override void DeserializeEveryProperty(PacketReader reader)
 		{
 			_v0 = reader.ReadInt32();

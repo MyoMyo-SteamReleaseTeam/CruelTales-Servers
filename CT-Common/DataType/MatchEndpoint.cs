@@ -29,5 +29,10 @@ namespace CT.Common.DataType
 			IpEndpoint = reader.ReadNetStringShort();
 			Port = reader.ReadUInt16();
 		}
+		public static void Ignore(PacketReader reader)
+		{
+			NetStringShort.Ignore(reader);
+			reader.Ignore(sizeof(ushort));
+		}
 	}
 }

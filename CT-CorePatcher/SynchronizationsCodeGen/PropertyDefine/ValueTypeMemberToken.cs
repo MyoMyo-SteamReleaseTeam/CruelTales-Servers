@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.Helper;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
@@ -48,6 +49,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
+		}
+
+		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		{
+			return string.Format(MemberFormat.IgnoreValueType, _typeName);
 		}
 	}
 }

@@ -32,5 +32,7 @@ namespace CT.Common.DataType
 		{
 			ID = reader.ReadByte();
 		}
+
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
+﻿using System;
+
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public abstract class BaseArgument
 	{
@@ -21,6 +23,7 @@
 		public abstract string GetTempReadParameter();
 		public abstract string GetWriteParameter(string paramName);
 		public abstract string GetWriteParameterInTuple(string tupleArgName);
+		public abstract string GetIgnoreRead();
 
 		/// <summary>arg.valueName</summary>
 		public string GetArgTuplePropertyName()

@@ -35,7 +35,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private NetTransform _valueTypeTransform = new();
 		public event Action<NetTransform>? OnValueTypeTransformChanged;
-		[SyncVar(SyncType.RelibaleOrUnreliable)]
+		[SyncVar]
 		private NetString _stringValue = new();
 		public event Action<NetString>? OnStringValueChanged;
 		[SyncObject(SyncType.RelibaleOrUnreliable)]
@@ -107,15 +107,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyUnreliable_0[0])
 			{
-				_stringValue.Deserialize(reader);
-				OnStringValueChanged?.Invoke(_stringValue);
-			}
-			if (_dirtyUnreliable_0[1])
-			{
 				_syncObjectBothSide.DeserializeSyncUnreliable(reader);
 				OnSyncObjectBothSideChanged?.Invoke(_syncObjectBothSide);
 			}
-			if (_dirtyUnreliable_0[2])
+			if (_dirtyUnreliable_0[1])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -123,6 +118,58 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					NetString message = new();
 					message.Deserialize(reader);
 					Server_Unreliable(message);
+				}
+			}
+		}
+		public override void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0[0])
+			{
+				UserToken.Ignore(reader);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				reader.Ignore(4);
+			}
+			if (_dirtyReliable_0[2])
+			{
+				reader.Ignore(1);
+			}
+			if (_dirtyReliable_0[3])
+			{
+				NetTransform.Ignore(reader);
+			}
+			if (_dirtyReliable_0[4])
+			{
+				NetString.Ignore(reader);
+			}
+			if (_dirtyReliable_0[5])
+			{
+				_syncObjectBothSide.IgnoreSyncReliable(reader);
+			}
+			if (_dirtyReliable_0[6])
+			{
+				_syncObjectReliable.IgnoreSyncReliable(reader);
+			}
+			if (_dirtyReliable_0[7])
+			{
+				reader.Ignore(1);
+			}
+		}
+		public override void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				_syncObjectBothSide.IgnoreSyncUnreliable(reader);
+			}
+			if (_dirtyUnreliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.Ignore(reader);
 				}
 			}
 		}

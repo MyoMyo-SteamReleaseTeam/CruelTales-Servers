@@ -81,5 +81,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			return sb.ToString();
 		}
+
+		public string Remote_IgnoreMembers(SyncType syncType, bool readDirtyBit = true)
+		{
+			StringBuilder sb = new();
+			int index = 0;
+			if (readDirtyBit)
+			{
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
+			}
+			foreach (var m in _members)
+			{
+				string content = m.Remote_IgnoreDeserialize(syncType);
+				CodeFormat.AddIndent(ref content);
+				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
+			}
+			return sb.ToString();
+		}
 	}
 }

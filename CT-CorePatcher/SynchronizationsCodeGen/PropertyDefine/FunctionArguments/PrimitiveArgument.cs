@@ -1,4 +1,6 @@
-﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
+﻿using CT.CorePatcher.Helper;
+
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public class PrimitiveArgument : BaseArgument
 	{
@@ -28,6 +30,12 @@
 		public override string GetWriteParameterInTuple(string name)
 		{
 			return string.Format(MemberFormat.WritePut, GetArgTuplePropertyName());
+		}
+
+		public override string GetIgnoreRead()
+		{
+			return string.Format(MemberFormat.IgnorePrimitive,
+								 ReflectionHelper.GetByteSizeByTypeName(_typeName));
 		}
 	}
 }

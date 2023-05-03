@@ -98,6 +98,12 @@ namespace CT.Common.Serialization.Type
 		{
 			value = reader.ReadNetString();
 		}
+
+		public static void Ignore(PacketReader reader)
+		{
+			ushort count = reader.ReadUInt16();
+			reader.Ignore(count);
+		}
 	}
 
 	/// <summary>256이하 길이의 string 입니다.</summary>
@@ -190,6 +196,12 @@ namespace CT.Common.Serialization.Type
 		public static void Deserialize(ref NetStringShort value, PacketReader reader)
 		{
 			value = reader.ReadNetStringShort();
+		}
+
+		public static void Ignore(PacketReader reader)
+		{
+			byte count = reader.ReadByte();
+			reader.Ignore(count);
 		}
 	}
 }

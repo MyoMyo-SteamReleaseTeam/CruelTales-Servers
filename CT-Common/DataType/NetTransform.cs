@@ -47,7 +47,7 @@ namespace CT.Common.DataType
 	{
 		public float Z;
 	
-		public int SerializeSize =>  + 4;
+		public int SerializeSize => sizeof(float);
 	
 		public void Serialize(PacketWriter writer)
 		{
@@ -58,6 +58,8 @@ namespace CT.Common.DataType
 		{
 			Z = reader.ReadSingle();
 		}
+
+		public void Ignore(PacketReader reader) => reader.Ignore(sizeof(float));
 	}
 
 	[Serializable]
@@ -103,5 +105,6 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"([{nameof(Position)}:{Position}][{nameof(Velocity)}:{Velocity}])";
+		public static void Ignore(PacketReader reader) => reader.Ignore(12);
 	}
 }

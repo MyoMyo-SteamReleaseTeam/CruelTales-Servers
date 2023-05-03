@@ -172,6 +172,34 @@ namespace CTS.Instance.SyncObjects
 				OnRemote_ValueChanged?.Invoke(_remote_Value);
 			}
 		}
+		public override void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0[0])
+			{
+				NetTransform.Ignore(reader);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				reader.Ignore(1);
+			}
+			if (_dirtyReliable_0[2])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.Ignore(reader);
+				}
+			}
+		}
+		public override void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				reader.Ignore(4);
+			}
+		}
 		public override void DeserializeEveryProperty(PacketReader reader)
 		{
 			_remote_netTransform.Deserialize(reader);

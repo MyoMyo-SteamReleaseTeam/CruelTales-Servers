@@ -31,11 +31,6 @@ namespace CT.Common.DataType
 			Id = reader.ReadUInt16();
 		}
 
-		public static void Ignore(PacketReader reader)
-		{
-			reader.Ignore(sizeof(ushort));
-		}
-
 		public static bool operator ==(NetworkIdentity left, NetworkIdentity right) => left.Id == right.Id;
 		public static bool operator !=(NetworkIdentity left, NetworkIdentity right) => left.Id != right.Id;
 		public override int GetHashCode() => Id.GetHashCode();
@@ -45,5 +40,6 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(ushort));
 	}
 }

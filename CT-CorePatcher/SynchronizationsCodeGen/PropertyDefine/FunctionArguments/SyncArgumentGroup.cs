@@ -100,5 +100,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 				sb.AppendLine(arg.GetTempReadParameter());
 			return sb.ToString();
 		}
+
+		public string GetIgnoreParameterContent()
+		{
+			StringBuilder sb = new();
+			foreach (var arg in _args)
+				sb.AppendLine(arg.GetIgnoreRead());
+			return sb.ToString();
+		}
 	}
 }

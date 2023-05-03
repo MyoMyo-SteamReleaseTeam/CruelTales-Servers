@@ -40,5 +40,6 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(ulong));
 	}
 }

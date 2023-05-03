@@ -298,6 +298,8 @@ namespace CTS.Instance.SyncObjects
 		public void SerializeEveryProperty(PacketWriter writer) { }
 		public void DeserializeSyncReliable(PacketReader reader) { }
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
+		public void IgnoreSyncReliable(PacketReader reader) { }
+		public void IgnoreSyncUnreliable(PacketReader reader) { }
 		public void DeserializeEveryProperty(PacketReader reader) { }
 	}
 }

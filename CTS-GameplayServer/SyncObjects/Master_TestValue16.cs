@@ -598,6 +598,8 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
+		public override void IgnoreSyncReliable(PacketReader reader) { }
+		public override void IgnoreSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader) { }
 	}
 }

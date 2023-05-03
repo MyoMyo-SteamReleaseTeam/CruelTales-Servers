@@ -1,5 +1,7 @@
 ﻿using System.Text;
+using CT.Common.Serialization;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.Helper;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
@@ -51,6 +53,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _clrTypeName));
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
+		}
+
+		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		{
+			return string.Format(MemberFormat.IgnorePrimitive,
+								 ReflectionHelper.GetByteSizeByTypeName(_typeName));
 		}
 	}
 }

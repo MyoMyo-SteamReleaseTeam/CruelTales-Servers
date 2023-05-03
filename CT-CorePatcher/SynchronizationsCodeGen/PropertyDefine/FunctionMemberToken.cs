@@ -76,5 +76,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 paramContent,
 								 _argGroup.GetCallParameters());
 		}
+
+		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		{
+			if (_argGroup.Count == 0)
+				return FuncMemberFormat.IgnoreVoid;
+
+			string paramContent = _argGroup.GetIgnoreParameterContent();
+			CodeFormat.AddIndent(ref paramContent);
+
+			return string.Format(FuncMemberFormat.IgnoreFunction, paramContent);
+		}
 	}
 }

@@ -50,7 +50,7 @@ namespace CT.CorePatcher.Helper
 			return result;
 		}
 
-		public static readonly Dictionary<string, int> _dataSizeByTypeName = new()
+		private static readonly Dictionary<string, int> _dataSizeByTypeName = new()
 		{
 			{ "bool",   sizeof(byte) },
 			{ "byte",   sizeof(byte) },

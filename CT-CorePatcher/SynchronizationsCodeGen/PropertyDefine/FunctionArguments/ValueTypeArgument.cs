@@ -1,4 +1,6 @@
-﻿namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
+﻿using CT.CorePatcher.Helper;
+
+namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
 	public class ValueTypeArgument : BaseArgument
 	{
@@ -25,6 +27,11 @@
 		public override string GetWriteParameterInTuple(string name)
 		{
 			return string.Format(MemberFormat.WriteSerialize, GetArgTuplePropertyName());
+		}
+
+		public override string GetIgnoreRead()
+		{
+			return string.Format(MemberFormat.IgnoreValueType, _typeName);
 		}
 	}
 }

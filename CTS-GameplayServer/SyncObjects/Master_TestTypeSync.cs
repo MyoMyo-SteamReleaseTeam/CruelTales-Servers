@@ -31,7 +31,7 @@ namespace CTS.Instance.SyncObjects
 		private NetEntityType _enumType = new();
 		[SyncVar]
 		private NetTransform _valueTypeTransform = new();
-		[SyncVar(SyncType.RelibaleOrUnreliable)]
+		[SyncVar]
 		private NetString _stringValue = new();
 		[SyncObject(SyncType.RelibaleOrUnreliable)]
 		private TestInnerObject _syncObjectBothSide = new();
@@ -120,20 +120,10 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0[7] = true;
 		}
 		private byte Server_ReliableCallstackCount = 0;
-		public NetString StringValue
-		{
-			get => _stringValue;
-			set
-			{
-				if (_stringValue == value) return;
-				_stringValue = value;
-				_dirtyUnreliable_0[0] = true;
-			}
-		}
 		public partial void Server_Unreliable(NetString message)
 		{
 			Server_UnreliableCallstack.Enqueue(message);
-			_dirtyUnreliable_0[2] = true;
+			_dirtyUnreliable_0[1] = true;
 		}
 		private Queue<NetString> Server_UnreliableCallstack = new();
 		public override void ClearDirtyReliable()
@@ -188,13 +178,9 @@ namespace CTS.Instance.SyncObjects
 			_dirtyUnreliable_0.Serialize(writer);
 			if (_dirtyUnreliable_0[0])
 			{
-				_stringValue.Serialize(writer);
-			}
-			if (_dirtyUnreliable_0[1])
-			{
 				_syncObjectBothSide.SerializeSyncUnreliable(writer);
 			}
-			if (_dirtyUnreliable_0[2])
+			if (_dirtyUnreliable_0[1])
 			{
 				byte count = (byte)Server_UnreliableCallstack.Count;
 				writer.Put(count);
@@ -217,6 +203,8 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
+		public override void IgnoreSyncReliable(PacketReader reader) { }
+		public override void IgnoreSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader) { }
 	}
 }

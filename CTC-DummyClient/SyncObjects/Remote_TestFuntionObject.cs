@@ -205,6 +205,132 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
+		public void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0.AnyTrue())
+			{
+				if (_dirtyReliable_0[0])
+				{
+					reader.Ignore(1);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_0[2])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+						reader.Ignore(4);
+					}
+				}
+				if (_dirtyReliable_0[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+						reader.Ignore(4);
+						reader.Ignore(8);
+					}
+				}
+				if (_dirtyReliable_0[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						NetVec2.Ignore(reader);
+					}
+				}
+				if (_dirtyReliable_0[5])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						NetVec2.Ignore(reader);
+						NetString.Ignore(reader);
+					}
+				}
+				if (_dirtyReliable_0[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						UserId.Ignore(reader);
+						NetVec2.Ignore(reader);
+						NetString.Ignore(reader);
+					}
+				}
+				if (_dirtyReliable_0[7])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(1);
+						reader.Ignore(1);
+					}
+				}
+			}
+			BitmaskByte _dirtyReliable_1 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_1.AnyTrue())
+			{
+				if (_dirtyReliable_1[0])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(1);
+						reader.Ignore(1);
+					}
+				}
+				if (_dirtyReliable_1[1])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(1);
+						reader.Ignore(1);
+						reader.Ignore(1);
+					}
+				}
+				if (_dirtyReliable_1[2])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+						reader.Ignore(1);
+					}
+				}
+				if (_dirtyReliable_1[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						NetVec2.Ignore(reader);
+						reader.Ignore(1);
+					}
+				}
+				if (_dirtyReliable_1[4])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						NetVec2.Ignore(reader);
+						reader.Ignore(1);
+						reader.Ignore(4);
+					}
+				}
+			}
+		}
+		public void IgnoreSyncUnreliable(PacketReader reader) { }
 		public void DeserializeEveryProperty(PacketReader reader) { }
 	}
 }

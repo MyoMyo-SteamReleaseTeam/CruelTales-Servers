@@ -241,7 +241,7 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar]
 		private NetTransform _valueTypeTransform;
 
-		[SyncVar(SyncType.RelibaleOrUnreliable)]
+		[SyncVar]
 		public NetString _stringValue;
 
 		[SyncObject(SyncType.RelibaleOrUnreliable)]

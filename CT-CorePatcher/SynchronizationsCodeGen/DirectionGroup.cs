@@ -88,11 +88,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_unreliableGruop = new DeserializeSyncGroup(dUnreliableMembers, SyncType.Unreliable, _modifier);
 			_entireGroup = new EntireDeserializeSyncGroup(dAllMembers, SyncType.None, _modifier);
 		}
+
 		public string Gen_SerializeSyncFuntions()
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(_reliableGruop.Remote_DeserializeSync());
 			sb.AppendLine(_unreliableGruop.Remote_DeserializeSync());
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync());
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync());
 			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll());
 			return sb.ToString();
 		}

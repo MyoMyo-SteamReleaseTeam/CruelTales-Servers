@@ -29,5 +29,6 @@ namespace CT.Common.DataType
 		}
 
 		public override string ToString() => Guid.ToString();
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(ulong));
 	}
 }

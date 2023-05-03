@@ -54,6 +54,18 @@ namespace CT.Common.Synchronizations
 		public void DeserializeEveryProperty(PacketReader reader);
 
 		/// <summary>
+		/// 동기화 요소를 무시합니다.
+		/// 존재하지 않는 객체인 경우 동기화 데이터를 건너뜁니다.
+		/// </summary>
+		public void IgnoreSyncReliable(PacketReader reader);
+
+		/// <summary>
+		/// 동기화 요소를 무시합니다.
+		/// 존재하지 않는 객체인 경우 동기화 데이터를 건너뜁니다.
+		/// </summary>
+		public void IgnoreSyncUnreliable(PacketReader reader);
+
+		/// <summary>
 		/// 신뢰성 Dirty Bits를 초기화합니다.
 		/// </summary>
 		public void ClearDirtyReliable();

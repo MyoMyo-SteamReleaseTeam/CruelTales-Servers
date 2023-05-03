@@ -54,6 +54,23 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
+		public void IgnoreSyncReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0[0])
+			{
+				reader.Ignore(4);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetStringShort.Ignore(reader);
+				}
+			}
+		}
+		public void IgnoreSyncUnreliable(PacketReader reader) { }
 		public void DeserializeEveryProperty(PacketReader reader)
 		{
 			_testInt = reader.ReadInt32();
