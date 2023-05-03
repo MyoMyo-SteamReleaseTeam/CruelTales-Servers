@@ -10,6 +10,24 @@ namespace CT.Common.Tools.Data
 	public static class FileHandler
 	{
 		/// <summary>텍스트 파일을 저장합니다.</summary>
+		/// <param name="folderPath">저장할 파일의 폴더 경로입니다.</param>
+		/// <param name="fileNameWithExtension">저장할 파일의 이름입니다. 확장자를 포함합니다.</param>
+		/// <param name="data">저장할 데이터입니다.</param>
+		/// <param name="makeDirectory">
+		/// true일 경우 경로가 없다면 생성합니다.
+		/// false일 경우 경로가 없다면 예외가 발생합니다.
+		/// </param>
+		/// <returns>성공 여부입니다.</returns>
+		public static JobResult TryWriteText(string folderPath,
+											 string fileNameWithExtension,
+											 string data,
+											 bool makeDirectory = false)
+		{
+			string filePath = Path.Combine(folderPath, fileNameWithExtension);
+			return TryWriteText(filePath, data, makeDirectory);
+		}
+
+		/// <summary>텍스트 파일을 저장합니다.</summary>
 		/// <param name="filePath">저장할 파일 경로입니다.</param>
 		/// <param name="data">저장할 데이터입니다.</param>
 		/// <param name="makeDirectory">
@@ -37,6 +55,25 @@ namespace CT.Common.Tools.Data
 			{
 				return new JobResult(result: JobResultType.Failed, exception: e);
 			}
+		}
+
+		/// <summary>텍스트 파일을 비동기로 저장합니다.</summary>
+		/// <param name="folderPath">저장할 파일의 폴더 경로입니다.</param>
+		/// <param name="fileNameWithExtension">저장할 파일의 이름입니다. 확장자를 포함합니다.</param>
+		/// <param name="data">저장할 데이터입니다.</param>
+		/// <param name="makeDirectory">
+		/// true일 경우 경로가 없다면 생성합니다.
+		/// false일 경우 경로가 없다면 예외가 발생합니다.
+		/// </param>
+		/// <returns>성공 여부입니다.</returns>
+		public static async ValueTask<JobResult> TryWriteTextAsync(string folderPath,
+																   string fileNameWithExtension,
+																   string data,
+																   bool makeDirectory = false,
+																   CancellationToken cancellationToken = default)
+		{
+			string filePath = Path.Combine(folderPath, fileNameWithExtension);
+			return await TryWriteTextAsync(filePath, data, makeDirectory, cancellationToken);
 		}
 
 		/// <summary>텍스트 파일을 비동기로 저장합니다.</summary>
@@ -71,7 +108,17 @@ namespace CT.Common.Tools.Data
 			}
 		}
 
-		/// <summary>비동기로 텍스트 파일을 읽습니다.</summary>
+		/// <summary>텍스트 파일을 읽습니다.</summary>
+		/// <param name="folderPath">읽을 파일의 폴더 경로입니다.</param>
+		/// <param name="fileNameWithExtension">읽을 파일의 이름입니다. 확장자를 포함합니다.</param>
+		/// <returns>읽기 결과입니다. 읽은 데이터를 포함합니다.</returns>
+		public static JobResult TryReadText(string folderPath, string fileNameWithExtension)
+		{
+			string filePath = Path.Combine(folderPath, fileNameWithExtension);
+			return TryReadText(filePath);
+		}
+
+		/// <summary>텍스트 파일을 읽습니다.</summary>
 		/// <returns>읽기 결과입니다. 읽은 데이터를 포함합니다.</returns>
 		public static JobResult TryReadText(string filePath)
 		{
@@ -83,6 +130,17 @@ namespace CT.Common.Tools.Data
 			{
 				return new JobResult(result: JobResultType.Failed, exception: e);
 			}
+		}
+
+		/// <summary>비동기로 텍스트 파일을 읽습니다.</summary>
+		/// <param name="folderPath">읽을 파일의 폴더 경로입니다.</param>
+		/// <param name="fileNameWithExtension">읽을 파일의 이름입니다. 확장자를 포함합니다.</param>
+		/// <returns>읽기 결과입니다. 읽은 데이터를 포함합니다.</returns>
+		public static async ValueTask<JobResult> TryReadTextAsync(string folderPath, string fileNameWithExtension,
+																  CancellationToken cancellationToken = default)
+		{
+			string filePath = Path.Combine(folderPath, fileNameWithExtension);
+			return await TryReadTextAsync(filePath, cancellationToken);
 		}
 
 		/// <summary>비동기로 텍스트 파일을 읽습니다.</summary>
