@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CT.Common.Serialization;
 
-namespace CT.Common.Serialization.Type
+namespace CT.Common.DataType
 {
 	public class NetIntArray : IList<int>
 	{

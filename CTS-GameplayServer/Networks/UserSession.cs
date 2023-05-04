@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.Networks.Extensions;
 using CT.Packets;
 using CTS.Instance.Gameplay;

@@ -5,8 +5,9 @@ using System.Diagnostics;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using CT.Common.Serialization;
 
-namespace CT.Common.Serialization.Type
+namespace CT.Common.DataType
 {
 	/// <summary>65536이하 길이의 string 입니다.</summary>
 	[Serializable]

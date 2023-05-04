@@ -1,5 +1,4 @@
 ﻿using CT.Common.DataType;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects

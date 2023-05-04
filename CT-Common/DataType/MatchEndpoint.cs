@@ -1,6 +1,5 @@
 ﻿using System;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 
 namespace CT.Common.DataType
 {

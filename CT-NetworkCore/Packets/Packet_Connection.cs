@@ -7,7 +7,6 @@
 
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 
 namespace CT.Packets
 {

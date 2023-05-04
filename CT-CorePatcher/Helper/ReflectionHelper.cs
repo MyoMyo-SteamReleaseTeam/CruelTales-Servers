@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using CT.Common.Serialization.Type;
+using CT.Common.DataType;
 using CT.Common.Tools.Collections;
 
 namespace CT.CorePatcher.Helper

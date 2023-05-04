@@ -11,7 +11,6 @@
 using System;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.SyncObjects;

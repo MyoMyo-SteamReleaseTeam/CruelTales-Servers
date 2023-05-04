@@ -1,10 +1,9 @@
 ﻿using CT.Common.DataType;
 using CT.Common.Serialization;
 using CTC.Networks.SyncObjects.TestSyncObjects;
-using CTS.Instance.SyncObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CT.Test.SyncObjectTest
+namespace CT.Test.SynchronizeTest
 {
 	[TestClass]
 	public class Test_SyncObjects
@@ -33,7 +32,7 @@ namespace CT.Test.SyncObjectTest
 			PacketReader reader = new PacketReader(syncData);
 			clientObj.DeserializeSyncReliable(reader);
 
-			Assert.AreEqual(new	UserToken(1122), clientObj.UserToken);
+			Assert.AreEqual(new UserToken(1122), clientObj.UserToken);
 			Assert.AreEqual(200, clientObj.IntValue);
 			Assert.AreEqual(10.50f, clientObj.FloatParam);
 			Assert.AreEqual("User token", clientObj.TextParam);

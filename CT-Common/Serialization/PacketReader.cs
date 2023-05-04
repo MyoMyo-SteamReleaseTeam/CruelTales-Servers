@@ -1,5 +1,5 @@
 ﻿using System;
-using CT.Common.Serialization.Type;
+using CT.Common.DataType;
 
 namespace CT.Common.Serialization
 {
@@ -41,6 +41,11 @@ namespace CT.Common.Serialization
 		public bool CanRead<T>(T serializeObject) where T : IPacketSerializable
 		{
 			return CanRead(serializeObject.SerializeSize);
+		}
+
+		public void Reset()
+		{
+			Position = 0;
 		}
 
 		public void SetPosition(int position)

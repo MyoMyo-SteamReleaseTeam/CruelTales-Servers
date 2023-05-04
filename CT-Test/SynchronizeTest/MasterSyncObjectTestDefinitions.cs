@@ -12,12 +12,12 @@ using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
-namespace CTS.Instance.SyncObjects
+namespace CT.Test.SynchronizeTest
 {
 	[Serializable]
 	public partial class TestMasterNetworkObject : MasterNetworkObject

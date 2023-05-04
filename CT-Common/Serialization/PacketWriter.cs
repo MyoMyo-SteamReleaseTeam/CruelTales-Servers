@@ -1,5 +1,6 @@
 ﻿using System;
-using CT.Common.Serialization.Type;
+using System.Diagnostics;
+using CT.Common.DataType;
 
 namespace CT.Common.Serialization
 {
@@ -35,7 +36,7 @@ namespace CT.Common.Serialization
 
 		public void Reset()
 		{
-			Count = Buffer.Offset;
+			Count = 0;
 		}
 
 		public bool CanPut(int putSize)

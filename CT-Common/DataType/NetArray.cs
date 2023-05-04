@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CT.Common.Serialization;
 
-namespace CT.Common.Serialization.Type
+namespace CT.Common.DataType
 {
 	/// <summary>
 	/// 직렬화 크기의 변동이 없는 데이터 타입의 배열입니다.
