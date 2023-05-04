@@ -304,7 +304,62 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void IgnoreSyncReliable(PacketReader reader)
+		public override void DeserializeEveryProperty(PacketReader reader)
+		{
+			_v0 = reader.ReadInt32();
+			OnV0Changed?.Invoke(_v0);
+			_v1 = reader.ReadInt32();
+			OnV1Changed?.Invoke(_v1);
+			_v2 = reader.ReadInt32();
+			OnV2Changed?.Invoke(_v2);
+			_v4 = reader.ReadInt32();
+			OnV4Changed?.Invoke(_v4);
+			_v5 = reader.ReadInt32();
+			OnV5Changed?.Invoke(_v5);
+			_v6 = reader.ReadInt32();
+			OnV6Changed?.Invoke(_v6);
+			_v7 = reader.ReadInt32();
+			OnV7Changed?.Invoke(_v7);
+			_v8 = reader.ReadInt32();
+			OnV8Changed?.Invoke(_v8);
+			_v9 = reader.ReadInt32();
+			OnV9Changed?.Invoke(_v9);
+			_v10 = reader.ReadInt32();
+			OnV10Changed?.Invoke(_v10);
+			_v12 = reader.ReadInt32();
+			OnV12Changed?.Invoke(_v12);
+			_v13 = reader.ReadInt32();
+			OnV13Changed?.Invoke(_v13);
+			_v15 = reader.ReadInt32();
+			OnV15Changed?.Invoke(_v15);
+			_uv0 = reader.ReadInt32();
+			OnUv0Changed?.Invoke(_uv0);
+			_uv1 = reader.ReadInt32();
+			OnUv1Changed?.Invoke(_uv1);
+			_uv2 = reader.ReadInt32();
+			OnUv2Changed?.Invoke(_uv2);
+			_uv4 = reader.ReadInt32();
+			OnUv4Changed?.Invoke(_uv4);
+			_uv5 = reader.ReadInt32();
+			OnUv5Changed?.Invoke(_uv5);
+			_uv6 = reader.ReadInt32();
+			OnUv6Changed?.Invoke(_uv6);
+			_uv7 = reader.ReadInt32();
+			OnUv7Changed?.Invoke(_uv7);
+			_uv8 = reader.ReadInt32();
+			OnUv8Changed?.Invoke(_uv8);
+			_uv9 = reader.ReadInt32();
+			OnUv9Changed?.Invoke(_uv9);
+			_uv10 = reader.ReadInt32();
+			OnUv10Changed?.Invoke(_uv10);
+			_uv12 = reader.ReadInt32();
+			OnUv12Changed?.Invoke(_uv12);
+			_uv13 = reader.ReadInt32();
+			OnUv13Changed?.Invoke(_uv13);
+			_uv15 = reader.ReadInt32();
+			OnUv15Changed?.Invoke(_uv15);
+		}
+		public static void IgnoreSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0.AnyTrue())
@@ -383,7 +438,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void IgnoreSyncUnreliable(PacketReader reader)
+		public static void IgnoreSyncUnreliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyUnreliable_0.AnyTrue())
@@ -461,61 +516,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					}
 				}
 			}
-		}
-		public override void DeserializeEveryProperty(PacketReader reader)
-		{
-			_v0 = reader.ReadInt32();
-			OnV0Changed?.Invoke(_v0);
-			_v1 = reader.ReadInt32();
-			OnV1Changed?.Invoke(_v1);
-			_v2 = reader.ReadInt32();
-			OnV2Changed?.Invoke(_v2);
-			_v4 = reader.ReadInt32();
-			OnV4Changed?.Invoke(_v4);
-			_v5 = reader.ReadInt32();
-			OnV5Changed?.Invoke(_v5);
-			_v6 = reader.ReadInt32();
-			OnV6Changed?.Invoke(_v6);
-			_v7 = reader.ReadInt32();
-			OnV7Changed?.Invoke(_v7);
-			_v8 = reader.ReadInt32();
-			OnV8Changed?.Invoke(_v8);
-			_v9 = reader.ReadInt32();
-			OnV9Changed?.Invoke(_v9);
-			_v10 = reader.ReadInt32();
-			OnV10Changed?.Invoke(_v10);
-			_v12 = reader.ReadInt32();
-			OnV12Changed?.Invoke(_v12);
-			_v13 = reader.ReadInt32();
-			OnV13Changed?.Invoke(_v13);
-			_v15 = reader.ReadInt32();
-			OnV15Changed?.Invoke(_v15);
-			_uv0 = reader.ReadInt32();
-			OnUv0Changed?.Invoke(_uv0);
-			_uv1 = reader.ReadInt32();
-			OnUv1Changed?.Invoke(_uv1);
-			_uv2 = reader.ReadInt32();
-			OnUv2Changed?.Invoke(_uv2);
-			_uv4 = reader.ReadInt32();
-			OnUv4Changed?.Invoke(_uv4);
-			_uv5 = reader.ReadInt32();
-			OnUv5Changed?.Invoke(_uv5);
-			_uv6 = reader.ReadInt32();
-			OnUv6Changed?.Invoke(_uv6);
-			_uv7 = reader.ReadInt32();
-			OnUv7Changed?.Invoke(_uv7);
-			_uv8 = reader.ReadInt32();
-			OnUv8Changed?.Invoke(_uv8);
-			_uv9 = reader.ReadInt32();
-			OnUv9Changed?.Invoke(_uv9);
-			_uv10 = reader.ReadInt32();
-			OnUv10Changed?.Invoke(_uv10);
-			_uv12 = reader.ReadInt32();
-			OnUv12Changed?.Invoke(_uv12);
-			_uv13 = reader.ReadInt32();
-			OnUv13Changed?.Invoke(_uv13);
-			_uv15 = reader.ReadInt32();
-			OnUv15Changed?.Invoke(_uv15);
 		}
 	}
 }

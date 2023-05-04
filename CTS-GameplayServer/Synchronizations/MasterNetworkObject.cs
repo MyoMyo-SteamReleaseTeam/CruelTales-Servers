@@ -20,8 +20,6 @@ namespace CTS.Instance.Synchronizations
 		public abstract void SerializeSyncReliable(PacketWriter writer);
 		public abstract void SerializeSyncUnreliable(PacketWriter writer);
 		public abstract void SerializeEveryProperty(PacketWriter writer);
-		public abstract void IgnoreSyncReliable(PacketReader reader);
-		public abstract void IgnoreSyncUnreliable(PacketReader reader);
 		public abstract void DeserializeSyncReliable(PacketReader reader);
 		public abstract void DeserializeEveryProperty(PacketReader reader);
 		public abstract void DeserializeSyncUnreliable(PacketReader reader);

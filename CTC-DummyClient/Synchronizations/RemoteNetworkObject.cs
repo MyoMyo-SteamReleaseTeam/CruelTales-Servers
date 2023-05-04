@@ -23,8 +23,6 @@ namespace CTC.Networks.Synchronizations
 		public abstract void DeserializeSyncReliable(PacketReader reader);
 		public abstract void DeserializeEveryProperty(PacketReader reader);
 		public abstract void DeserializeSyncUnreliable(PacketReader reader);
-		public abstract void IgnoreSyncReliable(PacketReader reader);
-		public abstract void IgnoreSyncUnreliable(PacketReader reader);
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 	}

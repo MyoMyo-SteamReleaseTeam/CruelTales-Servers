@@ -54,7 +54,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
-		public void IgnoreSyncReliable(PacketReader reader)
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
+			_testInt = reader.ReadInt32();
+			OnTestIntChanged?.Invoke(_testInt);
+		}
+		public static void IgnoreSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -70,12 +75,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public void IgnoreSyncUnreliable(PacketReader reader) { }
-		public void DeserializeEveryProperty(PacketReader reader)
-		{
-			_testInt = reader.ReadInt32();
-			OnTestIntChanged?.Invoke(_testInt);
-		}
+		public static void IgnoreSyncUnreliable(PacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

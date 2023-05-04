@@ -256,7 +256,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string Remote_IgnoreSync()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclaration, _modifier, _syncType));
+			sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclaration, _syncType));
 
 			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();

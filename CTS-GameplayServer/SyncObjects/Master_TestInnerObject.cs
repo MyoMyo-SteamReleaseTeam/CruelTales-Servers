@@ -83,9 +83,9 @@ namespace CTS.Instance.SyncObjects
 		}
 		public void DeserializeSyncReliable(PacketReader reader) { }
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
-		public void IgnoreSyncReliable(PacketReader reader) { }
-		public void IgnoreSyncUnreliable(PacketReader reader) { }
 		public void DeserializeEveryProperty(PacketReader reader) { }
+		public static void IgnoreSyncReliable(PacketReader reader) { }
+		public static void IgnoreSyncUnreliable(PacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

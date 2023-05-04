@@ -172,7 +172,14 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void IgnoreSyncReliable(PacketReader reader)
+		public override void DeserializeEveryProperty(PacketReader reader)
+		{
+			_userToken.Deserialize(reader);
+			OnUserTokenChanged?.Invoke(_userToken);
+			_floatValue = reader.ReadSingle();
+			OnFloatValueChanged?.Invoke(_floatValue);
+		}
+		public static void IgnoreSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -184,7 +191,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(1);
 			}
 		}
-		public override void IgnoreSyncUnreliable(PacketReader reader)
+		public static void IgnoreSyncUnreliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyUnreliable_0[0])
@@ -199,13 +206,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					NetString.Ignore(reader);
 				}
 			}
-		}
-		public override void DeserializeEveryProperty(PacketReader reader)
-		{
-			_userToken.Deserialize(reader);
-			OnUserTokenChanged?.Invoke(_userToken);
-			_floatValue = reader.ReadSingle();
-			OnFloatValueChanged?.Invoke(_floatValue);
 		}
 	}
 }

@@ -198,14 +198,14 @@ namespace CTS.Instance.SyncObjects
 			writer.Put((byte)_enumType);
 			_valueTypeTransform.Serialize(writer);
 			_stringValue.Serialize(writer);
-			_syncObjectBothSide.SerializeSyncEveryProperty(writer);
-			_syncObjectReliable.SerializeSyncEveryProperty(writer);
+			_syncObjectBothSide.SerializeEveryProperty(writer);
+			_syncObjectReliable.SerializeEveryProperty(writer);
 		}
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
-		public override void IgnoreSyncReliable(PacketReader reader) { }
-		public override void IgnoreSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader) { }
+		public static void IgnoreSyncReliable(PacketReader reader) { }
+		public static void IgnoreSyncUnreliable(PacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

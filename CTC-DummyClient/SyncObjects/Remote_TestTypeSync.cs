@@ -85,12 +85,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (_dirtyReliable_0[5])
 			{
-				_syncObjectBothSide.DeserializeSyncReliable(reader);
+				_syncObjectBothSide.DeserializeReliable(reader);
 				OnSyncObjectBothSideChanged?.Invoke(_syncObjectBothSide);
 			}
 			if (_dirtyReliable_0[6])
 			{
-				_syncObjectReliable.DeserializeSyncReliable(reader);
+				_syncObjectReliable.DeserializeReliable(reader);
 				OnSyncObjectReliableChanged?.Invoke(_syncObjectReliable);
 			}
 			if (_dirtyReliable_0[7])
@@ -107,7 +107,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyUnreliable_0[0])
 			{
-				_syncObjectBothSide.DeserializeSyncUnreliable(reader);
+				_syncObjectBothSide.DeserializeUnreliable(reader);
 				OnSyncObjectBothSideChanged?.Invoke(_syncObjectBothSide);
 			}
 			if (_dirtyUnreliable_0[1])
@@ -121,7 +121,24 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void IgnoreSyncReliable(PacketReader reader)
+		public override void DeserializeEveryProperty(PacketReader reader)
+		{
+			_valueTypeUserToken.Deserialize(reader);
+			OnValueTypeUserTokenChanged?.Invoke(_valueTypeUserToken);
+			_primitiveType = reader.ReadSingle();
+			OnPrimitiveTypeChanged?.Invoke(_primitiveType);
+			_enumType = (NetEntityType)reader.ReadByte();
+			OnEnumTypeChanged?.Invoke(_enumType);
+			_valueTypeTransform.Deserialize(reader);
+			OnValueTypeTransformChanged?.Invoke(_valueTypeTransform);
+			_stringValue.Deserialize(reader);
+			OnStringValueChanged?.Invoke(_stringValue);
+			_syncObjectBothSide.DeserializeNone(reader);
+			OnSyncObjectBothSideChanged?.Invoke(_syncObjectBothSide);
+			_syncObjectReliable.DeserializeNone(reader);
+			OnSyncObjectReliableChanged?.Invoke(_syncObjectReliable);
+		}
+		public static void IgnoreSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -157,7 +174,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(1);
 			}
 		}
-		public override void IgnoreSyncUnreliable(PacketReader reader)
+		public static void IgnoreSyncUnreliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyUnreliable_0[0])
@@ -172,23 +189,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					NetString.Ignore(reader);
 				}
 			}
-		}
-		public override void DeserializeEveryProperty(PacketReader reader)
-		{
-			_valueTypeUserToken.Deserialize(reader);
-			OnValueTypeUserTokenChanged?.Invoke(_valueTypeUserToken);
-			_primitiveType = reader.ReadSingle();
-			OnPrimitiveTypeChanged?.Invoke(_primitiveType);
-			_enumType = (NetEntityType)reader.ReadByte();
-			OnEnumTypeChanged?.Invoke(_enumType);
-			_valueTypeTransform.Deserialize(reader);
-			OnValueTypeTransformChanged?.Invoke(_valueTypeTransform);
-			_stringValue.Deserialize(reader);
-			OnStringValueChanged?.Invoke(_stringValue);
-			_syncObjectBothSide.DeserializeSyncNone(reader);
-			OnSyncObjectBothSideChanged?.Invoke(_syncObjectBothSide);
-			_syncObjectReliable.DeserializeSyncNone(reader);
-			OnSyncObjectReliableChanged?.Invoke(_syncObjectReliable);
 		}
 	}
 }

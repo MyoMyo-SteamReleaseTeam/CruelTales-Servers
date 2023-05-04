@@ -145,7 +145,10 @@ public partial class {0} : {1}
 		/// </summary>
 		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(PacketReader reader)";
 
-		public static string IgnoreSyncFunctionDeclaration => @"public {0}void IgnoreSync{1}(PacketReader reader)";
+		/// <summary>
+		/// {0} SyncType<br/>
+		/// </summary>
+		public static string IgnoreSyncFunctionDeclaration => @"public static void IgnoreSync{0}(PacketReader reader)";
 
 		public static string EntireFunctionSuffix => "EveryProperty";
 
@@ -378,7 +381,14 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
+		public static string WriteSyncObjectEntire => @"{0}.Serialize{1}(writer);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
 		public static string WriteSyncObject => @"{0}.SerializeSync{1}(writer);";
+
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// {1} CLR type name<br/>
@@ -401,7 +411,7 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} Read function name<br/>
 		/// </summary>
-		public static string ReadSyncObject => @"{0}.DeserializeSync{1}(reader);";
+		public static string ReadSyncObject => @"{0}.Deserialize{1}(reader);";
 
 		/// <summary>
 		/// {0} Public property name<br/>

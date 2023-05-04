@@ -27,7 +27,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			if (syncType == SyncType.None)
 			{
-				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, SyncGroupFormat.EntireFunctionSuffix);
+				return string.Format(MemberFormat.WriteSyncObjectEntire,
+									 _privateMemberName,
+									 SyncGroupFormat.EntireFunctionSuffix);
 			}
 			return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 		}
