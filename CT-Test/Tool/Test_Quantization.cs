@@ -65,5 +65,40 @@ namespace CT.Test.Tool
 			Console.WriteLine($"{name} : " + vec2);
 			Console.WriteLine($"{name} : " + angle);
 		}
+
+		[TestMethod]
+		public void BoundaryTest()
+		{
+			var maxbytes = new byte[2];
+			var minbytes = new byte[2];
+
+			short maxPos = short.MaxValue;
+			short minPos = short.MinValue;
+
+			maxPos = 1;
+			minPos = -1;
+
+			maxbytes = BitConverter.GetBytes(maxPos);
+			minbytes = BitConverter.GetBytes(minPos);
+
+			maxPos /= 2;
+			minPos /= 2;
+			maxbytes = BitConverter.GetBytes(maxPos);
+			minbytes = BitConverter.GetBytes(minPos);
+
+			maxPos /= 2;
+			minPos /= 2;
+			maxbytes = BitConverter.GetBytes(maxPos);
+			minbytes = BitConverter.GetBytes(minPos);
+
+			maxPos /= 2;
+			minPos /= 2;
+			maxbytes = BitConverter.GetBytes(maxPos);
+			minbytes = BitConverter.GetBytes(minPos);
+
+			short test = -32768;
+			test = (short)(test >> 1);
+			var testBytes = BitConverter.GetBytes(test);
+		}
 	}
 }
