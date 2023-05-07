@@ -26,6 +26,7 @@ namespace CT.Common.DataType.Input
 		public int SerializeSize => sizeof(byte);
 		public void Serialize(PacketWriter writer) => writer.Put(Direction);
 		public void Deserialize(PacketReader reader) => Direction = reader.ReadByte();
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 
 	public struct InputMovementData : IPacketSerializable
@@ -45,6 +46,12 @@ namespace CT.Common.DataType.Input
 		{
 			MovementType = reader.ReadMovementType();
 			Direction = reader.Read<ByteDirection>();
+		}
+
+		public static void Ignore(PacketReader reader)
+		{
+			reader.Ignore(sizeof(MovementType));
+			ByteDirection.Ignore(reader);
 		}
 	}
 

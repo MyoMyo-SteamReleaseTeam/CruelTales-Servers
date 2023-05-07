@@ -59,7 +59,7 @@ namespace CT.Common.DataType
 			Z = reader.ReadSingle();
 		}
 
-		public void Ignore(PacketReader reader) => reader.Ignore(sizeof(float));
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(float));
 	}
 
 	[Serializable]

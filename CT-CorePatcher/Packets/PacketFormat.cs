@@ -41,6 +41,7 @@ namespace {1}
 		/// {4} SerializeSize<br/>
 		/// {5} SerializeFunction<br/>
 		/// {6} DeserializeFuntion<br/>
+		/// {7} IgnoreFunction<br/>
 		/// </summary>
 		public static readonly string DataTypeDefinition =
 @"public {0} {1} : {2}
@@ -52,6 +53,8 @@ namespace {1}
 {5}
 
 {6}
+
+{7}
 }}";
 
 		/// <summary>
@@ -171,6 +174,8 @@ namespace {1}
 {{
 {3}
 }}";
+
+		public static readonly string IgnoreFunction = @"public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();";
 
 		/// <summary>
 		/// {0} Member name<br/>

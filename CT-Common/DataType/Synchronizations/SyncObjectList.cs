@@ -224,5 +224,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void ClearDirtyUnreliable() => throw _exception;
 		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
+		public static void IgnoreSyncReliable(PacketReader reader) => throw _exception;
+		public static void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
 	}
 }

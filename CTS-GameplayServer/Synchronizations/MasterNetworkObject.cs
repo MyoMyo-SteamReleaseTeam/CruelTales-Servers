@@ -25,5 +25,7 @@ namespace CTS.Instance.Synchronizations
 		public abstract void DeserializeSyncUnreliable(PacketReader reader);
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
+		public static void IgnoreSyncReliable(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreSyncUnreliable(PacketReader reader) => throw new System.NotImplementedException();
 	}
 }

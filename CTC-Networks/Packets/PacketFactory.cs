@@ -24,8 +24,6 @@ namespace CTC.Networks.Packets
 			{ PacketType.CS_Req_TryEnterGameInstance, () => new CS_Req_TryEnterGameInstance() },
 			{ PacketType.SC_Ack_TryEnterGameInstance, () => new SC_Ack_TryEnterGameInstance() },
 			{ PacketType.CS_Req_ReadyToSync, () => new CS_Req_ReadyToSync() },
-			{ PacketType.CS_Req_UserInput_Movement, () => new CS_Req_UserInput_Movement() },
-			{ PacketType.CS_Req_UserInput_Action, () => new CS_Req_UserInput_Action() },
 			
 		};
 
@@ -34,8 +32,6 @@ namespace CTC.Networks.Packets
 			{ typeof(CS_Req_TryEnterGameInstance), () => new CS_Req_TryEnterGameInstance() },
 			{ typeof(SC_Ack_TryEnterGameInstance), () => new SC_Ack_TryEnterGameInstance() },
 			{ typeof(CS_Req_ReadyToSync), () => new CS_Req_ReadyToSync() },
-			{ typeof(CS_Req_UserInput_Movement), () => new CS_Req_UserInput_Movement() },
-			{ typeof(CS_Req_UserInput_Action), () => new CS_Req_UserInput_Action() },
 			
 		};
 
@@ -44,8 +40,6 @@ namespace CTC.Networks.Packets
 			{ typeof(CS_Req_TryEnterGameInstance), PacketType.CS_Req_TryEnterGameInstance },
 			{ typeof(SC_Ack_TryEnterGameInstance), PacketType.SC_Ack_TryEnterGameInstance },
 			{ typeof(CS_Req_ReadyToSync), PacketType.CS_Req_ReadyToSync },
-			{ typeof(CS_Req_UserInput_Movement), PacketType.CS_Req_UserInput_Movement },
-			{ typeof(CS_Req_UserInput_Action), PacketType.CS_Req_UserInput_Action },
 			
 		};
 

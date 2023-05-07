@@ -7,13 +7,12 @@
 	<using>CT.Packets</using>
 	<using>CT.Common.DataType</using>
 	<using>CT.Common.Serialization</using>
-	<using>CT.Common.Serialization.Type</using>
 	
 	<!-- Declare Data Types -->
-	<class name="UserProfile">
+	<struct name="UserProfile">
 		<NetStringShort name="Username"/>
 		<NetStringShort name="Clothes"/>
-	</class>
+	</struct>
 	
 	<!-- Declare Packets -->
 	

@@ -24,20 +24,14 @@ namespace CT.Common.Tools.Collections
 		/// <summary>Byte수 만큼 비트 마스크를 생성합니다.</summary>
 		/// <param name="memoryStride1D">차지할 메모리 공간의 byte수 입니다. Size = byte * 8</param>
 		/// <param name="value">초기화 할 값</param>
-		public BitmaskByte(bool value = false)
-		{
-			Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
-		}
+		public BitmaskByte(bool value = false) => Mask = value ? ALL_BIT_SET : ALL_BIT_UNSET;
 
 		/// <summary>해당 비트를 참조합니다.</summary>
 		/// <param name="x">bitmask 인덱스</param>
 		/// <returns>값</returns>
 		public bool this[int index]
 		{
-			get
-			{
-				return (Mask & 1 << index) != 0;
-			}
+			get => (Mask & 1 << index) != 0;
 			set
 			{
 				if (value)
@@ -83,20 +77,13 @@ namespace CT.Common.Tools.Collections
 		/// <returns>유효한 인덱스라면 true를 반환합니다.</returns>
 		public bool IsValidIndex(int index) => !(index >= BIT_SIZE || index < 0);
 
-		public override string ToString()
-		{
-			return $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
-		}
+		public override string ToString() => $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
 
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(Mask);
-		}
+		public void Serialize(PacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(PacketReader reader)
-		{
-			Mask = reader.ReadByte();
-		}
+		public void Deserialize(PacketReader reader) => Mask = reader.ReadByte();
+
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 
 	public struct Bitmask32 : IPacketSerializable
@@ -173,20 +160,13 @@ namespace CT.Common.Tools.Collections
 		/// <returns>유효한 인덱스라면 true를 반환합니다.</returns>
 		public bool IsValidIndex(int index) => !(index >= BIT_SIZE || index < 0);
 
-		public override string ToString()
-		{
-			return $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
-		}
+		public override string ToString() => $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
 
-		public void Serialize(PacketWriter writer)
-		{
-			writer.Put(Mask);
-		}
+		public void Serialize(PacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(PacketReader reader)
-		{
-			Mask = reader.ReadUInt32();
-		}
+		public void Deserialize(PacketReader reader) => Mask = reader.ReadUInt32();
+
+		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(uint));
 	}
 
 	public static class BitmaskExtension

@@ -7,7 +7,6 @@
 	<using>CT.Packets</using>
 	<using>CT.Common.DataType</using>
 	<using>CT.Common.Serialization</using>
-	<using>CT.Common.Serialization.Type</using>
 
 	<!-- Declare Data Types -->
 	

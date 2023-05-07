@@ -58,6 +58,15 @@ namespace CT.Common.DataType
 			}
 		}
 
+		public static void Ignore(PacketReader reader)
+		{
+			int count = reader.ReadByte();
+			for (int i = 0; i < count; i++)
+			{
+				T.Ignore(reader);
+			}
+		}
+
 		public int Count
 		{
 			get
@@ -136,6 +145,15 @@ namespace CT.Common.DataType
 				T element = new T();
 				reader.ReadTo(element);
 				_array.Add(element);
+			}
+		}
+
+		public static void Ignore(PacketReader reader)
+		{
+			int count = reader.ReadByte();
+			for (int i = 0; i < count; i++)
+			{
+				T.Ignore(reader);
 			}
 		}
 

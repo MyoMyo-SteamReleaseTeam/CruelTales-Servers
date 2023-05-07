@@ -10,5 +10,6 @@
 		public int SerializeSize { get; }
 		public void Serialize(PacketWriter writer);
 		public void Deserialize(PacketReader reader);
+		public abstract static void Ignore(PacketReader reader);
 	}
 }

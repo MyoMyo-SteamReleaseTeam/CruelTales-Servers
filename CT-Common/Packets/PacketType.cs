@@ -16,7 +16,5 @@ namespace CT.Packets
 		SC_Sync_LifeCycle,
 		SC_Sync_Reliable,
 		SC_Sync_Unreliable,
-		CS_Req_UserInput_Movement,
-		CS_Req_UserInput_Action,
 	}
 }

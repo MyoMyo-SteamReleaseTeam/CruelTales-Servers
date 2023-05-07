@@ -62,5 +62,8 @@ namespace CT.Common.Synchronizations
 		/// 비신뢰성 Dirty Bits를 초기화합니다.
 		/// </summary>
 		public void ClearDirtyUnreliable();
+
+		public abstract static void IgnoreSyncReliable(PacketReader reader);
+		public abstract static void IgnoreSyncUnreliable(PacketReader reader);
 	}
 }

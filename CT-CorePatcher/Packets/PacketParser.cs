@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Xml;
 using CT.Common.Serialization;
@@ -473,7 +474,8 @@ namespace CT.CorePatcher.Packets
 										combineContent,
 										sizeExpression,
 										serializeFunction,
-										deserializeFunction);
+										deserializeFunction,
+										addIndent(PacketFormat.IgnoreFunction));
 			}
 
 			return className;

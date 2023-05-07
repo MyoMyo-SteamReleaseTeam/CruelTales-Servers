@@ -10,10 +10,10 @@ using CT.Common.Serialization;
 
 namespace CT.Packets
 {
-	public sealed partial class UserProfile : IPacketSerializable
+	public partial struct UserProfile : IPacketSerializable
 	{
-		public NetStringShort Username = new();
-		public NetStringShort Clothes = new();
+		public NetStringShort Username;
+		public NetStringShort Clothes;
 	
 		public int SerializeSize => Username.SerializeSize + Clothes.SerializeSize;
 	
@@ -28,6 +28,8 @@ namespace CT.Packets
 			Username.Deserialize(reader);
 			Clothes.Deserialize(reader);
 		}
+	
+		public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();
 	}
 	
 	public sealed partial class CS_Req_TryEnterGameInstance : PacketBase

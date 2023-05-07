@@ -135,21 +135,9 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeEveryProperty(PacketReader reader)
-		{
-			byte count = reader.ReadByte();
-			for (int i = 0; i < count; i++)
-			{
-				T item = new();
-				item.Deserialize(reader);
-				_list.Add(item);
-			}
-		}
-
 		public void SerializeSyncReliable(PacketWriter writer)
 		{
 			writer.Put((byte)_operationStack.Count);
-
 			byte operationCount = (byte)_operationStack.Count;
 			if (operationCount > 0)
 			{
@@ -189,10 +177,20 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
+			byte count = reader.ReadByte();
+			for (int i = 0; i < count; i++)
+			{
+				T item = new();
+				item.Deserialize(reader);
+				_list.Add(item);
+			}
+		}
+
 		public void DeserializeSyncReliable(PacketReader reader)
 		{
 			byte operationCount = reader.ReadByte();
-
 			for (int i = 0; i < operationCount; i++)
 			{
 				var operation = (CollectionOperationType)reader.ReadByte();
@@ -232,13 +230,47 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
-		public bool IsDirtyUnreliable => throw _exception;
+		public static void IgnoreSyncReliable(PacketReader reader)
+		{
+			byte operationCount = reader.ReadByte();
+			for (int i = 0; i < operationCount; i++)
+			{
+				var operation = (CollectionOperationType)reader.ReadByte();
+				switch (operation)
+				{
+					case CollectionOperationType.Clear:
+						break;
+
+					case CollectionOperationType.Add:
+						T.Ignore(reader);
+						break;
+
+					case CollectionOperationType.Remove:
+						reader.Ignore(sizeof(byte));
+						break;
+
+					case CollectionOperationType.Change:
+						reader.Ignore(sizeof(byte));
+						break;
+
+					case CollectionOperationType.Insert:
+						reader.Ignore(sizeof(byte));
+						T.Ignore(reader);
+						break;
+
+					default:
+						Debug.Assert(false);
+						break;
+				}
+			}
+		}
 
 		public bool IsReadOnly => throw new NotImplementedException();
-
+		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
+		public bool IsDirtyUnreliable => throw _exception;
 		public void ClearDirtyUnreliable() => throw _exception;
 		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
+		public static void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
 	}
 }
