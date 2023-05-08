@@ -100,11 +100,13 @@ namespace CT.Common.DataType
 			value = reader.ReadNetString();
 		}
 
-		public static void Ignore(PacketReader reader)
+		public static void IgnoreStatic(PacketReader reader)
 		{
 			ushort count = reader.ReadUInt16();
 			reader.Ignore(count);
 		}
+
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
 	}
 
 	/// <summary>256이하 길이의 string 입니다.</summary>
@@ -199,7 +201,9 @@ namespace CT.Common.DataType
 			value = reader.ReadNetStringShort();
 		}
 
-		public static void Ignore(PacketReader reader)
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+
+		public static void IgnoreStatic(PacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			reader.Ignore(count);

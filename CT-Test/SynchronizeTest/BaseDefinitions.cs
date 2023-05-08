@@ -22,4 +22,14 @@ public abstract class RemoteNetworkObject : ISynchronizable
 	public abstract void SerializeEveryProperty(PacketWriter writer);
 	public abstract void ClearDirtyReliable();
 	public abstract void ClearDirtyUnreliable();
+
+	public static void IgnoreSyncReliable(PacketReader reader)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public static void IgnoreSyncUnreliable(PacketReader reader)
+	{
+		throw new System.NotImplementedException();
+	}
 }

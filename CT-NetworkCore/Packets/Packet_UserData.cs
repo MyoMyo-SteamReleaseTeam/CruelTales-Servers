@@ -32,7 +32,8 @@ namespace CT.Packets
 			UserCostume.Deserialize(reader);
 		}
 	
-		public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
 	}
 	
 	public partial struct DokzaCostume : IPacketSerializable
@@ -54,6 +55,7 @@ namespace CT.Packets
 			Body = reader.ReadInt32();
 		}
 	
-		public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
 	}
 }

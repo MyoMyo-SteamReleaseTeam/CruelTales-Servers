@@ -175,7 +175,9 @@ namespace {1}
 {3}
 }}";
 
-		public static readonly string IgnoreFunction = @"public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();";
+		public static readonly string IgnoreFunction =
+@"public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
+public void Ignore(PacketReader reader) => throw new System.NotImplementedException();";
 
 		/// <summary>
 		/// {0} Member name<br/>

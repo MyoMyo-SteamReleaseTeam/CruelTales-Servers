@@ -9,7 +9,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Synchronizations;";
@@ -19,7 +18,6 @@ using CTS.Instance.Synchronizations;";
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
-using CT.Common.Serialization.Type;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTC.Networks.Synchronizations;";
@@ -439,7 +437,7 @@ public event Action<{1}>? On{3}Changed;";
 		/// <summary>
 		/// {0} Value type name<br/>
 		/// </summary>
-		public static string IgnoreValueType => @"{0}.Ignore(reader);";
+		public static string IgnoreValueType => @"{0}.IgnoreStatic(reader);";
 
 		/// <summary>
 		/// {0} Private member name<br/>

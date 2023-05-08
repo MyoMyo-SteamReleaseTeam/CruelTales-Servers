@@ -22,11 +22,12 @@ namespace CTS.Instance.SyncObjects
 	public partial class NetworkPlayer : ISynchronizable
 	{
 		[SyncVar]
-		private UserId _userId = new();
-		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncVar]
 		private int _costume;
+		[SyncVar(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		private UserId _userId = new();
+		public event Action<UserId>? OnUserIdChanged;
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{
@@ -38,16 +39,6 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 		public bool IsDirtyUnreliable => false;
-		public UserId UserId
-		{
-			get => _userId;
-			set
-			{
-				if (_userId == value) return;
-				_userId = value;
-				_dirtyReliable_0[0] = true;
-			}
-		}
 		public NetStringShort Username
 		{
 			get => _username;
@@ -55,7 +46,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_username == value) return;
 				_username = value;
-				_dirtyReliable_0[1] = true;
+				_dirtyReliable_0[0] = true;
 			}
 		}
 		public int Costume
@@ -65,7 +56,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_costume == value) return;
 				_costume = value;
-				_dirtyReliable_0[2] = true;
+				_dirtyReliable_0[1] = true;
 			}
 		}
 		public void ClearDirtyReliable()
@@ -78,13 +69,9 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
-				_userId.Serialize(writer);
-			}
-			if (_dirtyReliable_0[1])
-			{
 				_username.Serialize(writer);
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[1])
 			{
 				writer.Put(_costume);
 			}
@@ -92,15 +79,33 @@ namespace CTS.Instance.SyncObjects
 		public void SerializeSyncUnreliable(PacketWriter writer) { }
 		public void SerializeEveryProperty(PacketWriter writer)
 		{
-			_userId.Serialize(writer);
 			_username.Serialize(writer);
 			writer.Put(_costume);
 		}
 		public void DeserializeSyncReliable(PacketReader reader) { }
-		public void DeserializeSyncUnreliable(PacketReader reader) { }
-		public void DeserializeEveryProperty(PacketReader reader) { }
+		public void DeserializeSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				_userId.Deserialize(reader);
+				OnUserIdChanged?.Invoke(_userId);
+			}
+		}
+		public void DeserializeEveryProperty(PacketReader reader)
+		{
+			_userId.Deserialize(reader);
+			OnUserIdChanged?.Invoke(_userId);
+		}
 		public static void IgnoreSyncReliable(PacketReader reader) { }
-		public static void IgnoreSyncUnreliable(PacketReader reader) { }
+		public static void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				UserId.IgnoreStatic(reader);
+			}
+		}
 	}
 }
 #pragma warning restore CS0649

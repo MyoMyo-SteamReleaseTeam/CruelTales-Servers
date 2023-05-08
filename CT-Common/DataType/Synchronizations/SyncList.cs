@@ -230,7 +230,11 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
+#if NET
 		public static void IgnoreSyncReliable(PacketReader reader)
+#else
+		public void IgnoreSyncReliable(PacketReader reader)
+#endif
 		{
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
@@ -242,7 +246,7 @@ namespace CT.Common.DataType.Synchronizations
 						break;
 
 					case CollectionOperationType.Add:
-						T.Ignore(reader);
+						ignoreElement(reader);
 						break;
 
 					case CollectionOperationType.Remove:
@@ -254,8 +258,7 @@ namespace CT.Common.DataType.Synchronizations
 						break;
 
 					case CollectionOperationType.Insert:
-						reader.Ignore(sizeof(byte));
-						T.Ignore(reader);
+						ignoreElement(reader);
 						break;
 
 					default:
@@ -271,6 +274,19 @@ namespace CT.Common.DataType.Synchronizations
 		public void ClearDirtyUnreliable() => throw _exception;
 		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
+#if NET
 		public static void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
+#else
+		public void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
+#endif
+		private static void ignoreElement(PacketReader reader)
+		{
+#if NET
+			T.IgnoreStatic(reader);
+#else
+			T temp = new();
+			temp.Ignore(reader);
+#endif
+		}
 	}
 }

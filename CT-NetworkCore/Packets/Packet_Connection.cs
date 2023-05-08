@@ -29,7 +29,8 @@ namespace CT.Packets
 			Clothes.Deserialize(reader);
 		}
 	
-		public static void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
 	}
 	
 	public sealed partial class CS_Req_TryEnterGameInstance : PacketBase

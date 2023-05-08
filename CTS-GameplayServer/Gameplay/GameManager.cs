@@ -6,7 +6,6 @@ using CT.Common.Serialization;
 using CT.Packets;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
-using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Gameplay
 {

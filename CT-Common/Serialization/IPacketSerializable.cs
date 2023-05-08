@@ -10,6 +10,9 @@
 		public int SerializeSize { get; }
 		public void Serialize(PacketWriter writer);
 		public void Deserialize(PacketReader reader);
-		public abstract static void Ignore(PacketReader reader);
+		public void Ignore(PacketReader reader);
+#if NET
+		public abstract static void IgnoreStatic(PacketReader reader);
+#endif
 	}
 }

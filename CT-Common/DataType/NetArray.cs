@@ -58,12 +58,18 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public static void Ignore(PacketReader reader)
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader)
 		{
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
-				T.Ignore(reader);
+#if NET
+				T.IgnoreStatic(reader);
+#else
+				T temp = new();
+				temp.Ignore(reader);
+#endif
 			}
 		}
 
@@ -148,12 +154,18 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public static void Ignore(PacketReader reader)
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader)
 		{
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
-				T.Ignore(reader);
+#if NET
+				T.IgnoreStatic(reader);
+#else
+				T temp = new();
+				temp.Ignore(reader);
+#endif
 			}
 		}
 

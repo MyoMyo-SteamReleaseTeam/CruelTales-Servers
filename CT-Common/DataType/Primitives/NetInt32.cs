@@ -17,6 +17,7 @@ namespace CT.Common.DataType.Primitives
 		public void Deserialize(PacketReader reader) => _value = reader.ReadInt32();
 		public int CompareTo(int other) => _value.CompareTo(other);
 		public bool Equals(NetInt32 other) => _value == other._value;
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(int));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(int));
 	}
 }

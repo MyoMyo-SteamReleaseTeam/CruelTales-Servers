@@ -29,6 +29,7 @@ namespace CT.Common.DataType
 		}
 
 		public override string ToString() => Guid.ToString();
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(ulong));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(ulong));
 	}
 }

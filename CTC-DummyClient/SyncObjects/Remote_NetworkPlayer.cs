@@ -21,36 +21,62 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	[Serializable]
 	public partial class NetworkPlayer : ISynchronizable
 	{
-		[SyncVar]
+		[SyncVar(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		private UserId _userId = new();
-		public event Action<UserId>? OnUserIdChanged;
 		[SyncVar]
 		private NetStringShort _username = new();
 		public event Action<NetStringShort>? OnUsernameChanged;
 		[SyncVar]
 		private int _costume;
 		public event Action<int>? OnCostumeChanged;
+		private BitmaskByte _dirtyUnreliable_0 = new();
 		public bool IsDirtyReliable => false;
-		public bool IsDirtyUnreliable => false;
+		public bool IsDirtyUnreliable
+		{
+			get
+			{
+				bool isDirty = false;
+				isDirty |= _dirtyUnreliable_0.AnyTrue();
+				return isDirty;
+			}
+		}
+		public UserId UserId
+		{
+			get => _userId;
+			set
+			{
+				if (_userId == value) return;
+				_userId = value;
+				_dirtyUnreliable_0[0] = true;
+			}
+		}
 		public void ClearDirtyReliable() { }
-		public void ClearDirtyUnreliable() { }
+		public void ClearDirtyUnreliable()
+		{
+			_dirtyUnreliable_0.Clear();
+		}
 		public void SerializeSyncReliable(PacketWriter writer) { }
-		public void SerializeSyncUnreliable(PacketWriter writer) { }
-		public void SerializeEveryProperty(PacketWriter writer) { }
+		public void SerializeSyncUnreliable(PacketWriter writer)
+		{
+			_dirtyUnreliable_0.Serialize(writer);
+			if (_dirtyUnreliable_0[0])
+			{
+				_userId.Serialize(writer);
+			}
+		}
+		public void SerializeEveryProperty(PacketWriter writer)
+		{
+			_userId.Serialize(writer);
+		}
 		public void DeserializeSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
-				_userId.Deserialize(reader);
-				OnUserIdChanged?.Invoke(_userId);
-			}
-			if (_dirtyReliable_0[1])
-			{
 				_username.Deserialize(reader);
 				OnUsernameChanged?.Invoke(_username);
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[1])
 			{
 				_costume = reader.ReadInt32();
 				OnCostumeChanged?.Invoke(_costume);
@@ -59,8 +85,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public void DeserializeSyncUnreliable(PacketReader reader) { }
 		public void DeserializeEveryProperty(PacketReader reader)
 		{
-			_userId.Deserialize(reader);
-			OnUserIdChanged?.Invoke(_userId);
 			_username.Deserialize(reader);
 			OnUsernameChanged?.Invoke(_username);
 			_costume = reader.ReadInt32();
@@ -71,13 +95,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
-				UserId.Ignore(reader);
+				NetStringShort.IgnoreStatic(reader);
 			}
 			if (_dirtyReliable_0[1])
-			{
-				NetStringShort.Ignore(reader);
-			}
-			if (_dirtyReliable_0[2])
 			{
 				reader.Ignore(4);
 			}

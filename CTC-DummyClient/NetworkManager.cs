@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Packets;
 using CTC.Networks.Packets;
 using CTC.Networks.Synchronizations;
-using CTC.Networks.SyncObjects.TestSyncObjects;
 using LiteNetLib;
 using log4net;
 
@@ -26,16 +24,16 @@ namespace CTC.Networks
 
 		public void OnSyncInitialize(PacketReader reader)
 		{
-			while (reader.CanRead(1))
-			{
-				var type = reader.ReadNetworkObjectType();
-				NetworkIdentity id = new NetworkIdentity();
-				id.Deserialize(reader);
-				Test_MovingCube cube = new();
-				cube.OnCreated(id);
-				cube.DeserializeEveryProperty(reader);
-				_worldObjectById.Add(id, cube);
-			}
+			//while (reader.CanRead(1))
+			//{
+			//	var type = reader.ReadNetworkObjectType();
+			//	NetworkIdentity id = new NetworkIdentity();
+			//	id.Deserialize(reader);
+			//	Test_MovingCube cube = new();
+			//	cube.OnCreated(id);
+			//	cube.DeserializeEveryProperty(reader);
+			//	_worldObjectById.Add(id, cube);
+			//}
 		}
 
 		public void OnDeserializeReliable(PacketReader reader)
@@ -68,18 +66,18 @@ namespace CTC.Networks
 
 		public void Update(float deltaTime)
 		{
-			_showTime += deltaTime;
-			if (_showTime > 3.0f)
-			{
-				_showTime = 0;
-				foreach (var obj in _worldObjectById.Values)
-				{
-					if (obj is Test_MovingCube cube)
-					{
-						_log.Info($"{cube.Identity} : ({cube.R},{cube.G},{cube.B})");
-					}
-				}
-			}
+			//_showTime += deltaTime;
+			//if (_showTime > 3.0f)
+			//{
+			//	_showTime = 0;
+			//	foreach (var obj in _worldObjectById.Values)
+			//	{
+			//		if (obj is Test_MovingCube cube)
+			//		{
+			//			_log.Info($"{cube.Identity} : ({cube.R},{cube.G},{cube.B})");
+			//		}
+			//	}
+			//}
 		}
 	}
 

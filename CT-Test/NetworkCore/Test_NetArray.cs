@@ -59,6 +59,16 @@ namespace CT.Test.NetworkCore
 				Name = reader.ReadNetString();
 				Age = reader.ReadInt32();
 			}
+
+			public void Ignore(PacketReader reader)
+			{
+				throw new System.NotImplementedException();
+			}
+
+			public static void IgnoreStatic(PacketReader reader)
+			{
+				throw new System.NotImplementedException();
+			}
 		}
 
 		[TestMethod]
@@ -113,6 +123,16 @@ namespace CT.Test.NetworkCore
 				Type = (TestType)reader.ReadByte();
 				Age = reader.ReadInt32();
 				Height = reader.ReadInt32();
+			}
+
+			public void Ignore(PacketReader reader)
+			{
+				throw new System.NotImplementedException();
+			}
+
+			public static void IgnoreStatic(PacketReader reader)
+			{
+				throw new System.NotImplementedException();
 			}
 		}
 

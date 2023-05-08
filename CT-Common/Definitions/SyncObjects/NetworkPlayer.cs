@@ -8,7 +8,7 @@ namespace CT.Common.Definitions.SyncObjects
 	[SyncObjectDefinition]
 	public class NetworkPlayer
 	{
-		[SyncVar]
+		[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
 		public UserId UserId;
 
 		[SyncVar]

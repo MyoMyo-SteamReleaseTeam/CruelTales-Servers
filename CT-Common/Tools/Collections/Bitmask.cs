@@ -83,7 +83,9 @@ namespace CT.Common.Tools.Collections
 
 		public void Deserialize(PacketReader reader) => Mask = reader.ReadByte();
 
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 
 	public struct Bitmask32 : IPacketSerializable
@@ -166,7 +168,9 @@ namespace CT.Common.Tools.Collections
 
 		public void Deserialize(PacketReader reader) => Mask = reader.ReadUInt32();
 
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(uint));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(uint));
 	}
 
 	public static class BitmaskExtension

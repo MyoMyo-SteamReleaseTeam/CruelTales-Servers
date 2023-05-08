@@ -33,6 +33,7 @@ namespace CT.Common.DataType
 			ID = reader.ReadByte();
 		}
 
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(byte));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 }

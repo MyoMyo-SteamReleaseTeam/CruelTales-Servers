@@ -39,7 +39,8 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"({X}, {Y})";
-		public static void Ignore(PacketReader reader) => reader.Ignore(8);
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(8);
 	}
 
 	[Serializable]
@@ -59,7 +60,8 @@ namespace CT.Common.DataType
 			Z = reader.ReadSingle();
 		}
 
-		public static void Ignore(PacketReader reader) => reader.Ignore(sizeof(float));
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(float));
 	}
 
 	[Serializable]
@@ -105,6 +107,7 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"([{nameof(Position)}:{Position}][{nameof(Velocity)}:{Velocity}])";
-		public static void Ignore(PacketReader reader) => reader.Ignore(12);
+		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(12);
 	}
 }
