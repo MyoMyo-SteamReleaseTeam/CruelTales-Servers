@@ -11,15 +11,20 @@ namespace CTC.Networks
 {
 	public class GameSynchronizer
 	{
+
 		private static readonly ILog _log = LogManager.GetLogger(typeof(GameSynchronizer));
 
 		private NetworkManager _serverSession;
 
 		private Dictionary<NetworkIdentity, RemoteNetworkObject> _worldObjectById = new();
 
+		private List<NetworkIdentity>[,] _netIdByPartition = new List<NetworkIdentity>[10, 20];
+
 		public GameSynchronizer(NetworkManager serverSession)
 		{
 			_serverSession = serverSession;
+
+
 		}
 
 		public void OnSyncInitialize(PacketReader reader)

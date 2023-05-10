@@ -1,14 +1,27 @@
 ﻿using CT.Common.DataType;
+using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
-	public abstract class MasterNetworkObject : ISynchronizable
+	public abstract class MasterNetworkObject : ISynchronizable, IUpdatable
 	{
+		public NetworkTransform Transform { get; private set; }
+
 		public NetworkIdentity Identity { get; protected set; }
 		public abstract NetworkObjectType Type { get; }
+
+		public MasterNetworkObject()
+		{
+			Transform = new NetworkTransform();
+		}
+
+		public virtual void Update(float deltaTime)
+		{
+			Transform.Update(deltaTime);
+		}
 
 		public void OnCreated(NetworkIdentity id)
 		{

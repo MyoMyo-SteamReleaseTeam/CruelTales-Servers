@@ -12,7 +12,13 @@ namespace CTS.Instance.Gameplay
 	public class GameWorldManager
 	{
 		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObjectById = new();
+		private WorldPartitioner _worldPartition;
 		private NetworkIdentity _entityIdCounter;
+
+		public GameWorldManager()
+		{
+			_worldPartition = new WorldPartitioner(12);
+		}
 
 		public void Clear()
 		{
@@ -35,7 +41,7 @@ namespace CTS.Instance.Gameplay
 
 	public class GameManager
 	{
-		private MiniGameMapData MiniGameMapData { get; set; }
+		private MiniGameMapData _miniGameMapData { get; set; }
 		private GameInstance _gameInstance;
 		private UserSessionHandler _userSessionHandler;
 
@@ -52,7 +58,7 @@ namespace CTS.Instance.Gameplay
 			_userSessionHandler = gameInstance.SessionHandler;
 
 			// Temp
-			MiniGameMapData = new()
+			_miniGameMapData = new()
 			{
 				MapType = MiniGameMapType.Map_Square_Europe,
 				Theme = MiniGameMapTheme.Europe,
@@ -75,38 +81,14 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
-			//for (int z = 0; z < 20; z++)
-			//{
-			//	for (int x = 0; x < 20; x++)
-			//	{
-			//		var netId = GetNetworkIdentityCounter();
-			//		Test_MovingCube cube = new Test_MovingCube();
-			//		cube.OnCreated(netId);
-			//		cube.X = x;
-			//		cube.Y = 5;
-			//		cube.Z = z;
-			//		cube.R = 1;
-			//		cube.G = 1;
-			//		cube.B = 1;
-			//		cube.Dest = 8;
-			//		cube.Speed = 2.5f;
-			//		_worldObject.Add(cube.Identity, cube);
-			//		cube.SetMoveTime((x * z + 1) * 0.0125f);
-			//	}
-			//}
+
 		}
 
 		float sendTime = 0;
 
 		public void Update(float deltaTime)
 		{
-			//foreach (var netObj in _worldObject.Values)
-			//{
-			//	if (netObj is Test_MovingCube cube)
-			//	{
-			//		cube.Update(deltaTime);
-			//	}
-			//}
+
 		}
 
 		public void CheckEndCondition()
