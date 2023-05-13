@@ -64,12 +64,8 @@ namespace CT.Common.DataType
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
-#if NET
-				T.IgnoreStatic(reader);
-#else
 				T temp = new();
 				temp.Ignore(reader);
-#endif
 			}
 		}
 
@@ -160,12 +156,8 @@ namespace CT.Common.DataType
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
-#if NET
-				T.IgnoreStatic(reader);
-#else
 				T temp = new();
 				temp.Ignore(reader);
-#endif
 			}
 		}
 

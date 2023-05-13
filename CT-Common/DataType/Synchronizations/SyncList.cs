@@ -274,19 +274,11 @@ namespace CT.Common.DataType.Synchronizations
 		public void ClearDirtyUnreliable() => throw _exception;
 		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
-#if NET
-		public static void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
-#else
 		public void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
-#endif
 		private static void ignoreElement(PacketReader reader)
 		{
-#if NET
-			T.IgnoreStatic(reader);
-#else
 			T temp = new();
 			temp.Ignore(reader);
-#endif
 		}
 	}
 }

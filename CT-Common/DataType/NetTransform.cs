@@ -72,7 +72,11 @@ namespace CT.Common.DataType
 		public NetVec2 Velocity;
 
 #if NET
-		public NetTransform() {}
+		public NetTransform()
+		{
+			Position = new NetVec2();
+			Velocity = new NetVec2();
+		}
 #endif
 
 		public int SerializeSize =>

@@ -11,8 +11,5 @@
 		public void Serialize(PacketWriter writer);
 		public void Deserialize(PacketReader reader);
 		public void Ignore(PacketReader reader);
-#if NET
-		public abstract static void IgnoreStatic(PacketReader reader);
-#endif
 	}
 }
