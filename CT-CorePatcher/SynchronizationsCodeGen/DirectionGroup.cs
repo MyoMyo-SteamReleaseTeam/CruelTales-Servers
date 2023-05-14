@@ -95,8 +95,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(_reliableGruop.Remote_DeserializeSync());
 			sb.AppendLine(_unreliableGruop.Remote_DeserializeSync());
 			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll());
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync());
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync());
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclaration));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclaration));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic));
 			return sb.ToString();
 		}
 	}

@@ -59,10 +59,22 @@ namespace {1}
 
 		/// <summary>
 		/// {0} Object name<br/>
+		/// {1} Content<br/>
+		/// </summary>
+		public static string SyncObjectFormat =>
+@"[Serializable]
+public partial class {0}
+{{
+{1}
+}}
+";
+
+		/// <summary>
+		/// {0} Object name<br/>
 		/// {1} Inherit type name<br/>
 		/// {2} Content<br/>
 		/// </summary>
-		public static string SyncObjectFormat =>
+		public static string SyncObjectFormatHasInherit =>
 @"[Serializable]
 public partial class {0} : {1}
 {{
@@ -146,7 +158,12 @@ public partial class {0} : {1}
 		/// <summary>
 		/// {0} SyncType<br/>
 		/// </summary>
-		public static string IgnoreSyncFunctionDeclaration => @"public static void IgnoreSync{0}(PacketReader reader)";
+		public static string IgnoreSyncFunctionDeclaration => @"public override void IgnoreSync{0}(PacketReader reader)";
+
+		/// <summary>
+		/// {0} SyncType<br/>
+		/// </summary>
+		public static string IgnoreSyncFunctionDeclarationStatic => @"public static void IgnoreSyncStatic{0}(PacketReader reader)";
 
 		public static string EntireFunctionSuffix => "EveryProperty";
 

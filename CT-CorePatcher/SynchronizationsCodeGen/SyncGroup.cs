@@ -253,13 +253,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return headers.ToString();
 		}
 
-		public string Remote_IgnoreSync()
+		public string Remote_IgnoreSync(string delcaration)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclaration, _syncType));
+			sb.Append(string.Format(delcaration, _syncType));
 
 			if (_dirtyGroups.Count == 0)
+			{
 				return sb.AppendLine(" { }").ToString();
+			}
 
 			string content;
 			if (_dirtyGroups.Count == 1)

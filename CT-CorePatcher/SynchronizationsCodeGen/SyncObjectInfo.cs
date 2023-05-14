@@ -37,8 +37,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (_isNetworkObject)
 			{
-				_masterInheritName = CommonFormat.MasterNetworkObjectTypeName;
-				_remoteInheritName = CommonFormat.RemoteNetworkObjectTypeName;
+				_masterInheritName = string.Empty; //CommonFormat.MasterNetworkObjectTypeName;
+				_remoteInheritName = string.Empty; //CommonFormat.RemoteNetworkObjectTypeName;
 			}
 
 			// Add forward direction
@@ -111,7 +111,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(backward.Gen_SerializeSyncFuntions());
 			CodeFormat.AddIndent(sb);
 
-			var content = string.Format(CommonFormat.SyncObjectFormat, _objectName, inheritName, sb.ToString());
+			string content;
+			if (string.IsNullOrWhiteSpace(inheritName))
+			{
+				content = string.Format(CommonFormat.SyncObjectFormat, _objectName, sb.ToString());
+			}
+			else
+			{
+				content = string.Format(CommonFormat.SyncObjectFormatHasInherit, _objectName, inheritName, sb.ToString());
+			}
 			CodeFormat.AddIndent(ref content);
 
 			return string.Format(CommonFormat.FileFormat, usingStatements, namespaceName, content);
