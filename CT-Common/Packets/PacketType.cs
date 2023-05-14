@@ -13,8 +13,10 @@ namespace CT.Packets
 		CS_Req_TryEnterGameInstance,
 		SC_Ack_TryEnterGameInstance,
 		CS_Req_ReadyToSync,
-		SC_Sync_LifeCycle,
-		SC_Sync_Reliable,
-		SC_Sync_Unreliable,
+		CS_Sync_RemoteUnreliable,
+		CS_Sync_RemoteReliable,
+		SC_Sync_MasterLifeCycle,
+		SC_Sync_MasterReliable,
+		SC_Sync_MasterUnreliable,
 	}
 }

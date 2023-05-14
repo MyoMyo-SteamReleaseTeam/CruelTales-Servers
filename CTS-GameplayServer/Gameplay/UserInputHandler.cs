@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using CT.Common.DataType.Input;
 using CT.Networks.Runtimes;
 using log4net;
@@ -17,6 +18,7 @@ namespace CTS.Instance.Gameplay
 		public void Flush(FArg arg);
 	}
 
+	[Obsolete]
 	public class UserInputHandler : IJobHandler<float>
 	{
 		// Log

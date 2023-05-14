@@ -13,7 +13,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
-	public delegate void HandlePacketRaw(PacketReader reader, UserSession session);
+	public delegate void HandlePacketRaw(PacketReader receivedPacket, UserSession session);
 
 	public static class PacketDispatcher
 	{
@@ -26,11 +26,15 @@ namespace CTS.Instance.Packets
 
 		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
 		{
+			{ PacketType.CS_Sync_RemoteUnreliable, PacketHandler.Handle_CS_Sync_RemoteUnreliable },
+			{ PacketType.CS_Sync_RemoteReliable, PacketHandler.Handle_CS_Sync_RemoteReliable },
 			
 		};
 
 		private static HashSet<PacketType> _customPacketSet = new()
 		{
+			PacketType.CS_Sync_RemoteUnreliable,
+			PacketType.CS_Sync_RemoteReliable,
 			
 		};
 
@@ -39,9 +43,9 @@ namespace CTS.Instance.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader reader, UserSession session)
+		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, UserSession session)
 		{
-			_dispatcherRawTable[packetType](reader, session);
+			_dispatcherRawTable[packetType](receivedPacket, session);
 		}
 
 		public static bool IsCustomPacket(PacketType packetType)

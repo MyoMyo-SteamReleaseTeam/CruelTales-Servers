@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Common.Synchronizations;
 using CT.Networks.Extensions;
 using CT.Packets;
 using CTS.Instance.Gameplay;
@@ -19,9 +20,9 @@ namespace CTS.Instance.Networks
 		public static ILog _log = LogManager.GetLogger(typeof(UserSession));
 
 		// Gameplay
-		public UserSessionHandler? SessionHandler { get; private set; }
+		public GameInstance? _gameInstance { get; private set; }
 
-		// Services
+		// Managers
 		private readonly SessionManager _sessionManager;
 		private readonly NetworkManager _networkManager;
 		private readonly GameInstanceManager _gameInstanceManager;
@@ -95,8 +96,8 @@ namespace CTS.Instance.Networks
 			_sessionManager.Remove(this);
 
 			// Leave from game instance and clear it's reference
-			SessionHandler?.Push_OnDisconnected(this);
-			SessionHandler = null;
+			_gameInstance?.SessionHandler?.Push_OnDisconnected(this);
+			_gameInstance = null;
 
 			_log.Info($"User {this} disconnected. Reason : {disconnectReason}");
 		}
@@ -199,8 +200,8 @@ namespace CTS.Instance.Networks
 				_log.Info($"User {this} has been verified. Try to enter game [Target GUID:{GameInstanceGuid}]");
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					SessionHandler = instance.SessionHandler;
-					SessionHandler.Push_TryEnterGame(this);
+					_gameInstance = instance;
+					_gameInstance.SessionHandler.Push_TryEnterGame(this);
 					return;
 				}
 
@@ -265,11 +266,11 @@ namespace CTS.Instance.Networks
 		public void OnEnterGame(UserSessionHandler sessionHandler)
 		{
 			// 알 수 없는 이유로 세션 헨들러가 서로 다르다면 접속을 종료한다.
-			if (SessionHandler != sessionHandler)
+			if (_gameInstance?.SessionHandler != sessionHandler)
 			{
-				sessionHandler.Push_OnDisconnected(this);
-				SessionHandler?.Push_OnDisconnected(this);
-				SessionHandler = null;
+				_gameInstance?.SessionHandler.Push_OnDisconnected(this);
+				_gameInstance?.SessionHandler?.Push_OnDisconnected(this);
+				_gameInstance = null;
 				Disconnect(DisconnectReasonType.ServerError_WrongOperation);
 			}
 			CurrentState = UserSessionState.InGameplay;
@@ -278,6 +279,11 @@ namespace CTS.Instance.Networks
 		public override string ToString()
 		{
 			return $"{UserId}:{Username}";
+		}
+
+		public void OnTrySync(SyncOperation syncType, PacketReader packetReader)
+		{
+			_gameInstance?.GameManager.OnUserTrySync(syncType, packetReader);
 		}
 	}
 }

@@ -1,5 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Synchronizations;
 using CT.Networks.Runtimes;
 using CT.Packets;
 using CTS.Instance.Networks;
@@ -25,19 +28,18 @@ namespace CTS.Instance.Gameplay
 		public GameInstanceGuid Guid { get; private set; }
 
 		// Handlers
-		private UserSessionHandler _sessionHandler;
-		public UserSessionHandler SessionHandler => _sessionHandler;
-		private UserInputHandler _inputHandler;
+		public UserSessionHandler SessionHandler { get; private set; }
+		//private UserInputHandler _inputHandler;
 
 		// Managers
-		private GameManager _gameManager;
+		public GameManager GameManager { get; private set; }
 
 		public GameInstance(TickTimer serverTimer)
 		{
 			ServerTimer = serverTimer;
-			_sessionHandler = new UserSessionHandler(this);
-			_inputHandler = new UserInputHandler(this);
-			_gameManager = new GameManager(this);
+			SessionHandler = new UserSessionHandler(this);
+			//_inputHandler = new UserInputHandler(this);
+			GameManager = new GameManager(this);
 		}
 
 		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
@@ -47,11 +49,12 @@ namespace CTS.Instance.Gameplay
 
 			Guid = guid;
 
-			_sessionHandler.Initialize(_option);
-			_inputHandler.Clear();
+			SessionHandler.Initialize(_option);
+			GameManager.Initialize();
+			//_inputHandler.Clear();
 
 			// TEST
-			_gameManager.StartGame();
+			GameManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>
@@ -59,29 +62,29 @@ namespace CTS.Instance.Gameplay
 		public void Update(float deltaTime)
 		{
 			// Handle network connections
-			_sessionHandler.Flush();
+			SessionHandler.Flush();
 
 			// Handle received input
-			_inputHandler.Flush(deltaTime);
+			//_inputHandler.Flush(deltaTime);
 
 			// Update game logic
-			_gameManager.Update(deltaTime);
-			_gameManager.SyncReliable();
-			_gameManager.SyncUnreliable();
+			GameManager.Update(deltaTime);
+			GameManager.SyncReliable();
+			GameManager.SyncUnreliable();
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
 		{
-			foreach (var ps in _sessionHandler.UserList)
+			foreach (var ps in SessionHandler.UserList)
 			{
 				DisconnectPlayer(ps, reason);
 			}
 		}
 
-		public void OnUserInput(UserInputJob job)
-		{
-			_inputHandler.PushUserInput(job);
-		}
+		//public void OnUserInput(UserInputJob job)
+		//{
+		//	_inputHandler.PushUserInput(job);
+		//}
 
 		public void DisconnectPlayer(UserSession userSession, DisconnectReasonType reason)
 		{
@@ -92,19 +95,20 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnterGame(UserSession userSession)
 		{
-			_gameManager.OnUserEnter(userSession);
+			GameManager.OnUserEnter(userSession);
 		}
 
 		public void OnUserLeaveGame(UserSession userSession)
 		{
 			_log.Info($"[Instance:{Guid}] Session {userSession} leave the game");
+			GameManager.OnUserLeave(userSession);
 		}
 
 		#endregion
 
 		public override string ToString()
 		{
-			return $"[GUID:{Guid}][MemberCount:{_sessionHandler.MemberCount}]";
+			return $"[GUID:{Guid}][MemberCount:{SessionHandler.MemberCount}]";
 		}
 	}
 }

@@ -5,10 +5,10 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
-	[SyncObjectDefinition]
+	[SyncNetworkObjectDefinition]
 	public class NetworkPlayer
 	{
-		[SyncVar(SyncType.Unreliable, SyncDirection.FromRemote)]
+		[SyncVar]
 		public UserId UserId;
 
 		[SyncVar]

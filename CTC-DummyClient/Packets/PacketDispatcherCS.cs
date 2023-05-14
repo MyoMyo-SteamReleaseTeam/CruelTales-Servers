@@ -12,7 +12,7 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, NetworkManager networkManager);
-	public delegate void HandlePacketRaw(PacketReader reader, NetworkManager networkManager);
+	public delegate void HandlePacketRaw(PacketReader receivedPacket, NetworkManager networkManager);
 
 	public static class PacketDispatcher
 	{
@@ -24,17 +24,17 @@ namespace CTC.Networks.Packets
 
 		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
 		{
-			{ PacketType.SC_Sync_LifeCycle, PacketHandler.Handle_SC_Sync_LifeCycle },
-			{ PacketType.SC_Sync_Reliable, PacketHandler.Handle_SC_Sync_Reliable },
-			{ PacketType.SC_Sync_Unreliable, PacketHandler.Handle_SC_Sync_Unreliable },
+			{ PacketType.SC_Sync_MasterLifeCycle, PacketHandler.Handle_SC_Sync_MasterLifeCycle },
+			{ PacketType.SC_Sync_MasterReliable, PacketHandler.Handle_SC_Sync_MasterReliable },
+			{ PacketType.SC_Sync_MasterUnreliable, PacketHandler.Handle_SC_Sync_MasterUnreliable },
 			
 		};
 
 		private static HashSet<PacketType> _customPacketSet = new()
 		{
-			PacketType.SC_Sync_LifeCycle,
-			PacketType.SC_Sync_Reliable,
-			PacketType.SC_Sync_Unreliable,
+			PacketType.SC_Sync_MasterLifeCycle,
+			PacketType.SC_Sync_MasterReliable,
+			PacketType.SC_Sync_MasterUnreliable,
 			
 		};
 
@@ -43,9 +43,9 @@ namespace CTC.Networks.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, networkManager);
 		}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader reader, NetworkManager networkManager)
+		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, NetworkManager networkManager)
 		{
-			_dispatcherRawTable[packetType](reader, networkManager);
+			_dispatcherRawTable[packetType](receivedPacket, networkManager);
 		}
 
 		public static bool IsCustomPacket(PacketType packetType)

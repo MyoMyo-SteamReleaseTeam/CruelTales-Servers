@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -10,9 +9,8 @@ namespace CT.Common.Gameplay
 	[StructLayout(LayoutKind.Sequential)]
 	public class NetworkTransform : IUpdatable
 	{
-		public int SectionIndex { get; private set; }
-		public Vector3 Position { get; set; }
-		public Vector3 Velocity { get; set; }
+		public Vector3 Position { get; private set; }
+		public Vector3 Velocity { get; private set; }
 
 		// Check dirty
 		private Vector3 _previousPosition;
@@ -39,10 +37,9 @@ namespace CT.Common.Gameplay
 			IsDirty = Position != _previousPosition;
 		}
 
-		public void TeleportPosition(Vector3 position, int section = 0)
+		public void SetPosition(Vector3 position)
 		{
 			Position = position;
-			SectionIndex = section;
 			IsDirty = true;
 			_isTeleported = true;
 		}

@@ -11,7 +11,10 @@
 	<!-- Declare Data Types -->
 	
 	<!-- Declare Packets -->
-	<server name="Sync_LifeCycle" custom="true"/>
-	<server name="Sync_Reliable" custom="true"/>
-	<server name="Sync_Unreliable" custom="true"/>
+	<client name="Sync_RemoteUnreliable" custom="true"/>
+	<client name="Sync_RemoteReliable" custom="true"/>
+	
+	<server name="Sync_MasterLifeCycle" custom="true"/>
+	<server name="Sync_MasterReliable" custom="true"/>
+	<server name="Sync_MasterUnreliable" custom="true"/>
 </Definition>

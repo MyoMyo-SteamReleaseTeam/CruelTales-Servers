@@ -359,7 +359,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
-	public delegate void HandlePacketRaw(PacketReader reader, UserSession session);
+	public delegate void HandlePacketRaw(PacketReader receivedPacket, UserSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -383,9 +383,9 @@ namespace CTS.Instance.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader reader, UserSession session)
+		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, UserSession session)
 		{{
-			_dispatcherRawTable[packetType](reader, session);
+			_dispatcherRawTable[packetType](receivedPacket, session);
 		}}
 
 		public static bool IsCustomPacket(PacketType packetType)
@@ -408,7 +408,7 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, NetworkManager networkManager);
-	public delegate void HandlePacketRaw(PacketReader reader, NetworkManager networkManager);
+	public delegate void HandlePacketRaw(PacketReader receivedPacket, NetworkManager networkManager);
 
 	public static class PacketDispatcher
 	{{
@@ -432,9 +432,9 @@ namespace CTC.Networks.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, networkManager);
 		}}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader reader, NetworkManager networkManager)
+		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, NetworkManager networkManager)
 		{{
-			_dispatcherRawTable[packetType](reader, networkManager);
+			_dispatcherRawTable[packetType](receivedPacket, networkManager);
 		}}
 
 		public static bool IsCustomPacket(PacketType packetType)

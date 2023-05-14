@@ -1,44 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
+using CT.Common.Synchronizations;
+using CT.Common.Tools.Collections;
 using CT.Packets;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.Gameplay
 {
-	public class GameWorldManager
-	{
-		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObjectById = new();
-		private WorldPartitioner _worldPartition;
-		private NetworkIdentity _entityIdCounter;
-
-		public GameWorldManager()
-		{
-			_worldPartition = new WorldPartitioner(12);
-		}
-
-		public void Clear()
-		{
-			//_entityById.Clear();
-		}
-
-		public void AddPlayer(UserSession session)
-		{
-			//_entityIdCounter = new NetEntityId(_entityIdCounter.ID + 1);
-			//var playerEntity = new Entity_Player();
-			//playerEntity.BindClient(session.UserId);
-			//_entityById.Add(_entityIdCounter, playerEntity);
-		}
-
-		public void Create(MasterNetworkObject netObject)
-		{
-			_worldObjectById.Add(netObject.Identity, netObject);
-		}
-	}
-
 	public class GameManager
 	{
 		private MiniGameMapData _miniGameMapData { get; set; }
@@ -48,14 +20,13 @@ namespace CTS.Instance.Gameplay
 		// Test buffer
 		private byte[] _packetBuffer = new byte[1024 * 64];
 
-		private Dictionary<NetworkIdentity, MasterNetworkObject> _worldObject = new();
-
-		private static ushort _networkIdentityCounter = new();
+		private GameWorldManager _gameWorldManager;
 
 		public GameManager(GameInstance gameInstance)
 		{
 			_gameInstance = gameInstance;
 			_userSessionHandler = gameInstance.SessionHandler;
+			_gameWorldManager = new GameWorldManager();
 
 			// Temp
 			_miniGameMapData = new()
@@ -76,8 +47,10 @@ namespace CTS.Instance.Gameplay
 			};
 		}
 
-		private NetworkIdentity GetNetworkIdentityCounter() 
-			=> new NetworkIdentity(++_networkIdentityCounter);
+		public void Initialize()
+		{
+			_gameWorldManager.Clear();
+		}
 
 		public void StartGame()
 		{
@@ -88,7 +61,9 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-
+			_gameWorldManager.UpdateDeserialize();
+			_gameWorldManager.Update(deltaTime);
+			_gameWorldManager.UpdateSerialize();
 		}
 
 		public void CheckEndCondition()
@@ -98,71 +73,80 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnter(UserSession userSession)
 		{
-			PacketWriter pw = new(_packetBuffer);
-			pw.Put(PacketType.SC_Sync_LifeCycle);
-			foreach (var netObj in _worldObject.Values)
-			{
-				pw.Put(netObj.Type);
-				pw.Put(netObj.Identity);
-				netObj.SerializeEveryProperty(pw);
-			}
-			userSession.SendReliable(pw);
+			//PacketWriter pw = new(_packetBuffer);
+			//pw.Put(PacketType.SC_Sync_LifeCycle);
+			//foreach (var netObj in _worldObject.Values)
+			//{
+			//	pw.Put(netObj.Type);
+			//	pw.Put(netObj.Identity);
+			//	netObj.SerializeEveryProperty(pw);
+			//}
+			//userSession.SendReliable(pw);
+		}
+
+		internal void OnUserLeave(UserSession userSession)
+		{
 		}
 
 		public void SyncReliable()
 		{
-			var netObjs = _worldObject.Values;
-			if (netObjs.Count <= 0)
-				return;
+			//var netObjs = _worldObject.Values;
+			//if (netObjs.Count <= 0)
+			//	return;
 
-			int syncCount = 0;
+			//int syncCount = 0;
 
-			PacketWriter pw = new(_packetBuffer);
-			pw.Put(PacketType.SC_Sync_Reliable);
-			foreach (var netObj in netObjs)
-			{
-				if (!netObj.IsDirtyReliable)
-				{
-					continue;
-				}
-				pw.Put(netObj.Identity);
-				netObj.SerializeSyncReliable(pw);
-				netObj.ClearDirtyReliable();
-				syncCount++;
-			}
+			//PacketWriter pw = new(_packetBuffer);
+			//pw.Put(PacketType.SC_Sync_Reliable);
+			//foreach (var netObj in netObjs)
+			//{
+			//	if (!netObj.IsDirtyReliable)
+			//	{
+			//		continue;
+			//	}
+			//	pw.Put(netObj.Identity);
+			//	netObj.SerializeSyncReliable(pw);
+			//	netObj.ClearDirtyReliable();
+			//	syncCount++;
+			//}
 
-			if (syncCount > 0)
-			{
-				_userSessionHandler.SendReliableToAll(pw);
-			}
+			//if (syncCount > 0)
+			//{
+			//	_userSessionHandler.SendReliableToAll(pw);
+			//}
 		}
 
 		public void SyncUnreliable()
 		{
-			var netObjs = _worldObject.Values;
-			if (netObjs.Count <= 0)
-				return;
+			//var netObjs = _worldObject.Values;
+			//if (netObjs.Count <= 0)
+			//	return;
 
-			int syncCount = 0;
+			//int syncCount = 0;
 
-			PacketWriter pw = new(_packetBuffer);
-			pw.Put(PacketType.SC_Sync_Unreliable);
-			foreach (var netObj in netObjs)
-			{
-				if (!netObj.IsDirtyUnreliable)
-				{
-					continue;
-				}
-				pw.Put(netObj.Identity);
-				netObj.SerializeSyncUnreliable(pw);
-				netObj.ClearDirtyUnreliable();
-				syncCount++;
-			}
+			//PacketWriter pw = new(_packetBuffer);
+			//pw.Put(PacketType.SC_Sync_Unreliable);
+			//foreach (var netObj in netObjs)
+			//{
+			//	if (!netObj.IsDirtyUnreliable)
+			//	{
+			//		continue;
+			//	}
+			//	pw.Put(netObj.Identity);
+			//	netObj.SerializeSyncUnreliable(pw);
+			//	netObj.ClearDirtyUnreliable();
+			//	syncCount++;
+			//}
 
-			if (syncCount > 0)
-			{
-				_userSessionHandler.SendReliableToAll(pw);
-			}
+			//if (syncCount > 0)
+			//{
+			//	_userSessionHandler.SendReliableToAll(pw);
+			//}
+		}
+
+		public void OnUserTrySync(SyncOperation syncType, PacketReader packetReader)
+		{
+			//_gameWorldManager.
 		}
 	}
 }

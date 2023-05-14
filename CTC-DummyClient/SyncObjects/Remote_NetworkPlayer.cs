@@ -19,90 +19,88 @@ using CTC.Networks.Synchronizations;
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	[Serializable]
-	public partial class NetworkPlayer : ISynchronizable
+	public partial class NetworkPlayer
 	{
-		[SyncVar(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		public override NetworkObjectType Type => NetworkObjectType.NetworkPlayer;
+		[SyncVar]
 		private UserId _userId = new();
+		public event Action<UserId>? OnUserIdChanged;
 		[SyncVar]
 		private NetStringShort _username = new();
 		public event Action<NetStringShort>? OnUsernameChanged;
 		[SyncVar]
 		private int _costume;
 		public event Action<int>? OnCostumeChanged;
-		private BitmaskByte _dirtyUnreliable_0 = new();
-		public bool IsDirtyReliable => false;
-		public bool IsDirtyUnreliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
-		public UserId UserId
-		{
-			get => _userId;
-			set
-			{
-				if (_userId == value) return;
-				_userId = value;
-				_dirtyUnreliable_0[0] = true;
-			}
-		}
-		public void ClearDirtyReliable() { }
-		public void ClearDirtyUnreliable()
-		{
-			_dirtyUnreliable_0.Clear();
-		}
-		public void SerializeSyncReliable(PacketWriter writer) { }
-		public void SerializeSyncUnreliable(PacketWriter writer)
-		{
-			_dirtyUnreliable_0.Serialize(writer);
-			if (_dirtyUnreliable_0[0])
-			{
-				_userId.Serialize(writer);
-			}
-		}
-		public void SerializeEveryProperty(PacketWriter writer)
-		{
-			_userId.Serialize(writer);
-		}
-		public void DeserializeSyncReliable(PacketReader reader)
+		public override bool IsDirtyReliable => false;
+		public override bool IsDirtyUnreliable => false;
+		public override void ClearDirtyReliable() { }
+		public override void ClearDirtyUnreliable() { }
+		public override void SerializeSyncReliable(PacketWriter writer) { }
+		public override void SerializeSyncUnreliable(PacketWriter writer) { }
+		public override void SerializeEveryProperty(PacketWriter writer) { }
+		public override void DeserializeSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
+				_userId.Deserialize(reader);
+				OnUserIdChanged?.Invoke(_userId);
+			}
+			if (_dirtyReliable_0[1])
+			{
 				_username.Deserialize(reader);
 				OnUsernameChanged?.Invoke(_username);
 			}
-			if (_dirtyReliable_0[1])
+			if (_dirtyReliable_0[2])
 			{
 				_costume = reader.ReadInt32();
 				OnCostumeChanged?.Invoke(_costume);
 			}
 		}
-		public void DeserializeSyncUnreliable(PacketReader reader) { }
-		public void DeserializeEveryProperty(PacketReader reader)
+		public override void DeserializeSyncUnreliable(PacketReader reader) { }
+		public override void DeserializeEveryProperty(PacketReader reader)
 		{
+			_userId.Deserialize(reader);
+			OnUserIdChanged?.Invoke(_userId);
 			_username.Deserialize(reader);
 			OnUsernameChanged?.Invoke(_username);
 			_costume = reader.ReadInt32();
 			OnCostumeChanged?.Invoke(_costume);
 		}
-		public static void IgnoreSyncReliable(PacketReader reader)
+		public override void IgnoreSyncReliable(PacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
-				NetStringShort.IgnoreStatic(reader);
+				UserId.IgnoreStatic(reader);
 			}
 			if (_dirtyReliable_0[1])
+			{
+				NetStringShort.IgnoreStatic(reader);
+			}
+			if (_dirtyReliable_0[2])
 			{
 				reader.Ignore(4);
 			}
 		}
-		public static void IgnoreSyncUnreliable(PacketReader reader) { }
+		public static void IgnoreSyncStaticReliable(PacketReader reader)
+		{
+			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyReliable_0[0])
+			{
+				UserId.IgnoreStatic(reader);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				NetStringShort.IgnoreStatic(reader);
+			}
+			if (_dirtyReliable_0[2])
+			{
+				reader.Ignore(4);
+			}
+		}
+		public override void IgnoreSyncUnreliable(PacketReader reader) { }
+		public static void IgnoreSyncStaticUnreliable(PacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

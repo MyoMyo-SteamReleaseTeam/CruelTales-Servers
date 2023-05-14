@@ -23,6 +23,21 @@ namespace CTC.Networks
 			networkManager.GameSynchronizer.OnSyncInitialize(reader);
 		}
 
+		internal static void Handle_SC_Sync_MasterLifeCycle(PacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_Sync_MasterReliable(PacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_Sync_MasterUnreliable(PacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
+		}
+
 		internal static void Handle_SC_Sync_Reliable(PacketReader reader, NetworkManager networkManager)
 		{
 			_log.Info("Reliable");

@@ -16,6 +16,11 @@ namespace CT.Common.Serialization
 		public int Position { get; private set; }
 		public int Capacity { get; private set; }
 
+		public PacketReader()
+		{
+			
+		}
+
 		public PacketReader(ArraySegment<byte> buffer)
 		{
 			Initialize(buffer);

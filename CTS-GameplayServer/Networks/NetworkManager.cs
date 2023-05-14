@@ -42,6 +42,7 @@ namespace CTS.Instance.Networks
 			_networkListener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
 			_netManager = new NetManager(_networkListener);
+			_netManager.AutoRecycle = true;
 
 			// Gameplay Instance
 			_serverOption = serverOption;
@@ -116,11 +117,9 @@ namespace CTS.Instance.Networks
 				if (_sessionManager.TryGetSessionBy(peer.Id, out session))
 				{
 					PacketReader packetReader = new(reader.GetRemainingBytesSegment());
-
 					while (packetReader.CanRead(sizeof(PacketType)))
 					{
 						PacketType packetType = packetReader.ReadPacketType();
-
 						if (PacketDispatcher.IsCustomPacket(packetType))
 						{
 							session.OnReceiveRaw(packetType, packetReader);

@@ -1,5 +1,6 @@
 ﻿using System;
 using CT.Common.Serialization;
+using CT.Common.Synchronizations;
 using CT.Packets;
 using CTS.Instance.Networks;
 using log4net;
@@ -22,12 +23,14 @@ namespace CTS.Instance.Packets
 			session.OnReqReadyToEnter();
 		}
 
-		internal static void Handle_CS_Req_UserInput_Action(PacketBase receivedPacket, UserSession session)
+		internal static void Handle_CS_Sync_RemoteReliable(PacketReader receivedPacket, UserSession session)
 		{
+			session.OnTrySync(SyncOperation.Reliable, receivedPacket);
 		}
 
-		internal static void Handle_CS_Req_UserInput_Movement(PacketBase receivedPacket, UserSession session)
+		internal static void Handle_CS_Sync_RemoteUnreliable(PacketReader receivedPacket, UserSession session)
 		{
+			session.OnTrySync(SyncOperation.Unreliable, receivedPacket);
 		}
 	}
 }

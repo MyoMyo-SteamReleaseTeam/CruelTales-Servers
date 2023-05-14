@@ -126,6 +126,16 @@ namespace CT.Test.SynchronizeTest
 		public override void DeserializeSyncReliable(PacketReader reader) { }
 		public override void DeserializeSyncUnreliable(PacketReader reader) { }
 		public override void DeserializeEveryProperty(PacketReader reader) { }
+
+		public override void IgnoreSyncReliable(PacketReader reader)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void IgnoreSyncUnreliable(PacketReader reader)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 #pragma warning restore CS0649
