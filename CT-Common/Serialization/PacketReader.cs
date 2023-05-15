@@ -18,7 +18,6 @@ namespace CT.Common.Serialization
 
 		public PacketReader()
 		{
-			
 		}
 
 		public PacketReader(ArraySegment<byte> buffer)
@@ -78,6 +77,11 @@ namespace CT.Common.Serialization
 			T instance = new();
 			ReadTo(instance);
 			return instance;
+		}
+
+		public void ReadBufferToEnd(byte* buffer)
+		{
+
 		}
 
 		#region Peek

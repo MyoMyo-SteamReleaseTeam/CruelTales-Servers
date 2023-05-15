@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using CT.Common.DataType;
 
 namespace CT.Common.Serialization

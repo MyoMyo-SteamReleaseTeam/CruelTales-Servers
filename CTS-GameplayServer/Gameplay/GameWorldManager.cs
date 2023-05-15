@@ -7,6 +7,7 @@ using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
+using CT.Networks;
 using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
@@ -19,15 +20,16 @@ namespace CTS.Instance.Gameplay
 	public unsafe struct SynchronizeJob
 	{
 		public SyncOperation Operation;
-		public fixed byte Data[2048];
+		public fixed byte Data[GlobalNetwork.MTU];
 
 		public void CopyFrom(SyncOperation operation, PacketReader reader)
 		{
 			Operation = operation;
+
 		}
 	}
 
-	public class GameWorldManager : IUpdatable//, IJobHandler<SynchronizeJob>
+	public class GameWorldManager : IUpdatable, IJobHandler<SynchronizeJob>
 	{
 		// Log
 		private static ILog _log = LogManager.GetLogger(typeof(GameWorldManager));
@@ -60,11 +62,6 @@ namespace CTS.Instance.Gameplay
 			{
 				destroyObject(_destroyObjectStack.Pop());
 			}
-		}
-
-		public void UpdateDeserialize()
-		{
-
 		}
 
 		public void UpdateSerialize()
@@ -133,5 +130,14 @@ namespace CTS.Instance.Gameplay
 			var playerEntity = CreateObject<NetworkPlayer>();
 			playerEntity.BindUser(session);
 		}
+
+		#region Synchronize
+
+		public void Flush(SynchronizeJob job)
+		{
+
+		}
+
+		#endregion
 	}
 }

@@ -186,6 +186,8 @@ namespace CTC.Networks
 			}
 		}
 
+		private PacketSegment _connectPacket = new PacketSegment(1000);
+
 		private void OnConnected(NetPeer peer)
 		{
 			_sessionState = UserSessionState.TryConnecting;
@@ -209,10 +211,10 @@ namespace CTC.Networks
 
 			_log.Info($"Send CS_Req_TryEnterGameInstance : {UserInfo}");
 
-			PacketWriter pw = new PacketWriter(new PacketSegment(1000));
-			pw.Put(enterPacket);
+			_connectPacket.Writer.Reset();
+			_connectPacket.Writer.Put(enterPacket);
+			SendReliable(_connectPacket.Writer);
 
-			SendReliable(pw);
 			_packetPool.Return(enterPacket);
 		}
 
