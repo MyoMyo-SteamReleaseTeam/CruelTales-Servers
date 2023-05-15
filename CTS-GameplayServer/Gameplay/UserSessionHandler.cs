@@ -94,7 +94,7 @@ namespace CTS.Instance.Gameplay
 			_waitingTable.TryRemove(userSession.UserId);
 			if (_userById.TryRemove(userSession.UserId))
 			{
-				_log.Info($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
+				_log.Debug($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
 				_gameInstance.OnUserLeaveGame(userSession);
 			}
 			else
@@ -131,7 +131,7 @@ namespace CTS.Instance.Gameplay
 			_waitingTable.Add(userSession.UserId, userSession);
 
 			// Ack response
-			_log.Info($"User {userSession} has been enter the game instance. [GUID:{_gameInstance.Guid}]");
+			_log.Debug($"User {userSession} has been enter the game instance. [GUID:{_gameInstance.Guid}]");
 			userSession.AckTryEnterGameInstance();
 		}
 
@@ -153,7 +153,7 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
-			_log.Info($"[Instance:{_gameInstance.Guid}] Session {userSession} enter the game");
+			_log.Debug($"[Instance:{_gameInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
 			this._gameInstance.OnUserEnterGame(userSession);
 

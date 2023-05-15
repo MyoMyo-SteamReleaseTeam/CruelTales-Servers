@@ -84,7 +84,7 @@ namespace CTS.Instance.Networks
 		{
 			if (_sessionManager.Contains(peer.Id))
 			{
-				_log.Info($"Already exist peer try to connect! Endpoint : {peer.EndPoint}");
+				_log.Warn($"Already exist peer try to connect! Endpoint : {peer.EndPoint}");
 				return;
 			}
 
@@ -96,7 +96,7 @@ namespace CTS.Instance.Networks
 				return;
 			}
 
-			_log.Info($"[UserCount:{_sessionManager.Count}] Client connect from {peer.EndPoint.ToString()}");
+			_log.Debug($"[UserCount:{_sessionManager.Count}] Client connect from {peer.EndPoint.ToString()}");
 		}
 
 		private void onPeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -104,7 +104,7 @@ namespace CTS.Instance.Networks
 			if (_sessionManager.TryGetSessionBy(peer.Id, out var session))
 			{
 				session.OnDisconnected(disconnectInfo);
-				_log.Info($"[UserCount:{_sessionManager.Count}] Client disconnected {peer.EndPoint.ToString()}");
+				_log.Debug($"[UserCount:{_sessionManager.Count}] Client disconnected {peer.EndPoint.ToString()}");
 			}
 		}
 

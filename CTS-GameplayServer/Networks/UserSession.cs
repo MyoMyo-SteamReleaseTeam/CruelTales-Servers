@@ -99,7 +99,7 @@ namespace CTS.Instance.Networks
 			_gameInstance?.SessionHandler?.Push_OnDisconnected(this);
 			_gameInstance = null;
 
-			_log.Info($"User {this} disconnected. Reason : {disconnectReason}");
+			_log.Debug($"User {this} disconnected. Reason : {disconnectReason}");
 		}
 
 		public void OnReceive(PacketBase packet)
@@ -197,7 +197,7 @@ namespace CTS.Instance.Networks
 				UserDataInfo = userDataInfo;
 				GameInstanceGuid = roomGuid;
 
-				_log.Info($"User {this} has been verified. Try to enter game [Target GUID:{GameInstanceGuid}]");
+				_log.Debug($"User {this} has been verified. Try to enter game [Target GUID:{GameInstanceGuid}]");
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
 					_gameInstance = instance;
@@ -252,7 +252,7 @@ namespace CTS.Instance.Networks
 
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))
 				{
-					_log.Info($"User {this} is ready to sync");
+					_log.Debug($"User {this} is ready to sync");
 					instance.SessionHandler.Push_TryReadyToSync(this);
 					return;
 				}

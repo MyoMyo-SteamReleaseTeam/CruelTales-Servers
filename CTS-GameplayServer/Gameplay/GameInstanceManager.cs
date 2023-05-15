@@ -57,12 +57,17 @@ namespace CTS.Instance.Gameplay
 			_gameplayTickRunner.Run();
 		}
 
+		//private long _current = 0;
 		public void Update(float deltaTime)
 		{
+			//_current = _serverTimer.CurrentMs;
+
 			Parallel.ForEach(_gameInstanceList, (i) =>
 			{
 				i.Update(deltaTime);
 			});
+
+			//_log.Info($"Tick {_serverTimer.CurrentMs - _current}");
 		}
 
 		public bool TryGetGameInstanceBy(GameInstanceGuid instanceID,
