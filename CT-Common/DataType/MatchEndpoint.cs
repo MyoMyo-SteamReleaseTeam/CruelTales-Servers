@@ -17,21 +17,21 @@ namespace CT.Common.DataType
 
 		public int SerializeSize => IpEndpoint.SerializeSize + sizeof(ushort);
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(IpEndpoint);
 			writer.Put(Port);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			IpEndpoint = reader.ReadNetStringShort();
 			Port = reader.ReadUInt16();
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
-		public static void IgnoreStatic(PacketReader reader)
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			NetStringShort.IgnoreStatic(reader);
 			reader.Ignore(sizeof(ushort));

@@ -22,7 +22,7 @@ namespace CTS.Instance.Gameplay
 		public SyncOperation Operation;
 		public fixed byte Data[GlobalNetwork.MTU];
 
-		public void CopyFrom(SyncOperation operation, PacketReader reader)
+		public void CopyFrom(SyncOperation operation, IPacketReader reader)
 		{
 			Operation = operation;
 

@@ -13,11 +13,11 @@ namespace CT.Common.DataType.Primitives
 		public NetInt32() => _value = 0;
 #endif
 		public NetInt32(int value) => _value = value;
-		public void Serialize(PacketWriter writer) => writer.Put(_value);
-		public void Deserialize(PacketReader reader) => _value = reader.ReadInt32();
+		public void Serialize(IPacketWriter writer) => writer.Put(_value);
+		public void Deserialize(IPacketReader reader) => _value = reader.ReadInt32();
 		public int CompareTo(int other) => _value.CompareTo(other);
 		public bool Equals(NetInt32 other) => _value == other._value;
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(int));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(int));
 	}
 }

@@ -33,22 +33,22 @@ namespace CT.Common.Gameplay
 
 	public static class MiniGameMapTypesExtension
 	{
-		public static void Put(this PacketWriter writer, MiniGameMapTheme value)
+		public static void Put(this IPacketWriter writer, MiniGameMapTheme value)
 		{
 			writer.Put((ushort)value);
 		}
 
-		public static MiniGameMapTheme ReadMiniGameMapTheme(this PacketReader reader)
+		public static MiniGameMapTheme ReadMiniGameMapTheme(this IPacketReader reader)
 		{
 			return (MiniGameMapTheme)reader.ReadUInt16();
 		}
 
-		public static void Put(this PacketWriter writer, MiniGameMapType value)
+		public static void Put(this IPacketWriter writer, MiniGameMapType value)
 		{
 			writer.Put((ushort)value);
 		}
 
-		public static MiniGameMapType ReadMiniGameMapType(this PacketReader reader)
+		public static MiniGameMapType ReadMiniGameMapType(this IPacketReader reader)
 		{
 			return (MiniGameMapType)reader.ReadUInt16();
 		}

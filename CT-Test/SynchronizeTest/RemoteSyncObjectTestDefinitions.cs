@@ -34,10 +34,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(PacketWriter writer) { }
-		public override void SerializeSyncUnreliable(PacketWriter writer) { }
-		public override void SerializeEveryProperty(PacketWriter writer) { }
-		public override void DeserializeSyncReliable(PacketReader reader)
+		public override void SerializeSyncReliable(IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeEveryProperty(IPacketWriter writer) { }
+		public override void DeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte masterDirty = reader.ReadBitmaskByte();
 			if (masterDirty[0])
@@ -74,8 +74,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void DeserializeSyncUnreliable(PacketReader reader) { }
-		public override void DeserializeEveryProperty(PacketReader reader)
+		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
+		public override void DeserializeEveryProperty(IPacketReader reader)
 		{
 			_userToken.Deserialize(reader);
 			OnUserTokenChanged?.Invoke(_userToken);

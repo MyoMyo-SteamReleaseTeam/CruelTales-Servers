@@ -21,12 +21,12 @@ namespace CT.Common.DataType
 			Id = value;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Id);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Id = reader.ReadUInt16();
 		}
@@ -40,7 +40,7 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(ushort));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ushort));
 	}
 }

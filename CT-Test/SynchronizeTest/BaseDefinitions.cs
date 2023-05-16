@@ -14,21 +14,21 @@ public abstract class RemoteNetworkObject : ISynchronizable
 
 	public abstract bool IsDirtyReliable { get; }
 	public abstract bool IsDirtyUnreliable { get; }
-	public abstract void DeserializeSyncReliable(PacketReader reader);
-	public abstract void DeserializeEveryProperty(PacketReader reader);
-	public abstract void DeserializeSyncUnreliable(PacketReader reader);
-	public abstract void SerializeSyncReliable(PacketWriter writer);
-	public abstract void SerializeSyncUnreliable(PacketWriter writer);
-	public abstract void SerializeEveryProperty(PacketWriter writer);
+	public abstract void DeserializeSyncReliable(IPacketReader reader);
+	public abstract void DeserializeEveryProperty(IPacketReader reader);
+	public abstract void DeserializeSyncUnreliable(IPacketReader reader);
+	public abstract void SerializeSyncReliable(IPacketWriter writer);
+	public abstract void SerializeSyncUnreliable(IPacketWriter writer);
+	public abstract void SerializeEveryProperty(IPacketWriter writer);
 	public abstract void ClearDirtyReliable();
 	public abstract void ClearDirtyUnreliable();
 
-	public static void IgnoreSyncReliable(PacketReader reader)
+	public static void IgnoreSyncReliable(IPacketReader reader)
 	{
 		throw new System.NotImplementedException();
 	}
 
-	public static void IgnoreSyncUnreliable(PacketReader reader)
+	public static void IgnoreSyncUnreliable(IPacketReader reader)
 	{
 		throw new System.NotImplementedException();
 	}

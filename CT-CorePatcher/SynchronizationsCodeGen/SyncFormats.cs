@@ -147,23 +147,23 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string SerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(PacketWriter writer)";
+		public static string SerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(IPacketWriter writer)";
 
 		/// <summary>
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(PacketReader reader)";
+		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(IPacketReader reader)";
 
 		/// <summary>
 		/// {0} SyncType<br/>
 		/// </summary>
-		public static string IgnoreSyncFunctionDeclaration => @"public override void IgnoreSync{0}(PacketReader reader)";
+		public static string IgnoreSyncFunctionDeclaration => @"public override void IgnoreSync{0}(IPacketReader reader)";
 
 		/// <summary>
 		/// {0} SyncType<br/>
 		/// </summary>
-		public static string IgnoreSyncFunctionDeclarationStatic => @"public static void IgnoreSyncStatic{0}(PacketReader reader)";
+		public static string IgnoreSyncFunctionDeclarationStatic => @"public static void IgnoreSyncStatic{0}(IPacketReader reader)";
 
 		public static string EntireFunctionSuffix => "EveryProperty";
 
@@ -171,13 +171,13 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string EntireSerializeFunctionDeclaration => @"public {0}void Serialize{1}(PacketWriter writer)";
+		public static string EntireSerializeFunctionDeclaration => @"public {0}void Serialize{1}(IPacketWriter writer)";
 
 		/// <summary>
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string EntireDeserializeFunctionDeclaration => @"public {0}void Deserialize{1}(PacketReader reader)";
+		public static string EntireDeserializeFunctionDeclaration => @"public {0}void Deserialize{1}(IPacketReader reader)";
 
 		/// <summary>
 		/// {0} Dirty bit name<br/>

@@ -91,7 +91,7 @@ namespace CT.Common.DataType.Synchronizations
 			_operationStack.Clear();
 		}
 
-		public void SerializeEveryProperty(PacketWriter writer)
+		public void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put((byte)_list.Count);
 			for (int i = 0; i < _list.Count; i++)
@@ -100,7 +100,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeEveryProperty(PacketReader reader)
+		public void DeserializeEveryProperty(IPacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
@@ -111,7 +111,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void SerializeSyncReliable(PacketWriter writer)
+		public void SerializeSyncReliable(IPacketWriter writer)
 		{
 			BitmaskByte masterDirty = new BitmaskByte();
 			masterDirty[0] = _operationStack.Count > 0;
@@ -172,7 +172,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeSyncReliable(PacketReader reader)
+		public void DeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte masterDirty = reader.ReadBitmaskByte();
 
@@ -222,11 +222,11 @@ namespace CT.Common.DataType.Synchronizations
 		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
 		public bool IsDirtyUnreliable => throw _exception;
 		public void ClearDirtyUnreliable() => throw _exception;
-		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
-		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
+		public void DeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
+		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
 		#if NET
-		public static void IgnoreSyncReliable(PacketReader reader) => throw _exception;
-		public static void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
+		public static void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
+		public static void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
 #else
 		public void IgnoreSyncReliable(PacketReader reader) => throw _exception;
 		public void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;

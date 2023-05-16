@@ -34,9 +34,9 @@ namespace CT.Test.NetworkCore
 				byteArray[i] = (byte)i;
 			}
 
-			PacketSegment ps = new PacketSegment(1000);
-			PacketWriter writer = new PacketWriter(ps);
-			PacketReader reader = new PacketReader(ps);
+			ByteBuffer ps = new(1000);
+			IPacketWriter writer = ps;
+			IPacketReader reader = ps;
 
 			writer.Put(byteValue);
 			writer.Put(sbyteValue);
@@ -69,7 +69,7 @@ namespace CT.Test.NetworkCore
 			Assert.IsTrue(stringValue == reader.ReadNetString());
 			Assert.IsTrue(shortStringValue == reader.ReadNetStringShort());
 
-			int bytesPosition = reader.Position;
+			int bytesPosition = reader.ReadPosition;
 			var readBytes = reader.ReadBytes();
 			reader.SetPosition(bytesPosition);
 			var readBytes2 = new ArraySegment<byte>(new byte[byteCount]);
@@ -84,9 +84,9 @@ namespace CT.Test.NetworkCore
 		[TestMethod]
 		public void PacketCanReadWrite()
 		{
-			PacketSegment ps = new PacketSegment(12);
-			PacketWriter writer = new PacketWriter(ps);
-			PacketReader reader = new PacketReader(ps);
+			ByteBuffer ps = new(12);
+			IPacketWriter writer = ps;
+			IPacketReader reader = ps;
 
 			int intValue = 123456789;
 			double doubleValue = 12345676.124124D;
@@ -111,40 +111,40 @@ namespace CT.Test.NetworkCore
 			int testOffset = 4;
 			byte[] data = new byte[testCount];
 
-			PacketSegment ps = new PacketSegment(data);
-			PacketWriter writer = new PacketWriter(ps);
+			ByteBuffer ps = new(data, 0);
+			IPacketWriter writer = ps;
 
 			writer.Put(10);
 			Assert.IsTrue(writer.CanPut(1));
-			Assert.IsFalse(writer.IsEnd);
+			Assert.IsFalse(writer.IsWriteEnd);
 
 			writer.Put(20);
 			Assert.IsTrue(writer.CanPut(1));
-			Assert.IsFalse(writer.IsEnd);
+			Assert.IsFalse(writer.IsWriteEnd);
 
 			writer.Put(30);
 			Assert.IsTrue(writer.CanPut(1));
-			Assert.IsFalse(writer.IsEnd);
+			Assert.IsFalse(writer.IsWriteEnd);
 
 			writer.Put(40);
 			Assert.IsFalse(writer.CanPut(1));
-			Assert.IsTrue(writer.IsEnd);
+			Assert.IsTrue(writer.IsWriteEnd);
 
 			ArraySegment<byte> segments = new(data, testOffset, testCount - testOffset);
-			ps = new PacketSegment(segments);
-			PacketReader reader = new PacketReader(ps);
+			ps = new ByteBuffer(segments, segments.Count);
+			IPacketReader reader = ps;
 
 			Assert.AreEqual(20, reader.ReadInt32());
 			Assert.IsTrue(reader.CanRead(1));
-			Assert.IsFalse(reader.IsEnd);
+			Assert.IsFalse(reader.IsReadEnd);
 
 			Assert.AreEqual(30, reader.ReadInt32());
 			Assert.IsTrue(reader.CanRead(1));
-			Assert.IsFalse(reader.IsEnd);
+			Assert.IsFalse(reader.IsReadEnd);
 
 			Assert.AreEqual(40, reader.ReadInt32());
 			Assert.IsFalse(reader.CanRead(1));
-			Assert.IsTrue(reader.IsEnd);
+			Assert.IsTrue(reader.IsReadEnd);
 		}
 
 		[TestMethod]
@@ -156,7 +156,7 @@ namespace CT.Test.NetworkCore
 			data[2] = (byte)3;
 			data[3] = (byte)4;
 			ArraySegment<byte> section = new(data, 2, 2);
-			PacketReader reader = new PacketReader(section);
+			IPacketReader reader = new ByteBuffer(section, section.Count);
 
 			Assert.AreEqual(3, reader.ReadByte());
 			Assert.AreEqual(4, reader.ReadByte());
@@ -166,14 +166,14 @@ namespace CT.Test.NetworkCore
 		public void OffsetArraySegmentString()
 		{
 			byte[] data = new byte[16];
-			PacketWriter writer = new PacketWriter(data);
+			IPacketWriter writer = new ByteBuffer(data, data.Length);
 			writer.Put(0); // 4
 			writer.Put(0); // 4
 			writer.Put(0); // 4
 			writer.Put(new NetStringShort("12"));
 
 			ArraySegment<byte> section = new(data, 12, 3);
-			PacketReader reader = new PacketReader(section);
+			IPacketReader reader = new ByteBuffer(section, section.Count);
 
 			Assert.AreEqual("12", reader.ReadNetStringShort().Value);
 		}
@@ -182,16 +182,16 @@ namespace CT.Test.NetworkCore
 		public void WriteWriter()
 		{
 			byte[] srcData = new byte[12];
-			PacketWriter writer0 = new(new ArraySegment<byte>(srcData, 0, 4));
-			PacketWriter writer1 = new(new ArraySegment<byte>(srcData, 4, 4));
-			PacketWriter writer2 = new(new ArraySegment<byte>(srcData, 8, 4));
+			IPacketWriter writer0 = new ByteBuffer(new ArraySegment<byte>(srcData, 0, 4), 4);
+			IPacketWriter writer1 = new ByteBuffer(new ArraySegment<byte>(srcData, 4, 4), 4);
+			IPacketWriter writer2 = new ByteBuffer(new ArraySegment<byte>(srcData, 8, 4), 4);
 			writer0.Put(1);
 			writer1.Put(2);
 			writer2.Put(3);
 
 			byte[] destData = new byte[12];
-			PacketReader reader = new(destData);
-			PacketWriter destWriter = new(destData);
+			IPacketReader reader = new ByteBuffer(destData, destData.Length);
+			IPacketWriter destWriter = new ByteBuffer(destData, 0);
 			destWriter.Put(writer0);
 			destWriter.Put(writer1);
 			destWriter.Put(writer2);

@@ -46,7 +46,7 @@ namespace CT.Test.Tests
 
 			new Span<byte>(buffer.Buffer, 4).CopyTo(byteArray);
 
-			PacketReader reader = new PacketReader();
+			//IPacketReader reader = new IPacketReader();
 
 			fixed (TestBuffer* bp = &byteBuffer)
 			{

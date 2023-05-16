@@ -79,13 +79,13 @@ namespace CT.Common.Tools.Collections
 
 		public override string ToString() => $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
 
-		public void Serialize(PacketWriter writer) => writer.Put(Mask);
+		public void Serialize(IPacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(PacketReader reader) => Mask = reader.ReadByte();
+		public void Deserialize(IPacketReader reader) => Mask = reader.ReadByte();
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(byte));
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 
 	public struct Bitmask32 : IPacketSerializable
@@ -164,33 +164,33 @@ namespace CT.Common.Tools.Collections
 
 		public override string ToString() => $"{Convert.ToString(Mask, 2).PadLeft(BIT_SIZE, '0')}";
 
-		public void Serialize(PacketWriter writer) => writer.Put(Mask);
+		public void Serialize(IPacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(PacketReader reader) => Mask = reader.ReadUInt32();
+		public void Deserialize(IPacketReader reader) => Mask = reader.ReadUInt32();
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(uint));
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(uint));
 	}
 
 	public static class BitmaskExtension
 	{
-		public static void Put(this PacketWriter writer, BitmaskByte value)
+		public static void Put(this IPacketWriter writer, BitmaskByte value)
 		{
 			writer.Put(value.Mask);
 		}
 
-		public static BitmaskByte ReadBitmaskByte(this PacketReader reader)
+		public static BitmaskByte ReadBitmaskByte(this IPacketReader reader)
 		{
 			return new BitmaskByte(reader.ReadByte());
 		}
 
-		public static void Put(this PacketWriter writer, Bitmask32 value)
+		public static void Put(this IPacketWriter writer, Bitmask32 value)
 		{
 			writer.Put(value.Mask);
 		}
 
-		public static Bitmask32 ReadBitmask32(this PacketReader reader)
+		public static Bitmask32 ReadBitmask32(this IPacketReader reader)
 		{
 			return new Bitmask32(reader.ReadUInt32());
 		}

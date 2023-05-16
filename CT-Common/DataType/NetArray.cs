@@ -36,7 +36,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put((byte)Count);
 			int count = Count;
@@ -46,7 +46,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();
@@ -58,8 +58,8 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader)
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
@@ -128,7 +128,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put((byte)Count);
 			int count = Count;
@@ -138,7 +138,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();
@@ -150,8 +150,8 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader)
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)

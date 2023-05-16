@@ -18,18 +18,18 @@ namespace CT.Common.DataType
 			Guid = value;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Guid);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Guid = reader.ReadUInt64();
 		}
 
 		public override string ToString() => Guid.ToString();
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(ulong));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ulong));
 	}
 }

@@ -14,7 +14,7 @@ using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
 {
-	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase ReadPacket(IPacketReader reader);
 	public delegate PacketBase CreatePacket();
 
 	public static partial class PacketFactory

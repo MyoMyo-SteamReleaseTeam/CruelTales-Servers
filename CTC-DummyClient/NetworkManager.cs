@@ -27,7 +27,7 @@ namespace CTC.Networks
 
 		}
 
-		public void OnSyncInitialize(PacketReader reader)
+		public void OnSyncInitialize(IPacketReader reader)
 		{
 			//while (reader.CanRead(1))
 			//{
@@ -41,7 +41,7 @@ namespace CTC.Networks
 			//}
 		}
 
-		public void OnDeserializeReliable(PacketReader reader)
+		public void OnDeserializeReliable(IPacketReader reader)
 		{
 			while (reader.CanRead(1))
 			{
@@ -54,7 +54,7 @@ namespace CTC.Networks
 			}
 		}
 
-		public void OnDeserializeUnreliable(PacketReader reader)
+		public void OnDeserializeUnreliable(IPacketReader reader)
 		{
 			while (reader.CanRead(1))
 			{
@@ -137,22 +137,22 @@ namespace CTC.Networks
 			_netManager.DisconnectAll();
 		}
 
-		public void SendReliable(PacketWriter writer,
+		public void SendReliable(IPacketWriter writer,
 								 byte channelNumber = 0)
 		{
 			_serverPeer?.Send(writer.Buffer.Array,
 							  writer.Buffer.Offset,
-							  writer.Count,
+							  writer.Size,
 							  channelNumber,
 							  DeliveryMethod.ReliableOrdered);
 		}
 
-		public void SendUnreliable(PacketWriter writer,
+		public void SendUnreliable(IPacketWriter writer,
 								   byte channelNumber = 0)
 		{
 			_serverPeer?.Send(writer.Buffer.Array,
 							  writer.Buffer.Offset,
-							  writer.Count,
+							  writer.Size,
 							  channelNumber,
 							  DeliveryMethod.Unreliable);
 		}
@@ -161,8 +161,8 @@ namespace CTC.Networks
 		{
 			try
 			{
-				PacketReader packetReader = new PacketReader(reader.GetRemainingBytesSegment());
-
+				var packetSegment = reader.GetRemainingBytesSegment();
+				IPacketReader packetReader = new ByteBuffer(packetSegment, packetSegment.Count);
 				while (packetReader.CanRead(sizeof(PacketType)))
 				{
 					PacketType packetType = packetReader.ReadPacketType();
@@ -186,8 +186,7 @@ namespace CTC.Networks
 			}
 		}
 
-		private PacketSegment _connectPacket = new PacketSegment(1000);
-
+		private IPacketWriter _connectPacketWriter = new ByteBuffer(1000);
 		private void OnConnected(NetPeer peer)
 		{
 			_sessionState = UserSessionState.TryConnecting;
@@ -211,9 +210,9 @@ namespace CTC.Networks
 
 			_log.Info($"Send CS_Req_TryEnterGameInstance : {UserInfo}");
 
-			_connectPacket.Writer.Reset();
-			_connectPacket.Writer.Put(enterPacket);
-			SendReliable(_connectPacket.Writer);
+			_connectPacketWriter.ResetWriter();
+			_connectPacketWriter.Put(enterPacket);
+			SendReliable(_connectPacketWriter);
 
 			_packetPool.Return(enterPacket);
 		}
@@ -233,14 +232,15 @@ namespace CTC.Networks
 			}
 		}
 
+		private IPacketWriter _readyPacketWriter = new ByteBuffer(20);
 		internal void ReqTryReadyToSync()
 		{
 			_log.Info("Try request ready to sync");
 
 			var readyPacket = _packetPool.GetPacket<CS_Req_ReadyToSync>();
-			PacketWriter writer = new PacketWriter(new byte[20]);
-			writer.Put(readyPacket);
-			SendReliable(writer);
+			_readyPacketWriter.ResetWriter();
+			_readyPacketWriter.Put(readyPacket);
+			SendReliable(_readyPacketWriter);
 			_packetPool.Return(readyPacket);
 		}
 	}

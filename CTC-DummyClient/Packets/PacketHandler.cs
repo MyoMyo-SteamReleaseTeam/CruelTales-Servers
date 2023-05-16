@@ -17,34 +17,34 @@ namespace CTC.Networks
 			networkManager.ReqTryReadyToSync();
 		}
 
-		internal static void Handle_SC_Sync_LifeCycle(PacketReader reader, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_LifeCycle(IPacketReader reader, NetworkManager networkManager)
 		{
 			//Console.WriteLine("Initialize");
 			networkManager.GameSynchronizer.OnSyncInitialize(reader);
 		}
 
-		internal static void Handle_SC_Sync_MasterLifeCycle(PacketReader receivedPacket, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_MasterLifeCycle(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_Sync_MasterReliable(PacketReader receivedPacket, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_MasterReliable(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_Sync_MasterUnreliable(PacketReader receivedPacket, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_MasterUnreliable(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal static void Handle_SC_Sync_Reliable(PacketReader reader, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_Reliable(IPacketReader reader, NetworkManager networkManager)
 		{
 			_log.Info("Reliable");
 			networkManager.GameSynchronizer.OnDeserializeReliable(reader);
 		}
 			
-		internal static void Handle_SC_Sync_Unreliable(PacketReader reader, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_Unreliable(IPacketReader reader, NetworkManager networkManager)
 		{
 			//Console.WriteLine("Unreliable");
 			networkManager.GameSynchronizer.OnDeserializeUnreliable(reader);

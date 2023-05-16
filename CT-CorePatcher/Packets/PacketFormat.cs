@@ -176,8 +176,8 @@ namespace {1}
 }}";
 
 		public static readonly string IgnoreFunction =
-@"public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
-public void Ignore(PacketReader reader) => throw new System.NotImplementedException();";
+@"public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
+public void Ignore(IPacketReader reader) => throw new System.NotImplementedException();";
 
 		/// <summary>
 		/// {0} Member name<br/>
@@ -228,7 +228,7 @@ using CTS.Instance.PacketCustom;
 
 namespace CTS.Instance.Packets
 {{
-	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase ReadPacket(IPacketReader reader);
 	public delegate PacketBase CreatePacket();
 
 	public static partial class PacketFactory
@@ -285,7 +285,7 @@ using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
 {{
-	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase ReadPacket(IPacketReader reader);
 	public delegate PacketBase CreatePacket();
 
 	public static partial class PacketFactory
@@ -359,7 +359,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
-	public delegate void HandlePacketRaw(PacketReader receivedPacket, UserSession session);
+	public delegate void HandlePacketRaw(IPacketReader receivedPacket, UserSession session);
 
 	public static class PacketDispatcher
 	{{
@@ -383,7 +383,7 @@ namespace CTS.Instance.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, UserSession session)
+		public static void DispatchRaw(PacketType packetType, IPacketReader receivedPacket, UserSession session)
 		{{
 			_dispatcherRawTable[packetType](receivedPacket, session);
 		}}
@@ -408,7 +408,7 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {{
 	public delegate void HandlePacket(PacketBase receivedPacket, NetworkManager networkManager);
-	public delegate void HandlePacketRaw(PacketReader receivedPacket, NetworkManager networkManager);
+	public delegate void HandlePacketRaw(IPacketReader receivedPacket, NetworkManager networkManager);
 
 	public static class PacketDispatcher
 	{{
@@ -432,7 +432,7 @@ namespace CTC.Networks.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, networkManager);
 		}}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, NetworkManager networkManager)
+		public static void DispatchRaw(PacketType packetType, IPacketReader receivedPacket, NetworkManager networkManager)
 		{{
 			_dispatcherRawTable[packetType](receivedPacket, networkManager);
 		}}

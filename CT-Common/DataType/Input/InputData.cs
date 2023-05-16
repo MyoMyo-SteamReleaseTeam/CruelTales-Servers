@@ -24,10 +24,10 @@ namespace CT.Common.DataType.Input
 
 		public Vector2 GetDirectionVector2() => Quantizer.RadByteToVec2(Direction);
 		public int SerializeSize => sizeof(byte);
-		public void Serialize(PacketWriter writer) => writer.Put(Direction);
-		public void Deserialize(PacketReader reader) => Direction = reader.ReadByte();
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(byte));
+		public void Serialize(IPacketWriter writer) => writer.Put(Direction);
+		public void Deserialize(IPacketReader reader) => Direction = reader.ReadByte();
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 
 	public struct InputMovementData : IPacketSerializable
@@ -37,21 +37,21 @@ namespace CT.Common.DataType.Input
 
 		public int SerializeSize => sizeof(MovementType) + Direction.SerializeSize;
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.PutMovementType(MovementType);
 			writer.Put(Direction);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			MovementType = reader.ReadMovementType();
 			Direction = reader.Read<ByteDirection>();
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
-		public static void IgnoreStatic(PacketReader reader)
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			reader.Ignore(sizeof(MovementType));
 			ByteDirection.IgnoreStatic(reader);
@@ -68,12 +68,12 @@ namespace CT.Common.DataType.Input
 
 	public static class MovementTypeExtension
 	{
-		public static void PutMovementType(this PacketWriter writer, MovementType movementType)
+		public static void PutMovementType(this IPacketWriter writer, MovementType movementType)
 		{
 			writer.Put((byte)movementType);
 		}
 
-		public static MovementType ReadMovementType(this PacketReader reader)
+		public static MovementType ReadMovementType(this IPacketReader reader)
 		{
 			return (MovementType)reader.ReadByte();
 		}

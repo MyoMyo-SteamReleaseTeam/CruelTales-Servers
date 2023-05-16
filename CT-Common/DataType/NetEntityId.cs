@@ -23,17 +23,17 @@ namespace CT.Common.DataType
 			ID = value;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(ID);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			ID = reader.ReadByte();
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(byte));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 	}
 }

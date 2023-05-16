@@ -12,7 +12,7 @@ using CT.Common.Serialization;
 namespace CTC.Networks.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, NetworkManager networkManager);
-	public delegate void HandlePacketRaw(PacketReader receivedPacket, NetworkManager networkManager);
+	public delegate void HandlePacketRaw(IPacketReader receivedPacket, NetworkManager networkManager);
 
 	public static class PacketDispatcher
 	{
@@ -43,7 +43,7 @@ namespace CTC.Networks.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, networkManager);
 		}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, NetworkManager networkManager)
+		public static void DispatchRaw(PacketType packetType, IPacketReader receivedPacket, NetworkManager networkManager)
 		{
 			_dispatcherRawTable[packetType](receivedPacket, networkManager);
 		}

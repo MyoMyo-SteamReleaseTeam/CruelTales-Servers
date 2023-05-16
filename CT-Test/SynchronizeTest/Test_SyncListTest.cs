@@ -12,9 +12,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[TestMethod]
 		public void SyncListTest()
 		{
-			byte[] data = new byte[1000];
-			PacketWriter pw = new PacketWriter(data);
-			PacketReader pr = new PacketReader(data);
+			ByteBuffer data = new(1000);
+			IPacketWriter pw = data;
+			IPacketReader pr = data;
 
 			SyncList<NetInt32> src = new()
 			{
@@ -47,7 +47,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 
 		private void checkWithBuffercheck<T>(SyncList<T> lhs, SyncList<T> rhs,
-											 PacketWriter pw, PacketReader pr)
+											 IPacketWriter pw, IPacketReader pr)
 			where T : struct, IPacketSerializable, IEquatable<T>
 		{
 			lhs.SerializeSyncReliable(pw);
@@ -56,8 +56,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				Assert.IsTrue(lhs[i].Equals(rhs[i]));
 			}
-			pw.Reset();
-			pr.Reset();
+			pw.ResetWriter();
+			pr.ResetReader();
 
 			lhs.ClearDirtyReliable();
 		}

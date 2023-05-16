@@ -61,7 +61,6 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-			_gameWorldManager.UpdateDeserialize();
 			_gameWorldManager.Update(deltaTime);
 			_gameWorldManager.UpdateSerialize();
 		}
@@ -144,7 +143,7 @@ namespace CTS.Instance.Gameplay
 			//}
 		}
 
-		public void OnUserTrySync(SyncOperation syncType, PacketReader packetReader)
+		public void OnUserTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
 			//_gameWorldManager.
 		}

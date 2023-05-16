@@ -409,13 +409,13 @@ namespace CT.CorePatcher.Packets
 			{
 				serializeFunction = string.Format(PacketFormat.PacketSerializeFunction,
 												  nameof(IPacketSerializable.Serialize),
-												  nameof(PacketWriter),
+												  nameof(IPacketWriter),
 												  WriterName,
 												  serializeContent);
 
 				deserializeFunction = string.Format(PacketFormat.PacketDeserializeFunction,
 												  nameof(IPacketSerializable.Deserialize),
-												  nameof(PacketReader),
+												  nameof(IPacketReader),
 												  ReaderName,
 												  deserializeContent);
 			}
@@ -423,13 +423,13 @@ namespace CT.CorePatcher.Packets
 			{
 				serializeFunction = string.Format(PacketFormat.SerializeFunction,
 												  nameof(IPacketSerializable.Serialize),
-												  nameof(PacketWriter),
+												  nameof(IPacketWriter),
 												  WriterName,
 												  serializeContent);
 
 				deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
 												  nameof(IPacketSerializable.Deserialize),
-												  nameof(PacketReader),
+												  nameof(IPacketReader),
 												  ReaderName,
 												  deserializeContent);
 			}

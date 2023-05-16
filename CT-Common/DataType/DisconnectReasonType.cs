@@ -44,13 +44,13 @@ namespace CT.Common.DataType
 
 	public static class DisconnectReasonTypeExtension
 	{
-		public static void PutDisconnectReasonType(this PacketWriter writer,
+		public static void PutDisconnectReasonType(this IPacketWriter writer,
 												   DisconnectReasonType reasonType)
 		{
 			writer.Put((byte)reasonType);
 		}
 
-		public static DisconnectReasonType ReadDisconnectReasonType(this PacketReader reader)
+		public static DisconnectReasonType ReadDisconnectReasonType(this IPacketReader reader)
 		{
 			return (DisconnectReasonType)reader.ReadByte();
 		}

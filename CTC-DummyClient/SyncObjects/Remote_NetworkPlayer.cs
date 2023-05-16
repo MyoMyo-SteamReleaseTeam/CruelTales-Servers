@@ -35,10 +35,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(PacketWriter writer) { }
-		public override void SerializeSyncUnreliable(PacketWriter writer) { }
-		public override void SerializeEveryProperty(PacketWriter writer) { }
-		public override void DeserializeSyncReliable(PacketReader reader)
+		public override void SerializeSyncReliable(IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeEveryProperty(IPacketWriter writer) { }
+		public override void DeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -57,8 +57,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				OnCostumeChanged?.Invoke(_costume);
 			}
 		}
-		public override void DeserializeSyncUnreliable(PacketReader reader) { }
-		public override void DeserializeEveryProperty(PacketReader reader)
+		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
+		public override void DeserializeEveryProperty(IPacketReader reader)
 		{
 			_userId.Deserialize(reader);
 			OnUserIdChanged?.Invoke(_userId);
@@ -67,7 +67,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_costume = reader.ReadInt32();
 			OnCostumeChanged?.Invoke(_costume);
 		}
-		public override void IgnoreSyncReliable(PacketReader reader)
+		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -83,7 +83,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 		}
-		public static void IgnoreSyncStaticReliable(PacketReader reader)
+		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
@@ -99,8 +99,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 		}
-		public override void IgnoreSyncUnreliable(PacketReader reader) { }
-		public static void IgnoreSyncStaticUnreliable(PacketReader reader) { }
+		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

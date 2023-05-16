@@ -18,12 +18,12 @@ namespace CT.Common.DataType
 
 	public static class AckJoinMatchExtension
 	{
-		public static void Put(this PacketWriter writer, AckJoinMatch value)
+		public static void Put(this IPacketWriter writer, AckJoinMatch value)
 		{
 			writer.Put((byte)value);
 		}
 
-		public static AckJoinMatch ReadAckJoinMatch(this PacketReader reader)
+		public static AckJoinMatch ReadAckJoinMatch(this IPacketReader reader)
 		{
 			return (AckJoinMatch)reader.ReadByte();
 		}

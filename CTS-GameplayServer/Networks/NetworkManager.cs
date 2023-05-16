@@ -108,8 +108,7 @@ namespace CTS.Instance.Networks
 			}
 		}
 
-		private PacketReader _packetReader = new();
-
+		private ByteBuffer _packetReader = new ByteBuffer();
 		private void onNetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
 		{
 			UserSession? session = null;
@@ -118,7 +117,8 @@ namespace CTS.Instance.Networks
 			{
 				if (_sessionManager.TryGetSessionBy(peer.Id, out session))
 				{
-					_packetReader.Initialize(reader.GetRemainingBytesSegment());
+					var packetSegment = reader.GetRemainingBytesSegment();
+					_packetReader.Initialize(packetSegment, packetSegment.Count);
 
 					while (_packetReader.CanRead(sizeof(PacketType)))
 					{

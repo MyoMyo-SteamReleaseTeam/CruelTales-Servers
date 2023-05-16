@@ -18,7 +18,7 @@ namespace CT.Common.DataType
 
 		public int SerializeSize => sizeof(byte) + sizeof(int) * Count;
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put((byte)Count);
 			int count = Count;
@@ -28,7 +28,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();
@@ -72,7 +72,7 @@ namespace CT.Common.DataType
 
 		public int SerializeSize => sizeof(byte) + sizeof(float) * Count;
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put((byte)Count);
 			int count = Count;
@@ -82,7 +82,7 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();

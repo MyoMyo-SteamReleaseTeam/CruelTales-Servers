@@ -18,22 +18,22 @@ namespace CT.Packets
 	
 		public int SerializeSize => UserId.SerializeSize + Username.SerializeSize + UserCostume.SerializeSize;
 	
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			UserId.Serialize(writer);
 			Username.Serialize(writer);
 			UserCostume.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			UserId.Deserialize(reader);
 			Username.Deserialize(reader);
 			UserCostume.Deserialize(reader);
 		}
 	
-		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
-		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(IPacketReader reader) => throw new System.NotImplementedException();
 	}
 	
 	public partial struct DokzaCostume : IPacketSerializable
@@ -43,19 +43,19 @@ namespace CT.Packets
 	
 		public int SerializeSize =>  + 8;
 	
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Head);
 			writer.Put(Body);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Head = reader.ReadInt32();
 			Body = reader.ReadInt32();
 		}
 	
-		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
-		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(IPacketReader reader) => throw new System.NotImplementedException();
 	}
 }

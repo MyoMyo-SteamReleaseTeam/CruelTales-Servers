@@ -17,13 +17,13 @@ namespace CT.Common.DataType
 			Y = y;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(X);
 			writer.Put(Y);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			X = reader.ReadSingle();
 			Y = reader.ReadSingle();
@@ -39,8 +39,8 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"({X}, {Y})";
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(8);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(8);
 	}
 
 	[Serializable]
@@ -50,18 +50,18 @@ namespace CT.Common.DataType
 	
 		public int SerializeSize => sizeof(float);
 	
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Z);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Z = reader.ReadSingle();
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(float));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(float));
 	}
 
 	[Serializable]
@@ -84,14 +84,14 @@ namespace CT.Common.DataType
 			//PositionZ.SerializeSize + 
 			Velocity.SerializeSize;
 	
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			Position.Serialize(writer);
 			//PositionZ.Serialize(writer);
 			Velocity.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Position.Deserialize(reader);
 			//PositionZ.Deserialize(reader);
@@ -111,7 +111,7 @@ namespace CT.Common.DataType
 			return this == lhs;
 		}
 		public override string ToString() => $"([{nameof(Position)}:{Position}][{nameof(Velocity)}:{Velocity}])";
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(12);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(12);
 	}
 }

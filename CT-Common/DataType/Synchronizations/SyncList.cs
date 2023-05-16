@@ -126,7 +126,7 @@ namespace CT.Common.DataType.Synchronizations
 			_operationStack.Clear();
 		}
 
-		public void SerializeEveryProperty(PacketWriter writer)
+		public void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put((byte)_list.Count);
 			for (int i = 0; i < _list.Count; i++)
@@ -135,7 +135,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void SerializeSyncReliable(PacketWriter writer)
+		public void SerializeSyncReliable(IPacketWriter writer)
 		{
 			writer.Put((byte)_operationStack.Count);
 			byte operationCount = (byte)_operationStack.Count;
@@ -177,7 +177,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeEveryProperty(PacketReader reader)
+		public void DeserializeEveryProperty(IPacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
@@ -188,7 +188,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeSyncReliable(PacketReader reader)
+		public void DeserializeSyncReliable(IPacketReader reader)
 		{
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
@@ -231,7 +231,7 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 #if NET
-		public static void IgnoreSyncReliable(PacketReader reader)
+		public static void IgnoreSyncReliable(IPacketReader reader)
 #else
 		public void IgnoreSyncReliable(PacketReader reader)
 #endif
@@ -272,10 +272,10 @@ namespace CT.Common.DataType.Synchronizations
 		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
 		public bool IsDirtyUnreliable => throw _exception;
 		public void ClearDirtyUnreliable() => throw _exception;
-		public void DeserializeSyncUnreliable(PacketReader reader) => throw _exception;
-		public void SerializeSyncUnreliable(PacketWriter writer) => throw _exception;
-		public void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
-		private static void ignoreElement(PacketReader reader)
+		public void DeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
+		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
+		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
+		private static void ignoreElement(IPacketReader reader)
 		{
 			T temp = new();
 			temp.Ignore(reader);

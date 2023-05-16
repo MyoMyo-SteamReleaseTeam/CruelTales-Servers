@@ -79,7 +79,7 @@ namespace CT.Test.SynchronizeTest
 			_dirtyReliable_0.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(PacketWriter writer)
+		public override void SerializeSyncReliable(IPacketWriter writer)
 		{
 			BitmaskByte masterDirty = new BitmaskByte();
 			masterDirty[0] = _dirtyReliable_0.AnyTrue();
@@ -117,22 +117,22 @@ namespace CT.Test.SynchronizeTest
 				}
 			}
 		}
-		public override void SerializeSyncUnreliable(PacketWriter writer) { }
-		public override void SerializeEveryProperty(PacketWriter writer)
+		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userToken.Serialize(writer);
 			writer.Put(_intValue);
 		}
-		public override void DeserializeSyncReliable(PacketReader reader) { }
-		public override void DeserializeSyncUnreliable(PacketReader reader) { }
-		public override void DeserializeEveryProperty(PacketReader reader) { }
+		public override void DeserializeSyncReliable(IPacketReader reader) { }
+		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
+		public override void DeserializeEveryProperty(IPacketReader reader) { }
 
-		public override void IgnoreSyncReliable(PacketReader reader)
+		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override void IgnoreSyncUnreliable(PacketReader reader)
+		public override void IgnoreSyncUnreliable(IPacketReader reader)
 		{
 			throw new NotImplementedException();
 		}

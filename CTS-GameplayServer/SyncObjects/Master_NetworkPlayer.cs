@@ -74,7 +74,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(PacketWriter writer)
+		public override void SerializeSyncReliable(IPacketWriter writer)
 		{
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
@@ -90,20 +90,20 @@ namespace CTS.Instance.SyncObjects
 				writer.Put(_costume);
 			}
 		}
-		public override void SerializeSyncUnreliable(PacketWriter writer) { }
-		public override void SerializeEveryProperty(PacketWriter writer)
+		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
 			writer.Put(_costume);
 		}
-		public override void DeserializeSyncReliable(PacketReader reader) { }
-		public override void DeserializeSyncUnreliable(PacketReader reader) { }
-		public override void DeserializeEveryProperty(PacketReader reader) { }
-		public override void IgnoreSyncReliable(PacketReader reader) { }
-		public static void IgnoreSyncStaticReliable(PacketReader reader) { }
-		public override void IgnoreSyncUnreliable(PacketReader reader) { }
-		public static void IgnoreSyncStaticUnreliable(PacketReader reader) { }
+		public override void DeserializeSyncReliable(IPacketReader reader) { }
+		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
+		public override void DeserializeEveryProperty(IPacketReader reader) { }
+		public override void IgnoreSyncReliable(IPacketReader reader) { }
+		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
+		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

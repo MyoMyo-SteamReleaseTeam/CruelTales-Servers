@@ -50,14 +50,14 @@ namespace CT.Common.Gameplay
 			Velocity = velocity;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(_isTeleported);
 			writer.Put(Position);
 			writer.Put(Velocity);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			bool isTeleport = reader.ReadBool();
 			Position = reader.ReadVector3();

@@ -25,11 +25,11 @@ namespace CT.Test.SynchronizeTest
 			serverObj.Server_SendValue(10.50f);
 			serverObj.Server_SendMessage("User token");
 
-			byte[] syncData = new byte[1000];
-			PacketWriter writer = new PacketWriter(syncData);
+			ByteBuffer syncData = new(1000);
+			IPacketWriter writer = syncData;
 			serverObj.SerializeSyncReliable(writer);
 
-			PacketReader reader = new PacketReader(syncData);
+			IPacketReader reader = syncData;
 			clientObj.DeserializeSyncReliable(reader);
 
 			Assert.AreEqual(new UserToken(1122), clientObj.UserToken);

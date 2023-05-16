@@ -9,12 +9,12 @@ namespace CTS.Instance.PacketCustom
 
 		public override int SerializeSize => throw new System.NotImplementedException();
 
-		public override void Deserialize(PacketReader reader)
+		public override void Deserialize(IPacketReader reader)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public override void Serialize(PacketWriter writer)
+		public override void Serialize(IPacketWriter writer)
 		{
 			throw new System.NotImplementedException();
 		}

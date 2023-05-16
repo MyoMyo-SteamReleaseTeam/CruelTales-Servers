@@ -17,20 +17,20 @@ namespace CT.Packets
 	
 		public int SerializeSize => Username.SerializeSize + Clothes.SerializeSize;
 	
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			Username.Serialize(writer);
 			Clothes.Serialize(writer);
 		}
 	
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Username.Deserialize(reader);
 			Clothes.Deserialize(reader);
 		}
 	
-		public static void IgnoreStatic(PacketReader reader) => throw new System.NotImplementedException();
-		public void Ignore(PacketReader reader) => throw new System.NotImplementedException();
+		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
+		public void Ignore(IPacketReader reader) => throw new System.NotImplementedException();
 	}
 	
 	public sealed partial class CS_Req_TryEnterGameInstance : PacketBase
@@ -43,7 +43,7 @@ namespace CT.Packets
 	
 		public override int SerializeSize => MatchTo.SerializeSize + UserDataInfo.SerializeSize + Token.SerializeSize + 2;
 	
-		public override void Serialize(PacketWriter writer)
+		public override void Serialize(IPacketWriter writer)
 		{
 			writer.Put(PacketType);
 			MatchTo.Serialize(writer);
@@ -51,7 +51,7 @@ namespace CT.Packets
 			Token.Serialize(writer);
 		}
 	
-		public override void Deserialize(PacketReader reader)
+		public override void Deserialize(IPacketReader reader)
 		{
 			MatchTo.Deserialize(reader);
 			UserDataInfo.Deserialize(reader);
@@ -67,13 +67,13 @@ namespace CT.Packets
 	
 		public override int SerializeSize =>  + 3;
 	
-		public override void Serialize(PacketWriter writer)
+		public override void Serialize(IPacketWriter writer)
 		{
 			writer.Put(PacketType);
 			writer.Put(AckResult);
 		}
 	
-		public override void Deserialize(PacketReader reader)
+		public override void Deserialize(IPacketReader reader)
 		{
 			AckResult = reader.ReadAckJoinMatch();
 		}
@@ -87,13 +87,13 @@ namespace CT.Packets
 	
 		public override int SerializeSize =>  + 2;
 	
-		public override void Serialize(PacketWriter writer)
+		public override void Serialize(IPacketWriter writer)
 		{
 			writer.Put(PacketType);
 			
 		}
 	
-		public override void Deserialize(PacketReader reader)
+		public override void Deserialize(IPacketReader reader)
 		{
 			
 		}

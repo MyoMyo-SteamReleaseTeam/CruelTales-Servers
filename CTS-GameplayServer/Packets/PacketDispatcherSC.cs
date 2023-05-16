@@ -13,7 +13,7 @@ using CTS.Instance.Networks;
 namespace CTS.Instance.Packets
 {
 	public delegate void HandlePacket(PacketBase receivedPacket, UserSession session);
-	public delegate void HandlePacketRaw(PacketReader receivedPacket, UserSession session);
+	public delegate void HandlePacketRaw(IPacketReader receivedPacket, UserSession session);
 
 	public static class PacketDispatcher
 	{
@@ -43,7 +43,7 @@ namespace CTS.Instance.Packets
 			_dispatcherTable[receivedPacket.PacketType](receivedPacket, session);
 		}
 
-		public static void DispatchRaw(PacketType packetType, PacketReader receivedPacket, UserSession session)
+		public static void DispatchRaw(PacketType packetType, IPacketReader receivedPacket, UserSession session)
 		{
 			_dispatcherRawTable[packetType](receivedPacket, session);
 		}

@@ -165,7 +165,7 @@ namespace CTS.Instance.Gameplay
 			_userList.Add(userSession);
 		}
 
-		public void SendReliableToAll(PacketWriter writer,
+		public void SendReliableToAll(IPacketWriter writer,
 									  byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			foreach (var user in _userById.ForwardValues)
@@ -174,7 +174,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void SendUnreliableToAll(PacketWriter writer,
+		public void SendUnreliableToAll(IPacketWriter writer,
 										byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			foreach (var user in _userById.ForwardValues)
@@ -183,7 +183,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void SendReliable(UserId userId, PacketWriter writer,
+		public void SendReliable(UserId userId, IPacketWriter writer,
 								 byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			if (_userById.TryGetValue(userId, out var userSession))
@@ -196,7 +196,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void SendUnreliable(UserId userId, PacketWriter writer,
+		public void SendUnreliable(UserId userId, IPacketWriter writer,
 								   byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			if (_userById.TryGetValue(userId, out var userSession))

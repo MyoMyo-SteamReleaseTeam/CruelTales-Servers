@@ -49,12 +49,12 @@ namespace CT.Common.DataType
 			Value = value;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(this);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Value = reader.ReadNetString();
 		}
@@ -89,24 +89,24 @@ namespace CT.Common.DataType
 		public static bool operator !=(NetString lhs, NetString rhs) => lhs.Value != rhs.Value;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Serialize(in NetString value, PacketWriter writer)
+		public static void Serialize(in NetString value, IPacketWriter writer)
 		{
 			writer.Put(value);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Deserialize(ref NetString value, PacketReader reader)
+		public static void Deserialize(ref NetString value, IPacketReader reader)
 		{
 			value = reader.ReadNetString();
 		}
 
-		public static void IgnoreStatic(PacketReader reader)
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			ushort count = reader.ReadUInt16();
 			reader.Ignore(count);
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 	}
 
 	/// <summary>256이하 길이의 string 입니다.</summary>
@@ -150,12 +150,12 @@ namespace CT.Common.DataType
 			Value = value;
 		}
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(this);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Value = reader.ReadNetStringShort();
 		}
@@ -190,20 +190,20 @@ namespace CT.Common.DataType
 		public static bool operator !=(NetStringShort lhs, NetStringShort rhs) => lhs.Value != rhs.Value;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Serialize(in NetStringShort value, PacketWriter writer)
+		public static void Serialize(in NetStringShort value, IPacketWriter writer)
 		{
 			writer.Put(value);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Deserialize(ref NetStringShort value, PacketReader reader)
+		public static void Deserialize(ref NetStringShort value, IPacketReader reader)
 		{
 			value = reader.ReadNetStringShort();
 		}
 
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
-		public static void IgnoreStatic(PacketReader reader)
+		public static void IgnoreStatic(IPacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			reader.Ignore(count);

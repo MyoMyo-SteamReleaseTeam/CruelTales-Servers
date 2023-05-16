@@ -8,8 +8,8 @@
 	public interface IPacketSerializable
 	{
 		public int SerializeSize { get; }
-		public void Serialize(PacketWriter writer);
-		public void Deserialize(PacketReader reader);
-		public void Ignore(PacketReader reader);
+		public void Serialize(IPacketWriter writer);
+		public void Deserialize(IPacketReader reader);
+		public void Ignore(IPacketReader reader);
 	}
 }

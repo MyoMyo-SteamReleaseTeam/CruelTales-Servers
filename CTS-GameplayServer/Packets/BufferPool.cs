@@ -56,7 +56,7 @@ namespace CTS.Instance.Packets
 			return PacketFactory.CreatePacket(type);
 		}
 
-		public PacketBase ReadPacket(PacketType packetType, PacketReader reader)
+		public PacketBase ReadPacket(PacketType packetType, IPacketReader reader)
 		{
 			var packet = GetPacket(packetType);
 			packet.Deserialize(reader);

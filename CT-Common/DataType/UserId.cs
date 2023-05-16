@@ -16,12 +16,12 @@ namespace CT.Common.DataType
 
 		public int SerializeSize => sizeof(ulong);
 
-		public void Serialize(PacketWriter writer)
+		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Id);
 		}
 
-		public void Deserialize(PacketReader reader)
+		public void Deserialize(IPacketReader reader)
 		{
 			Id = reader.ReadUInt64();
 		}
@@ -40,7 +40,7 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
-		public void Ignore(PacketReader reader) => IgnoreStatic(reader);
-		public static void IgnoreStatic(PacketReader reader) => reader.Ignore(sizeof(ulong));
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ulong));
 	}
 }

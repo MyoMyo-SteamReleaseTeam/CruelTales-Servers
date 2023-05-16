@@ -18,9 +18,9 @@ namespace CT.Test.NetworkCore
 				floatArray.Add(i * multiply);
 			}
 
-			PacketSegment segment = new PacketSegment(33 * 4);
-			PacketWriter writer = new PacketWriter(segment);
-			PacketReader reader = new PacketReader(segment);
+			ByteBuffer segment = new(33 * 4);
+			IPacketWriter writer = segment;
+			IPacketReader reader = segment;
 
 			floatArray.Serialize(writer);
 
@@ -48,24 +48,24 @@ namespace CT.Test.NetworkCore
 
 			public int SerializeSize => sizeof(int) + Name.SerializeSize;
 
-			public void Serialize(PacketWriter writer)
+			public void Serialize(IPacketWriter writer)
 			{
 				writer.Put(Name);
 				writer.Put(Age);
 			}
 
-			public void Deserialize(PacketReader reader)
+			public void Deserialize(IPacketReader reader)
 			{
 				Name = reader.ReadNetString();
 				Age = reader.ReadInt32();
 			}
 
-			public void Ignore(PacketReader reader)
+			public void Ignore(IPacketReader reader)
 			{
 				throw new System.NotImplementedException();
 			}
 
-			public static void IgnoreStatic(PacketReader reader)
+			public static void IgnoreStatic(IPacketReader reader)
 			{
 				throw new System.NotImplementedException();
 			}
@@ -81,9 +81,9 @@ namespace CT.Test.NetworkCore
 				new FlexibleSizeData("ABCDE한글", 777),
 			};
 
-			PacketSegment segment = new PacketSegment(200);
-			PacketWriter writer = new PacketWriter(segment);
-			PacketReader reader = new PacketReader(segment);
+			ByteBuffer segment = new(200);
+			IPacketWriter writer = segment;
+			IPacketReader reader = segment;
 
 			refArray.Serialize(writer);
 
@@ -111,26 +111,26 @@ namespace CT.Test.NetworkCore
 
 			public int SerializeSize => 9;
 
-			public void Serialize(PacketWriter writer)
+			public void Serialize(IPacketWriter writer)
 			{
 				writer.Put((byte)Type);
 				writer.Put(Age);
 				writer.Put(Height);
 			}
 
-			public void Deserialize(PacketReader reader)
+			public void Deserialize(IPacketReader reader)
 			{
 				Type = (TestType)reader.ReadByte();
 				Age = reader.ReadInt32();
 				Height = reader.ReadInt32();
 			}
 
-			public void Ignore(PacketReader reader)
+			public void Ignore(IPacketReader reader)
 			{
 				throw new System.NotImplementedException();
 			}
 
-			public static void IgnoreStatic(PacketReader reader)
+			public static void IgnoreStatic(IPacketReader reader)
 			{
 				throw new System.NotImplementedException();
 			}
@@ -147,9 +147,9 @@ namespace CT.Test.NetworkCore
 				new FixedSizeData() { Type = TestType.G,  Age = 656, Height = 123 },
 			};
 
-			PacketSegment segment = new PacketSegment(9 * fixedArray.Count);
-			PacketWriter writer = new PacketWriter(segment);
-			PacketReader reader = new PacketReader(segment);
+			ByteBuffer segment = new(9 * fixedArray.Count);
+			IPacketWriter writer = segment;
+			IPacketReader reader = segment;
 
 			fixedArray.Serialize(writer);
 

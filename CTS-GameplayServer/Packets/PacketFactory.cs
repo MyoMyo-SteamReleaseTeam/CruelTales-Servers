@@ -14,7 +14,7 @@ using CTS.Instance.PacketCustom;
 
 namespace CTS.Instance.Packets
 {
-	public delegate PacketBase ReadPacket(PacketReader reader);
+	public delegate PacketBase ReadPacket(IPacketReader reader);
 	public delegate PacketBase CreatePacket();
 
 	public static partial class PacketFactory

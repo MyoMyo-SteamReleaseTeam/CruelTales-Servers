@@ -107,27 +107,27 @@ namespace CTS.Instance.Networks
 			PacketDispatcher.Dispatch(packet, this);
 		}
 
-		public void OnReceiveRaw(PacketType packetType, PacketReader reader)
+		public void OnReceiveRaw(PacketType packetType, IPacketReader reader)
 		{
 			PacketDispatcher.DispatchRaw(packetType, reader, this);
 		}
 
-		public void SendReliable(PacketWriter writer,
+		public void SendReliable(IPacketWriter writer,
 								 byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			_peer?.Send(writer.Buffer.Array,
 						writer.Buffer.Offset, 
-						writer.Count, 
+						writer.Size, 
 						channelNumber, 
 						DeliveryMethod.ReliableOrdered);
 		}
 
-		public void SendUnreliable(PacketWriter writer,
+		public void SendUnreliable(IPacketWriter writer,
 								   byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
 			_peer?.Send(writer.Buffer.Array,
 						writer.Buffer.Offset,
-						writer.Count,
+						writer.Size,
 						channelNumber,
 						DeliveryMethod.Unreliable);
 		}
@@ -230,7 +230,7 @@ namespace CTS.Instance.Networks
 				// Create Ack packet
 				var ackPacket = _packetPool.GetPacket<SC_Ack_TryEnterGameInstance>();
 				ackPacket.AckResult = AckJoinMatch.Success;
-				PacketWriter writer = new PacketWriter(new byte[20]);
+				ByteBuffer writer = new ByteBuffer(20);
 				writer.Put(ackPacket);
 
 				// Send Ack
@@ -281,7 +281,7 @@ namespace CTS.Instance.Networks
 			return $"{UserId}:{Username}";
 		}
 
-		public void OnTrySync(SyncOperation syncType, PacketReader packetReader)
+		public void OnTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
 			_gameInstance?.GameManager.OnUserTrySync(syncType, packetReader);
 		}
