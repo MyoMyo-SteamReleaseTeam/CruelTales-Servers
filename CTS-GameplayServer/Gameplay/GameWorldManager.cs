@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
@@ -16,20 +17,18 @@ using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	[StructLayout(LayoutKind.Sequential)]
-	public unsafe struct SynchronizeJob
+	public class PlayerVisibleTable
 	{
-		public SyncOperation Operation;
-		public fixed byte Data[GlobalNetwork.MTU];
+		/// <summary>무시할 가시성 특성입니다.</summary>
+		public NetworkVisibility IgnoreVisibility = NetworkVisibility.None;
 
-		public void CopyFrom(SyncOperation operation, IPacketReader reader)
+		public PlayerVisibleTable(NetworkPlayer networkPlayer)
 		{
-			Operation = operation;
-
+			//networkPlayer
 		}
 	}
 
-	public class GameWorldManager : IUpdatable, IJobHandler<SynchronizeJob>
+	public class GameWorldManager : IUpdatable
 	{
 		// Log
 		private static ILog _log = LogManager.GetLogger(typeof(GameWorldManager));
@@ -53,7 +52,9 @@ namespace CTS.Instance.Gameplay
 			// Update every objects
 			foreach (var netObj in _worldObjectById.ForwardValues)
 			{
-				netObj.FixedUpdate(deltaTime);
+				if (!netObj.IsAlive)
+					return;
+
 				netObj.Update(deltaTime);
 			}
 
@@ -73,7 +74,7 @@ namespace CTS.Instance.Gameplay
 		{
 			var netObj = _objectPoolManager.Create<T>();
 			_worldObjectById.Add(netObj.Identity, netObj);
-			netObj.Initialize(this, _worldPartition, getNetworkIdentityCounter(), position);
+			netObj.Create(this, _worldPartition, getNetworkIdentityCounter(), position);
 			netObj.OnCreated();
 			return netObj;
 
@@ -118,26 +119,48 @@ namespace CTS.Instance.Gameplay
 			if (!_worldObjectById.TryRemove(netObject))
 			{
 				_log.Error($"There is no network object to remove. Object : [{netObject}]");
+				Debug.Assert(false);
 				return;
 			}
 
-			netObject.OnDestroy();
+			netObject.Dispose();
+			netObject.OnDestroyed();
 			_objectPoolManager.Return(netObject);
 		}
 
-		public void AddPlayer(UserSession session)
+		public void OnDeserializeSyncReliable(IPacketReader reader)
 		{
-			var playerEntity = CreateObject<NetworkPlayer>();
-			playerEntity.BindUser(session);
+			while (reader.CanRead(1))
+			{
+				NetworkIdentity id = new NetworkIdentity();
+				id.Deserialize(reader);
+				if (_worldObjectById.TryGetValue(id, out var netObj))
+				{
+					netObj.DeserializeSyncReliable(reader);
+				}
+				else
+				{
+					_log.Warn($"{nameof(OnDeserializeSyncReliable)} ignored!");
+					reader.IgnoreAll();
+				}
+			}
 		}
 
-		#region Synchronize
-
-		public void Flush(SynchronizeJob job)
+		public void OnDeserializeSyncUnreliable(IPacketReader reader)
 		{
-
+			while (reader.CanRead(1))
+			{
+				NetworkIdentity id = new NetworkIdentity();
+				id.Deserialize(reader);
+				if (_worldObjectById.TryGetValue(id, out var netObj))
+				{
+					netObj.DeserializeSyncUnreliable(reader);
+				}
+				else
+				{
+					_log.Warn($"{nameof(OnDeserializeSyncUnreliable)} ignored!");
+				}
+			}
 		}
-
-		#endregion
 	}
 }

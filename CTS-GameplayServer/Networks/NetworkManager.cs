@@ -49,7 +49,7 @@ namespace CTS.Instance.Networks
 			_serverTimer = serverTimer;
 
 			GameplayInstanceManager = new(_serverOption, _serverTimer);
-			_sessionManager = new SessionManager(this);
+			_sessionManager = new SessionManager(this, (int)(_serverOption.GameCount * 7 * 1.15f));
 		}
 
 		public void Start()

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
-using CT.Common.Serialization;
-using CT.Common.Synchronizations;
 using CT.Networks.Runtimes;
-using CT.Packets;
 using CTS.Instance.Networks;
-using CTS.Instance.PacketCustom;
-using CTS.Instance.Packets;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -15,6 +9,7 @@ namespace CTS.Instance.Gameplay
 	public class GameInstanceOption
 	{
 		public int MaxUser { get; set; }
+		public int SyncJobCapacity => MaxUser * 20;
 	}
 
 	public class GameInstance
@@ -34,18 +29,18 @@ namespace CTS.Instance.Gameplay
 		// Managers
 		public GameManager GameManager { get; private set; }
 
-		public GameInstance(TickTimer serverTimer)
+		public GameInstance(TickTimer serverTimer, GameInstanceOption option)
 		{
+			_option = option;
 			ServerTimer = serverTimer;
-			SessionHandler = new UserSessionHandler(this);
+			SessionHandler = new UserSessionHandler(this, 8);
 			//_inputHandler = new UserInputHandler(this);
-			GameManager = new GameManager(this);
+			GameManager = new GameManager(this, _option.SyncJobCapacity);
 		}
 
-		public void Initialize(GameInstanceGuid guid, GameInstanceOption option)
+		public void Initialize(GameInstanceGuid guid)
 		{
 			_log = LogManager.GetLogger($"{nameof(GameInstance)}_{guid}");
-			_option = option;
 
 			Guid = guid;
 
@@ -54,7 +49,7 @@ namespace CTS.Instance.Gameplay
 			//_inputHandler.Clear();
 
 			// TEST
-			GameManager.StartGame();
+			//GameManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>
@@ -68,9 +63,8 @@ namespace CTS.Instance.Gameplay
 			//_inputHandler.Flush(deltaTime);
 
 			// Update game logic
+			GameManager.Flush();
 			GameManager.Update(deltaTime);
-			GameManager.SyncReliable();
-			GameManager.SyncUnreliable();
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
@@ -80,11 +74,6 @@ namespace CTS.Instance.Gameplay
 				DisconnectPlayer(ps, reason);
 			}
 		}
-
-		//public void OnUserInput(UserInputJob job)
-		//{
-		//	_inputHandler.PushUserInput(job);
-		//}
 
 		public void DisconnectPlayer(UserSession userSession, DisconnectReasonType reason)
 		{

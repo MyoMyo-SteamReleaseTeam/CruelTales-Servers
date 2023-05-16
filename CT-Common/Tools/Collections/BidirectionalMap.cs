@@ -11,8 +11,8 @@ namespace CT.Common.Tools.Collections
 		where T1 : notnull
 		where T2 : notnull
 	{
-		private readonly Dictionary<T1, T2> _forwardMap = new Dictionary<T1, T2>();
-		private readonly Dictionary<T2, T1> _reverseMap = new Dictionary<T2, T1>();
+		private readonly Dictionary<T1, T2> _forwardMap;
+		private readonly Dictionary<T2, T1> _reverseMap;
 
 		public Dictionary<T1, T2>.ValueCollection ForwardValues => _forwardMap.Values;
 		public Dictionary<T2, T1>.ValueCollection ReverseValues => _reverseMap.Values;
@@ -21,6 +21,18 @@ namespace CT.Common.Tools.Collections
 
 		public IEnumerator GetEnumerator() => _forwardMap.GetEnumerator();
 		public int Count => _forwardMap.Count;
+
+		public BidirectionalMap()
+		{
+			_forwardMap = new Dictionary<T1, T2>();
+			_reverseMap = new Dictionary<T2, T1>();
+		}
+
+		public BidirectionalMap(int capacity)
+		{
+			_forwardMap = new Dictionary<T1, T2>(capacity);
+			_reverseMap = new Dictionary<T2, T1>(capacity);
+		}
 
 		/// <summary>Map의 모든 요소를 삭제합니다.</summary>
 		public void Clear()

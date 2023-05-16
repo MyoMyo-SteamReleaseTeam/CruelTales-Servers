@@ -8,7 +8,7 @@ namespace CTS.Instance.Gameplay
 {
 	public class WorldPartitioner
 	{
-		public const float RESOLUTION = 1.0f / 128.0f;
+		public const float INVERSE_CEll_SIZE = 1.0f / 8.0f;
 
 		public const float ORIGIN_OFFSET_X = 128.0f;
 		public const float ORIGIN_OFFSET_Z = 128.0f;
@@ -33,28 +33,41 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public HashSet<NetworkIdentity> this[Vector3 pos] => this[GetWorldCell(pos)];
-		public HashSet<NetworkIdentity> this[Vector2Int internalCell]
+		//private HashSet<NetworkIdentity> getCell(Vector3 pos) => getCell(GetWorldCell(pos));
+		private HashSet<NetworkIdentity> getCell(Vector2Int internalCell)
 		{
-			get
+			if (internalCell.Y < 0 || internalCell.Y > CELL_HEIGHT ||
+				internalCell.X < 0 || internalCell.X > CELL_WIDTH)
 			{
-				if (internalCell.Y < 0 || internalCell.Y > CELL_HEIGHT ||
-					internalCell.X < 0 || internalCell.X > CELL_WIDTH)
-				{
-					return _nullSet;
-				}
-
-				return _networkObjectByCell[internalCell.Y, internalCell.X];
+				return _nullSet;
 			}
+
+			return _networkObjectByCell[internalCell.Y, internalCell.X];
 		}
 
 		public static Vector2Int GetWorldCell(Vector3 position)
 		{
 			float curPosX = position.X + ORIGIN_OFFSET_X;
 			float curPosZ = position.Z + ORIGIN_OFFSET_Z;
-			int cellX = (int)(curPosX * RESOLUTION);
-			int cellZ = (int)(curPosZ * RESOLUTION);
+			int cellX = (int)(curPosX * INVERSE_CEll_SIZE);
+			int cellZ = (int)(curPosZ * INVERSE_CEll_SIZE);
 			return new Vector2Int(cellX, cellZ);
+		}
+
+		public void OnCellChanged(NetworkIdentity id, Vector2Int previous, Vector2Int current)
+		{
+			getCell(previous).Remove(id);
+			getCell(current).Add(id);
+		}
+
+		public void OnCreated(NetworkIdentity id, Vector2Int cellPos)
+		{
+			getCell(cellPos).Add(id);
+		}
+
+		public void OnDestroy(NetworkIdentity id, Vector2Int cellPos)
+		{
+			getCell(cellPos).Remove(id);
 		}
 	}
 }

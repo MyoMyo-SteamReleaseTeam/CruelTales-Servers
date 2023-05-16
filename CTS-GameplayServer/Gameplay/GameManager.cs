@@ -1,32 +1,48 @@
-﻿using System;
-using System.Numerics;
-using CT.Common.DataType;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;
-using CT.Packets;
+using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
-using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
+using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public class GameManager
+	[StructLayout(LayoutKind.Sequential)]
+	public struct SynchronizeJob
 	{
+		public SyncOperation Operation;
+		public IPacketReader SyncDataReader;
+
+		public SynchronizeJob(SyncOperation operation, IPacketReader reader)
+		{
+			Operation = operation;
+			SyncDataReader = reader;
+		}
+	}
+
+	public class GameManager : IJobHandler
+	{
+		private static readonly ILog _log = LogManager.GetLogger(typeof(GameManager));
+
 		private MiniGameMapData _miniGameMapData { get; set; }
 		private GameInstance _gameInstance;
 		private UserSessionHandler _userSessionHandler;
+		public GameWorldManager WorldManager { get; private set; }
 
-		// Test buffer
-		private byte[] _packetBuffer = new byte[1024 * 64];
+		// Job Queue
+		private JobQueue<SynchronizeJob> _syncJobQueue;
 
-		private GameWorldManager _gameWorldManager;
-
-		public GameManager(GameInstance gameInstance)
+		public GameManager(GameInstance gameInstance, int syncJobCapacity)
 		{
 			_gameInstance = gameInstance;
 			_userSessionHandler = gameInstance.SessionHandler;
-			_gameWorldManager = new GameWorldManager();
+			WorldManager = new GameWorldManager();
+
+			// Job Queue
+			_syncJobQueue = new JobQueue<SynchronizeJob>(onSyncJobExecute, syncJobCapacity);
 
 			// Temp
 			_miniGameMapData = new()
@@ -49,29 +65,28 @@ namespace CTS.Instance.Gameplay
 
 		public void Initialize()
 		{
-			_gameWorldManager.Clear();
+			WorldManager.Clear();
 		}
-
-		public void StartGame()
-		{
-
-		}
-
-		float sendTime = 0;
 
 		public void Update(float deltaTime)
 		{
-			_gameWorldManager.Update(deltaTime);
-			_gameWorldManager.UpdateSerialize();
+			WorldManager.Update(deltaTime);
+			WorldManager.UpdateSerialize();
 		}
 
-		public void CheckEndCondition()
+		public void Clear()
 		{
+		}
 
+		public void Flush()
+		{
+			_syncJobQueue.Flush();
 		}
 
 		public void OnUserEnter(UserSession userSession)
 		{
+			var playerEntity = WorldManager.CreateObject<NetworkPlayer>();
+			playerEntity.BindUser(userSession);
 			//PacketWriter pw = new(_packetBuffer);
 			//pw.Put(PacketType.SC_Sync_LifeCycle);
 			//foreach (var netObj in _worldObject.Values)
@@ -87,65 +102,36 @@ namespace CTS.Instance.Gameplay
 		{
 		}
 
-		public void SyncReliable()
-		{
-			//var netObjs = _worldObject.Values;
-			//if (netObjs.Count <= 0)
-			//	return;
-
-			//int syncCount = 0;
-
-			//PacketWriter pw = new(_packetBuffer);
-			//pw.Put(PacketType.SC_Sync_Reliable);
-			//foreach (var netObj in netObjs)
-			//{
-			//	if (!netObj.IsDirtyReliable)
-			//	{
-			//		continue;
-			//	}
-			//	pw.Put(netObj.Identity);
-			//	netObj.SerializeSyncReliable(pw);
-			//	netObj.ClearDirtyReliable();
-			//	syncCount++;
-			//}
-
-			//if (syncCount > 0)
-			//{
-			//	_userSessionHandler.SendReliableToAll(pw);
-			//}
-		}
-
-		public void SyncUnreliable()
-		{
-			//var netObjs = _worldObject.Values;
-			//if (netObjs.Count <= 0)
-			//	return;
-
-			//int syncCount = 0;
-
-			//PacketWriter pw = new(_packetBuffer);
-			//pw.Put(PacketType.SC_Sync_Unreliable);
-			//foreach (var netObj in netObjs)
-			//{
-			//	if (!netObj.IsDirtyUnreliable)
-			//	{
-			//		continue;
-			//	}
-			//	pw.Put(netObj.Identity);
-			//	netObj.SerializeSyncUnreliable(pw);
-			//	netObj.ClearDirtyUnreliable();
-			//	syncCount++;
-			//}
-
-			//if (syncCount > 0)
-			//{
-			//	_userSessionHandler.SendReliableToAll(pw);
-			//}
-		}
+		#region Synchronize
 
 		public void OnUserTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
-			//_gameWorldManager.
+			_syncJobQueue.Push(new SynchronizeJob(syncType, packetReader));
 		}
+
+		private void onSyncJobExecute(SynchronizeJob syncJob)
+		{
+			switch (syncJob.Operation)
+			{
+				case SyncOperation.Reliable:
+					WorldManager.OnDeserializeSyncReliable(syncJob.SyncDataReader);
+					break;
+
+				case SyncOperation.Unreliable:
+					WorldManager.OnDeserializeSyncUnreliable(syncJob.SyncDataReader);
+					break;
+
+				case SyncOperation.Creation:
+				case SyncOperation.Destruction:
+					_log.Fatal($"Client try to manage sync object life cycle! Type : {syncJob.Operation}");
+					break;
+
+				default:
+					_log.Warn($"There is no such sync operation. Type : {syncJob.Operation}");
+					break;
+			}
+		}
+
+		#endregion
 	}
 }

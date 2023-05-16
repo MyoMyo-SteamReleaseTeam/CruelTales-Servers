@@ -53,10 +53,10 @@ namespace CTS.Instance.Gameplay
 		// Job Queue
 		private JobQueue<SessionJob> _jobQueue;
 
-		public UserSessionHandler(GameInstance gameInstance)
+		public UserSessionHandler(GameInstance gameInstance, int jobCapacity)
 		{
 			_gameInstance = gameInstance;
-			_jobQueue = new(onJobExecuted);
+			_jobQueue = new(onJobExecuted, jobCapacity);
 		}
 
 		public void Initialize(GameInstanceOption option)

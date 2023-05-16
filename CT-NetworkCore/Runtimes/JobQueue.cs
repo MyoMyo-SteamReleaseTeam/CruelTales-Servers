@@ -111,12 +111,14 @@ namespace CT.Networks.Runtimes
 		private readonly Action<Job> _onJobExecute;
 
 		// Normal Job
-		private Queue<Job> _jobQueueBuffer = new();
-		private Queue<Job> _jobQueueExecute = new();
+		private Queue<Job> _jobQueueBuffer;
+		private Queue<Job> _jobQueueExecute;
 
-		public JobQueue(Action<Job> onJobExecute)
+		public JobQueue(Action<Job> onJobExecute, int capacity)
 		{
 			_onJobExecute = onJobExecute;
+			_jobQueueBuffer = new Queue<Job>(capacity);
+			_jobQueueExecute = new Queue<Job>(capacity);
 		}
 
 		/// <summary>실행할 Job을 추가합니다.</summary>

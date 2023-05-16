@@ -1,68 +1,102 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
-using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
-	[Flags]
-	public enum NetworkVisibility : byte
-	{
-		/// <summary>모든 대상에게 보입니다.</summary>
-		Static = 0b_0000_0001,
-
-		/// <summary>소유자에게만 보입니다.</summary>
-		OwnerOnly = 0b_0000_0010,
-
-		/// <summary>가까운 거리에서만 보입니다.</summary>
-		Distance = 0b_0000_0100,
-	}
-
 	public abstract class MasterNetworkObject : ISynchronizable, IUpdatable
 	{
-		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
+		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; } = new NetworkIdentity();
+
+		/// <summary>네트워크 객체의 Transform입니다.</summary>
+		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
+
+		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
+
+		/// <summary>네트워크 객체의 네트워크 가시성 타입입니다.</summary>
+		public NetworkVisibility Visibility { get; protected set; } = NetworkVisibility.Distance;
 
 		[AllowNull] private GameWorldManager _worldManager;
 		[AllowNull] private WorldPartitioner _worldPartitioner;
 
-		public bool IsAlived { get; private set; } = false;
+		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
+		public bool IsAlive { get; private set; } = false;
+
+		/// <summary>위치가 고정된 네트워크 객체인지 여부입니다.</summary>
+		public bool IsStatic { get; }
+
 		public MasterNetworkObject() {}
 
-		public void FixedUpdate(float deltaTime)
+		private Vector2Int _currentCellPos;
+
+		/// <summary>네트워크 객체를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
+		public void Update(float deltaTime)
 		{
-			Transform.Update(deltaTime);
-			// TODO : Calculate world partition position
+			Vector2Int previousPos = _currentCellPos;
+
+			// 고정 물리 업데이트를 수행합니다.
+			if (!IsStatic)
+			{
+				fixedUpdate(deltaTime);
+			}
+
+			_currentCellPos = WorldPartitioner.GetWorldCell(Transform.Position);
+			_worldPartitioner.OnCellChanged(Identity, previousPos, _currentCellPos);
 		}
 
-		public virtual void Update(float deltaTime) { }
-		public virtual void OnDestroy() { }
+		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
+		private void fixedUpdate(float deltaTime)
+		{
+			Transform.Update(deltaTime);
+		}
+
+		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
+		public virtual void OnDestroyed() { }
+
+		/// <summary>객체가 생성되었을 때 호출됩니다.</summary>
 		public virtual void OnCreated() { }
 
-		public void Initialize(GameWorldManager manager,
+		/// <summary>객체가 갱신되었을 때 호출됩니다.</summary>
+		public virtual void OnUpdate(float deltaTime) { }
+
+		/// <summary>객체를 초기화합니다.</summary>
+		public void Create(GameWorldManager manager,
 							   WorldPartitioner worldPartitioner,
 							   NetworkIdentity id,
 							   Vector3 position)
 		{
-			IsAlived = true;
+			// Initialize
+			Identity = id;
+			IsAlive = true;
+
+			// Bind reference
 			_worldManager = manager;
 			_worldPartitioner = worldPartitioner;
-			Identity = id;
+
+			// Set position
 			Transform.SetPosition(position);
+			_currentCellPos = WorldPartitioner.GetWorldCell(Transform.Position);
+			_worldPartitioner.OnCreated(id, _currentCellPos);
 		}
 
+		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
 		public void Destroy()
 		{
-			IsAlived = false;
+			IsAlive = false;
 			_worldManager.AddDestroyStack(this);
+			_worldPartitioner.OnDestroy(Identity, _currentCellPos);
+		}
+
+		/// <summary>객체를 해제합니다.</summary>
+		public void Dispose()
+		{
 		}
 
 		public abstract bool IsDirtyReliable { get; }

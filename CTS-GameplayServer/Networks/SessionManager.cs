@@ -11,13 +11,23 @@ namespace CTS.Instance.Networks
 
 		private static ILog _log = LogManager.GetLogger(typeof(SessionManager));
 		private object _sessionManagerLock = new object();
-		private BidirectionalMap<int, UserSession> _sessionById = new();
 		private NetworkManager _networkManager;
-		private Stack<UserSession> _sessionPool = new();
 
-		public SessionManager(NetworkManager networkManager)
+		private BidirectionalMap<int, UserSession> _sessionById;
+		private Stack<UserSession> _sessionPool;
+
+		public SessionManager(NetworkManager networkManager, int maxUserCapacity)
 		{
 			_networkManager = networkManager;
+
+			_sessionById = new(maxUserCapacity);
+			_sessionPool = new(maxUserCapacity);
+
+			// Warm pool
+			for (int i = 0; i < maxUserCapacity; i++)
+			{
+				_sessionPool.Push(new UserSession(this, _networkManager));
+			}
 		}
 
 		public UserSession Create(int peerId)

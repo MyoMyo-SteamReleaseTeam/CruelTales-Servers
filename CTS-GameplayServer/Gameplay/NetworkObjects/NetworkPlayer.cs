@@ -21,12 +21,12 @@ namespace CTS.Instance.SyncObjects
 			_log.Debug($"Player {Username} network object created!");
 		}
 
-		public override void OnDestroy()
+		public override void OnDestroyed()
 		{
 			_log.Debug($"Player {Username} network object destroyed!");
 		}
 
-		public override void Update(float deltaTime)
+		public override void OnUpdate(float deltaTime)
 		{
 
 		}
