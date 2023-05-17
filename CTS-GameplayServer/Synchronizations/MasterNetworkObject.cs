@@ -23,7 +23,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 네트워크 가시성 타입입니다.</summary>
 		public NetworkVisibility Visibility { get; protected set; } = NetworkVisibility.Distance;
 
-		[AllowNull] private GameWorldManager _worldManager;
+		[AllowNull] private WorldManager _worldManager;
 		[AllowNull] private WorldPartitioner _worldPartitioner;
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
@@ -67,7 +67,7 @@ namespace CTS.Instance.Synchronizations
 		public virtual void OnUpdate(float deltaTime) { }
 
 		/// <summary>객체를 초기화합니다.</summary>
-		public void Create(GameWorldManager manager,
+		public void Create(WorldManager manager,
 							   WorldPartitioner worldPartitioner,
 							   NetworkIdentity id,
 							   Vector3 position)

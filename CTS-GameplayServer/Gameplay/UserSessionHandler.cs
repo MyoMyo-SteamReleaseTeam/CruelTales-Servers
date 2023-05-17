@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
@@ -38,30 +37,30 @@ namespace CTS.Instance.Gameplay
 		private readonly ILog _log = LogManager.GetLogger(typeof(UserSessionHandler));
 
 		// DI
-		private readonly GameInstance _gameInstance;
+		private readonly GameplayInstance _gameInstance;
 
 		// Settings
 		public int MemberCount => _userById.Count + _waitingTable.Count;
 		public int MaxUser { get; private set; }
 
 		// Session Map
-		private readonly BidirectionalMap<UserId, UserSession> _userById = new();
-		private readonly List<UserSession> _userList = new();
-		private readonly BidirectionalMap<UserId, UserSession> _waitingTable = new();
-		public IReadOnlyList<UserSession> UserList => _userList;
+		public List<UserSession> UserList { get; private set; }
+		private readonly BidirectionalMap<UserId, UserSession> _userById;
+		private readonly BidirectionalMap<UserId, UserSession> _waitingTable;
 
 		// Job Queue
 		private JobQueue<SessionJob> _jobQueue;
 
-		public UserSessionHandler(GameInstance gameInstance, int jobCapacity)
+		public UserSessionHandler(GameplayInstance gameInstance,
+								  InstanceInitializeOption option)
 		{
 			_gameInstance = gameInstance;
-			_jobQueue = new(onJobExecuted, jobCapacity);
-		}
+			_jobQueue = new(onJobExecuted, option.SessionJobCapacity);
+			MaxUser = option.SystemMaxUser;
 
-		public void Initialize(GameInstanceOption option)
-		{
-			MaxUser = option.MaxUser;
+			UserList = new List<UserSession>(MaxUser);
+			_userById = new BidirectionalMap<UserId, UserSession>(MaxUser);
+			_waitingTable = new BidirectionalMap<UserId, UserSession>(MaxUser);
 		}
 
 		public void Clear() => _jobQueue.Clear();
@@ -162,7 +161,7 @@ namespace CTS.Instance.Gameplay
 				_log.Error($"Failed to try remove user session from waiting!");
 			}
 			_userById.Add(userSession.UserId, userSession);
-			_userList.Add(userSession);
+			UserList.Add(userSession);
 		}
 
 		public void SendReliableToAll(IPacketWriter writer,

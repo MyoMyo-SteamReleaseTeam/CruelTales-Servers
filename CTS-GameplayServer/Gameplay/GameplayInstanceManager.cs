@@ -8,10 +8,10 @@ using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public class GameInstanceManager
+	public class GameplayInstanceManager
 	{
 		// Log
-		private static ILog _log = LogManager.GetLogger(typeof(GameInstanceManager));
+		private static ILog _log = LogManager.GetLogger(typeof(GameplayInstanceManager));
 
 		// Server setup
 		private readonly TickTimer _serverTimer;
@@ -20,8 +20,8 @@ namespace CTS.Instance.Gameplay
 		// Game Instance
 		public int MaxGameCount { get; private set; }
 
-		private readonly Dictionary<GameInstanceGuid, GameInstance> _gameInstanceById = new();
-		private readonly List<GameInstance> _gameInstanceList = new();
+		private readonly Dictionary<GameInstanceGuid, GameplayInstance> _gameInstanceById = new();
+		private readonly List<GameplayInstance> _gameInstanceList = new();
 
 		private object _instanceManagerlock = new object();
 
@@ -30,19 +30,21 @@ namespace CTS.Instance.Gameplay
 
 		private Random _random = new Random();
 
-		public GameInstanceManager(ServerOption serverOption,
+		public GameplayInstanceManager(ServerOption serverOption,
 								   TickTimer tickTimer)
 		{
 			_serverOption = serverOption;
 			_serverTimer = tickTimer;
 			MaxGameCount = serverOption.GameCount;
 
-			var option = new GameInstanceOption() { MaxUser = 7 };
+			var option = new InstanceInitializeOption() { SystemMaxUser = 7 };
+			var gameplayOption = new GameplayOption();
+			gameplayOption.MaxUser = 7;
 
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
-				var instance = new GameInstance(_serverTimer, option);
-				instance.Initialize(new GameInstanceGuid((ulong)i));
+				var instance = new GameplayInstance(_serverTimer, option);
+				instance.Initialize(gameplayOption, new GameInstanceGuid((ulong)i));
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);
 			}
@@ -71,7 +73,7 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public bool TryGetGameInstanceBy(GameInstanceGuid instanceID,
-										 [MaybeNullWhen(false)] out GameInstance instance)
+										 [MaybeNullWhen(false)] out GameplayInstance instance)
 		{
 			lock (_instanceManagerlock)
 			{
@@ -84,7 +86,7 @@ namespace CTS.Instance.Gameplay
 			int count = _gameInstanceList.Count;
 			for (int i = 0; i < count; i++)
 			{
-				GameInstance game = _gameInstanceList[i];
+				GameplayInstance game = _gameInstanceList[i];
 				game.Update(deltaTime);
 			}
 		}

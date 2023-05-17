@@ -21,7 +21,7 @@ namespace CTS.Instance.Networks
 		private readonly SessionManager _sessionManager;
 
 		// GameInstance
-		public readonly GameInstanceManager GameplayInstanceManager;
+		public readonly GameplayInstanceManager GameplayInstanceManager;
 
 		// References
 		private readonly ServerOption _serverOption;

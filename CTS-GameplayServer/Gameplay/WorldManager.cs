@@ -22,16 +22,18 @@ namespace CTS.Instance.Gameplay
 		/// <summary>무시할 가시성 특성입니다.</summary>
 		public NetworkVisibility IgnoreVisibility = NetworkVisibility.None;
 
+		private NetworkPlayer _networkPlayer;
+
 		public PlayerVisibleTable(NetworkPlayer networkPlayer)
 		{
-			//networkPlayer
+			networkPlayer = networkPlayer;
 		}
 	}
 
-	public class GameWorldManager : IUpdatable
+	public class WorldManager : IUpdatable
 	{
 		// Log
-		private static ILog _log = LogManager.GetLogger(typeof(GameWorldManager));
+		private static ILog _log = LogManager.GetLogger(typeof(WorldManager));
 
 		// Network Object Management
 		private BidirectionalMap<NetworkIdentity, MasterNetworkObject> _worldObjectById = new();
@@ -41,7 +43,7 @@ namespace CTS.Instance.Gameplay
 		private Stack<MasterNetworkObject> _destroyObjectStack = new(16);
 		private ushort _idCounter = 1;
 
-		public GameWorldManager()
+		public WorldManager()
 		{
 			_worldPartition = new WorldPartitioner(12);
 			_objectPoolManager = new NetworkObjectPoolManager();

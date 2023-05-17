@@ -25,12 +25,12 @@ namespace CTS.Instance.Gameplay
 		private readonly ILog _log = LogManager.GetLogger(typeof(UserInputHandler));
 
 		// DI
-		private readonly GameInstance _gameInstance;
+		private readonly GameplayInstance _gameInstance;
 
 		// Job Queue
 		private readonly JobQueue<UserInputJob, float> _jobQueue;
 
-		public UserInputHandler(GameInstance gameInstance)
+		public UserInputHandler(GameplayInstance gameInstance)
 		{
 			_gameInstance = gameInstance;
 			_jobQueue = new(_gameInstance.ServerTimer, onJobExecuted);
