@@ -33,8 +33,8 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		//private HashSet<NetworkIdentity> getCell(Vector3 pos) => getCell(GetWorldCell(pos));
-		private HashSet<NetworkIdentity> getCell(Vector2Int internalCell)
+		public HashSet<NetworkIdentity> GetCell(Vector3 pos) => GetCell(GetWorldCell(pos));
+		public HashSet<NetworkIdentity> GetCell(Vector2Int internalCell)
 		{
 			if (internalCell.Y < 0 || internalCell.Y > CELL_HEIGHT ||
 				internalCell.X < 0 || internalCell.X > CELL_WIDTH)
@@ -56,18 +56,18 @@ namespace CTS.Instance.Gameplay
 
 		public void OnCellChanged(NetworkIdentity id, Vector2Int previous, Vector2Int current)
 		{
-			getCell(previous).Remove(id);
-			getCell(current).Add(id);
+			GetCell(previous).Remove(id);
+			GetCell(current).Add(id);
 		}
 
 		public void OnCreated(NetworkIdentity id, Vector2Int cellPos)
 		{
-			getCell(cellPos).Add(id);
+			GetCell(cellPos).Add(id);
 		}
 
 		public void OnDestroy(NetworkIdentity id, Vector2Int cellPos)
 		{
-			getCell(cellPos).Remove(id);
+			GetCell(cellPos).Remove(id);
 		}
 	}
 }

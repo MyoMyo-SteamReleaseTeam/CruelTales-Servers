@@ -68,9 +68,9 @@ namespace CTS.Instance.Synchronizations
 
 		/// <summary>객체를 초기화합니다.</summary>
 		public void Create(WorldManager manager,
-							   WorldPartitioner worldPartitioner,
-							   NetworkIdentity id,
-							   Vector3 position)
+						   WorldPartitioner worldPartitioner,
+						   NetworkIdentity id,
+						   Vector3 position)
 		{
 			// Initialize
 			Identity = id;
@@ -83,7 +83,7 @@ namespace CTS.Instance.Synchronizations
 			// Set position
 			Transform.SetPosition(position);
 			_currentCellPos = WorldPartitioner.GetWorldCell(Transform.Position);
-			_worldPartitioner.OnCreated(id, _currentCellPos);
+			_worldPartitioner.OnCreated(Identity, _currentCellPos);
 		}
 
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>

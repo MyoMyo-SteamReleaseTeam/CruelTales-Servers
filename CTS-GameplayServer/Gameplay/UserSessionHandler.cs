@@ -37,7 +37,7 @@ namespace CTS.Instance.Gameplay
 		private readonly ILog _log = LogManager.GetLogger(typeof(UserSessionHandler));
 
 		// DI
-		private readonly GameplayInstance _gameInstance;
+		private readonly GameplayInstance _gameplayInstance;
 
 		// Settings
 		public int MemberCount => _userById.Count + _waitingTable.Count;
@@ -54,7 +54,7 @@ namespace CTS.Instance.Gameplay
 		public UserSessionHandler(GameplayInstance gameInstance,
 								  InstanceInitializeOption option)
 		{
-			_gameInstance = gameInstance;
+			_gameplayInstance = gameInstance;
 			_jobQueue = new(onJobExecuted, option.SessionJobCapacity);
 			MaxUser = option.SystemMaxUser;
 
@@ -93,8 +93,8 @@ namespace CTS.Instance.Gameplay
 			_waitingTable.TryRemove(userSession.UserId);
 			if (_userById.TryRemove(userSession.UserId))
 			{
-				_log.Debug($"[GUID:{_gameInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
-				_gameInstance.OnUserLeaveGame(userSession);
+				_log.Debug($"[GUID:{_gameplayInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
+				_gameplayInstance.GameManager.OnUserLeaveGame(userSession);
 			}
 			else
 			{
@@ -120,7 +120,7 @@ namespace CTS.Instance.Gameplay
 
 			if (MemberCount >= MaxUser)
 			{
-				_log.Warn($"User {userSession} fail to join GameInstance {_gameInstance.Guid}. " +
+				_log.Warn($"User {userSession} fail to join GameInstance {_gameplayInstance.Guid}. " +
 					$"Reason : {DisconnectReasonType.Reject_GameInstanceIsAlreadyFull}");
 
 				userSession.Disconnect(DisconnectReasonType.Reject_GameInstanceIsAlreadyFull);
@@ -130,7 +130,7 @@ namespace CTS.Instance.Gameplay
 			_waitingTable.Add(userSession.UserId, userSession);
 
 			// Ack response
-			_log.Debug($"User {userSession} has been enter the game instance. [GUID:{_gameInstance.Guid}]");
+			_log.Debug($"User {userSession} has been enter the game instance. [GUID:{_gameplayInstance.Guid}]");
 			userSession.AckTryEnterGameInstance();
 		}
 
@@ -147,14 +147,14 @@ namespace CTS.Instance.Gameplay
 		{
 			if (!_waitingTable.ContainsForward(userSession.UserId))
 			{
-				_log.Warn($"There is no {userSession} user in waiting table! GUID:{_gameInstance.Guid}");
+				_log.Warn($"There is no {userSession} user in waiting table! GUID:{_gameplayInstance.Guid}");
 				userSession.Disconnect(DisconnectReasonType.ServerError_YouAreNotInTheWaitingQueue);
 				return;
 			}
 
-			_log.Debug($"[Instance:{_gameInstance.Guid}] Session {userSession} enter the game");
+			_log.Debug($"[Instance:{_gameplayInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
-			this._gameInstance.OnUserEnterGame(userSession);
+			this._gameplayInstance.GameManager.OnUserEnterGame(userSession);
 
 			if (!_waitingTable.TryRemove(userSession.UserId))
 			{
@@ -191,7 +191,7 @@ namespace CTS.Instance.Gameplay
 			}
 			else
 			{
-				_log.Warn($"There is no {userId} to {nameof(SendReliable)} in GI:{_gameInstance.Guid}");
+				_log.Warn($"There is no {userId} to {nameof(SendReliable)} in GI:{_gameplayInstance.Guid}");
 			}
 		}
 
@@ -204,7 +204,7 @@ namespace CTS.Instance.Gameplay
 			}
 			else
 			{
-				_log.Warn($"There is no {userId} to {nameof(SendUnreliable)} in GI:{_gameInstance.Guid}");
+				_log.Warn($"There is no {userId} to {nameof(SendUnreliable)} in GI:{_gameplayInstance.Guid}");
 			}
 		}
 	}

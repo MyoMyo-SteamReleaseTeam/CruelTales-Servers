@@ -5,7 +5,6 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
-using CTS.Instance.SyncObjects;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -21,14 +20,6 @@ namespace CTS.Instance.Gameplay
 			Operation = operation;
 			SyncDataReader = reader;
 		}
-	}
-
-	/// <summary>서버의 초기화 옵션입니다.</summary>
-	public struct InstanceInitializeOption
-	{
-		public int SystemMaxUser { get; set; }
-		public int SyncJobCapacity => SystemMaxUser * 20;
-		public int SessionJobCapacity => (int)(SystemMaxUser * 1.5f);
 	}
 
 	/// <summary>게임 진행을 위한 옵션입니다.</summary>
@@ -52,6 +43,7 @@ namespace CTS.Instance.Gameplay
 		public UserSessionHandler SessionHandler { get; private set; }
 
 		// Managers
+		public GameManager GameManager { get; private set; }
 		public WorldManager WorldManager { get; private set; }
 
 		// Job Queue
@@ -61,7 +53,8 @@ namespace CTS.Instance.Gameplay
 		{
 			ServerTimer = serverTimer;
 			SessionHandler = new UserSessionHandler(this, option);
-			WorldManager = new WorldManager();
+			WorldManager = new WorldManager(this, option);
+			GameManager = new GameManager(this, option);
 			_syncJobQueue = new(onSyncJobExecute, option.SyncJobCapacity);
 		}
 
@@ -79,9 +72,16 @@ namespace CTS.Instance.Gameplay
 			// Handle network connections
 			SessionHandler.Flush();
 
-			// Update game logic
+			// Sync network object from remote
 			_syncJobQueue.Flush();
+
+			// Update world positions and logic
 			WorldManager.Update(deltaTime);
+
+			// Update game manager logic
+			GameManager.Update(deltaTime);
+
+			// Send sync data to each user
 			WorldManager.UpdateSerialize();
 		}
 
@@ -97,21 +97,6 @@ namespace CTS.Instance.Gameplay
 		{
 			userSession.Disconnect(reason);
 		}
-
-		#region Session
-
-		public void OnUserEnterGame(UserSession userSession)
-		{
-			var playerEntity = WorldManager.CreateObject<NetworkPlayer>();
-			playerEntity.BindUser(userSession);
-		}
-
-		public void OnUserLeaveGame(UserSession userSession)
-		{
-			_log.Info($"[Instance:{Guid}] Session {userSession} leave the game");
-		}
-
-		#endregion
 
 		#region Synchronize
 
@@ -145,9 +130,6 @@ namespace CTS.Instance.Gameplay
 
 		#endregion
 
-		public override string ToString()
-		{
-			return $"[GUID:{Guid}][MemberCount:{SessionHandler.MemberCount}]";
-		}
+		public override string ToString() => $"[i:{Guid}][CCU:{SessionHandler.MemberCount}]";
 	}
 }

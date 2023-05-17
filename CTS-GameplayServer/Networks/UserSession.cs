@@ -51,7 +51,7 @@ namespace CTS.Instance.Networks
 		private PacketPool _packetPool = new();
 
 		public UserSession(SessionManager sessionManager,
-							 NetworkManager networkManager)
+						   NetworkManager networkManager)
 		{
 			_sessionManager = sessionManager;
 			_networkManager = networkManager;
@@ -276,14 +276,14 @@ namespace CTS.Instance.Networks
 			CurrentState = UserSessionState.InGameplay;
 		}
 
-		public override string ToString()
-		{
-			return $"{UserId}:{Username}";
-		}
-
 		public void OnTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
 			_gameplayInstance?.OnUserTrySync(syncType, packetReader);
+		}
+
+		public override string ToString()
+		{
+			return $"{UserId}:{Username}";
 		}
 	}
 }
