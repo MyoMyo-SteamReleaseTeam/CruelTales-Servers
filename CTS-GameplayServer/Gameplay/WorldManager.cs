@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
@@ -16,57 +15,6 @@ using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public class PlayerVisibleTable
-	{
-		// Reference
-		private WorldPartitioner _partitioner;
-
-		/// <summary>무시할 가시성 특성입니다.</summary>
-		public NetworkVisibility IgnoreVisibility = NetworkVisibility.None;
-
-		[AllowNull] private NetworkPlayer _networkPlayer;
-
-		// Sync set
-		private HashSet<NetworkIdentity> _spawnObjects;
-		private HashSet<NetworkIdentity> _traceObjects;
-		private HashSet<NetworkIdentity> _despawnObjects;
-
-		// View boundary
-		private Vector2 _viewInSize;
-		private Vector2 _viewOutSize;
-
-		public PlayerVisibleTable(WorldPartitioner worldPartitioner, InstanceInitializeOption option)
-		{
-			// Reference
-			_partitioner = worldPartitioner;
-
-			// Sync set
-			_spawnObjects = new HashSet<NetworkIdentity>(option.SpawnObjectCapacity);
-			_traceObjects = new HashSet<NetworkIdentity>(option.TraceObjectCapacity);
-			_despawnObjects = new HashSet<NetworkIdentity>(option.DespawnObjectCapacity);
-
-			// View boundary
-			_viewInSize = option.ViewInSize;
-			_viewOutSize = option.ViewOutSize;
-		}
-
-		public void BindPlayer(NetworkPlayer networkPlayer)
-		{
-			_networkPlayer = networkPlayer;
-		}
-
-		public void RemovePlayer()
-		{
-			_networkPlayer = null;
-		}
-
-		public void UpdateAndSend()
-		{
-			var hashSet = _partitioner.GetCell(_networkPlayer.Transform.Position);
-			// TODO update visibility
-		}
-	}
-
 	public class WorldManager : IUpdatable
 	{
 		// Log
@@ -88,7 +36,7 @@ namespace CTS.Instance.Gameplay
 
 		// Visible Table
 		private ObjectPool<PlayerVisibleTable> _playerVisibleTablePool;
-		private List<PlayerVisibleTable> _playerVisibleTableList;
+		private Dictionary<UserSession, PlayerVisibleTable> _playerVisibleBySession;
 
 		// Session
 		private BidirectionalMap<UserSession, NetworkPlayer> _networkPlayerByUserSession;
@@ -107,9 +55,8 @@ namespace CTS.Instance.Gameplay
 			_worldPartition = new(option.PartitionCellCapacity);
 
 			// Visible Table
-			_playerVisibleTablePool = new(() => new PlayerVisibleTable(_worldPartition, _option),
-										  option.SystemMaxUser);
-			_playerVisibleTableList = new(option.SystemMaxUser);
+			_playerVisibleTablePool = new(() => new PlayerVisibleTable(_option), option.SystemMaxUser);
+			_playerVisibleBySession = new(option.SystemMaxUser);
 
 			// Session
 			_networkPlayerByUserSession = new(option.SystemMaxUser);
@@ -144,10 +91,10 @@ namespace CTS.Instance.Gameplay
 		public NetworkPlayer CreateNetworkPlayer(UserSession userSession)
 		{
 			var playerVisibleTable = _playerVisibleTablePool.Get();
+			_playerVisibleBySession.Add(userSession, playerVisibleTable);
+
 			var playerEntity = this.CreateObject<NetworkPlayer>();
-			playerVisibleTable.BindPlayer(playerEntity);
-			playerEntity.BindUserSession(userSession, playerVisibleTable);
-			_playerVisibleTableList.Add(playerVisibleTable);
+			playerEntity.BindUserSession(userSession);
 			_networkPlayerByUserSession.Add(userSession, playerEntity);
 			return playerEntity;
 		}
@@ -159,16 +106,16 @@ namespace CTS.Instance.Gameplay
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s player in the world!");
 				return;
 			}
-			var visibleTable = player.VisibleTable;
 			player.RemoveUserSession();
 			_networkPlayerByUserSession.TryRemove(player);
-			if (visibleTable == null)
+
+			if (!_playerVisibleBySession.TryGetValue(userSession, out var visibleTable))
 			{
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s visible table!");
 				return;
 			}
-			visibleTable.RemovePlayer();
-			_playerVisibleTableList.Remove(visibleTable);
+			visibleTable.Clear();
+			_playerVisibleBySession.Remove(userSession);
 		}
 
 		#endregion

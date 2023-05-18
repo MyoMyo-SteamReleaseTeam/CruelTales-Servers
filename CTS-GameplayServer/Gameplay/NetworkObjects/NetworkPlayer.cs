@@ -9,14 +9,17 @@ namespace CTS.Instance.SyncObjects
 	public partial class NetworkPlayer : MasterNetworkObject
 	{
 		private readonly static ILog _log = LogManager.GetLogger(typeof(NetworkPlayer));
-		public PlayerVisibleTable? VisibleTable { get; private set; }
+		//public PlayerVisibleTable? VisibleTable { get; private set; }
 
-		public void BindUserSession(UserSession userSession, PlayerVisibleTable visibleTable)
+		/// <summary>무시할 가시성 특성입니다.</summary>
+		public NetworkVisibility IgnoreVisibility = NetworkVisibility.None;
+
+		public void BindUserSession(UserSession userSession)//, PlayerVisibleTable visibleTable)
 		{
 			this.UserId = userSession.UserId;
 			this.Username = userSession.Username;
 			this.Costume = 119;
-			this.VisibleTable = visibleTable;
+			//this.VisibleTable = visibleTable;
 		}
 
 		public void RemoveUserSession()
@@ -24,7 +27,7 @@ namespace CTS.Instance.SyncObjects
 			this.UserId = new UserId(0);
 			this.Username = string.Empty;
 			this.Costume = 0;
-			this.VisibleTable = null;
+			//this.VisibleTable = null;
 		}
 
 		public override void OnCreated()
