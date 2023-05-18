@@ -20,8 +20,11 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
 
-		/// <summary>네트워크 객체의 네트워크 가시성 타입입니다.</summary>
-		public NetworkVisibility Visibility { get; protected set; } = NetworkVisibility.Distance;
+		/// <summary>네트워크 객체가 보일 조건을 결정합니다.</summary>
+		public abstract PartitionType Visibility { get; }
+
+		/// <summary>네트워크 객체가 보일 대상을 결정합니다.</summary>
+		public abstract VisibilityAuthority Target { get; }
 
 		[AllowNull] private WorldManager _worldManager;
 		[AllowNull] private WorldPartitioner _worldPartitioner;

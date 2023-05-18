@@ -6,7 +6,7 @@ using CT.Common.Synchronizations;
 namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition]
-	public class NetworkPlayer
+	public class PlayerCharacter
 	{
 		[SyncVar]
 		public UserId UserId;

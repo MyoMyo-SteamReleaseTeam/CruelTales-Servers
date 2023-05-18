@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using CT.Common.DataType;
+using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.Gameplay
 {
@@ -60,7 +61,7 @@ namespace CTS.Instance.Gameplay
 			GetCell(current).Add(id);
 		}
 
-		public void OnCreated(NetworkIdentity id, Vector2Int cellPos)
+		public void OnCreated(PartitionType type, NetworkIdentity id, Vector2Int cellPos)
 		{
 			GetCell(cellPos).Add(id);
 		}

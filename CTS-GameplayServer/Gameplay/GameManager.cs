@@ -2,7 +2,6 @@
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Networks;
-using CTS.Instance.SyncObjects;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -32,7 +31,7 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserEnterGame(UserSession userSession)
 		{
-			var player = _worldManager.CreateNetworkPlayer(userSession);
+			var player = _worldManager.CreatePlayerVisibleTable(userSession);
 			_networkPlayerByUserId.Add(userSession.UserId, player);
 		}
 

@@ -10,7 +10,6 @@ using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
-using CTS.Instance.SyncObjects;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -38,9 +37,6 @@ namespace CTS.Instance.Gameplay
 		private ObjectPool<PlayerVisibleTable> _playerVisibleTablePool;
 		private Dictionary<UserSession, PlayerVisibleTable> _playerVisibleBySession;
 
-		// Session
-		private BidirectionalMap<UserSession, NetworkPlayer> _networkPlayerByUserSession;
-
 		public WorldManager(GameplayInstance gameplayInstance, InstanceInitializeOption option)
 		{
 			// Reference
@@ -57,9 +53,6 @@ namespace CTS.Instance.Gameplay
 			// Visible Table
 			_playerVisibleTablePool = new(() => new PlayerVisibleTable(_option), option.SystemMaxUser);
 			_playerVisibleBySession = new(option.SystemMaxUser);
-
-			// Session
-			_networkPlayerByUserSession = new(option.SystemMaxUser);
 		}
 
 		public void Update(float deltaTime)
@@ -95,37 +88,22 @@ namespace CTS.Instance.Gameplay
 
 		#region Session
 
-		public NetworkPlayer CreateNetworkPlayer(UserSession userSession)
+		public PlayerVisibleTable CreatePlayerVisibleTable(UserSession userSession)
 		{
-			// Manage network player
-			var playerEntity = this.CreateObject<NetworkPlayer>();
-			playerEntity.BindUserSession(userSession);
-			_networkPlayerByUserSession.Add(userSession, playerEntity);
-
-			// Manage visible table
 			var playerVisibleTable = _playerVisibleTablePool.Get();
 			_playerVisibleBySession.Add(userSession, playerVisibleTable);
-			return playerEntity;
+			return playerVisibleTable;
 		}
 
 		public void DestroyNetworkPlayer(UserSession userSession)
 		{
-			// Remove network player
-			if (!_networkPlayerByUserSession.TryGetValue(userSession, out var player))
-			{
-				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s player in the world!");
-				return;
-			}
-			player.RemoveUserSession();
-			_networkPlayerByUserSession.TryRemove(player);
-
-			// Remove visible table
 			if (!_playerVisibleBySession.TryGetValue(userSession, out var visibleTable))
 			{
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s visible table!");
 				return;
 			}
 			visibleTable.Clear();
+			_playerVisibleTablePool.Return(visibleTable);
 			_playerVisibleBySession.Remove(userSession);
 		}
 

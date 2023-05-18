@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CT.Common.DataType;
 using CTS.Instance.Synchronizations;
 using CTS.Instance.SyncObjects;
 
@@ -14,7 +13,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 		{
 			_netObjectPoolByType = new()
 			{
-				{ typeof(NetworkPlayer), new NetworkObjectPool<NetworkPlayer>(typeof(NetworkPlayer), 7) },
+				{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(typeof(PlayerCharacter), 7) },
 			};
 		}
 

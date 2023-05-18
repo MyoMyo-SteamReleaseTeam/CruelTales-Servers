@@ -12,6 +12,7 @@ namespace CTS.Instance.Gameplay
 		public int SpawnObjectCapacity { get; set; }
 		public int TraceObjectCapacity { get; set; }
 		public int DespawnObjectCapacity { get; set; }
+		public int GlobalObjectCapacity { get; set; }
 		public Vector2 ViewInSize { get; set; }
 		public Vector2 ViewOutSize { get; set; }
 		public int DestroyObjectStackCapacity { get; set; }
@@ -27,6 +28,7 @@ namespace CTS.Instance.Gameplay
 			SpawnObjectCapacity = 16;
 			TraceObjectCapacity = 32;
 			DespawnObjectCapacity = 16;
+			GlobalObjectCapacity = 16;
 
 			DestroyObjectStackCapacity = 16;
 
