@@ -83,24 +83,34 @@ namespace CTS.Instance.Gameplay
 
 		public void UpdateSerialize()
 		{
+			foreach (var p in _playerVisibleBySession)
+			{
+				// TODO : Visible 테이블 갱신 (위치 및 카메라 컬링, 조건 검사)
 
+				// TODO : 데이터 전송 (Life cycle -> Reliable -> Unreliable)
+
+				// TODO : Visible 테이블 갱신 (스폰 -> 추적, 디스폰 -> 제거)
+			}
 		}
 
 		#region Session
 
 		public NetworkPlayer CreateNetworkPlayer(UserSession userSession)
 		{
-			var playerVisibleTable = _playerVisibleTablePool.Get();
-			_playerVisibleBySession.Add(userSession, playerVisibleTable);
-
+			// Manage network player
 			var playerEntity = this.CreateObject<NetworkPlayer>();
 			playerEntity.BindUserSession(userSession);
 			_networkPlayerByUserSession.Add(userSession, playerEntity);
+
+			// Manage visible table
+			var playerVisibleTable = _playerVisibleTablePool.Get();
+			_playerVisibleBySession.Add(userSession, playerVisibleTable);
 			return playerEntity;
 		}
 
 		public void DestroyNetworkPlayer(UserSession userSession)
 		{
+			// Remove network player
 			if (!_networkPlayerByUserSession.TryGetValue(userSession, out var player))
 			{
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s player in the world!");
@@ -109,6 +119,7 @@ namespace CTS.Instance.Gameplay
 			player.RemoveUserSession();
 			_networkPlayerByUserSession.TryRemove(player);
 
+			// Remove visible table
 			if (!_playerVisibleBySession.TryGetValue(userSession, out var visibleTable))
 			{
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s visible table!");

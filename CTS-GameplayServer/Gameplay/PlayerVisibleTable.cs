@@ -9,6 +9,8 @@ namespace CTS.Instance.Gameplay
 		public HashSet<NetworkIdentity> TraceObjects { get; private set; }
 		public HashSet<NetworkIdentity> DespawnObjects { get; private set; }
 
+		// TODO : Static 객체, 소유 객체 등등
+
 		public PlayerVisibleTable(InstanceInitializeOption option)
 		{
 			SpawnObjects = new HashSet<NetworkIdentity>(option.SpawnObjectCapacity);
