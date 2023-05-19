@@ -82,7 +82,7 @@ namespace CTS.Instance.Gameplay
 			GameManager.Update(deltaTime);
 
 			// Send sync data to each user
-			WorldManager.UpdateSerialize();
+			WorldManager.UpdateVisibility();
 		}
 
 		public void Shutdown(DisconnectReasonType reason)

@@ -71,7 +71,7 @@ namespace CT.Test.NetworkCore
 
 			int bytesPosition = reader.ReadPosition;
 			var readBytes = reader.ReadBytes();
-			reader.SetPosition(bytesPosition);
+			reader.SetReadPosition(bytesPosition);
 			var readBytes2 = new ArraySegment<byte>(new byte[byteCount]);
 			reader.ReadBytesCopy(readBytes2, 0);
 			for (int i = 0; i < byteCount; i++)
@@ -196,7 +196,7 @@ namespace CT.Test.NetworkCore
 			destWriter.Put(writer1);
 			destWriter.Put(writer2);
 
-			reader.SetPosition(0);
+			reader.SetReadPosition(0);
 			Assert.AreEqual(1, reader.ReadInt32());
 			Assert.AreEqual(2, reader.ReadInt32());
 			Assert.AreEqual(3, reader.ReadInt32());

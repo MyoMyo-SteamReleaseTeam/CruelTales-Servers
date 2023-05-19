@@ -60,16 +60,26 @@ namespace CTS.Instance.Gameplay
 		}
 
 		//private long _current = 0;
+		private static float _globalDeltaTime;
 		public void Update(float deltaTime)
 		{
 			//_current = _serverTimer.CurrentMs;
 
-			Parallel.ForEach(_gameInstanceList, (i) =>
-			{
-				i.Update(deltaTime);
-			});
+			_globalDeltaTime = deltaTime;
+
+			Parallel.ForEach(_gameInstanceList, processUpdate);
+
+			//Parallel.ForEach(_gameInstanceList, (i) =>
+			//{
+			//	i.Update(deltaTime);
+			//});
 
 			//_log.Info($"Tick {_serverTimer.CurrentMs - _current}");
+		}
+
+		private static void processUpdate(GameplayInstance gameplayInstance)
+		{
+			gameplayInstance.Update(_globalDeltaTime);
 		}
 
 		public bool TryGetGameInstanceBy(GameInstanceGuid instanceID,

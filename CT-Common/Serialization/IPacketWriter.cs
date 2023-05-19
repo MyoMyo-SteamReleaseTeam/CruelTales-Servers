@@ -10,6 +10,9 @@ namespace CT.Common.Serialization
 		public int Size { get; }
 		public int Capacity { get; }
 		public void ResetWriter();
+
+		public void SetSize(int size);
+		public void OffsetSize(int offset);
 		public bool CanPut(int putSize);
 		public bool CanPut<T>(T serializeObject) where T : IPacketSerializable;
 		public void Put<T>(T serializeObject) where T : IPacketSerializable;

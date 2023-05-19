@@ -55,6 +55,16 @@ namespace CT.Common.Serialization
 
 		#region Write
 
+		public void SetSize(int size)
+		{
+			Size = size;
+		}
+
+		public void OffsetSize(int offset)
+		{
+			Size += offset;
+		}
+
 		public bool CanPut(int putSize)
 		{
 			return Size + putSize <= Capacity;
@@ -182,7 +192,7 @@ namespace CT.Common.Serialization
 			return CanRead(serializeObject.SerializeSize);
 		}
 
-		public void SetPosition(int position)
+		public void SetReadPosition(int position)
 		{
 			ReadPosition = position;
 		}

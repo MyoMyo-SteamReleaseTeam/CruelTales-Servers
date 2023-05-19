@@ -26,15 +26,15 @@ namespace CTS.Instance.Packets
 
 		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
 		{
-			{ PacketType.CS_Sync_RemoteUnreliable, PacketHandler.Handle_CS_Sync_RemoteUnreliable },
 			{ PacketType.CS_Sync_RemoteReliable, PacketHandler.Handle_CS_Sync_RemoteReliable },
+			{ PacketType.CS_Sync_RemoteUnreliable, PacketHandler.Handle_CS_Sync_RemoteUnreliable },
 			
 		};
 
 		private static HashSet<PacketType> _customPacketSet = new()
 		{
-			PacketType.CS_Sync_RemoteUnreliable,
 			PacketType.CS_Sync_RemoteReliable,
+			PacketType.CS_Sync_RemoteUnreliable,
 			
 		};
 

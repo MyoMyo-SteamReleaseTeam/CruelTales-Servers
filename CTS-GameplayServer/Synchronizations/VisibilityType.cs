@@ -3,7 +3,7 @@
 	/// <summary>
 	/// 네트워크 객체가 보일 조건 특성입니다.
 	/// </summary>
-	public enum PartitionType
+	public enum VisibilityType
 	{
 		/// <summary>보이지 않습니다.</summary>
 		None = 0,
@@ -33,20 +33,23 @@
 		/// <summary>소유자에게만 보입니다.</summary>
 		Owner,
 
-		/// <summary>해당하는 그룹일 때 보입니다.</summary>
+		/// <summary>같은 소속일 때 보입니다.</summary>
 		Faction,
 
 		/// <summary>해당되는 유저에게만 보입니다.</summary>
-		Users,
+		//Users,
 	}
 
 	public enum Faction : byte
 	{
-		/// <summary>관전자입니다.</summary>
-		Speculator,
+		/// <summary>시스템입니다.</summary>
+		System,
 
 		/// <summary>중립입니다.</summary>
 		Neutral,
+
+		/// <summary>관전자입니다.</summary>
+		Speculator,
 
 		Red,
 		Bule,

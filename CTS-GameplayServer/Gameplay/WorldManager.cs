@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
-using CT.Common.Tools;
 using CT.Common.Tools.Collections;
+using CT.Networks;
+using CT.Packets;
 using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
@@ -24,18 +26,14 @@ namespace CTS.Instance.Gameplay
 		private InstanceInitializeOption _option;
 
 		// Network Object Management
-		private BidirectionalMap<NetworkIdentity, MasterNetworkObject> _worldObjectById = new();
+		private BidirectionalMap<NetworkIdentity, MasterNetworkObject> _networkObjectById = new();
 		private NetworkObjectPoolManager _objectPoolManager;
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
 		private Stack<MasterNetworkObject> _destroyObjectStack;
-		private ushort _idCounter = 1;
+		private NetworkIdentity _idCounter;
 
-		// Partitioner
-		private WorldPartitioner _worldPartition;
-
-		// Visible Table
-		private ObjectPool<PlayerVisibleTable> _playerVisibleTablePool;
-		private Dictionary<UserSession, PlayerVisibleTable> _playerVisibleBySession;
+		// Visibility
+		private WorldVisibilityManager _visibilityManager;
 
 		public WorldManager(GameplayInstance gameplayInstance, InstanceInitializeOption option)
 		{
@@ -48,17 +46,13 @@ namespace CTS.Instance.Gameplay
 			_destroyObjectStack = new(option.DestroyObjectStackCapacity);
 
 			// Partitioner
-			_worldPartition = new(option.PartitionCellCapacity);
-
-			// Visible Table
-			_playerVisibleTablePool = new(() => new PlayerVisibleTable(_option), option.SystemMaxUser);
-			_playerVisibleBySession = new(option.SystemMaxUser);
+			_visibilityManager = new(gameplayInstance, option);
 		}
 
 		public void Update(float deltaTime)
 		{
 			// Update every objects
-			foreach (var netObj in _worldObjectById.ForwardValues)
+			foreach (var netObj in _networkObjectById.ForwardValues)
 			{
 				if (!netObj.IsAlive)
 					return;
@@ -74,63 +68,48 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void UpdateSerialize()
+		public void UpdateVisibility()
 		{
-			foreach (var p in _playerVisibleBySession)
-			{
-				// TODO : Visible 테이블 갱신 (위치 및 카메라 컬링, 조건 검사)
-
-				// TODO : 데이터 전송 (Life cycle -> Reliable -> Unreliable)
-
-				// TODO : Visible 테이블 갱신 (스폰 -> 추적, 디스폰 -> 제거)
-			}
+			this._visibilityManager.Update();
 		}
 
-		#region Session
-
-		public PlayerVisibleTable CreatePlayerVisibleTable(UserSession userSession)
+		public void OnPlayerEnter(NetworkPlayer player)
 		{
-			var playerVisibleTable = _playerVisibleTablePool.Get();
-			_playerVisibleBySession.Add(userSession, playerVisibleTable);
-			return playerVisibleTable;
+			this._visibilityManager.CreatePlayerVisibleTable(player);
 		}
 
-		public void DestroyNetworkPlayer(UserSession userSession)
+		public void OnPlayerLeave(NetworkPlayer player)
 		{
-			if (!_playerVisibleBySession.TryGetValue(userSession, out var visibleTable))
-			{
-				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s visible table!");
-				return;
-			}
-			visibleTable.Clear();
-			_playerVisibleTablePool.Return(visibleTable);
-			_playerVisibleBySession.Remove(userSession);
+			this._visibilityManager.DestroyNetworkPlayer(player);
 		}
 
-		#endregion
+		public bool TryGetNetworkObject(NetworkIdentity id,
+									    [MaybeNullWhen(false)]
+										out MasterNetworkObject networkObject)
+		{
+			return _networkObjectById.TryGetValue(id, out networkObject);
+		}
 
 		#region Life Cycle
 
 		public T CreateObject<T>(Vector3 position = default) where T : MasterNetworkObject, new()
 		{
 			var netObj = _objectPoolManager.Create<T>();
-			_worldObjectById.Add(netObj.Identity, netObj);
-			netObj.Create(this, _worldPartition, getNetworkIdentityCounter(), position);
+			_networkObjectById.Add(netObj.Identity, netObj);
+			netObj.Create(this, _visibilityManager, getNetworkIdentityCounter(), position);
 			netObj.OnCreated();
 			return netObj;
 
 			NetworkIdentity getNetworkIdentityCounter()
 			{
-				for (int i = 0; i < ushort.MaxValue; i++)
+				for (int i = 0; i < NetworkIdentity.MaxValue; i++)
 				{
-					if (_idCounter == 0)
-						_idCounter++;
+					_idCounter++;
 
-					var newId = new NetworkIdentity(_idCounter++);
-					if (_worldObjectById.ContainsForward(newId))
+					if (_networkObjectById.ContainsForward(_idCounter))
 						continue;
 
-					return newId;
+					return _idCounter;
 				}
 
 				throw new IndexOutOfRangeException($"There are no more network identity");
@@ -144,20 +123,20 @@ namespace CTS.Instance.Gameplay
 
 		public void Clear()
 		{
-			_idCounter = 1;
+			_idCounter = new NetworkIdentity(0);
 			_destroyObjectStack.Clear();
-			var ids = _worldObjectById.ForwardKeys;
-			int removeCount = _worldObjectById.Count;
+			var ids = _networkObjectById.ForwardKeys;
+			int removeCount = _networkObjectById.Count;
 			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
 			for (int i = 0; i < removeCount; i++)
 			{
-				destroyObject(_worldObjectById.GetValue(removeIds[i]));
+				destroyObject(_networkObjectById.GetValue(removeIds[i]));
 			}
 		}
 
 		private void destroyObject(MasterNetworkObject netObject)
 		{
-			if (!_worldObjectById.TryRemove(netObject))
+			if (!_networkObjectById.TryRemove(netObject))
 			{
 				_log.Error($"There is no network object to remove. Object : [{netObject}]");
 				Debug.Assert(false);
@@ -173,13 +152,104 @@ namespace CTS.Instance.Gameplay
 
 		#region Synchronizaion
 
+		// TODO : Need to pool packet
+		private static ByteBuffer _reliableBuffer = new ByteBuffer(16 * 1024);
+		private static ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU);
+
+		public static void SendSynchronization(UserSession userSession,
+											   PlayerVisibleTable visibleTable)
+		{
+			_reliableBuffer.ResetWriter();
+
+			SerializeSpawnData(_reliableBuffer,
+							   visibleTable.SpawnObjects,
+							   PacketType.SC_Sync_MasterSpawn);
+
+			SerializeSpawnData(_reliableBuffer,
+							   visibleTable.RespawnObjects,
+							   PacketType.SC_Sync_MasterRespawn);
+
+			SerializeReliableData(_reliableBuffer,
+								  visibleTable.TraceObjects,
+								  PacketType.SC_Sync_MasterReliable);
+
+			if (_reliableBuffer.Size > 0)
+			{
+				userSession.SendReliable(_reliableBuffer);
+			}
+
+			_mtuBuffer.ResetWriter();
+			SerializeUnreliableData(_mtuBuffer,
+									visibleTable.TraceObjects,
+									PacketType.SC_Sync_MasterUnreliable);
+
+			if (_mtuBuffer.Size > 0)
+			{
+				userSession.SendReliable(_mtuBuffer);
+			}
+		}
+
+		public static void SerializeSpawnData(IPacketWriter writer,
+											  HashSet<MasterNetworkObject> netObjs,
+											  PacketType packetType)
+		{
+			if (netObjs.Count <= 0)
+				return;
+
+			writer.Put(packetType);
+			//int sizeHeaderPos = writer.Size;
+			//writer.OffsetSize(2);
+			writer.Put((byte)netObjs.Count);
+
+			//int beforeSize = writer.Size;
+			foreach (var spawnObj in netObjs)
+			{
+				spawnObj.SerializeEveryProperty(writer);
+			}
+			//int afterSize = writer.Size;
+
+			//writer.SetSize(sizeHeaderPos);
+			//writer.Put((ushort)(afterSize - beforeSize));
+			//writer.SetSize(afterSize);
+		}
+
+		public static void SerializeReliableData(IPacketWriter writer,
+												 HashSet<MasterNetworkObject> netObjs,
+												 PacketType packetType)
+		{
+			if (netObjs.Count <= 0)
+				return;
+
+			writer.Put(packetType);
+			writer.Put((byte)netObjs.Count);
+			foreach (var spawnObj in netObjs)
+			{
+				spawnObj.SerializeSyncReliable(writer);
+			}
+		}
+
+		public static void SerializeUnreliableData(IPacketWriter writer,
+												   HashSet<MasterNetworkObject> netObjs,
+												   PacketType packetType)
+		{
+			if (netObjs.Count <= 0)
+				return;
+
+			writer.Put(packetType);
+			writer.Put((byte)netObjs.Count);
+			foreach (var spawnObj in netObjs)
+			{
+				spawnObj.SerializeSyncUnreliable(writer);
+			}
+		}
+
 		public void OnDeserializeSyncReliable(IPacketReader reader)
 		{
 			while (reader.CanRead(1))
 			{
 				NetworkIdentity id = new NetworkIdentity();
 				id.Deserialize(reader);
-				if (_worldObjectById.TryGetValue(id, out var netObj))
+				if (_networkObjectById.TryGetValue(id, out var netObj))
 				{
 					netObj.DeserializeSyncReliable(reader);
 				}
@@ -197,7 +267,7 @@ namespace CTS.Instance.Gameplay
 			{
 				NetworkIdentity id = new NetworkIdentity();
 				id.Deserialize(reader);
-				if (_worldObjectById.TryGetValue(id, out var netObj))
+				if (_networkObjectById.TryGetValue(id, out var netObj))
 				{
 					netObj.DeserializeSyncUnreliable(reader);
 				}

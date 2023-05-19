@@ -11,10 +11,12 @@
 	<!-- Declare Data Types -->
 	
 	<!-- Declare Packets -->
-	<client name="Sync_RemoteUnreliable" custom="true"/>
 	<client name="Sync_RemoteReliable" custom="true"/>
-	
-	<server name="Sync_MasterLifeCycle" custom="true"/>
+	<client name="Sync_RemoteUnreliable" custom="true"/>
+	<server name="Sync_MasterMovement" custom="true"/>
+	<server name="Sync_MasterSpawn" custom="true"/>
+	<server name="Sync_MasterRespawn" custom="true"/>
+	<server name="Sync_MasterDespawn" custom="true"/>
 	<server name="Sync_MasterReliable" custom="true"/>
 	<server name="Sync_MasterUnreliable" custom="true"/>
 </Definition>

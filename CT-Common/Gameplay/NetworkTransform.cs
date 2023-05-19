@@ -9,8 +9,8 @@ namespace CT.Common.Gameplay
 	[StructLayout(LayoutKind.Sequential)]
 	public class NetworkTransform : IUpdatable
 	{
-		public Vector3 Position { get; private set; }
-		public Vector3 Velocity { get; private set; }
+		public Vector3 Position { get; set; }
+		public Vector3 Velocity { get; set; }
 
 		// Check dirty
 		private Vector3 _previousPosition;

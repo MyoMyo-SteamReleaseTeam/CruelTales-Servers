@@ -11,8 +11,17 @@ namespace CTS.Instance.Synchronizations
 {
 	public abstract class MasterNetworkObject : ISynchronizable, IUpdatable
 	{
+		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
+		[AllowNull] private WorldManager _worldManager;
+
+		/// <summary></summary>
+		[AllowNull] private WorldVisibilityManager _worldPartitioner;
+
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; } = new NetworkIdentity();
+
+		public UserId Owner { get; protected set; } = new UserId(0);
+		public Faction Faction { get; protected set; } = Faction.System;
 
 		/// <summary>네트워크 객체의 Transform입니다.</summary>
 		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
@@ -21,13 +30,10 @@ namespace CTS.Instance.Synchronizations
 		public abstract NetworkObjectType Type { get; }
 
 		/// <summary>네트워크 객체가 보일 조건을 결정합니다.</summary>
-		public abstract PartitionType Visibility { get; }
+		public abstract VisibilityType Visibility { get; }
 
 		/// <summary>네트워크 객체가 보일 대상을 결정합니다.</summary>
-		public abstract VisibilityAuthority Target { get; }
-
-		[AllowNull] private WorldManager _worldManager;
-		[AllowNull] private WorldPartitioner _worldPartitioner;
+		public abstract VisibilityAuthority VisibilityAuthority { get; }
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
@@ -50,8 +56,11 @@ namespace CTS.Instance.Synchronizations
 				fixedUpdate(deltaTime);
 			}
 
-			_currentCellPos = WorldPartitioner.GetWorldCell(Transform.Position);
-			_worldPartitioner.OnCellChanged(Identity, previousPos, _currentCellPos);
+			if (Visibility == VisibilityType.View)
+			{
+				_currentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				_worldPartitioner.OnCellChanged(this, previousPos, _currentCellPos);
+			}
 		}
 
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
@@ -71,7 +80,7 @@ namespace CTS.Instance.Synchronizations
 
 		/// <summary>객체를 초기화합니다.</summary>
 		public void Create(WorldManager manager,
-						   WorldPartitioner worldPartitioner,
+						   WorldVisibilityManager worldPartitioner,
 						   NetworkIdentity id,
 						   Vector3 position)
 		{
@@ -81,12 +90,15 @@ namespace CTS.Instance.Synchronizations
 
 			// Bind reference
 			_worldManager = manager;
-			_worldPartitioner = worldPartitioner;
 
 			// Set position
 			Transform.SetPosition(position);
-			_currentCellPos = WorldPartitioner.GetWorldCell(Transform.Position);
-			_worldPartitioner.OnCreated(Identity, _currentCellPos);
+			if (Visibility == VisibilityType.View)
+			{
+				_worldPartitioner = worldPartitioner;
+				_currentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				_worldPartitioner.OnCreated(this);
+			}
 		}
 
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
@@ -94,13 +106,49 @@ namespace CTS.Instance.Synchronizations
 		{
 			IsAlive = false;
 			_worldManager.AddDestroyStack(this);
-			_worldPartitioner.OnDestroy(Identity, _currentCellPos);
+
+			if (Visibility == VisibilityType.View)
+			{
+				_worldPartitioner.OnDestroy(this);
+			}
 		}
 
 		/// <summary>객체를 해제합니다.</summary>
 		public void Dispose()
 		{
 		}
+
+		#region Visibility authority
+
+		public bool IsValidVisibilityAuthority(NetworkPlayer networkPlayer)
+		{
+			switch (VisibilityAuthority)
+			{
+				case VisibilityAuthority.All:
+					return true;
+
+				case VisibilityAuthority.Owner:
+					return networkPlayer.UserId == Owner;
+
+				case VisibilityAuthority.Faction:
+					return networkPlayer.Faction == Faction;
+
+				default:
+					return false;
+			}
+		}
+
+		public virtual bool IsOwner(NetworkPlayer networkPlayer)
+		{
+			return Owner == networkPlayer.UserId;
+		}
+
+		public virtual bool IsSameFaction(NetworkPlayer networkPlayer)
+		{
+			return Faction == networkPlayer.Faction;
+		}
+
+		#endregion
 
 		public abstract bool IsDirtyReliable { get; }
 		public abstract bool IsDirtyUnreliable { get; }

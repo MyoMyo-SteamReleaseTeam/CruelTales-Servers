@@ -24,7 +24,10 @@ namespace CTC.Networks.Packets
 
 		private static Dictionary<PacketType, HandlePacketRaw> _dispatcherRawTable = new()
 		{
-			{ PacketType.SC_Sync_MasterLifeCycle, PacketHandler.Handle_SC_Sync_MasterLifeCycle },
+			{ PacketType.SC_Sync_MasterMovement, PacketHandler.Handle_SC_Sync_MasterMovement },
+			{ PacketType.SC_Sync_MasterSpawn, PacketHandler.Handle_SC_Sync_MasterSpawn },
+			{ PacketType.SC_Sync_MasterRespawn, PacketHandler.Handle_SC_Sync_MasterRespawn },
+			{ PacketType.SC_Sync_MasterDespawn, PacketHandler.Handle_SC_Sync_MasterDespawn },
 			{ PacketType.SC_Sync_MasterReliable, PacketHandler.Handle_SC_Sync_MasterReliable },
 			{ PacketType.SC_Sync_MasterUnreliable, PacketHandler.Handle_SC_Sync_MasterUnreliable },
 			
@@ -32,7 +35,10 @@ namespace CTC.Networks.Packets
 
 		private static HashSet<PacketType> _customPacketSet = new()
 		{
-			PacketType.SC_Sync_MasterLifeCycle,
+			PacketType.SC_Sync_MasterMovement,
+			PacketType.SC_Sync_MasterSpawn,
+			PacketType.SC_Sync_MasterRespawn,
+			PacketType.SC_Sync_MasterDespawn,
 			PacketType.SC_Sync_MasterReliable,
 			PacketType.SC_Sync_MasterUnreliable,
 			

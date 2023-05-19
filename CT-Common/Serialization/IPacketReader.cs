@@ -12,7 +12,7 @@ namespace CT.Common.Serialization
 		public bool CanRead(int readSize);
 		public bool CanRead<T>(T serializeObject) where T : IPacketSerializable;
 		public void ResetReader();
-		public void SetPosition(int position);
+		public void SetReadPosition(int position);
 		public void ReadTo<T>(T serializeObject) where T : IPacketSerializable;
 		public void IgnoreAll();
 		public void Ignore(int count);
