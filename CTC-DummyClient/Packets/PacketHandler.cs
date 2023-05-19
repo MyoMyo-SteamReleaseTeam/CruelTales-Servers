@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CT.Common.Serialization;
+﻿using CT.Common.Serialization;
 using log4net;
 
 namespace CTC.Networks
@@ -17,37 +12,46 @@ namespace CTC.Networks
 			networkManager.ReqTryReadyToSync();
 		}
 
-		internal static void Handle_SC_Sync_LifeCycle(IPacketReader reader, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_MasterMovement(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
-			//Console.WriteLine("Initialize");
-			networkManager.GameSynchronizer.OnSyncInitialize(reader);
+			_log.Info(nameof(Handle_SC_Sync_MasterMovement));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnSyncInitialize(receivedPacket);
 		}
 
-		internal static void Handle_SC_Sync_MasterLifeCycle(IPacketReader receivedPacket, NetworkManager networkManager)
+		internal static void Handle_SC_Sync_MasterSpawn(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
-			throw new NotImplementedException();
+			_log.Info(nameof(Handle_SC_Sync_MasterSpawn));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnSyncInitialize(receivedPacket);
+		}
+
+		internal static void Handle_SC_Sync_MasterRespawn(IPacketReader receivedPacket, NetworkManager networkManager)
+		{
+			_log.Info(nameof(Handle_SC_Sync_MasterRespawn));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnSyncInitialize(receivedPacket);
+		}
+
+		internal static void Handle_SC_Sync_MasterDespawn(IPacketReader receivedPacket, NetworkManager networkManager)
+		{
+			_log.Info(nameof(Handle_SC_Sync_MasterDespawn));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnSyncInitialize(receivedPacket);
 		}
 
 		internal static void Handle_SC_Sync_MasterReliable(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
-			throw new NotImplementedException();
+			_log.Info(nameof(Handle_SC_Sync_MasterReliable));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnDeserializeReliable(receivedPacket);
 		}
 
 		internal static void Handle_SC_Sync_MasterUnreliable(IPacketReader receivedPacket, NetworkManager networkManager)
 		{
-			throw new NotImplementedException();
-		}
-
-		internal static void Handle_SC_Sync_Reliable(IPacketReader reader, NetworkManager networkManager)
-		{
-			_log.Info("Reliable");
-			networkManager.GameSynchronizer.OnDeserializeReliable(reader);
-		}
-			
-		internal static void Handle_SC_Sync_Unreliable(IPacketReader reader, NetworkManager networkManager)
-		{
-			//Console.WriteLine("Unreliable");
-			networkManager.GameSynchronizer.OnDeserializeUnreliable(reader);
+			_log.Info(nameof(Handle_SC_Sync_MasterUnreliable));
+			receivedPacket.IgnoreAll();
+			//networkManager.GameSynchronizer.OnDeserializeUnreliable(receivedPacket);
 		}
 	}
 }

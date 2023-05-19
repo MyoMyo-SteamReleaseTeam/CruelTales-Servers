@@ -2,7 +2,7 @@
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
-	public partial class NetworkPlayer : RemoteNetworkObject
+	public partial class PlayerCharacter : RemoteNetworkObject
 	{
 	}
 }
