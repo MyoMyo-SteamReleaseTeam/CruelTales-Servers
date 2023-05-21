@@ -59,22 +59,23 @@ namespace CTS.Instance.Gameplay
 			_gameplayTickRunner.Run();
 		}
 
-		//private long _current = 0;
+		private long _current = 0;
 		private static float _globalDeltaTime;
 		public void Update(float deltaTime)
 		{
-			//_current = _serverTimer.CurrentMs;
+			// Check tick
+			_current = _serverTimer.CurrentMs;
 
+			// Process
 			_globalDeltaTime = deltaTime;
-
 			Parallel.ForEach(_gameInstanceList, processUpdate);
 
-			//Parallel.ForEach(_gameInstanceList, (i) =>
-			//{
-			//	i.Update(deltaTime);
-			//});
-
-			//_log.Info($"Tick {_serverTimer.CurrentMs - _current}");
+			// Alarm high CPU load
+			long tickElapsed = _serverTimer.CurrentMs - _current;
+			if (tickElapsed > _serverOption.AlarmTickMs)
+			{
+				_log.Fatal($"Current tick elapsed : {tickElapsed}");
+			}
 		}
 
 		private static void processUpdate(GameplayInstance gameplayInstance)

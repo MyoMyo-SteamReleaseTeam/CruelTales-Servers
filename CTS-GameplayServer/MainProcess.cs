@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Runtime.Versioning;
+using CT.Common.Tools.Data;
 using CT.Networks.Runtimes;
 using log4net;
 
 namespace CTS.Instance
 {
-	public class ServerOption
+	public struct ServerOption
 	{
 		public int Port { get; set; } = 60128;
 		public int FramePerMs = 66;
-		public int GameCount = 1;
+		public int AlarmTickMs = 40;
+		public int GameCount = 10;
+
+		public ServerOption() {}
 	}
 
 	[SupportedOSPlatform("windows")]
@@ -17,9 +21,33 @@ namespace CTS.Instance
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(MainProcess));
 
+		private static readonly string ConfigurationFile = "server-config.json";
+
 		static void Main(string[] args)
 		{
 			try { Console.SetWindowSize(200, 50); } catch { }
+
+			ServerOption serverOption = new ServerOption();
+			var configRead = JsonHandler.TryReadObject<ServerOption>(ConfigurationFile);
+			if (configRead.ResultType != JobResultType.Success)
+			{
+				_log.Warn($"There is no configuration file!");
+				var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, serverOption, true);
+				if (createDefault.ResultType != JobResultType.Success)
+				{
+					_log.Fatal($"Failed to create default configuration file!");
+					_log.Fatal(createDefault.Exception);
+				}
+				else
+				{
+					_log.Info($"Create default configuration file!");
+				}
+			}
+			else
+			{
+				_log.Info("Load server configuration file.");
+				serverOption = configRead.Value;
+			}
 
 			// Start server
 			_log.Info("Start gameplay server");
@@ -27,9 +55,11 @@ namespace CTS.Instance
 			TickTimer serverTimer = new TickTimer();
 
 			// Setup server option
-			ServerOption serverOption = new ServerOption();
+			serverOption.AlarmTickMs = (int)(serverOption.FramePerMs * 0.7f);
+
 			_log.Info($"Server Port\t: {serverOption.Port}");
-			_log.Info($"Tick ms\t: {serverOption.FramePerMs}");
+			_log.Info($"Frame per ms\t: {serverOption.FramePerMs}");
+			_log.Info($"Alarm Tick ms\t: {serverOption.AlarmTickMs}");
 			_log.Info($"Max Game Count\t: {serverOption.GameCount}");
 
 			GameplayServer gameplayServer = new(serverTimer, serverOption);
