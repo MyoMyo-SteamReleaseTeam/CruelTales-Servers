@@ -15,6 +15,7 @@ namespace CTC.Networks
 		public UserId UserId;
 		public UserToken UserToken;
 		public GameInstanceGuid GameInstanceGuid;
+		public int ServerPort;
 
 		public override string ToString()
 		{
@@ -31,15 +32,16 @@ namespace CTC.Networks
 		public static ILog _log = LogManager.GetLogger(typeof(MainProcess));
 
 		// Server Endpoint
-		//public static readonly string ServerIp = "192.168.0.29";
-		public static readonly string ServerIp = "127.0.0.1";
+		public static readonly string ServerIp = "192.168.0.29";
+		//public static readonly string ServerIp = "127.0.0.1";
 		public static readonly int ServerPort = 60128;
 
 		// Dummy client setup
 		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 700;
+		private static int _dummyCount = 4000;
 		private static int _joinRoomPerPlayer = 7;
+		private static int _serverNumber = 2;
 		private static List<NetworkManager> _dummyClients = new();
 
 		// Handle test process
@@ -58,14 +60,24 @@ namespace CTC.Networks
 				Thread.Sleep(1000);
 			}
 
+			int serverPort = ServerPort;
+			int index = 0;
 			for (int i = 1; i <= _dummyCount; i++)
 			{
+				index++;
+				serverPort = ServerPort + i / (_dummyCount / _serverNumber);
+				if (index > (_dummyCount / _serverNumber))
+				{
+					index = 0;
+				}
+
 				DummyUserInfo info = new DummyUserInfo()
 				{
 					DummyClientPort = _dummyClientBindPort + i,
-					UserId = new UserId((ulong)i * 100),
-					UserToken = new UserToken((ulong)(i * 10000)),
-					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / _joinRoomPerPlayer) + 1))
+					UserId = new UserId((ulong)index * 100),
+					UserToken = new UserToken((ulong)(index * 10000)),
+					GameInstanceGuid = new GameInstanceGuid((ulong)(((index - 1) / _joinRoomPerPlayer) + 1)),
+					ServerPort = serverPort
 				};
 
 				// Create dummy clinet and add to list
@@ -81,10 +93,10 @@ namespace CTC.Networks
 
 				try
 				{
-					int port = dummyClient.UserInfo.DummyClientPort;
-					dummyClient.Start(port);
-					dummyClient.TryConnect(ServerIp, ServerPort);
-					_log.Info($"[Client Count {i}] Bind Port : {port} / Try connect {ServerIp}:{ServerPort}");
+					var info = dummyClient.UserInfo;
+					dummyClient.Start(info.DummyClientPort);
+					dummyClient.TryConnect(ServerIp, info.ServerPort);
+					_log.Info($"[Client Count {i}] Bind Port : {info.DummyClientPort} / Try connect {ServerIp}:{info.ServerPort}");
 
 					if (i % 10 == 0)
 					{
