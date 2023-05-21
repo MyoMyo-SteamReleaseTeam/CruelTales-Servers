@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using CT.Common.Tools.Data;
 using CT.Networks.Runtimes;
@@ -25,7 +26,10 @@ namespace CTS.Instance
 
 		static void Main(string[] args)
 		{
-			try { Console.SetWindowSize(200, 50); } catch { }
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				try { Console.SetWindowSize(200, 50); } catch { }
+			}
 
 			ServerOption serverOption = new ServerOption();
 			var configRead = JsonHandler.TryReadObject<ServerOption>(ConfigurationFile);
