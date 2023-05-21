@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Networks;
 using CT.Packets;
 using CTC.Networks.Packets;
 using CTC.Networks.Synchronizations;
@@ -107,6 +108,7 @@ namespace CTC.Networks
 			_gameSynchronizer = new GameSynchronizer(this);
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
+			_netManager.DisconnectTimeout = GlobalNetwork.DisconnectTimeout;
 
 			_listener.NetworkReceiveEvent += OnReceived;
 			_listener.PeerConnectedEvent += OnConnected;

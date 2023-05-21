@@ -1,4 +1,4 @@
-﻿#if NET7_0_OR_GREATER
+﻿#if NET
 using System.Diagnostics;
 #endif
 
@@ -13,11 +13,7 @@ namespace CT.Common.DataType
 	[Serializable]
 	public struct NetString : IPacketSerializable
 	{
-#if NET7_0_OR_GREATER
-		public string Value = "";
-#else
 		public string Value;
-#endif
 		public const int MAX_BYTE_LENGTH = 65536;
 
 		public int ByteSize
@@ -34,19 +30,17 @@ namespace CT.Common.DataType
 		public static implicit operator string(NetString value) => value.Value;
 		public static implicit operator NetString(string value) => new NetString(value ?? string.Empty);
 
-#if NET7_0_OR_GREATER
 		public NetString()
 		{
 			Value = string.Empty;
 		}
-#endif
 
 		public NetString(string value)
 		{
-#if NET7_0_OR_GREATER
+			Value = value;
+#if NET
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
 #endif
-			Value = value;
 		}
 
 		public void Serialize(IPacketWriter writer)
@@ -113,11 +107,7 @@ namespace CT.Common.DataType
 	[Serializable]
 	public struct NetStringShort : IPacketSerializable
 	{
-#if NET7_0_OR_GREATER
-		public string Value = "";
-#else
 		public string Value;
-#endif
 		public const int MAX_BYTE_LENGTH = 256;
 
 		public int ByteSize
@@ -135,19 +125,17 @@ namespace CT.Common.DataType
 		public static implicit operator string(NetStringShort value) => value.Value;
 		public static implicit operator NetStringShort(string value) => new NetStringShort(value ?? string.Empty);
 
-#if NET7_0_OR_GREATER
 		public NetStringShort()
 		{
 			Value = string.Empty;
 		}
-#endif
 
 		public NetStringShort(string value)
 		{
-#if NET7_0_OR_GREATER
+			Value = value;
+#if NET
 			Debug.Assert(ByteSize <= MAX_BYTE_LENGTH);
 #endif
-			Value = value;
 		}
 
 		public void Serialize(IPacketWriter writer)

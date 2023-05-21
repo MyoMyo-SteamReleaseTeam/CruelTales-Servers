@@ -57,6 +57,12 @@ namespace CT.Common.Gameplay
 			writer.Put(Velocity);
 		}
 
+		public void SerializeSpawnData(IPacketWriter writer)
+		{
+			writer.Put(Position);
+			writer.Put(Velocity);
+		}
+
 		public void Deserialize(IPacketReader reader)
 		{
 			bool isTeleport = reader.ReadBool();

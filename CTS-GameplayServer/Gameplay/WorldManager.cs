@@ -46,7 +46,7 @@ namespace CTS.Instance.Gameplay
 			_destroyObjectStack = new(option.DestroyObjectStackCapacity);
 
 			// Partitioner
-			_visibilityManager = new(gameplayInstance, option);
+			_visibilityManager = new(gameplayInstance, this, option);
 		}
 
 		public void Update(float deltaTime)
@@ -55,7 +55,7 @@ namespace CTS.Instance.Gameplay
 			foreach (var netObj in _networkObjectById.ForwardValues)
 			{
 				if (!netObj.IsAlive)
-					return;
+					continue;
 
 				// Update positions and logic
 				netObj.Update(deltaTime);
@@ -71,6 +71,15 @@ namespace CTS.Instance.Gameplay
 		public void UpdateVisibility()
 		{
 			this._visibilityManager.Update();
+		}
+
+		public void ClearDirtys()
+		{
+			foreach (var netObj in _networkObjectById.ForwardValues)
+			{
+				netObj.ClearDirtyReliable();
+				netObj.ClearDirtyUnreliable();
+			}
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)
@@ -95,8 +104,8 @@ namespace CTS.Instance.Gameplay
 		public T CreateObject<T>(Vector3 position = default) where T : MasterNetworkObject, new()
 		{
 			var netObj = _objectPoolManager.Create<T>();
-			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.Create(this, _visibilityManager, getNetworkIdentityCounter(), position);
+			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.OnCreated();
 			return netObj;
 
@@ -136,16 +145,16 @@ namespace CTS.Instance.Gameplay
 
 		private void destroyObject(MasterNetworkObject netObject)
 		{
+			_objectPoolManager.Return(netObject);
 			if (!_networkObjectById.TryRemove(netObject))
 			{
-				_log.Error($"There is no network object to remove. Object : [{netObject}]");
+				_log.Error($"There is no network object to remove. Object : [{netObject.Identity}]");
 				Debug.Assert(false);
 				return;
 			}
 
 			netObject.Dispose();
 			netObject.OnDestroyed();
-			_objectPoolManager.Return(netObject);
 		}
 
 		#endregion
@@ -153,31 +162,41 @@ namespace CTS.Instance.Gameplay
 		#region Synchronizaion
 
 		// TODO : Need to pool packet
-		private static ByteBuffer _reliableBuffer = new ByteBuffer(16 * 1024);
-		private static ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU);
+		private ByteBuffer _reliableBuffer = new ByteBuffer(16 * 1024);
+		private ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU);
 
-		public static void SendSynchronization(UserSession userSession,
+		public void SendSynchronization(UserSession userSession,
 											   PlayerVisibleTable visibleTable)
 		{
 			_reliableBuffer.ResetWriter();
 
-			SerializeSpawnData(_reliableBuffer,
-							   visibleTable.SpawnObjects,
-							   PacketType.SC_Sync_MasterSpawn);
+			if (visibleTable.SpawnObjects.Count != 0)
+			{
+				SerializeSpawnData(_reliableBuffer,
+								   visibleTable.SpawnObjects,
+								   PacketType.SC_Sync_MasterSpawn);
+			}
 
-			SerializeSpawnData(_reliableBuffer,
-							   visibleTable.RespawnObjects,
-							   PacketType.SC_Sync_MasterRespawn);
+			if (visibleTable.RespawnObjects.Count != 0)
+			{
+				SerializeSpawnData(_reliableBuffer,
+								   visibleTable.RespawnObjects,
+								   PacketType.SC_Sync_MasterRespawn);
+			}
 
-			SerializeReliableData(_reliableBuffer,
-								  visibleTable.TraceObjects,
-								  PacketType.SC_Sync_MasterReliable);
+			if (visibleTable.TraceObjects.Count != 0)
+			{
+				SerializeReliableData(_reliableBuffer,
+									  visibleTable.TraceObjects,
+									  PacketType.SC_Sync_MasterReliable);
+			}
 
 			if (_reliableBuffer.Size > 0)
 			{
 				userSession.SendReliable(_reliableBuffer);
 			}
 
+			// TODO : Fragment the packet by MTU
 			_mtuBuffer.ResetWriter();
 			SerializeUnreliableData(_mtuBuffer,
 									visibleTable.TraceObjects,
@@ -189,57 +208,63 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public static void SerializeSpawnData(IPacketWriter writer,
+		public void SerializeSpawnData(IPacketWriter writer,
 											  HashSet<MasterNetworkObject> netObjs,
 											  PacketType packetType)
 		{
-			if (netObjs.Count <= 0)
-				return;
-
 			writer.Put(packetType);
-			//int sizeHeaderPos = writer.Size;
-			//writer.OffsetSize(2);
 			writer.Put((byte)netObjs.Count);
 
-			//int beforeSize = writer.Size;
 			foreach (var spawnObj in netObjs)
 			{
+				writer.Put(spawnObj.Type);
+				writer.Put(spawnObj.Identity);
+				spawnObj.Transform.SerializeSpawnData(writer);
 				spawnObj.SerializeEveryProperty(writer);
 			}
-			//int afterSize = writer.Size;
-
-			//writer.SetSize(sizeHeaderPos);
-			//writer.Put((ushort)(afterSize - beforeSize));
-			//writer.SetSize(afterSize);
 		}
 
-		public static void SerializeReliableData(IPacketWriter writer,
+		public void SerializeReliableData(IPacketWriter writer,
 												 HashSet<MasterNetworkObject> netObjs,
 												 PacketType packetType)
 		{
-			if (netObjs.Count <= 0)
-				return;
-
+			int originSize = writer.Size;
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
 			foreach (var spawnObj in netObjs)
 			{
-				spawnObj.SerializeSyncReliable(writer);
+				if (spawnObj.IsDirtyReliable)
+				{
+					spawnObj.SerializeSyncReliable(writer);
+				}
+			}
+
+			// Revert size if there is no serialized data
+			if (originSize == writer.Size - (sizeof(PacketType) + sizeof(byte)))
+			{
+				writer.SetSize(originSize);
 			}
 		}
 
-		public static void SerializeUnreliableData(IPacketWriter writer,
+		public void SerializeUnreliableData(IPacketWriter writer,
 												   HashSet<MasterNetworkObject> netObjs,
 												   PacketType packetType)
 		{
-			if (netObjs.Count <= 0)
-				return;
-
+			int originSize = writer.Size;
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
 			foreach (var spawnObj in netObjs)
 			{
-				spawnObj.SerializeSyncUnreliable(writer);
+				if (spawnObj.IsDirtyUnreliable)
+				{
+					spawnObj.SerializeSyncUnreliable(writer);
+				}
+			}
+
+			// Revert size if there is no serialized data
+			if (originSize == writer.Size - (sizeof(PacketType) + sizeof(byte)))
+			{
+				writer.SetSize(originSize);
 			}
 		}
 

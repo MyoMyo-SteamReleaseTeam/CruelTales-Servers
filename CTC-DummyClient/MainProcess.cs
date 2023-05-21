@@ -37,7 +37,8 @@ namespace CTC.Networks
 		// Dummy client setup
 		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 100;
+		private static int _dummyCount = 14;
+		private static int _joinRoomPerPlayer = 7;
 		private static List<NetworkManager> _dummyClients = new();
 
 		// Handle test process
@@ -63,7 +64,7 @@ namespace CTC.Networks
 					DummyClientPort = _dummyClientBindPort + i,
 					UserId = new UserId((ulong)i * 100),
 					UserToken = new UserToken((ulong)(i * 10000)),
-					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / 7) + 1))
+					GameInstanceGuid = new GameInstanceGuid((ulong)(((i - 1) / _joinRoomPerPlayer) + 1))
 				};
 
 				// Create dummy clinet and add to list

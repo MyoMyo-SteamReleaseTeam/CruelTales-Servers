@@ -83,6 +83,9 @@ namespace CTS.Instance.Gameplay
 
 			// Send sync data to each user
 			WorldManager.UpdateVisibility();
+
+			// Reset dirtys
+			WorldManager.ClearDirtys();
 		}
 
 		public void Shutdown(DisconnectReasonType reason)

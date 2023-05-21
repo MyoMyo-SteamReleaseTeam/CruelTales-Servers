@@ -19,6 +19,7 @@ namespace CTS.Instance.Gameplay
 
 		// Reference
 		private GameplayInstance _gameplayInstance;
+		private WorldManager _worldManager;
 
 		// World cell sizes
 		public const float INVERSE_CEll_SIZE = 1.0f / 8.0f;
@@ -40,9 +41,12 @@ namespace CTS.Instance.Gameplay
 		private ObjectPool<PlayerVisibleTable> _playerVisibleTablePool;
 		private Dictionary<NetworkPlayer, PlayerVisibleTable> _playerVisibleBySession;
 
-		public WorldVisibilityManager(GameplayInstance gameplayInstance, InstanceInitializeOption option)
+		public WorldVisibilityManager(GameplayInstance gameplayInstance,
+									  WorldManager worldManager,
+									  InstanceInitializeOption option)
 		{
 			_gameplayInstance = gameplayInstance;
+			_worldManager = worldManager;
 
 			_spawnList = new(option.VisibleSpawnCapacity);
 			_networkObjectByCell = new HashSet<MasterNetworkObject>[CELL_HEIGHT, CELL_WIDTH];
@@ -144,6 +148,19 @@ namespace CTS.Instance.Gameplay
 							if (objPos.X < inboundLB.X || objPos.X > inboundRT.X ||
 								objPos.Y < inboundLB.Y || objPos.Y > inboundRT.Y)
 							{
+								if (viewTable.TraceObjects.Contains(netObj))
+								{
+									continue;
+								} 
+
+								// TODO : 초기 생성 객체는 셀 타일에 등록되지 않도록 관리되어야함
+								// 임시 코드
+								if (viewTable.SpawnObjects.Contains(netObj))
+								{
+									continue;
+								}
+								// 임시 코드
+
 								if (netObj.IsValidVisibilityAuthority(player))
 								{
 									viewTable.RespawnObjects.Add(netObj);
@@ -188,10 +205,13 @@ namespace CTS.Instance.Gameplay
 				PlayerVisibleTable visibleTable = kv.Value;
 				if (session != null)
 				{
-					WorldManager.SendSynchronization(session, visibleTable);
+					_worldManager.SendSynchronization(session, visibleTable);
 				}
 				visibleTable.TransitionVisibilityCycle();
 			}
+
+			// Reset spawn objects
+			_spawnList.Clear();
 		}
 
 		public void OnCellChanged(MasterNetworkObject netObject, Vector2Int previous, Vector2Int current)

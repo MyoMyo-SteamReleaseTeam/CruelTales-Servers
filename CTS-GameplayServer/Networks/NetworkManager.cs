@@ -2,6 +2,7 @@
 using System.Threading;
 using CT.Common.DataType;
 using CT.Common.Serialization;
+using CT.Networks;
 using CT.Networks.Runtimes;
 using CT.Packets;
 using CTS.Instance.Gameplay;
@@ -43,6 +44,7 @@ namespace CTS.Instance.Networks
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
 			_netManager = new NetManager(_networkListener);
 			_netManager.AutoRecycle = true;
+			_netManager.DisconnectTimeout = GlobalNetwork.DisconnectTimeout;
 
 			// Gameplay Instance
 			_serverOption = serverOption;
