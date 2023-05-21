@@ -97,6 +97,11 @@ namespace CT.Common.Gameplay
 			_isTeleported = false;
 			IsDirty = false;
 		}
+
+		public override string ToString()
+		{
+			return $"(Position:{_position},Velocity:{_velocity})";
+		}
 	}
 }
 

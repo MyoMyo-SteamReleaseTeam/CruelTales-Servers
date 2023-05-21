@@ -1,22 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using CTS.Instance.Synchronizations;
+using CTC.Networks.Synchronizations;
 using log4net;
 
-namespace CTS.Instance.Gameplay.ObjectManagements
+namespace CTC.Networks.Gameplay.ObjectManagements
 {
 	public interface INetworkObjectPool
 	{
-		public void Return(MasterNetworkObject networkObject);
-		public MasterNetworkObject Get();
+		public void Return(RemoteNetworkObject networkObject);
+		public RemoteNetworkObject Get();
 	}
 
-	public class NetworkObjectPool<T> : INetworkObjectPool where T : MasterNetworkObject, new()
+	public class NetworkObjectPool<T> : INetworkObjectPool where T : RemoteNetworkObject, new()
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(NetworkObjectPool<T>));
 
 		public int Count => _objectStack.Count;
-		private Stack<MasterNetworkObject> _objectStack;
+		private Stack<RemoteNetworkObject> _objectStack;
 		private int _initialCapacity;
 
 		public NetworkObjectPool(int initialCapacity)
@@ -30,7 +30,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 			}
 		}
 
-		public MasterNetworkObject Get()
+		public RemoteNetworkObject Get()
 		{
 			if (_objectStack.Count == 0)
 			{
@@ -44,7 +44,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 			}
 		}
 
-		public void Return(MasterNetworkObject networkObject)
+		public void Return(RemoteNetworkObject networkObject)
 		{
 			if (networkObject == null)
 				return;

@@ -6,6 +6,22 @@ using CT.Common.Synchronizations;
 namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition]
+	public class TestCube
+	{
+		[SyncVar]
+		public float R;
+
+		[SyncVar]
+		public float G;
+
+		[SyncVar]
+		public float B;
+
+		[SyncRpc]
+		public void TestRPC(NetStringShort someMessage) { }
+	}
+
+	[SyncNetworkObjectDefinition]
 	public class PlayerCharacter
 	{
 		[SyncVar]

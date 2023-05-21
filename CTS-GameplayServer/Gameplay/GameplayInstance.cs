@@ -63,6 +63,9 @@ namespace CTS.Instance.Gameplay
 			Option = option;
 			Guid = guid;
 			WorldManager.Clear();
+
+			// TODO : Start game properly
+			GameManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>

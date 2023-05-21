@@ -61,6 +61,8 @@ namespace CTS.Instance.Synchronizations
 				_currentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
 				_worldPartitioner.OnCellChanged(this, previousPos, _currentCellPos);
 			}
+
+			OnUpdate(deltaTime);
 		}
 
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>

@@ -9,7 +9,7 @@ namespace CTS.Instance
 	{
 		public int Port { get; set; } = 60128;
 		public int FramePerMs = 66;
-		public int GameCount = 2;
+		public int GameCount = 1;
 	}
 
 	[SupportedOSPlatform("windows")]

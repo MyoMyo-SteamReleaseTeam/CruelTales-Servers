@@ -1,9 +1,11 @@
-﻿using CT.Common.Gameplay;
+﻿using System.Numerics;
+using CT.Common.Gameplay;
 using CT.Common.Tools;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Networks;
 using CTS.Instance.SyncObjects;
 using log4net;
+using Microsoft.VisualBasic.FileIO;
 
 namespace CTS.Instance.Gameplay
 {
@@ -22,6 +24,7 @@ namespace CTS.Instance.Gameplay
 
 		// Test
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
+		private InstanceInitializeOption _option;
 
 		public GameManager(GameplayInstance gameplayInstance,
 						   InstanceInitializeOption option)
@@ -29,6 +32,7 @@ namespace CTS.Instance.Gameplay
 			// Reference
 			_gameplayInstance = gameplayInstance;
 			_worldManager = gameplayInstance.WorldManager;
+			_option = option;
 
 			// Manage Players
 			_networkPlayerByUserId = new(option.SystemMaxUser);
@@ -45,6 +49,14 @@ namespace CTS.Instance.Gameplay
 			{
 				player.Update(deltaTime);
 			}
+		}
+
+		public void StartGame()
+		{
+			float inX = _option.HalfViewInSize.X;
+			float outX = _option.HalfViewOutSize.X;
+
+			_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

@@ -7,15 +7,11 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 {
 	public class NetworkObjectPoolManager
 	{
-		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType;
-
-		public NetworkObjectPoolManager()
+		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
 		{
-			_netObjectPoolByType = new()
-			{
-				{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(typeof(PlayerCharacter), 7) },
-			};
-		}
+			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(7) },
+			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
+		};
 
 		public T Create<T>() where T : MasterNetworkObject, new()
 		{

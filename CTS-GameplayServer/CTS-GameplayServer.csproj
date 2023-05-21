@@ -50,8 +50,4 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SyncObjects\" />
-  </ItemGroup>
-
 </Project>

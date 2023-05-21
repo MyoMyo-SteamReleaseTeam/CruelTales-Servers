@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
@@ -114,10 +115,18 @@ namespace CTS.Instance.Gameplay
 				PlayerVisibleTable viewTable = kv.Value;
 				Vector3 viewPos3D = player.ViewTransform.Position;
 				Vector2 viewPos = new Vector2(viewPos3D.X, viewPos3D.Z);
+
+				Vector2 inBoundary = player.HalfViewInSize;
 				Vector2 outBoundary = player.HalfViewOutSize;
 
-				Vector2Int inboundLB = GetWorldCell(viewPos - player.HalfViewInSize);
-				Vector2Int inboundRT = GetWorldCell(viewPos + player.HalfViewOutSize);
+				Vector2 inboundLB = viewPos - inBoundary;
+				Vector2 inboundRT = viewPos + inBoundary;
+
+				Vector2 outboundLB = viewPos - outBoundary;
+				Vector2 outboundRT = viewPos + outBoundary;
+
+				Vector2Int inboundCellLB = GetWorldCell(inboundLB);
+				Vector2Int inboundCellRT = GetWorldCell(inboundRT);
 
 				// Add spawn object
 				int spawnCount = _spawnList.Count;
@@ -126,8 +135,8 @@ namespace CTS.Instance.Gameplay
 					var spawnObject = _spawnList[i];
 
 					Vector3 objPos = spawnObject.Transform.Position;
-					if (objPos.X < inboundLB.X || objPos.X > inboundRT.X ||
-						objPos.Y < inboundLB.Y || objPos.Y > inboundRT.Y)
+					if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
+						objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
 					{
 						if (spawnObject.IsValidVisibilityAuthority(player))
 						{
@@ -137,16 +146,16 @@ namespace CTS.Instance.Gameplay
 				}
 
 				// Add respawn object
-				for (int cz = inboundLB.Y; cz <= inboundRT.Y; cz++)
+				for (int cz = inboundCellLB.Y; cz <= inboundCellRT.Y; cz++)
 				{
-					for (int cx = inboundLB.X; cx <= inboundRT.X; cx++)
+					for (int cx = inboundCellLB.X; cx <= inboundCellRT.X; cx++)
 					{
 						var curCell = GetCell(cx, cz);
 						foreach (var netObj in curCell)
 						{
 							Vector3 objPos = netObj.Transform.Position;
-							if (objPos.X < inboundLB.X || objPos.X > inboundRT.X ||
-								objPos.Y < inboundLB.Y || objPos.Y > inboundRT.Y)
+							if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
+								objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
 							{
 								if (viewTable.TraceObjects.Contains(netObj))
 								{
@@ -157,6 +166,7 @@ namespace CTS.Instance.Gameplay
 								// 임시 코드
 								if (viewTable.SpawnObjects.Contains(netObj))
 								{
+									//Debug.Assert(false);
 									continue;
 								}
 								// 임시 코드
@@ -175,8 +185,8 @@ namespace CTS.Instance.Gameplay
 				foreach (var netObj in viewTable.TraceObjects)
 				{
 					Vector3 objPos = netObj.Transform.Position;
-					if (objPos.X < viewPos.X - outBoundary.X || objPos.X > viewPos.X + outBoundary.X ||
-						objPos.Y < viewPos.Y - outBoundary.Y || objPos.Y > viewPos.Y + outBoundary.Y)
+					if (objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
+						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y)
 					{
 						_outObjectSet.Add(netObj);
 					}
