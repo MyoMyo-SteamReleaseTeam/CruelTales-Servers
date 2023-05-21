@@ -32,7 +32,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private float _b;
 		public event Action<float>? OnBChanged;
 		[SyncRpc]
-		public partial void TestRPC(NetStringShort someMessage);
+		public partial void TestRPC(long someMessage);
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
@@ -63,8 +63,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					NetStringShort someMessage = new();
-					someMessage.Deserialize(reader);
+					long someMessage = reader.ReadInt64();
 					TestRPC(someMessage);
 				}
 			}
@@ -99,7 +98,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					NetStringShort.IgnoreStatic(reader);
+					reader.Ignore(8);
 				}
 			}
 		}
@@ -123,7 +122,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					NetStringShort.IgnoreStatic(reader);
+					reader.Ignore(8);
 				}
 			}
 		}

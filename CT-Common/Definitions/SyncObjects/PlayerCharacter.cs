@@ -18,7 +18,7 @@ namespace CT.Common.Definitions.SyncObjects
 		public float B;
 
 		[SyncRpc]
-		public void TestRPC(NetStringShort someMessage) { }
+		public void TestRPC(long someMessage) { }
 	}
 
 	[SyncNetworkObjectDefinition]

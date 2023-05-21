@@ -12,7 +12,7 @@ namespace CTS.Instance
 		public int Port { get; set; } = 60128;
 		public int FramePerMs = 66;
 		public int AlarmTickMs = 40;
-		public int GameCount = 10;
+		public int GameCount = 100;
 
 		public ServerOption() {}
 	}

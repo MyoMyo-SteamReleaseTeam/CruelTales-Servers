@@ -6,7 +6,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	public partial class TestCube : RemoteNetworkObject
 	{
-		public partial void TestRPC(NetStringShort someMessage)
+		public partial void TestRPC(long someMessage)
 		{
 			//Console.WriteLine(someMessage);
 		}

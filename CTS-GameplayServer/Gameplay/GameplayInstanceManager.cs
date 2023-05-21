@@ -76,6 +76,10 @@ namespace CTS.Instance.Gameplay
 			{
 				_log.Fatal($"Current tick elapsed : {tickElapsed}");
 			}
+			else
+			{
+				_log.Info($"Current tick elapsed : {tickElapsed}");
+			}
 		}
 
 		private static void processUpdate(GameplayInstance gameplayInstance)

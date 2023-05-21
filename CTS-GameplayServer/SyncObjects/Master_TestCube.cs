@@ -29,7 +29,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private float _b;
 		[SyncRpc]
-		public partial void TestRPC(NetStringShort someMessage);
+		public partial void TestRPC(long someMessage);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -71,12 +71,12 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[2] = true;
 			}
 		}
-		public partial void TestRPC(NetStringShort someMessage)
+		public partial void TestRPC(long someMessage)
 		{
 			TestRPCCallstack.Enqueue(someMessage);
 			_dirtyReliable_0[3] = true;
 		}
-		private Queue<NetStringShort> TestRPCCallstack = new();
+		private Queue<long> TestRPCCallstack = new();
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -104,7 +104,7 @@ namespace CTS.Instance.SyncObjects
 				for (int i = 0; i < count; i++)
 				{
 					var arg = TestRPCCallstack.Dequeue();
-					arg.Serialize(writer);
+					writer.Put(arg);
 				}
 			}
 		}

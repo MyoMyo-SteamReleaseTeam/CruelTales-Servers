@@ -40,7 +40,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				_showTime += 0.1f;
 				//Console.WriteLine(Transform);
-				TestRPC($"I'm {Identity}");
+				TestRPC(Identity);
 			}
 		}
 	}

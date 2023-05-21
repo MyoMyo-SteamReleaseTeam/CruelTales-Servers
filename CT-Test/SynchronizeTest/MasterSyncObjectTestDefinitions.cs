@@ -62,6 +62,11 @@ namespace CT.Test.SynchronizeTest
 				_dirtyReliable_0[1] = true;
 			}
 		}
+
+		public override VisibilityType Visibility => throw new NotImplementedException();
+
+		public override VisibilityAuthority VisibilityAuthority => throw new NotImplementedException();
+
 		public partial void Server_SendValue(float floatParam)
 		{
 			Server_SendValueCallstack.Enqueue(floatParam);
