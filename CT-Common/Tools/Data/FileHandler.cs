@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,7 +41,7 @@ namespace CT.Common.Tools.Data
 				if (makeDirectory)
 				{
 					string? fileDirectory = Path.GetDirectoryName(filePath);
-					if (fileDirectory != null && !Directory.Exists(fileDirectory))
+					if (!string.IsNullOrEmpty(fileDirectory) && !Directory.Exists(fileDirectory))
 					{
 						Directory.CreateDirectory(fileDirectory);
 					}
@@ -93,7 +92,7 @@ namespace CT.Common.Tools.Data
 				if (makeDirectory)
 				{
 					string? fileDirectory = Path.GetDirectoryName(filePath);
-					if (fileDirectory != null && !Directory.Exists(fileDirectory))
+					if (!string.IsNullOrEmpty(fileDirectory) && !Directory.Exists(fileDirectory))
 					{
 						Directory.CreateDirectory(fileDirectory);
 					}
