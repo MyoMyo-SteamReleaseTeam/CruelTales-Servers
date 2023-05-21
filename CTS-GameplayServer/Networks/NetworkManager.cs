@@ -43,7 +43,7 @@ namespace CTS.Instance.Networks
 			_networkListener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
 			_netManager = new NetManager(_networkListener);
-			_netManager.AutoRecycle = true;
+			//_netManager.AutoRecycle = true;
 			_netManager.DisconnectTimeout = GlobalNetwork.DisconnectTimeout;
 
 			// Gameplay Instance
@@ -137,9 +137,11 @@ namespace CTS.Instance.Networks
 						}
 					}
 				}
+				reader.Recycle();
 			}
 			catch (Exception e)
 			{
+				reader.Recycle();
 				_log.Error($"Receive error from : {peer.EndPoint.ToString()}", e);
 				if (session == null)
 				{
