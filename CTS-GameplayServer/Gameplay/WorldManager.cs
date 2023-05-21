@@ -68,9 +68,9 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void UpdateVisibility()
+		public void UpdateVisibilityAndSendData()
 		{
-			this._visibilityManager.Update();
+			this._visibilityManager.UpdateVisibilityAndSendData();
 		}
 
 		public void ClearDirtys()
@@ -79,6 +79,7 @@ namespace CTS.Instance.Gameplay
 			{
 				netObj.ClearDirtyReliable();
 				netObj.ClearDirtyUnreliable();
+				netObj.Transform.ClearDirty();
 			}
 		}
 
@@ -170,6 +171,7 @@ namespace CTS.Instance.Gameplay
 		{
 			_reliableBuffer.ResetWriter();
 
+			// Serialize first spawn data
 			if (visibleTable.SpawnObjects.Count != 0)
 			{
 				SerializeSpawnData(_reliableBuffer,
@@ -177,6 +179,7 @@ namespace CTS.Instance.Gameplay
 								   PacketType.SC_Sync_MasterSpawn);
 			}
 
+			// Serialize respawn data
 			if (visibleTable.RespawnObjects.Count != 0)
 			{
 				SerializeSpawnData(_reliableBuffer,
@@ -184,33 +187,52 @@ namespace CTS.Instance.Gameplay
 								   PacketType.SC_Sync_MasterRespawn);
 			}
 
+			// Serialize despawn data
+			if (visibleTable.DespawnObjects.Count != 0)
+			{
+				SerializeDespawnData(_reliableBuffer,
+									 visibleTable.DespawnObjects,
+									 PacketType.SC_Sync_MasterDespawn);
+			}
+
+			// Serialize reliable and unreliable trace object data
 			if (visibleTable.TraceObjects.Count != 0)
 			{
+				// Reliable data
 				SerializeReliableData(_reliableBuffer,
 									  visibleTable.TraceObjects,
 									  PacketType.SC_Sync_MasterReliable);
+
+				// TODO : Fragment the packet by MTU
+				_mtuBuffer.ResetWriter();
+
+				// Unreliable data
+				SerializeUnreliableData(_mtuBuffer,
+										visibleTable.TraceObjects,
+										PacketType.SC_Sync_MasterUnreliable);
+
+				// Serialize movement data
+				SerializeMovementData(_mtuBuffer,
+									  visibleTable.TraceObjects,
+									  PacketType.SC_Sync_MasterMovement);
+
+				// Send unreliable data
+				if (_mtuBuffer.Size > 0)
+				{
+					userSession.SendReliable(_mtuBuffer);
+				}
 			}
 
+			// Send reliable data
 			if (_reliableBuffer.Size > 0)
 			{
 				userSession.SendReliable(_reliableBuffer);
 			}
-
-			// TODO : Fragment the packet by MTU
-			_mtuBuffer.ResetWriter();
-			SerializeUnreliableData(_mtuBuffer,
-									visibleTable.TraceObjects,
-									PacketType.SC_Sync_MasterUnreliable);
-
-			if (_mtuBuffer.Size > 0)
-			{
-				userSession.SendReliable(_mtuBuffer);
-			}
 		}
 
 		public void SerializeSpawnData(IPacketWriter writer,
-											  HashSet<MasterNetworkObject> netObjs,
-											  PacketType packetType)
+									   HashSet<MasterNetworkObject> netObjs,
+									   PacketType packetType)
 		{
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
@@ -224,13 +246,28 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void SerializeReliableData(IPacketWriter writer,
-												 HashSet<MasterNetworkObject> netObjs,
-												 PacketType packetType)
+		public void SerializeDespawnData(IPacketWriter writer,
+										 HashSet<MasterNetworkObject> netObjs,
+										 PacketType packetType)
 		{
-			int originSize = writer.Size;
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
+
+			foreach (var spawnObj in netObjs)
+			{
+				writer.Put(spawnObj.Identity);
+			}
+		}
+
+		private const int OFFSET_SIZE = sizeof(PacketType) + sizeof(byte);
+		public void SerializeReliableData(IPacketWriter writer,
+										  HashSet<MasterNetworkObject> netObjs,
+										  PacketType packetType)
+		{
+			int originSize = writer.Size;
+			writer.OffsetSize(OFFSET_SIZE);
+
+			// Serialize data
 			foreach (var spawnObj in netObjs)
 			{
 				if (spawnObj.IsDirtyReliable)
@@ -240,19 +277,28 @@ namespace CTS.Instance.Gameplay
 			}
 
 			// Revert size if there is no serialized data
-			if (originSize == writer.Size - (sizeof(PacketType) + sizeof(byte)))
+			if (originSize == writer.Size - OFFSET_SIZE)
 			{
 				writer.SetSize(originSize);
+			}
+			else
+			{
+				int serializeSize = writer.Size;
+				writer.SetSize(originSize);
+				writer.Put(packetType);
+				writer.Put((byte)netObjs.Count);
+				writer.SetSize(serializeSize);
 			}
 		}
 
 		public void SerializeUnreliableData(IPacketWriter writer,
-												   HashSet<MasterNetworkObject> netObjs,
-												   PacketType packetType)
+											HashSet<MasterNetworkObject> netObjs,
+											PacketType packetType)
 		{
 			int originSize = writer.Size;
-			writer.Put(packetType);
-			writer.Put((byte)netObjs.Count);
+			writer.OffsetSize(OFFSET_SIZE);
+
+			// Serialize data
 			foreach (var spawnObj in netObjs)
 			{
 				if (spawnObj.IsDirtyUnreliable)
@@ -262,9 +308,49 @@ namespace CTS.Instance.Gameplay
 			}
 
 			// Revert size if there is no serialized data
-			if (originSize == writer.Size - (sizeof(PacketType) + sizeof(byte)))
+			if (originSize == writer.Size - OFFSET_SIZE)
 			{
 				writer.SetSize(originSize);
+			}
+			else
+			{
+				int serializeSize = writer.Size;
+				writer.SetSize(originSize);
+				writer.Put(packetType);
+				writer.Put((byte)netObjs.Count);
+				writer.SetSize(serializeSize);
+			}
+		}
+
+		public void SerializeMovementData(IPacketWriter writer,
+										  HashSet<MasterNetworkObject> netObjs,
+										  PacketType packetType)
+		{
+			int originSize = writer.Size;
+			writer.OffsetSize(OFFSET_SIZE);
+
+			// Serialize data
+			foreach (var spawnObj in netObjs)
+			{
+				NetworkTransform transform = spawnObj.Transform;
+				if (transform.IsDirty)
+				{
+					transform.Serialize(writer);
+				}
+			}
+
+			// Revert size if there is no serialized data
+			if (originSize == writer.Size - OFFSET_SIZE)
+			{
+				writer.SetSize(originSize);
+			}
+			else
+			{
+				int serializeSize = writer.Size;
+				writer.SetSize(originSize);
+				writer.Put(packetType);
+				writer.Put((byte)netObjs.Count);
+				writer.SetSize(serializeSize);
 			}
 		}
 

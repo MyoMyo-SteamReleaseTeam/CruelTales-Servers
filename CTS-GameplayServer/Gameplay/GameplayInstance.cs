@@ -82,7 +82,7 @@ namespace CTS.Instance.Gameplay
 			GameManager.Update(deltaTime);
 
 			// Send sync data to each user
-			WorldManager.UpdateVisibility();
+			WorldManager.UpdateVisibilityAndSendData();
 
 			// Reset dirtys
 			WorldManager.ClearDirtys();

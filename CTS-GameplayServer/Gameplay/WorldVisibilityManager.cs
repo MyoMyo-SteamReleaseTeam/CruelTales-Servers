@@ -106,7 +106,7 @@ namespace CTS.Instance.Gameplay
 		}
 
 		private HashSet<MasterNetworkObject> _outObjectSet = new(16);
-		public void Update()
+		public void UpdateVisibilityAndSendData()
 		{
 			foreach (var kv in _playerVisibleBySession)
 			{
