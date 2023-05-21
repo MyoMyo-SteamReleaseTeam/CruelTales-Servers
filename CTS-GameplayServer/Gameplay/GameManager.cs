@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools;
 using CT.Common.Tools.Collections;
@@ -51,12 +52,21 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
+		private static Random _random = new Random();
+
 		public void StartGame()
 		{
-			float inX = _option.HalfViewInSize.X;
-			float outX = _option.HalfViewOutSize.X;
+			//float inX = _option.HalfViewInSize.X;
+			//float outX = _option.HalfViewOutSize.X;
 
-			_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
+			//_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
+
+			for (int i = 0; i < 30; i++)
+			{
+				float x = (float)(_random.NextDouble() - 0.5) * 20;
+				float y = (float)(_random.NextDouble() - 0.5) * 20;
+				_worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
+			}
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

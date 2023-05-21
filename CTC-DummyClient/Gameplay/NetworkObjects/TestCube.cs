@@ -8,7 +8,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public partial void TestRPC(NetStringShort someMessage)
 		{
-			Console.WriteLine(someMessage);
+			//Console.WriteLine(someMessage);
 		}
 	}
 }

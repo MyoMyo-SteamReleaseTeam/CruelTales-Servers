@@ -163,8 +163,8 @@ namespace CTS.Instance.Gameplay
 		#region Synchronizaion
 
 		// TODO : Need to pool packet
-		private ByteBuffer _reliableBuffer = new ByteBuffer(16 * 1024);
-		private ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU);
+		private ByteBuffer _reliableBuffer = new ByteBuffer(64 * 1024);
+		private ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU * 16);
 
 		public void SendSynchronization(UserSession userSession,
 											   PlayerVisibleTable visibleTable)
