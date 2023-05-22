@@ -1,4 +1,4 @@
-﻿//#define CHECK_PACKET_SIZE
+﻿#define CHECK_PACKET_SIZE
 
 using CT.Common.Serialization;
 using log4net;

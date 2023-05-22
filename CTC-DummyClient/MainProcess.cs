@@ -39,7 +39,7 @@ namespace CTC.Networks
 		// Dummy client setup
 		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 1000;
+		private static int _dummyCount = 6;
 		private static int _joinRoomPerPlayer = 7;
 		private static int _serverNumber = 1;
 		private static List<NetworkManager> _dummyClients = new();

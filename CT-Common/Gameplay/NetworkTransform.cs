@@ -1,11 +1,19 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using CT.Common.Serialization;
 
 namespace CT.Common.Gameplay
 {
+	public struct MovementJob
+	{
+		public Vector3 Position;
+		public Vector3 Velocity;
+		public bool IsTeleported;
+	}
+
 	[StructLayout(LayoutKind.Sequential)]
 	public class NetworkTransform : IUpdatable
 	{
@@ -35,6 +43,7 @@ namespace CT.Common.Gameplay
 		public bool IsDirty { get; private set; }
 
 		public Action<bool, Vector3, Vector3>? OnChanged;
+		private Queue<MovementJob> _movementJob = new(8);
 
 		public NetworkTransform()
 		{
@@ -47,19 +56,36 @@ namespace CT.Common.Gameplay
 #endif
 		}
 
-		public void Update(float deltaTime)
+		public void FixedUpdate(float deltaTime)
 		{
+			while (_movementJob.TryDequeue(out var movementJob))
+			{
+				Position = movementJob.Position;
+				Velocity = movementJob.Velocity;
+				_isTeleported |= movementJob.IsTeleported;
+			}
+
+			IsDirty |= _isTeleported;
 			//_previousPosition = Position;
 			Position += Velocity * deltaTime;
 			//IsDirty = Position != _previousPosition;
 		}
 
+		/// <summary>초기 생성시 좌표를 설정합니다.</summary>
+		public void Initialize(Vector3 position)
+		{
+			_position = position;
+		}
+
 		/// <summary>위치를 변경합니다. 해당 위치로 순간이동합니다.</summary>
 		public void SetPosition(Vector3 position)
 		{
-			Position = position;
-			IsDirty = true;
-			_isTeleported = true;
+			_movementJob.Enqueue(new MovementJob()
+			{
+				Position = position,
+				Velocity = this._velocity,
+				IsTeleported = true,
+			});
 		}
 
 		/// <summary>움직임을 변경합니다.</summary>
@@ -67,8 +93,12 @@ namespace CT.Common.Gameplay
 		/// <param name="velocity"></param>
 		public void OnMovement(Vector3 position, Vector3 velocity)
 		{
-			Position = position;
-			Velocity = velocity;
+			_movementJob.Enqueue(new MovementJob()
+			{
+				Position = position,
+				Velocity = velocity,
+				IsTeleported = false,
+			});
 		}
 
 		public void Serialize(IPacketWriter writer)

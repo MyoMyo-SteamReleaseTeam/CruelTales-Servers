@@ -49,7 +49,7 @@ namespace CTS.Instance.Gameplay
 			_visibilityManager = new(gameplayInstance, this, option);
 		}
 
-		public void Update(float deltaTime)
+		public void FixedUpdate(float deltaTime)
 		{
 			// Update every objects
 			foreach (var netObj in _networkObjectById.ForwardValues)
@@ -58,9 +58,12 @@ namespace CTS.Instance.Gameplay
 					continue;
 
 				// Update positions and logic
-				netObj.Update(deltaTime);
+				netObj.FixedUpdate(deltaTime);
 			}
+		}
 
+		public void UpdateRemoveObjects()
+		{
 			// Remove objects
 			while (_destroyObjectStack.Count > 0)
 			{
@@ -97,7 +100,13 @@ namespace CTS.Instance.Gameplay
 									    [MaybeNullWhen(false)]
 										out MasterNetworkObject networkObject)
 		{
-			return _networkObjectById.TryGetValue(id, out networkObject);
+			if (_networkObjectById.TryGetValue(id, out networkObject))
+			{
+				return true;
+			}
+
+			Debug.Assert(false);
+			return false;
 		}
 
 		#region Life Cycle
@@ -167,7 +176,7 @@ namespace CTS.Instance.Gameplay
 		private ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU * 16);
 
 		public void SendSynchronization(UserSession userSession,
-											   PlayerVisibleTable visibleTable)
+										PlayerVisibleTable visibleTable)
 		{
 			_reliableBuffer.ResetWriter();
 
@@ -206,20 +215,20 @@ namespace CTS.Instance.Gameplay
 				// TODO : Fragment the packet by MTU
 				_mtuBuffer.ResetWriter();
 
-				// Unreliable data
-				SerializeUnreliableData(_mtuBuffer,
-										visibleTable.TraceObjects,
-										PacketType.SC_Sync_MasterUnreliable);
-
 				// Serialize movement data
 				SerializeMovementData(_mtuBuffer,
 									  visibleTable.TraceObjects,
 									  PacketType.SC_Sync_MasterMovement);
 
+				// Unreliable data
+				SerializeUnreliableData(_mtuBuffer,
+										visibleTable.TraceObjects,
+										PacketType.SC_Sync_MasterUnreliable);
+
 				// Send unreliable data
 				if (_mtuBuffer.Size > 0)
 				{
-					userSession.SendReliable(_mtuBuffer);
+					userSession.SendUnreliable(_mtuBuffer);
 				}
 			}
 
@@ -231,13 +240,13 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public void SerializeSpawnData(IPacketWriter writer,
-									   HashSet<MasterNetworkObject> netObjs,
+									   Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 									   PacketType packetType)
 		{
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
 
-			foreach (var spawnObj in netObjs)
+			foreach (var spawnObj in netObjs.Values)
 			{
 				writer.Put(spawnObj.Type);
 				writer.Put(spawnObj.Identity);
@@ -247,32 +256,32 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public void SerializeDespawnData(IPacketWriter writer,
-										 HashSet<MasterNetworkObject> netObjs,
+										 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 										 PacketType packetType)
 		{
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
 
-			foreach (var spawnObj in netObjs)
+			foreach (var spawnObjId in netObjs.Keys)
 			{
-				writer.Put(spawnObj.Identity);
+				writer.Put(spawnObjId);
 			}
 		}
 
 		private const int OFFSET_SIZE = sizeof(PacketType) + sizeof(byte);
 		public void SerializeReliableData(IPacketWriter writer,
-										  HashSet<MasterNetworkObject> netObjs,
+										  Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 										  PacketType packetType)
 		{
 			int originSize = writer.Size;
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
-			foreach (var spawnObj in netObjs)
+			foreach (var syncObj in netObjs.Values)
 			{
-				if (spawnObj.IsDirtyReliable)
+				if (syncObj.IsDirtyReliable)
 				{
-					spawnObj.SerializeSyncReliable(writer);
+					syncObj.SerializeSyncReliable(writer);
 				}
 			}
 
@@ -292,18 +301,18 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public void SerializeUnreliableData(IPacketWriter writer,
-											HashSet<MasterNetworkObject> netObjs,
+											Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 											PacketType packetType)
 		{
 			int originSize = writer.Size;
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
-			foreach (var spawnObj in netObjs)
+			foreach (var syncObj in netObjs.Values)
 			{
-				if (spawnObj.IsDirtyUnreliable)
+				if (syncObj.IsDirtyUnreliable)
 				{
-					spawnObj.SerializeSyncUnreliable(writer);
+					syncObj.SerializeSyncUnreliable(writer);
 				}
 			}
 
@@ -323,16 +332,16 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public void SerializeMovementData(IPacketWriter writer,
-										  HashSet<MasterNetworkObject> netObjs,
+										  Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 										  PacketType packetType)
 		{
 			int originSize = writer.Size;
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
-			foreach (var spawnObj in netObjs)
+			foreach (var syncObj in netObjs.Values)
 			{
-				NetworkTransform transform = spawnObj.Transform;
+				NetworkTransform transform = syncObj.Transform;
 				if (transform.IsDirty)
 				{
 					transform.Serialize(writer);

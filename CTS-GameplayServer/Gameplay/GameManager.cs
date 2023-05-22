@@ -44,7 +44,7 @@ namespace CTS.Instance.Gameplay
 			_playerCharacterByPlayer = new(option.SystemMaxUser);
 		}
 
-		public void Update(float deltaTime)
+		public void FixedUpdate(float deltaTime)
 		{
 			foreach (var player in _networkPlayerByUserId.ForwardValues)
 			{
@@ -56,17 +56,17 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
-			//float inX = _option.HalfViewInSize.X;
-			//float outX = _option.HalfViewOutSize.X;
+			float inX = _option.HalfViewInSize.X;
+			float outX = _option.HalfViewOutSize.X;
 
-			//_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
+			_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
 
-			for (int i = 0; i < 30; i++)
-			{
-				float x = (float)(_random.NextDouble() - 0.5) * 20;
-				float y = (float)(_random.NextDouble() - 0.5) * 20;
-				_worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
-			}
+			//for (int i = 0; i < 2; i++)
+			//{
+			//	float x = (float)(_random.NextDouble() - 0.5) * 20;
+			//	float y = (float)(_random.NextDouble() - 0.5) * 20;
+			//	_worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
+			//}
 		}
 
 		public void OnUserEnterGame(UserSession userSession)
@@ -92,7 +92,7 @@ namespace CTS.Instance.Gameplay
 			_worldManager.OnPlayerLeave(player);
 			_networkPlayerByUserId.TryRemove(player);
 			player.OnDestroyed();
-			_log.Info($"[{_gameplayInstance}] Session {userSession} leave the game");
+			_log.Debug($"[{_gameplayInstance}] Session {userSession} leave the game");
 
 			// Test
 			if (_playerCharacterByPlayer.TryGetValue(player, out var character))

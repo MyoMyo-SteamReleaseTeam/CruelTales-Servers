@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CTS.Instance.Synchronizations;
 
@@ -11,43 +10,43 @@ namespace CTS.Instance.Gameplay
 		/// 곧바로 생성된 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> SpawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> SpawnObjects { get; private set; }
 
 		/// <summary>
 		/// 재등장하는 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> RespawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> RespawnObjects { get; private set; }
 
 		/// <summary>
 		/// 추적중인 오브젝트의 집합입니다.
 		/// 갱신 주기마다 동기화 데이터를 전송합니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> TraceObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> TraceObjects { get; private set; }
 
 		/// <summary>
 		/// 삭제된 오브젝트의 집합입니다.
 		/// 삭제후 1회 삭제 데이터를 송신한 뒤 집합에서 제거됩니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> DespawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> DespawnObjects { get; private set; }
 
 		/// <summary>
 		/// 거리에 따른 가시성 영향을 받지 않는 생성된 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> GlobalSpawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> GlobalSpawnObjects { get; private set; }
 		
 		/// <summary>
 		/// 거리에 따른 가시성 영향을 받지 않는 전역 객체의 집합입니다.
 		/// 갱신 주기마다 동기화 데이터를 전송합니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> GlobalTraceObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> GlobalTraceObjects { get; private set; }
 
 		/// <summary>
 		/// 거리에 따른 가시성 영향을 받지 않는 삭제된 오브젝트의 집합입니다.
 		/// 삭제후 1회 삭제 데이터를 송신한 뒤 집합에서 제거됩니다.
 		/// </summary>
-		public HashSet<MasterNetworkObject> GlobalDespawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> GlobalDespawnObjects { get; private set; }
 
 		public PlayerVisibleTable(InstanceInitializeOption option)
 		{
@@ -77,19 +76,28 @@ namespace CTS.Instance.Gameplay
 		{
 			if (SpawnObjects.Count != 0)
 			{
-				TraceObjects.UnionWith(SpawnObjects);
+				foreach (var kv in SpawnObjects)
+				{
+					TraceObjects.Add(kv.Key, kv.Value);
+				}
 				SpawnObjects.Clear();
 			}
 			if (RespawnObjects.Count != 0)
 			{
-				TraceObjects.UnionWith(RespawnObjects);
+				foreach (var kv in RespawnObjects)
+				{
+					TraceObjects.Add(kv.Key, kv.Value);
+				}
 				RespawnObjects.Clear();
 			}
 			DespawnObjects.Clear();
 
 			if (GlobalSpawnObjects.Count != 0)
 			{
-				GlobalTraceObjects.UnionWith(GlobalSpawnObjects);
+				foreach (var kv in GlobalSpawnObjects)
+				{
+					TraceObjects.Add(kv.Key, kv.Value);
+				}
 				GlobalSpawnObjects.Clear();
 			}
 			GlobalDespawnObjects.Clear();

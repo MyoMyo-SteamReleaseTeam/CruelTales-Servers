@@ -46,7 +46,7 @@ namespace CTS.Instance.Synchronizations
 		private Vector2Int _currentCellPos;
 
 		/// <summary>네트워크 객체를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
-		public void Update(float deltaTime)
+		public void FixedUpdate(float deltaTime)
 		{
 			Vector2Int previousPos = _currentCellPos;
 
@@ -68,7 +68,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
 		private void fixedUpdate(float deltaTime)
 		{
-			Transform.Update(deltaTime);
+			Transform.FixedUpdate(deltaTime);
 		}
 
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
@@ -94,7 +94,7 @@ namespace CTS.Instance.Synchronizations
 			_worldManager = manager;
 
 			// Set position
-			Transform.SetPosition(position);
+			Transform.Initialize(position);
 			if (Visibility == VisibilityType.View)
 			{
 				_worldPartitioner = worldPartitioner;

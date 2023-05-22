@@ -13,7 +13,7 @@ namespace CTS.Instance
 		public int Port { get; set; } = 60128;
 		public int FramePerMs = 66;
 		public int AlarmTickMs = 40;
-		public int GameCount = 300;
+		public int GameCount = 1;
 
 		public ServerOption() {}
 	}
@@ -33,26 +33,27 @@ namespace CTS.Instance
 			}
 
 			ServerOption serverOption = new ServerOption();
-			var configRead = JsonHandler.TryReadObject<ServerOption>(ConfigurationFile);
-			if (configRead.ResultType != JobResultType.Success)
-			{
-				_log.Warn($"There is no configuration file!");
-				var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, serverOption, true);
-				if (createDefault.ResultType != JobResultType.Success)
-				{
-					_log.Fatal($"Failed to create default configuration file!");
-					_log.Fatal(createDefault.Exception);
-				}
-				else
-				{
-					_log.Info($"Create default configuration file!");
-				}
-			}
-			else
-			{
-				_log.Info("Load server configuration file.");
-				serverOption = configRead.Value;
-			}
+
+			//var configRead = JsonHandler.TryReadObject<ServerOption>(ConfigurationFile);
+			//if (configRead.ResultType != JobResultType.Success)
+			//{
+			//	_log.Warn($"There is no configuration file!");
+			//	var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, serverOption, true);
+			//	if (createDefault.ResultType != JobResultType.Success)
+			//	{
+			//		_log.Fatal($"Failed to create default configuration file!");
+			//		_log.Fatal(createDefault.Exception);
+			//	}
+			//	else
+			//	{
+			//		_log.Info($"Create default configuration file!");
+			//	}
+			//}
+			//else
+			//{
+			//	_log.Info("Load server configuration file.");
+			//	serverOption = configRead.Value;
+			//}
 
 			// Start server
 			_log.Info("Start gameplay server");

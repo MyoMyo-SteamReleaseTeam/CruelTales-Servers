@@ -38,7 +38,7 @@ namespace CTS.Instance.SyncObjects
 			_showTime -= deltaTime;
 			if (_showTime < 0)
 			{
-				_showTime += 0.1f;
+				_showTime += 0.5f;
 				//Console.WriteLine(Transform);
 				TestRPC(Identity);
 			}

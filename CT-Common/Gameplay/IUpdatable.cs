@@ -5,7 +5,7 @@ namespace CT.Common.Gameplay
 {
 	public interface IUpdatable
 	{
-		public void Update(float deltaTime);
+		public void FixedUpdate(float deltaTime);
 	}
 }
 
