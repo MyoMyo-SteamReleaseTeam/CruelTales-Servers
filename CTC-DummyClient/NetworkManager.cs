@@ -81,7 +81,7 @@ namespace CTC.Networks
 							  DeliveryMethod.Unreliable);
 		}
 
-		private void OnReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+		private void OnReceived(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
 		{
 			try
 			{

@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using CT.Common.DataType;
 using CT.Networks.Runtimes;
+using CTS.Instance.Networks;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -12,6 +13,9 @@ namespace CTS.Instance.Gameplay
 	{
 		// Log
 		private static ILog _log = LogManager.GetLogger(typeof(GameplayInstanceManager));
+
+		// Reference
+		private NetworkManager _networkManager;
 
 		// Server setup
 		private readonly TickTimer _serverTimer;
@@ -30,9 +34,11 @@ namespace CTS.Instance.Gameplay
 
 		private Random _random = new Random();
 
-		public GameplayInstanceManager(ServerOption serverOption,
-								   TickTimer tickTimer)
+		public GameplayInstanceManager(NetworkManager networkManager,
+									   ServerOption serverOption,
+									   TickTimer tickTimer)
 		{
+			_networkManager = networkManager;
 			_serverOption = serverOption;
 			_serverTimer = tickTimer;
 			MaxGameCount = serverOption.GameCount;
@@ -87,6 +93,7 @@ namespace CTS.Instance.Gameplay
 			{
 				if (_currentTick % 100  == 0)
 				{
+					_log.Info($"Packet pool size : {_networkManager.NetManager.PoolCount}");
 					_log.Info($"Average tick elapsed : {_aveElapsed}");
 				}
 			}

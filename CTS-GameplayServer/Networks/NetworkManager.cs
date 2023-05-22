@@ -19,6 +19,7 @@ namespace CTS.Instance.Networks
 		private readonly EventBasedNetListener _networkListener;
 		private readonly NetManager _netManager;
 		private readonly SessionManager _sessionManager;
+		public NetManager NetManager => _netManager;
 
 		// GameInstance
 		public readonly GameplayInstanceManager GameplayInstanceManager;
@@ -42,6 +43,7 @@ namespace CTS.Instance.Networks
 			_networkListener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
 			_netManager = new NetManager(_networkListener);
+			_netManager.PacketPoolSize = 50000;
 			_netManager.MaxConnectAttempts = 100;
 			_netManager.UnsyncedEvents = true;
 			_netManager.UnsyncedReceiveEvent = true;
@@ -53,7 +55,7 @@ namespace CTS.Instance.Networks
 			_serverOption = serverOption;
 			_serverTimer = serverTimer;
 
-			GameplayInstanceManager = new(_serverOption, _serverTimer);
+			GameplayInstanceManager = new(this, _serverOption, _serverTimer);
 			_sessionManager = new SessionManager(this, (int)(_serverOption.GameCount * 7 * 1.15f));
 		}
 
@@ -114,7 +116,7 @@ namespace CTS.Instance.Networks
 		}
 
 		private ByteBuffer _packetReader = new ByteBuffer();
-		private void onNetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+		private void onNetworkReceiveEvent(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
 		{
 			UserSession? session = null;
 

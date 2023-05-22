@@ -32,16 +32,16 @@ namespace CTC.Networks
 		public static ILog _log = LogManager.GetLogger(typeof(MainProcess));
 
 		// Server Endpoint
-		public static readonly string ServerIp = "192.168.0.29";
-		//public static readonly string ServerIp = "127.0.0.1";
+		//public static readonly string ServerIp = "192.168.0.29";
+		public static readonly string ServerIp = "127.0.0.1";
 		public static readonly int ServerPort = 60128;
 
 		// Dummy client setup
 		private static int _startCounter = 0;
 		private static int _dummyClientBindPort = 40000;
-		private static int _dummyCount = 4000;
+		private static int _dummyCount = 1000;
 		private static int _joinRoomPerPlayer = 7;
-		private static int _serverNumber = 2;
+		private static int _serverNumber = 1;
 		private static List<NetworkManager> _dummyClients = new();
 
 		// Handle test process
