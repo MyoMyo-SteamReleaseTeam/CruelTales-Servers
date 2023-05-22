@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Networks;
@@ -43,6 +42,10 @@ namespace CTS.Instance.Networks
 			_networkListener.PeerDisconnectedEvent += onPeerDisconnectedEvent;
 			_networkListener.NetworkReceiveEvent += onNetworkReceiveEvent;
 			_netManager = new NetManager(_networkListener);
+			_netManager.MaxConnectAttempts = 100;
+			_netManager.UnsyncedEvents = true;
+			_netManager.UnsyncedReceiveEvent = true;
+			_netManager.UnsyncedDeliveryEvent = true;
 			//_netManager.AutoRecycle = true;
 			_netManager.DisconnectTimeout = GlobalNetwork.DisconnectTimeout;
 
@@ -60,22 +63,22 @@ namespace CTS.Instance.Networks
 
 			_netManager.Start(_serverOption.Port);
 
-			Thread thread = new Thread(startPollingEvents);
-			thread.IsBackground = false;
-			thread.Start();
+			//Thread thread = new Thread(startPollingEvents);
+			//thread.IsBackground = false;
+			//thread.Start();
 
 			GameplayInstanceManager.Start();
 		}
 
-		private void startPollingEvents()
-		{
-			_log.Info($"Start network polling events...");
-			while (true)
-			{
-				_netManager.PollEvents();
-				Thread.Sleep(10);
-			}
-		}
+		//private void startPollingEvents()
+		//{
+		//	_log.Info($"Start network polling events...");
+		//	while (true)
+		//	{
+		//		_netManager.PollEvents();
+		//		Thread.Sleep(10);
+		//	}
+		//}
 
 		private void onConnectionRequestEvent(ConnectionRequest request)
 		{

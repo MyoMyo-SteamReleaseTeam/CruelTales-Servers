@@ -59,8 +59,12 @@ namespace CTS.Instance.Gameplay
 			_gameplayTickRunner.Run();
 		}
 
+		private long _currentTick = 0;
 		private long _current = 0;
+		private long _aveElapsed = 0;
 		private static float _globalDeltaTime;
+
+		private int[] _gcCollectionCount = new int[3];
 		public void Update(float deltaTime)
 		{
 			// Check tick
@@ -71,14 +75,37 @@ namespace CTS.Instance.Gameplay
 			Parallel.ForEach(_gameInstanceList, processUpdate);
 
 			// Alarm high CPU load
+			_currentTick++;
 			long tickElapsed = _serverTimer.CurrentMs - _current;
+			_aveElapsed = (_aveElapsed * 7 + tickElapsed) / 8;
+
 			if (tickElapsed > _serverOption.AlarmTickMs)
 			{
 				_log.Fatal($"Current tick elapsed : {tickElapsed}");
 			}
 			else
 			{
-				_log.Info($"Current tick elapsed : {tickElapsed}");
+				if (_currentTick % 100  == 0)
+				{
+					_log.Info($"Average tick elapsed : {_aveElapsed}");
+				}
+			}
+
+			// Check GC Collection
+			bool hasGcCall = false;
+			for (int i = 0; i <= 2; i++)
+			{
+				int collection = GC.CollectionCount(i);
+				if (_gcCollectionCount[i] != collection)
+				{
+					hasGcCall = true;
+					_gcCollectionCount[i] = collection;
+				}
+			}
+
+			if (hasGcCall)
+			{
+				_log.Warn($"GC Collect [{_gcCollectionCount[0]}\t][{_gcCollectionCount[1]}\t][{_gcCollectionCount[2]}\t]");
 			}
 		}
 

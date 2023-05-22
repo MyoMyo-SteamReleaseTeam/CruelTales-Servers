@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Threading;
 using CT.Common.Tools.Data;
 using CT.Networks.Runtimes;
 using log4net;
@@ -67,7 +68,13 @@ namespace CTS.Instance
 			_log.Info($"Max Game Count\t: {serverOption.GameCount}");
 
 			GameplayServer gameplayServer = new(serverTimer, serverOption);
+
 			gameplayServer.Start();
+
+			while (true)
+			{
+				Thread.Sleep(10000);
+			}
 		}
 	}
 }

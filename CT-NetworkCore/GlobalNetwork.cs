@@ -9,7 +9,7 @@ namespace CT.Networks
 	public static class GlobalNetwork
 	{
 #if DEBUG
-		public const int DisconnectTimeout = 50000;//180000;
+		public const int DisconnectTimeout = 5000;//180000;
 #else
 		public const int DisconnectTimeout = 5000;
 #endif

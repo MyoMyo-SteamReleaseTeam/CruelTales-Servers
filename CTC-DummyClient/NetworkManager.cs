@@ -29,6 +29,7 @@ namespace CTC.Networks
 			_gameSynchronizer = new GameSynchronizer(this);
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
+			_netManager.ReuseAddress = true;
 			_netManager.DisconnectTimeout = GlobalNetwork.DisconnectTimeout;
 
 			_listener.NetworkReceiveEvent += OnReceived;
