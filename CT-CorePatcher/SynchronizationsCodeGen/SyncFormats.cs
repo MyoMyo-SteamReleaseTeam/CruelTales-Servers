@@ -232,10 +232,10 @@ public partial class {0} : {1}
 		public static string CallWithStack =>
 @"{0} partial void {1}({2})
 {{
-	{1}Callstack.Enqueue({3});
+	{1}Callstack.Add({3});
 	{5}[{6}] = true;
 }}
-private Queue<{4}> {1}Callstack = new();";
+private List<{4}> {1}Callstack = new(8);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -260,7 +260,7 @@ private byte {1}CallstackCount = 0;";
 writer.Put(count);
 for (int i = 0; i < count; i++)
 {{
-	var arg = {0}Callstack.Dequeue();
+	var arg = {0}Callstack[i];
 {1}
 }}";
 
@@ -328,6 +328,11 @@ for (int i = 0; i < count; i++)
 		/// {2} CLR enum size type name<br/>
 		/// </summary>
 		public static string TempReadEnum => @"{0} {1} = ({0})reader.Read{2}();";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string ClearCallStack => @"{0}Callstack.Clear();";
 	}
 
 	public static class MemberFormat

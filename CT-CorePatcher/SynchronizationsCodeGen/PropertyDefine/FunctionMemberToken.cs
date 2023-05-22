@@ -53,7 +53,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		}
 
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
-		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
+
+		public override string Master_ClearDirty(SyncType syncType)
+		{
+			return string.Format(FuncMemberFormat.ClearCallStack, _functionName);
+		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
