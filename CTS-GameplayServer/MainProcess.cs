@@ -2,7 +2,9 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
+#if !DEBUG
 using CT.Common.Tools.Data;
+#endif
 using CT.Networks.Runtimes;
 using log4net;
 
