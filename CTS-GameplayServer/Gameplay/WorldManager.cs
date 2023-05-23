@@ -196,14 +196,6 @@ namespace CTS.Instance.Gameplay
 								   PacketType.SC_Sync_MasterRespawn);
 			}
 
-			// Serialize despawn data
-			if (visibleTable.DespawnObjects.Count != 0)
-			{
-				SerializeDespawnData(_reliableBuffer,
-									 visibleTable.DespawnObjects,
-									 PacketType.SC_Sync_MasterDespawn);
-			}
-
 			// Serialize reliable and unreliable trace object data
 			if (visibleTable.TraceObjects.Count != 0)
 			{
@@ -230,6 +222,15 @@ namespace CTS.Instance.Gameplay
 				{
 					userSession.SendUnreliable(_mtuBuffer);
 				}
+			}
+
+			// Serialize despawn data
+			// Despawn data should be serialize after reliable data
+			if (visibleTable.DespawnObjects.Count != 0)
+			{
+				SerializeDespawnData(_reliableBuffer,
+									 visibleTable.DespawnObjects,
+									 PacketType.SC_Sync_MasterDespawn);
 			}
 
 			// Send reliable data
@@ -277,10 +278,13 @@ namespace CTS.Instance.Gameplay
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
+			int syncCount = 0;
 			foreach (var syncObj in netObjs.Values)
 			{
 				if (syncObj.IsDirtyReliable)
 				{
+					syncCount++;
+					writer.Put(syncObj.Identity);
 					syncObj.SerializeSyncReliable(writer);
 				}
 			}
@@ -295,7 +299,7 @@ namespace CTS.Instance.Gameplay
 				int serializeSize = writer.Size;
 				writer.SetSize(originSize);
 				writer.Put(packetType);
-				writer.Put((byte)netObjs.Count);
+				writer.Put((byte)syncCount);
 				writer.SetSize(serializeSize);
 			}
 		}
@@ -308,10 +312,13 @@ namespace CTS.Instance.Gameplay
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
+			int syncCount = 0;
 			foreach (var syncObj in netObjs.Values)
 			{
 				if (syncObj.IsDirtyUnreliable)
 				{
+					syncCount++;
+					writer.Put(syncObj.Identity);
 					syncObj.SerializeSyncUnreliable(writer);
 				}
 			}
@@ -326,7 +333,7 @@ namespace CTS.Instance.Gameplay
 				int serializeSize = writer.Size;
 				writer.SetSize(originSize);
 				writer.Put(packetType);
-				writer.Put((byte)netObjs.Count);
+				writer.Put((byte)syncCount);
 				writer.SetSize(serializeSize);
 			}
 		}
@@ -339,11 +346,14 @@ namespace CTS.Instance.Gameplay
 			writer.OffsetSize(OFFSET_SIZE);
 
 			// Serialize data
+			int syncCount = 0;
 			foreach (var syncObj in netObjs.Values)
 			{
 				NetworkTransform transform = syncObj.Transform;
 				if (transform.IsDirty)
 				{
+					syncCount++;
+					writer.Put(syncObj.Identity);
 					transform.Serialize(writer);
 				}
 			}
@@ -358,7 +368,7 @@ namespace CTS.Instance.Gameplay
 				int serializeSize = writer.Size;
 				writer.SetSize(originSize);
 				writer.Put(packetType);
-				writer.Put((byte)netObjs.Count);
+				writer.Put((byte)syncCount);
 				writer.SetSize(serializeSize);
 			}
 		}

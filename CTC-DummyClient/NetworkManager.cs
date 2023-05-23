@@ -17,8 +17,8 @@ namespace CTC.Networks
 		private NetPeer? _serverPeer;
 		private PacketPool _packetPool = new();
 
-		private GameSynchronizer _gameSynchronizer;
-		public GameSynchronizer GameSynchronizer => _gameSynchronizer;
+		private RemoteWorldManager _gameSynchronizer;
+		public RemoteWorldManager GameSynchronizer => _gameSynchronizer;
 
 		public DummyUserInfo UserInfo { get; private set; }
 
@@ -26,7 +26,7 @@ namespace CTC.Networks
 		{
 			UserInfo = info;
 
-			_gameSynchronizer = new GameSynchronizer(this);
+			_gameSynchronizer = new RemoteWorldManager(this);
 			_listener = new EventBasedNetListener();
 			_netManager = new NetManager(_listener);
 			_netManager.ReuseAddress = true;

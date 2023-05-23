@@ -65,7 +65,7 @@ namespace CTC.Networks
 			for (int i = 1; i <= _dummyCount; i++)
 			{
 				index++;
-				serverPort = ServerPort + i / (_dummyCount / _serverNumber);
+				serverPort = ServerPort + (i - 1) / (_dummyCount / _serverNumber);
 				if (index > (_dummyCount / _serverNumber))
 				{
 					index = 0;

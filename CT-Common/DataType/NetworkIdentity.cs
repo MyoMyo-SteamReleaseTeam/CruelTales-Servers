@@ -16,6 +16,11 @@ namespace CT.Common.DataType
 		public NetworkIdentity(byte value) => Id = value;
 		public NetworkIdentity(NetworkIdentity value) => this.Id = value.Id;
 
+		public NetworkIdentity(IPacketReader reader)
+		{
+			Id = reader.ReadByte();
+		}
+
 		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Id);
@@ -44,5 +49,6 @@ namespace CT.Common.DataType
 		}
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
+		public override string ToString() => Id.ToString();
 	}
 }

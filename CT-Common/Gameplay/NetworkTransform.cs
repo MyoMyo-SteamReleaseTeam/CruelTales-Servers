@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using CT.Common.Serialization;
 
 namespace CT.Common.Gameplay
@@ -114,6 +115,12 @@ namespace CT.Common.Gameplay
 			writer.Put(Velocity);
 		}
 
+		public void DeserializeSpawnData(IPacketReader reader)
+		{
+			Position = reader.ReadVector3();
+			Velocity = reader.ReadVector3();
+		}
+
 		public void Deserialize(IPacketReader reader)
 		{
 			bool isTeleport = reader.ReadBool();
@@ -126,6 +133,13 @@ namespace CT.Common.Gameplay
 		{
 			_isTeleported = false;
 			IsDirty = false;
+		}
+
+		public static void Ignore(IPacketReader reader)
+		{
+			reader.Ignore(sizeof(byte));
+			reader.Ignore(12);
+			reader.Ignore(12);
 		}
 
 		public override string ToString()

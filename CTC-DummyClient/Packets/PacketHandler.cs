@@ -19,7 +19,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterMovement)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterMovement(receivedPacket);
 		}
 
@@ -28,7 +27,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterSpawn)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterSpawn(receivedPacket);
 		}
 
@@ -37,7 +35,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterRespawn)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterRespawn(receivedPacket);
 		}
 
@@ -46,7 +43,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterDespawn)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterDespawn(receivedPacket);
 		}
 
@@ -55,7 +51,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterReliable)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterReliable(receivedPacket);
 		}
 
@@ -64,7 +59,6 @@ namespace CTC.Networks
 #if CHECK_PACKET_SIZE
 			_log.Info($"{nameof(Handle_SC_Sync_MasterUnreliable)} [Size:{receivedPacket.Size}]");
 #endif
-			receivedPacket.IgnoreAll();
 			networkManager.GameSynchronizer.OnMasterUnreliable(receivedPacket);
 		}
 	}
