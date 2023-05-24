@@ -228,8 +228,8 @@ namespace CT.Common.DataType.Synchronizations
 		public static void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
 		public static void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
 #else
-		public void IgnoreSyncReliable(PacketReader reader) => throw _exception;
-		public void IgnoreSyncUnreliable(PacketReader reader) => throw _exception;
+		public void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
+		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
 #endif
 	}
 }

@@ -81,23 +81,24 @@ namespace CTC.Networks
 							  DeliveryMethod.Unreliable);
 		}
 
+		private ByteBuffer _receivedPacket = new ByteBuffer();
 		private void OnReceived(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
 		{
 			try
 			{
 				var packetSegment = reader.GetRemainingBytesSegment();
-				IPacketReader packetReader = new ByteBuffer(packetSegment, packetSegment.Count);
-				while (packetReader.CanRead(sizeof(PacketType)))
+				_receivedPacket.Initialize(packetSegment, packetSegment.Count);
+				while (_receivedPacket.CanRead(sizeof(PacketType)))
 				{
-					PacketType packetType = packetReader.ReadPacketType();
+					PacketType packetType = _receivedPacket.ReadPacketType();
 
 					if (PacketDispatcher.IsCustomPacket(packetType))
 					{
-						PacketDispatcher.DispatchRaw(packetType, packetReader, this);
+						PacketDispatcher.DispatchRaw(packetType, _receivedPacket, this);
 					}
 					else
 					{
-						var packet = _packetPool.ReadPacket(packetType, packetReader);
+						var packet = _packetPool.ReadPacket(packetType, _receivedPacket);
 						PacketDispatcher.Dispatch(packet, this);
 						_packetPool.Return(packet);
 					}

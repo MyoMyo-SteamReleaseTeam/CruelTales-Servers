@@ -1,9 +1,12 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+#if NET
 using System.Numerics;
+#else
+using UnityEngine;
+#endif
 using System.Runtime.InteropServices;
-using System.Security.Principal;
 using CT.Common.Serialization;
 
 namespace CT.Common.Gameplay
@@ -43,7 +46,7 @@ namespace CT.Common.Gameplay
 		private bool _isTeleported;
 		public bool IsDirty { get; private set; }
 
-		public Action<bool, Vector3, Vector3>? OnChanged;
+		public event Action<bool, Vector3, Vector3>? OnChanged;
 		private Queue<MovementJob> _movementJob = new(8);
 
 		public NetworkTransform()

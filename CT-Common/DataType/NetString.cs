@@ -30,10 +30,12 @@ namespace CT.Common.DataType
 		public static implicit operator string(NetString value) => value.Value;
 		public static implicit operator NetString(string value) => new NetString(value ?? string.Empty);
 
+#if NET
 		public NetString()
 		{
 			Value = string.Empty;
 		}
+#endif
 
 		public NetString(string value)
 		{
@@ -125,10 +127,12 @@ namespace CT.Common.DataType
 		public static implicit operator string(NetStringShort value) => value.Value;
 		public static implicit operator NetStringShort(string value) => new NetStringShort(value ?? string.Empty);
 
+#if NET
 		public NetStringShort()
 		{
 			Value = string.Empty;
 		}
+#endif
 
 		public NetStringShort(string value)
 		{

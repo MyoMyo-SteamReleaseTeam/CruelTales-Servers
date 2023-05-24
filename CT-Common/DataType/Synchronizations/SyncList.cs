@@ -233,7 +233,7 @@ namespace CT.Common.DataType.Synchronizations
 #if NET
 		public static void IgnoreSyncReliable(IPacketReader reader)
 #else
-		public void IgnoreSyncReliable(PacketReader reader)
+		public void IgnoreSyncReliable(IPacketReader reader)
 #endif
 		{
 			byte operationCount = reader.ReadByte();
