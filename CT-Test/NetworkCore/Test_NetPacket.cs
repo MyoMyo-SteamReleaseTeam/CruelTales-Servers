@@ -166,7 +166,7 @@ namespace CT.Test.NetworkCore
 		public void OffsetArraySegmentString()
 		{
 			byte[] data = new byte[16];
-			IPacketWriter writer = new ByteBuffer(data, data.Length);
+			IPacketWriter writer = new ByteBuffer(data, 0);
 			writer.Put(0); // 4
 			writer.Put(0); // 4
 			writer.Put(0); // 4
@@ -182,19 +182,20 @@ namespace CT.Test.NetworkCore
 		public void WriteWriter()
 		{
 			byte[] srcData = new byte[12];
-			IPacketWriter writer0 = new ByteBuffer(new ArraySegment<byte>(srcData, 0, 4), 4);
-			IPacketWriter writer1 = new ByteBuffer(new ArraySegment<byte>(srcData, 4, 4), 4);
-			IPacketWriter writer2 = new ByteBuffer(new ArraySegment<byte>(srcData, 8, 4), 4);
+			IPacketWriter writer0 = new ByteBuffer(new ArraySegment<byte>(srcData, 0, 4), 0);
+			IPacketWriter writer1 = new ByteBuffer(new ArraySegment<byte>(srcData, 4, 4), 0);
+			IPacketWriter writer2 = new ByteBuffer(new ArraySegment<byte>(srcData, 8, 4), 0);
 			writer0.Put(1);
 			writer1.Put(2);
 			writer2.Put(3);
 
 			byte[] destData = new byte[12];
-			IPacketReader reader = new ByteBuffer(destData, destData.Length);
 			IPacketWriter destWriter = new ByteBuffer(destData, 0);
 			destWriter.Put(writer0);
 			destWriter.Put(writer1);
 			destWriter.Put(writer2);
+
+			IPacketReader reader = (IPacketReader)destWriter;
 
 			reader.SetReadPosition(0);
 			Assert.AreEqual(1, reader.ReadInt32());
