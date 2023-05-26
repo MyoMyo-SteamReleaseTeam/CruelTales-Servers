@@ -19,6 +19,10 @@ namespace CTS.Instance.SyncObjects
 		{
 			_originPosition = Transform.Position;
 			_radiusFactor = (float)_random.NextDouble();
+
+			R = (float)_random.NextDouble();
+			G = (float)_random.NextDouble();
+			B = (float)_random.NextDouble();
 		}
 
 		private float _showTime;
@@ -27,7 +31,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			float x = MathF.Cos(_radiusFactor);
 			float y = MathF.Sin(_radiusFactor);
-			Transform.SetPosition(_originPosition + new Vector3(x, 0, y) * 7);
+			Transform.SetPosition(_originPosition + new Vector3(x, 0, 0) * 7);
 
 			_radiusFactor += 0.128f;
 			if (_radiusFactor > MathF.PI * 2)

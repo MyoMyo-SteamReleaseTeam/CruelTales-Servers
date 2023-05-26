@@ -22,8 +22,8 @@ namespace CTS.Instance.Gameplay
 		public int DestroyObjectStackCapacity = 16;
 
 		// Half view boundary
-		public Vector2 HalfViewInSize = new Vector2(20, 16) / 2;
-		public Vector2 HalfViewOutSize = new Vector2(24, 20) / 2;
+		public Vector2 HalfViewInSize = new Vector2(32, 18) / 2;
+		public Vector2 HalfViewOutSize = new Vector2(36, 22) / 2;
 
 		public int SyncJobCapacity => SystemMaxUser * 20;
 		public int SessionJobCapacity => (int)(SystemMaxUser * 1.5f);

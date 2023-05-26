@@ -30,6 +30,7 @@ namespace CT.Common.DataType
 
 		// Client error
 		ClientError_CannotHandlePacket,
+		ClientError_FailedToReceivePacket,
 
 		// Server error
 		ServerError_CannotHandlePacket,

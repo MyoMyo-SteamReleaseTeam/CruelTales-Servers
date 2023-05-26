@@ -120,11 +120,10 @@ namespace CTS.Instance.Gameplay
 				Vector2 viewPos = new Vector2(viewPos3D.X, viewPos3D.Z);
 
 				Vector2 inBoundary = player.HalfViewInSize;
-				Vector2 outBoundary = player.HalfViewOutSize;
-
 				Vector2 inboundLB = viewPos - inBoundary;
 				Vector2 inboundRT = viewPos + inBoundary;
 
+				Vector2 outBoundary = player.HalfViewOutSize;
 				Vector2 outboundLB = viewPos - outBoundary;
 				Vector2 outboundRT = viewPos + outBoundary;
 
