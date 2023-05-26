@@ -5,7 +5,7 @@ namespace CT.Common.Serialization
 {
 	public interface IPacketWriter
 	{
-		public ArraySegment<byte> Buffer { get; }
+		public ArraySegment<byte> ByteSegment { get; }
 		public bool IsWriteEnd { get; }
 		public int Size { get; }
 		public int Capacity { get; }
@@ -31,5 +31,6 @@ namespace CT.Common.Serialization
 		public void Put(NetStringShort value);
 		public void Put(byte[] value);
 		public void Put(IPacketWriter writer);
+		public void Put(ArraySegment<byte> buffer, int count);
 	}
 }

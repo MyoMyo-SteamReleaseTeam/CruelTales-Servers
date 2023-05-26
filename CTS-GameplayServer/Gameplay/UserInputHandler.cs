@@ -6,18 +6,6 @@ using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public interface IJobHandler
-	{
-		public void Clear();
-		public void Flush();
-	}
-
-	public interface IJobHandler<FArg> where FArg : struct
-	{
-		public void Clear();
-		public void Flush(FArg arg);
-	}
-
 	[Obsolete]
 	public class UserInputHandler : IJobHandler<float>
 	{

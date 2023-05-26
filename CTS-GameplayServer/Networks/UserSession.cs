@@ -115,8 +115,8 @@ namespace CTS.Instance.Networks
 		public void SendReliable(IPacketWriter writer,
 								 byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
-			_peer?.Send(writer.Buffer.Array,
-						writer.Buffer.Offset, 
+			_peer?.Send(writer.ByteSegment.Array,
+						writer.ByteSegment.Offset, 
 						writer.Size, 
 						channelNumber, 
 						DeliveryMethod.ReliableOrdered);
@@ -125,8 +125,8 @@ namespace CTS.Instance.Networks
 		public void SendUnreliable(IPacketWriter writer,
 								   byte channelNumber = NetworkManager.CHANNEL_CONNECTION)
 		{
-			_peer?.Send(writer.Buffer.Array,
-						writer.Buffer.Offset,
+			_peer?.Send(writer.ByteSegment.Array,
+						writer.ByteSegment.Offset,
 						writer.Size,
 						channelNumber,
 						DeliveryMethod.Unreliable);

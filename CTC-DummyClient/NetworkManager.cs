@@ -64,8 +64,8 @@ namespace CTC.Networks
 		public void SendReliable(IPacketWriter writer,
 								 byte channelNumber = 0)
 		{
-			_serverPeer?.Send(writer.Buffer.Array,
-							  writer.Buffer.Offset,
+			_serverPeer?.Send(writer.ByteSegment.Array,
+							  writer.ByteSegment.Offset,
 							  writer.Size,
 							  channelNumber,
 							  DeliveryMethod.ReliableOrdered);
@@ -74,8 +74,8 @@ namespace CTC.Networks
 		public void SendUnreliable(IPacketWriter writer,
 								   byte channelNumber = 0)
 		{
-			_serverPeer?.Send(writer.Buffer.Array,
-							  writer.Buffer.Offset,
+			_serverPeer?.Send(writer.ByteSegment.Array,
+							  writer.ByteSegment.Offset,
 							  writer.Size,
 							  channelNumber,
 							  DeliveryMethod.Unreliable);

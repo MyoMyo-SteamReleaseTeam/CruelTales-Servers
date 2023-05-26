@@ -5,7 +5,7 @@ namespace CT.Common.Serialization
 {
 	public interface IPacketReader
 	{
-		public ArraySegment<byte> Buffer { get; }
+		public ArraySegment<byte> ByteSegment { get; }
 		public int Size { get; }
 		public bool IsReadEnd { get; }
 		public int ReadPosition { get; }
