@@ -140,7 +140,7 @@ namespace CTS.Instance.Gameplay
 
 					Vector3 objPos = spawnObject.Transform.Position;
 					if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-						objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
+						objPos.Z >= inboundLB.Y && objPos.Z <= inboundRT.Y)
 					{
 						if (spawnObject.IsValidVisibilityAuthority(player))
 						{
@@ -159,7 +159,7 @@ namespace CTS.Instance.Gameplay
 						{
 							Vector3 objPos = netObj.Transform.Position;
 							if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-								objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
+								objPos.Z >= inboundLB.Y && objPos.Z <= inboundRT.Y)
 							{
 								if (viewTable.TraceObjects.ContainsKey(netObj.Identity))
 								{
@@ -190,7 +190,7 @@ namespace CTS.Instance.Gameplay
 				{
 					Vector3 objPos = netObj.Transform.Position;
 					if (objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
-						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y)
+						objPos.Z < outboundLB.Y || objPos.Z > outboundRT.Y)
 					{
 						_outObjectSet.TryAdd(netObj.Identity, netObj);
 					}
