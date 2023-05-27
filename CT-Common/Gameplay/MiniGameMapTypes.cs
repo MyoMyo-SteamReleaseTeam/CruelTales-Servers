@@ -21,6 +21,8 @@ namespace CT.Common.Gameplay
 	{
 		None = 0,
 
+		Map_Square_Loading = 20,
+
 		Map_Square_Europe = 50,
 
 		Map_RedHood_0 = 110,
@@ -28,7 +30,7 @@ namespace CT.Common.Gameplay
 		Map_RedHood_2 = 112,
 		Map_RedHood_3 = 113,
 
-		Map_Dueoksini = 200,
+		Map_Dueoksini_0 = 200,
 	}
 
 	public static class MiniGameMapTypesExtension
