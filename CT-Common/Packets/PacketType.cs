@@ -17,8 +17,9 @@ namespace CT.Packets
 		CS_Sync_RemoteUnreliable,
 		SC_Sync_MasterMovement,
 		SC_Sync_MasterSpawn,
-		SC_Sync_MasterRespawn,
 		SC_Sync_MasterDespawn,
+		SC_Sync_MasterEnter,
+		SC_Sync_MasterLeave,
 		SC_Sync_MasterReliable,
 		SC_Sync_MasterUnreliable,
 	}

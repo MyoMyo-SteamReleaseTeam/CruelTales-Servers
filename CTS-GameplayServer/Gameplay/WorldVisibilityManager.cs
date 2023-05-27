@@ -177,7 +177,7 @@ namespace CTS.Instance.Gameplay
 
 								if (netObj.IsValidVisibilityAuthority(player))
 								{
-									viewTable.RespawnObjects.TryAdd(netObj.Identity, netObj);
+									viewTable.EnterObjects.TryAdd(netObj.Identity, netObj);
 								}
 							}
 						}

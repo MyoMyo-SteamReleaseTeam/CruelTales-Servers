@@ -30,8 +30,8 @@ namespace CTS.Instance.SyncObjects
 		public override void OnUpdate(float deltaTime)
 		{
 			float x = MathF.Cos(_radiusFactor);
-			float y = MathF.Sin(_radiusFactor);
-			Transform.SetPosition(_originPosition + new Vector3(x, 0, 0) * 7);
+			float z = MathF.Sin(_radiusFactor);
+			Transform.SetPosition(_originPosition + new Vector3(x, 0, z) * 7);
 
 			_radiusFactor += 0.128f;
 			if (_radiusFactor > MathF.PI * 2)

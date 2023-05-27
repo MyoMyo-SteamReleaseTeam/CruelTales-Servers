@@ -16,7 +16,7 @@ namespace CTS.Instance.Gameplay
 		/// 재등장하는 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
-		public Dictionary<NetworkIdentity, MasterNetworkObject> RespawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> EnterObjects { get; private set; }
 
 		/// <summary>
 		/// 추적중인 오브젝트의 집합입니다.
@@ -51,7 +51,7 @@ namespace CTS.Instance.Gameplay
 		public PlayerVisibleTable(InstanceInitializeOption option)
 		{
 			SpawnObjects = new(option.SpawnObjectCapacity);
-			RespawnObjects = new(option.SpawnObjectCapacity);
+			EnterObjects = new(option.EnterObjectCapacity);
 			TraceObjects = new(option.TraceObjectCapacity);
 			DespawnObjects = new(option.DespawnObjectCapacity);
 
@@ -63,7 +63,7 @@ namespace CTS.Instance.Gameplay
 		public void Clear()
 		{
 			SpawnObjects.Clear();
-			RespawnObjects.Clear();
+			EnterObjects.Clear();
 			TraceObjects.Clear();
 			DespawnObjects.Clear();
 
@@ -82,13 +82,13 @@ namespace CTS.Instance.Gameplay
 				}
 				SpawnObjects.Clear();
 			}
-			if (RespawnObjects.Count != 0)
+			if (EnterObjects.Count != 0)
 			{
-				foreach (var kv in RespawnObjects)
+				foreach (var kv in EnterObjects)
 				{
 					TraceObjects.Add(kv.Key, kv.Value);
 				}
-				RespawnObjects.Clear();
+				EnterObjects.Clear();
 			}
 			DespawnObjects.Clear();
 

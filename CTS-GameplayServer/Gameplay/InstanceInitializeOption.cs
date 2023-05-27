@@ -11,7 +11,7 @@ namespace CTS.Instance.Gameplay
 		public int VisibleCellCapacity = 32;
 		public int VisibleSpawnCapacity = 16;
 		public int SpawnObjectCapacity = 16;
-		public int RespawnObjectCapacity = 16;
+		public int EnterObjectCapacity = 16;
 		public int TraceObjectCapacity = 32;
 		public int DespawnObjectCapacity = 16;
 		public int GlobalSpawnObjectCapacity = 16;

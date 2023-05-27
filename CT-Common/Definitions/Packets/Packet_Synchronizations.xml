@@ -15,8 +15,9 @@
 	<client name="Sync_RemoteUnreliable" custom="true"/>
 	<server name="Sync_MasterMovement" custom="true"/>
 	<server name="Sync_MasterSpawn" custom="true"/>
-	<server name="Sync_MasterRespawn" custom="true"/>
 	<server name="Sync_MasterDespawn" custom="true"/>
+	<server name="Sync_MasterEnter" custom="true"/>
+	<server name="Sync_MasterLeave" custom="true"/>
 	<server name="Sync_MasterReliable" custom="true"/>
 	<server name="Sync_MasterUnreliable" custom="true"/>
 </Definition>

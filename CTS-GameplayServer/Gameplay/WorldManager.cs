@@ -188,12 +188,12 @@ namespace CTS.Instance.Gameplay
 								   PacketType.SC_Sync_MasterSpawn);
 			}
 
-			// Serialize respawn data
-			if (visibleTable.RespawnObjects.Count != 0)
+			// Serialize enter data
+			if (visibleTable.EnterObjects.Count != 0)
 			{
 				SerializeSpawnData(_reliableBuffer,
-								   visibleTable.RespawnObjects,
-								   PacketType.SC_Sync_MasterRespawn);
+								   visibleTable.EnterObjects,
+								   PacketType.SC_Sync_MasterEnter);
 			}
 
 			// Serialize reliable and unreliable trace object data

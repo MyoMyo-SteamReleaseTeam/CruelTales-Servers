@@ -26,8 +26,9 @@ namespace CTC.Networks.Packets
 		{
 			{ PacketType.SC_Sync_MasterMovement, PacketHandler.Handle_SC_Sync_MasterMovement },
 			{ PacketType.SC_Sync_MasterSpawn, PacketHandler.Handle_SC_Sync_MasterSpawn },
-			{ PacketType.SC_Sync_MasterRespawn, PacketHandler.Handle_SC_Sync_MasterRespawn },
 			{ PacketType.SC_Sync_MasterDespawn, PacketHandler.Handle_SC_Sync_MasterDespawn },
+			{ PacketType.SC_Sync_MasterEnter, PacketHandler.Handle_SC_Sync_MasterEnter },
+			{ PacketType.SC_Sync_MasterLeave, PacketHandler.Handle_SC_Sync_MasterLeave },
 			{ PacketType.SC_Sync_MasterReliable, PacketHandler.Handle_SC_Sync_MasterReliable },
 			{ PacketType.SC_Sync_MasterUnreliable, PacketHandler.Handle_SC_Sync_MasterUnreliable },
 			
@@ -37,8 +38,9 @@ namespace CTC.Networks.Packets
 		{
 			PacketType.SC_Sync_MasterMovement,
 			PacketType.SC_Sync_MasterSpawn,
-			PacketType.SC_Sync_MasterRespawn,
 			PacketType.SC_Sync_MasterDespawn,
+			PacketType.SC_Sync_MasterEnter,
+			PacketType.SC_Sync_MasterLeave,
 			PacketType.SC_Sync_MasterReliable,
 			PacketType.SC_Sync_MasterUnreliable,
 			
