@@ -5,32 +5,14 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct UserId : IPacketSerializable
+	public struct UserId : IPacketSerializable, IEquatable<UserId>
 	{
 		public ulong Id;
-
-		public UserId(ulong value)
-		{
-			Id = value;
-		}
-
 		public int SerializeSize => sizeof(ulong);
 
-		public void Serialize(IPacketWriter writer)
-		{
-			writer.Put(Id);
-		}
-
-		public void Deserialize(IPacketReader reader)
-		{
-			Id = reader.ReadUInt64();
-		}
-
-		public override string ToString()
-		{
-			return Id.ToString();
-		}
-
+		public UserId(ulong value) => Id = value;
+		public void Serialize(IPacketWriter writer) => writer.Put(Id);
+		public void Deserialize(IPacketReader reader) => Id = reader.ReadUInt64();
 		public static bool operator ==(UserId left, UserId right) => left.Id == right.Id;
 		public static bool operator !=(UserId left, UserId right) => left.Id != right.Id;
 		public override int GetHashCode() => Id.GetHashCode();
@@ -40,7 +22,9 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
+		public bool Equals(UserId other) => this == other;
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ulong));
+		public override string ToString() => Id.ToString();
 	}
 }

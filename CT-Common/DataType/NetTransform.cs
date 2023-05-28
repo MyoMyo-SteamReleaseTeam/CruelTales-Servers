@@ -4,7 +4,7 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct NetVec2 : IPacketSerializable
+	public struct NetVec2 : IPacketSerializable, IEquatable<NetVec2>
 	{
 		public float X;
 		public float Y;
@@ -38,34 +38,31 @@ namespace CT.Common.DataType
 				return false;
 			return this == lhs;
 		}
+		public bool Equals(NetVec2 other) => this == other;
 		public override string ToString() => $"({X}, {Y})";
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(8);
 	}
 
 	[Serializable]
-	public struct NetVecZ : IPacketSerializable
+	public struct NetVecZ : IPacketSerializable, IEquatable<NetVecZ>
 	{
 		public float Z;
-	
 		public int SerializeSize => sizeof(float);
 	
-		public void Serialize(IPacketWriter writer)
-		{
-			writer.Put(Z);
-		}
-	
-		public void Deserialize(IPacketReader reader)
-		{
-			Z = reader.ReadSingle();
-		}
-
+		public void Serialize(IPacketWriter writer) => writer.Put(Z);
+		public void Deserialize(IPacketReader reader) => Z = reader.ReadSingle();
+		public static bool operator ==(NetVecZ lhs, NetVecZ rhs) => lhs.Z == rhs.Z && lhs.Z == rhs.Z;
+		public static bool operator !=(NetVecZ lhs, NetVecZ rhs) => lhs.Z != rhs.Z || lhs.Z != rhs.Z;
+		public bool Equals(NetVecZ other) => this == other;
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(float));
+		public override bool Equals(object? obj) => obj is NetVecZ && Equals((NetVecZ)obj);
+		public override int GetHashCode() => Z.GetHashCode();
 	}
 
 	[Serializable]
-	public struct NetTransform : IPacketSerializable
+	public struct NetTransform : IPacketSerializable, IEquatable<NetTransform>
 	{
 		public NetVec2 Position;
 		//public NetVecZ PositionZ = new();
@@ -113,5 +110,10 @@ namespace CT.Common.DataType
 		public override string ToString() => $"([{nameof(Position)}:{Position}][{nameof(Velocity)}:{Velocity}])";
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(12);
+
+		public bool Equals(NetTransform other)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

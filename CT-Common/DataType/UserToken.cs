@@ -7,34 +7,12 @@ namespace CT.Common.DataType
 	public struct UserToken : IPacketSerializable
 	{
 		public ulong Token;
-
-		public UserToken(ulong token)
-		{
-			Token = token;
-		}
-
 		public int SerializeSize => sizeof(ulong);
 
-		public void Serialize(IPacketWriter writer)
-		{
-			writer.Put(Token);
-		}
-
-		public void Deserialize(IPacketReader reader)
-		{
-			Token = reader.ReadUInt64();
-		}
-
-		public override string ToString()
-		{
-			return $"Token:{Token}";
-		}
-
-		public bool IsValid()
-		{
-			return Token > 0;
-		}
-
+		public UserToken(ulong token) => Token = token;
+		public void Serialize(IPacketWriter writer) => writer.Put(Token);
+		public void Deserialize(IPacketReader reader) => Token = reader.ReadUInt64();
+		public bool IsValid() => Token > 0;
 		public static bool operator ==(UserToken lhs, UserToken rhs) => lhs.Token == rhs.Token;
 		public static bool operator !=(UserToken lhs, UserToken rhs) => lhs.Token != rhs.Token;
 		public override int GetHashCode() => Token.GetHashCode();
@@ -46,5 +24,6 @@ namespace CT.Common.DataType
 		}
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ulong));
+		public override string ToString() => Token.ToString();
 	}
 }

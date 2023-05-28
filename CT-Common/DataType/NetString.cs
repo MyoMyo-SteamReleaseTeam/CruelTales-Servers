@@ -11,7 +11,7 @@ namespace CT.Common.DataType
 {
 	/// <summary>65536이하 길이의 string 입니다.</summary>
 	[Serializable]
-	public struct NetString : IPacketSerializable
+	public struct NetString : IPacketSerializable, IEquatable<NetString>
 	{
 		public string Value;
 		public const int MAX_BYTE_LENGTH = 65536;
@@ -75,8 +75,8 @@ namespace CT.Common.DataType
 			return Value == value;
 		}
 
+		public bool Equals(NetString other) => other == this;
 		public override int GetHashCode() => Value.GetHashCode();
-
 		public static bool operator ==(NetString lhs, string rhs) => lhs.Value == rhs;
 		public static bool operator !=(NetString lhs, string rhs) => lhs.Value != rhs;
 		public static bool operator ==(string lhs, NetString rhs) => lhs == rhs.Value;
@@ -107,7 +107,7 @@ namespace CT.Common.DataType
 
 	/// <summary>256이하 길이의 string 입니다.</summary>
 	[Serializable]
-	public struct NetStringShort : IPacketSerializable
+	public struct NetStringShort : IPacketSerializable, IEquatable<NetStringShort>
 	{
 		public string Value;
 		public const int MAX_BYTE_LENGTH = 256;
@@ -172,8 +172,8 @@ namespace CT.Common.DataType
 			return Value == value;
 		}
 
+		public bool Equals(NetStringShort other) => other == this;
 		public override int GetHashCode() => Value.GetHashCode();
-
 		public static bool operator ==(NetStringShort lhs, string rhs) => lhs.Value == rhs;
 		public static bool operator !=(NetStringShort lhs, string rhs) => lhs.Value != rhs;
 		public static bool operator ==(string lhs, NetStringShort rhs) => lhs == rhs.Value;

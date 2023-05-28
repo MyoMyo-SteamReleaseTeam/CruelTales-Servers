@@ -5,7 +5,7 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct NetworkIdentity : IPacketSerializable
+	public struct NetworkIdentity : IPacketSerializable, IEquatable<NetworkIdentity>
 	{
 		public byte Id;
 
@@ -47,6 +47,7 @@ namespace CT.Common.DataType
 				return false;
 			return value == this;
 		}
+		public bool Equals(NetworkIdentity other) => this == other;
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 		public override string ToString() => Id.ToString();
