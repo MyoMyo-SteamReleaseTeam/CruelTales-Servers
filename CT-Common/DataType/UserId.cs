@@ -12,7 +12,7 @@ namespace CT.Common.DataType
 
 		public UserId(ulong value) => Id = value;
 		public void Serialize(IPacketWriter writer) => writer.Put(Id);
-		public void Deserialize(IPacketReader reader) => Id = reader.ReadUInt64();
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadUInt64(out Id);
 		public static bool operator ==(UserId left, UserId right) => left.Id == right.Id;
 		public static bool operator !=(UserId left, UserId right) => left.Id != right.Id;
 		public override int GetHashCode() => Id.GetHashCode();

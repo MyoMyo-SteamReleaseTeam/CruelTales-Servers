@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
+﻿using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Networks;

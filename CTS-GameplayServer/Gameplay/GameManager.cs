@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using CT.Common.Gameplay;
+using CT.Common.DataType;
 using CT.Common.Tools;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Networks;
@@ -20,7 +21,7 @@ namespace CTS.Instance.Gameplay
 		private WorldManager _worldManager;
 
 		// Manage Players
-		private BidirectionalMap<UserSession, NetworkPlayer> _networkPlayerByUserId;
+		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
 		private ObjectPool<NetworkPlayer> _networkPlayerPool;
 
 		// Test
@@ -79,7 +80,7 @@ namespace CTS.Instance.Gameplay
 		{
 			var player = _networkPlayerPool.Get();
 			player.OnCreated(userSession);
-			_networkPlayerByUserId.Add(userSession, player);
+			_networkPlayerByUserId.Add(userSession.UserId, player);
 			_worldManager.OnPlayerEnter(player);
 			
 			// Test
@@ -89,7 +90,7 @@ namespace CTS.Instance.Gameplay
 
 		public void OnUserLeaveGame(UserSession userSession)
 		{
-			if (!_networkPlayerByUserId.TryGetValue(userSession, out var player))
+			if (!_networkPlayerByUserId.TryGetValue(userSession.UserId, out var player))
 			{
 				_log.Error($"[{_gameplayInstance}] There is no {userSession}'s network player!");
 				return;
@@ -106,6 +107,16 @@ namespace CTS.Instance.Gameplay
 				character.Destroy();
 				_playerCharacterByPlayer.TryRemove(player);
 			}
+		}
+
+		public bool TryGetNetworkPlayer(UserId user, [MaybeNullWhen(false)] out NetworkPlayer player)
+		{
+			return _networkPlayerByUserId.TryGetForward(user, out player);
+		}
+
+		public bool IsConnectedPlayer(UserId user)
+		{
+			return _networkPlayerByUserId.Contains(user);
 		}
 	}
 }

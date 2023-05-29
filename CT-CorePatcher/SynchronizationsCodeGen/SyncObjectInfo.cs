@@ -42,12 +42,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Add forward direction
-			_masterSerializeGroup = new(_masterSideMembers, _modifier);
-			_masterDeserializeGroup = new(_remoteSideMembers, _modifier);
+			_masterSerializeGroup = new(_masterSideMembers, SyncDirection.FromMaster, _modifier);
+			_masterDeserializeGroup = new(_remoteSideMembers, SyncDirection.FromMaster, _modifier);
 
 			// Add reverse direction
-			_remoteSerializeGroup = new(_remoteSideMembers, _modifier);
-			_remoteDeserializeGroup = new(_masterSideMembers, _modifier);
+			_remoteSerializeGroup = new(_remoteSideMembers, SyncDirection.FromRemote, _modifier);
+			_remoteDeserializeGroup = new(_masterSideMembers, SyncDirection.FromRemote, _modifier);
 		}
 
 		public string Gen_MasterCode()

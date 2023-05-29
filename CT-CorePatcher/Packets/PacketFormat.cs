@@ -113,7 +113,7 @@ namespace {1}
 		/// {3} Content<br/>
 		/// </summary>
 		public static readonly string PacketDeserializeFunction =
-@"public override void {0}({1} {2})
+@"public override bool {0}({1} {2})
 {{
 {3}
 }}";
@@ -170,7 +170,7 @@ namespace {1}
 		/// {3} Content<br/>
 		/// </summary>
 		public static readonly string DeserializeFunction =
-@"public void {0}({1} {2})
+@"public bool {0}({1} {2})
 {{
 {3}
 }}";

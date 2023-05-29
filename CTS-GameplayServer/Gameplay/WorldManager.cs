@@ -23,6 +23,7 @@ namespace CTS.Instance.Gameplay
 
 		// Reference
 		private GameplayInstance _gameplayInstance;
+		private GameManager _gameManager;
 		private InstanceInitializeOption _option;
 
 		// Network Object Management
@@ -39,6 +40,7 @@ namespace CTS.Instance.Gameplay
 		{
 			// Reference
 			_gameplayInstance = gameplayInstance;
+			_gameManager = gameplayInstance.GameManager;
 			_option = option;
 
 			// Network Object Management
@@ -127,7 +129,7 @@ namespace CTS.Instance.Gameplay
 		public T CreateObject<T>(Vector3 position = default) where T : MasterNetworkObject, new()
 		{
 			var netObj = _objectPoolManager.Create<T>();
-			netObj.Create(this, _visibilityManager, getNetworkIdentityCounter(), position);
+			netObj.Create(this, _visibilityManager, _gameManager, getNetworkIdentityCounter(), position);
 			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.OnCreated();
 			return netObj;
@@ -431,39 +433,65 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void OnDeserializeSyncReliable(IPacketReader reader)
+		// TODO : 역직렬화 실패시 Network Player 내부의 UserSession으로 연결을 종료하도록 리펙토링 할 수 있음
+		public bool OnDeserializeSyncReliable(UserId sender, IPacketReader reader)
 		{
-			while (reader.CanRead(1))
+			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
 			{
-				NetworkIdentity id = new NetworkIdentity();
-				id.Deserialize(reader);
+				return false;
+			}
+
+			int objCount = reader.ReadByte();
+			for (int i = 0; i < objCount; i++)
+			{
+				NetworkIdentity id = new NetworkIdentity(reader);
 				if (_networkObjectById.TryGetValue(id, out var netObj))
 				{
-					netObj.DeserializeSyncReliable(reader);
+					if (!netObj.TryDeserializeSyncReliable(player, reader))
+					{
+						Debug.Assert(false);
+						reader.IgnoreAll();
+						return false;
+					}
 				}
 				else
 				{
-					_log.Warn($"{nameof(OnDeserializeSyncReliable)} ignored!");
+					Debug.Assert(false);
+					reader.IgnoreAll();
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		public bool OnDeserializeSyncUnreliable(UserId sender, IPacketReader reader)
+		{
+			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
+			{
+				return false;
+			}
+
+			int objCount = reader.ReadByte();
+			for (int i = 0; i < objCount; i++)
+			{
+				NetworkIdentity id = new NetworkIdentity(reader);
+				if (_networkObjectById.TryGetValue(id, out var netObj))
+				{
+					if (!netObj.TryDeserializeSyncUnreliable(player, reader))
+					{
+						Debug.Assert(false);
+						reader.IgnoreAll();
+						return false;
+					}
+				}
+				else
+				{
 					reader.IgnoreAll();
 				}
 			}
-		}
 
-		public void OnDeserializeSyncUnreliable(IPacketReader reader)
-		{
-			while (reader.CanRead(1))
-			{
-				NetworkIdentity id = new NetworkIdentity();
-				id.Deserialize(reader);
-				if (_networkObjectById.TryGetValue(id, out var netObj))
-				{
-					netObj.DeserializeSyncUnreliable(reader);
-				}
-				else
-				{
-					_log.Warn($"{nameof(OnDeserializeSyncUnreliable)} ignored!");
-				}
-			}
+			return true;
 		}
 
 		#endregion

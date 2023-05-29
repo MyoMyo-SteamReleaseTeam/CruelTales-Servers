@@ -207,9 +207,9 @@ namespace CT.Common.Serialization
 			ReadPosition = position;
 		}
 
-		public void ReadTo<T>(T serializeObject) where T : IPacketSerializable
+		public bool TryReadTo<T>(in T serializeObject) where T : IPacketSerializable
 		{
-			serializeObject.Deserialize(this);
+			return serializeObject.TryDeserialize(this);
 		}
 
 		public void IgnoreAll()
@@ -222,11 +222,10 @@ namespace CT.Common.Serialization
 			ReadPosition += count;
 		}
 
-		public T Read<T>() where T : IPacketSerializable, new()
+		public bool TryRead<T>(out T value) where T : IPacketSerializable, new()
 		{
-			T instance = new();
-			ReadTo(instance);
-			return instance;
+			value = new();
+			return TryReadTo(value);
 		}
 
 		// Peek
@@ -287,7 +286,7 @@ namespace CT.Common.Serialization
 
 		public float PeekSingle()
 		{
-			var value = BinaryConverter.ReadFloat(ByteSegment, ReadPosition);
+			var value = BinaryConverter.ReadSingle(ByteSegment, ReadPosition);
 			return value;
 		}
 
@@ -364,7 +363,7 @@ namespace CT.Common.Serialization
 
 		public float ReadSingle()
 		{
-			var value = BinaryConverter.ReadFloat(ByteSegment, ReadPosition);
+			var value = BinaryConverter.ReadSingle(ByteSegment, ReadPosition);
 			ReadPosition += sizeof(float);
 			return value;
 		}
@@ -402,6 +401,250 @@ namespace CT.Common.Serialization
 			var result = BinaryConverter.ReadBytes(ByteSegment, ReadPosition, out int read);
 			ReadPosition += read;
 			return result;
+		}
+
+		#endregion
+
+		#region TryRead
+
+		public bool TryPeekBool(out bool value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = false;
+				return false;
+			}
+			value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekByte(out byte value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadByte(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekSByte(out sbyte value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadSByte(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekInt16(out short value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadInt16(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekUInt16(out ushort value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadUInt16(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekInt32(out int value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadInt32(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekUInt32(out uint value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadUInt32(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekInt64(out long value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadInt64(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekUInt64(out ulong value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadUInt64(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekSingle(out float value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadSingle(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryPeekDouble(out double value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = 0;
+				return false;
+			}
+			value = BinaryConverter.ReadDouble(ByteSegment, ReadPosition);
+			return true;
+		}
+		public bool TryReadBool(out bool value)
+		{
+			if (TryPeekBool(out value))
+			{
+				ReadPosition += sizeof(byte);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadByte(out byte value)
+		{
+			if (TryPeekByte(out value))
+			{
+				ReadPosition += sizeof(byte);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadSByte(out sbyte value)
+		{
+			if (TryPeekSByte(out value))
+			{
+				ReadPosition += sizeof(sbyte);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadInt16(out short value)
+		{
+			if (TryPeekInt16(out value))
+			{
+				ReadPosition += sizeof(short);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadUInt16(out ushort value)
+		{
+			if (TryPeekUInt16(out value))
+			{
+				ReadPosition += sizeof(ushort);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadInt32(out int value)
+		{
+			if (TryPeekInt32(out value))
+			{
+				ReadPosition += sizeof(int);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadUInt32(out uint value)
+		{
+			if (TryPeekUInt32(out value))
+			{
+				ReadPosition += sizeof(uint);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadInt64(out long value)
+		{
+			if (TryPeekInt64(out value))
+			{
+				ReadPosition += sizeof(long);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadUInt64(out ulong value)
+		{
+			if (TryPeekUInt64(out value))
+			{
+				ReadPosition += sizeof(ulong);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadSingle(out float value)
+		{
+			if (TryPeekSingle(out value))
+			{
+				ReadPosition += sizeof(float);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadDouble(out double value)
+		{
+			if (TryPeekDouble(out value))
+			{
+				ReadPosition += sizeof(double);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadNetString(out string value)
+		{
+			if (!(TryPeekUInt16(out var byteLength) && CanRead(byteLength)))
+			{
+				value = string.Empty;
+				return false;
+			}
+
+			ReadPosition += sizeof(ushort);
+			Debug.Assert(ByteSegment.Array != null);
+			value = BinaryConverter.Utf8Encoding.GetString(ByteSegment.Array,
+														   ByteSegment.Offset + ReadPosition,
+														   byteLength);
+			return true;
+		}
+		public bool TryReadNetStringShort(out string value)
+		{
+			if (!(TryPeekByte(out var byteLength) && CanRead(byteLength)))
+			{
+				value = string.Empty;
+				return false;
+			}
+
+			ReadPosition += sizeof(byte);
+			Debug.Assert(ByteSegment.Array != null);
+			value = BinaryConverter.Utf8Encoding.GetString(ByteSegment.Array,
+														   ByteSegment.Offset + ReadPosition,
+														   byteLength);
+			return true;
 		}
 
 		#endregion

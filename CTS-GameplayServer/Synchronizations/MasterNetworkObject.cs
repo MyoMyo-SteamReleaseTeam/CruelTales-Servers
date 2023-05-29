@@ -9,12 +9,15 @@ using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
-	public abstract class MasterNetworkObject : ISynchronizable
+	public abstract class MasterNetworkObject : IMasterSynchronizable
 	{
-		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
-		[AllowNull] private WorldManager _worldManager;
+		/// <summary>게임 매니져 입니다.</summary>
+		[AllowNull] protected GameManager _gameManager;
 
-		/// <summary></summary>
+		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
+		[AllowNull] protected WorldManager _worldManager;
+
+		/// <summary>네트워크 가시성 매니져입니다.</summary>
 		[AllowNull] private WorldVisibilityManager _worldPartitioner;
 
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
@@ -86,6 +89,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 초기화합니다.</summary>
 		public void Create(WorldManager manager,
 						   WorldVisibilityManager worldPartitioner,
+						   GameManager gameManager,
 						   NetworkIdentity id,
 						   Vector3 position)
 		{
@@ -95,6 +99,7 @@ namespace CTS.Instance.Synchronizations
 
 			// Bind reference
 			_worldManager = manager;
+			_gameManager = gameManager;
 
 			// Set position
 			Transform.Initialize(position);
@@ -160,9 +165,8 @@ namespace CTS.Instance.Synchronizations
 		public abstract void SerializeSyncReliable(IPacketWriter writer);
 		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
 		public abstract void SerializeEveryProperty(IPacketWriter writer);
-		public abstract void DeserializeSyncReliable(IPacketReader reader);
-		public abstract void DeserializeEveryProperty(IPacketReader reader);
-		public abstract void DeserializeSyncUnreliable(IPacketReader reader);
+		public abstract bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader);
+		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);

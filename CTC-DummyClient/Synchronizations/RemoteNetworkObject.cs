@@ -7,7 +7,7 @@ using CTC.Networks.SyncObjects.TestSyncObjects;
 
 namespace CTC.Networks.Synchronizations
 {
-	public abstract class RemoteNetworkObject : ISynchronizable
+	public abstract class RemoteNetworkObject : IRemoteSynchronizable
 	{
 		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
 		[AllowNull] private RemoteWorldManager _worldManager;
@@ -53,9 +53,9 @@ namespace CTC.Networks.Synchronizations
 		public abstract void SerializeSyncReliable(IPacketWriter writer);
 		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
 		public abstract void SerializeEveryProperty(IPacketWriter writer);
-		public abstract void DeserializeSyncReliable(IPacketReader reader);
-		public abstract void DeserializeEveryProperty(IPacketReader reader);
-		public abstract void DeserializeSyncUnreliable(IPacketReader reader);
+		public abstract bool TryDeserializeSyncReliable(IPacketReader reader);
+		public abstract bool TryDeserializeEveryProperty(IPacketReader reader);
+		public abstract bool TryDeserializeSyncUnreliable(IPacketReader reader);
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);

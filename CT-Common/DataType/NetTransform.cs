@@ -23,10 +23,9 @@ namespace CT.Common.DataType
 			writer.Put(Y);
 		}
 	
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			X = reader.ReadSingle();
-			Y = reader.ReadSingle();
+			return reader.TryReadSingle(out X) && reader.TryReadSingle(out Y);
 		}
 
 		public static bool operator ==(NetVec2 lhs, NetVec2 rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
@@ -51,7 +50,7 @@ namespace CT.Common.DataType
 		public int SerializeSize => sizeof(float);
 	
 		public void Serialize(IPacketWriter writer) => writer.Put(Z);
-		public void Deserialize(IPacketReader reader) => Z = reader.ReadSingle();
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadSingle(out Z);
 		public static bool operator ==(NetVecZ lhs, NetVecZ rhs) => lhs.Z == rhs.Z && lhs.Z == rhs.Z;
 		public static bool operator !=(NetVecZ lhs, NetVecZ rhs) => lhs.Z != rhs.Z || lhs.Z != rhs.Z;
 		public bool Equals(NetVecZ other) => this == other;
@@ -88,11 +87,9 @@ namespace CT.Common.DataType
 			Velocity.Serialize(writer);
 		}
 	
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			Position.Deserialize(reader);
-			//PositionZ.Deserialize(reader);
-			Velocity.Deserialize(reader);
+			return Position.TryDeserialize(reader) && Velocity.TryDeserialize(reader);
 		}
 
 		public static bool operator ==(NetTransform lhs, NetTransform rhs) 

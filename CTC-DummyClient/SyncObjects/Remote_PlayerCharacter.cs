@@ -38,34 +38,36 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer) { }
-		public override void DeserializeSyncReliable(IPacketReader reader)
+		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
-				_userId.Deserialize(reader);
+				if (!_userId.TryDeserialize(reader)) return false;
 				OnUserIdChanged?.Invoke(_userId);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				_username.Deserialize(reader);
+				if (!_username.TryDeserialize(reader)) return false;
 				OnUsernameChanged?.Invoke(_username);
 			}
 			if (_dirtyReliable_0[2])
 			{
-				_costume = reader.ReadInt32();
+				if (!reader.TryReadInt32(out _costume)) return false;
 				OnCostumeChanged?.Invoke(_costume);
 			}
+			return true;
 		}
-		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
-		public override void DeserializeEveryProperty(IPacketReader reader)
+		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
+		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			_userId.Deserialize(reader);
+			if (!_userId.TryDeserialize(reader)) return false;
 			OnUserIdChanged?.Invoke(_userId);
-			_username.Deserialize(reader);
+			if (!_username.TryDeserialize(reader)) return false;
 			OnUsernameChanged?.Invoke(_username);
-			_costume = reader.ReadInt32();
+			if (!reader.TryReadInt32(out _costume)) return false;
 			OnCostumeChanged?.Invoke(_costume);
+			return true;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{

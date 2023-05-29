@@ -23,10 +23,17 @@ namespace CT.Common.DataType
 			writer.Put(Port);
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			IpEndpoint = reader.ReadNetStringShort();
-			Port = reader.ReadUInt16();
+			if (!reader.TryReadNetStringShort(out var ipEndPoint) || 
+				!reader.TryReadUInt16(out var port))
+			{
+				return false;
+			}
+
+			IpEndpoint = ipEndPoint;
+			Port = port;
+			return true;
 		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);

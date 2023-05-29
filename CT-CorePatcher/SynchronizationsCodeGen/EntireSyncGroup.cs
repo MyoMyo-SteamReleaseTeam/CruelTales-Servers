@@ -10,12 +10,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		List<BaseMemberToken> _members;
 		private SyncType _syncType;
+		private SyncDirection _direction;
 		private string _modifier;
 
-		public EntireSerializeSyncGroup(List<BaseMemberToken> members, SyncType syncType, string modifier)
+		public EntireSerializeSyncGroup(List<BaseMemberToken> members,
+										SyncType syncType, SyncDirection direction, string modifier)
 		{
 			_members = members;
 			_syncType = syncType;
+			_direction = direction;
 			_modifier = modifier;
 		}
 
@@ -55,12 +58,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		List<BaseMemberToken> _members;
 		private SyncType _syncType;
+		private SyncDirection _direction;
 		private string _modifier;
 
-		public EntireDeserializeSyncGroup(List<BaseMemberToken> members, SyncType syncType, string modifier)
+		public EntireDeserializeSyncGroup(List<BaseMemberToken> members,
+										  SyncType syncType, SyncDirection direction, string modifier)
 		{
 			_members = members;
 			_syncType = syncType;
+			_direction = direction;
 			_modifier = modifier;
 		}
 
@@ -71,12 +77,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Remote_DeserializeSyncAll()
 		{
+			if (_direction == SyncDirection.FromMaster)
+			{
+				return string.Empty;
+			}
+
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.EntireDeserializeFunctionDeclaration, _modifier,
 									SyncGroupFormat.EntireFunctionSuffix));
 
 			if (!HasProperty())
-				return sb.AppendLine(" { }").ToString();
+				return sb.AppendLine(SyncGroupFormat.EmptyDeserializeImplementation).ToString();
 
 			StringBuilder contents = new();
 			foreach (var m in _members)
@@ -90,6 +101,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(contents.ToString());
+			sb.AppendLine("\treturn true;");
 			sb.AppendLine("}");
 
 			return sb.ToString();

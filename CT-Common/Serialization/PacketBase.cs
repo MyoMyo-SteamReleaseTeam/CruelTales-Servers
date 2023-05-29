@@ -9,9 +9,8 @@ namespace CT.Common.Serialization
 
 		public abstract PacketType PacketType { get; }
 		public abstract int SerializeSize { get; }
-		public abstract void Deserialize(IPacketReader reader);
+		public abstract bool TryDeserialize(IPacketReader reader);
 		public abstract void Serialize(IPacketWriter writer);
-		public static void IgnoreStatic(IPacketReader reader) => throw _exception;
 		public void Ignore(IPacketReader reader) => throw _exception;
 	}
 }

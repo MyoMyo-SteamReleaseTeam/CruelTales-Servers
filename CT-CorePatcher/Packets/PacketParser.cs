@@ -414,7 +414,7 @@ namespace CT.CorePatcher.Packets
 												  serializeContent);
 
 				deserializeFunction = string.Format(PacketFormat.PacketDeserializeFunction,
-												  nameof(IPacketSerializable.Deserialize),
+												  nameof(IPacketSerializable.TryDeserialize),
 												  nameof(IPacketReader),
 												  ReaderName,
 												  deserializeContent);
@@ -428,7 +428,7 @@ namespace CT.CorePatcher.Packets
 												  serializeContent);
 
 				deserializeFunction = string.Format(PacketFormat.DeserializeFunction,
-												  nameof(IPacketSerializable.Deserialize),
+												  nameof(IPacketSerializable.TryDeserialize),
 												  nameof(IPacketReader),
 												  ReaderName,
 												  deserializeContent);

@@ -278,7 +278,15 @@ namespace CTS.Instance.Networks
 
 		public void OnTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
-			_gameplayInstance?.OnUserTrySync(syncType, packetReader);
+			if (_gameplayInstance == null)
+			{
+				return;
+			}
+
+			if (!_gameplayInstance.TrySync(UserId, syncType, packetReader))
+			{
+				Disconnect(DisconnectReasonType.Reject_PermissionDenied);
+			}
 		}
 
 		public override string ToString()

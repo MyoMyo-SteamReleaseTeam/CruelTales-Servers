@@ -9,13 +9,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	public class SerializeDirectionGroup
 	{
 		private string _modifier;
+		private SyncDirection _direction;
 
 		private SerializeSyncGroup _reliableGruop;
 		private SerializeSyncGroup _unreliableGruop;
 		private EntireSerializeSyncGroup _entireGroup;
 
-		public SerializeDirectionGroup(List<MemberToken> serializeMembers, string modifier)
+		public SerializeDirectionGroup(List<MemberToken> serializeMembers, SyncDirection syncDirection, string modifier)
 		{
+			_direction = syncDirection;
 			_modifier = modifier;
 
 			List<BaseMemberToken> sReliableMembers = serializeMembers
@@ -29,9 +31,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			List<BaseMemberToken> sAllMembers = serializeMembers
 				.Select(m => m.Member).ToList();
 
-			_reliableGruop = new SerializeSyncGroup(sReliableMembers, SyncType.Reliable, _modifier);
-			_unreliableGruop = new SerializeSyncGroup(sUnreliableMembers, SyncType.Unreliable, _modifier);
-			_entireGroup = new EntireSerializeSyncGroup(sAllMembers, SyncType.None, _modifier);
+			_reliableGruop = new SerializeSyncGroup(sReliableMembers, SyncType.Reliable, _direction, _modifier);
+			_unreliableGruop = new SerializeSyncGroup(sUnreliableMembers, SyncType.Unreliable, _direction, _modifier);
+			_entireGroup = new EntireSerializeSyncGroup(sAllMembers, SyncType.None, _direction, _modifier);
 		}
 
 		public string Gen_SynchronizerProperties()
@@ -64,13 +66,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	public class DeserializeDirectionGroup
 	{
 		private string _modifier;
+		private SyncDirection _direction;
 
 		private DeserializeSyncGroup _reliableGruop;
 		private DeserializeSyncGroup _unreliableGruop;
 		private EntireDeserializeSyncGroup _entireGroup;
 
-		public DeserializeDirectionGroup(List<MemberToken> deserializeMembers, string modifier)
+		public DeserializeDirectionGroup(List<MemberToken> deserializeMembers, SyncDirection direction, string modifier)
 		{
+			_direction = direction;
 			_modifier = modifier;
 
 			List<BaseMemberToken> dReliableMembers = deserializeMembers
@@ -84,9 +88,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			List<BaseMemberToken> dAllMembers = deserializeMembers
 				.Select(m => m.Member).ToList();
 
-			_reliableGruop = new DeserializeSyncGroup(dReliableMembers, SyncType.Reliable, _modifier);
-			_unreliableGruop = new DeserializeSyncGroup(dUnreliableMembers, SyncType.Unreliable, _modifier);
-			_entireGroup = new EntireDeserializeSyncGroup(dAllMembers, SyncType.None, _modifier);
+			_reliableGruop = new DeserializeSyncGroup(dReliableMembers, SyncType.Reliable, direction, _modifier);
+			_unreliableGruop = new DeserializeSyncGroup(dUnreliableMembers, SyncType.Unreliable, direction, _modifier);
+			_entireGroup = new EntireDeserializeSyncGroup(dAllMembers, SyncType.None, direction, _modifier);
 		}
 
 		public string Gen_SerializeSyncFuntions()

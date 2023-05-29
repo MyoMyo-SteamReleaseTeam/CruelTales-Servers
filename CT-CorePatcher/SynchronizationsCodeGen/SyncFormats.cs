@@ -11,6 +11,7 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
+using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;";
 
 		public static string RemoteUsingStatements =>
@@ -153,7 +154,13 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string DeserializeFunctionDeclaration => @"public {0}void DeserializeSync{1}(IPacketReader reader)";
+		public static string MasterDeserializeFunctionDeclaration => @"public {0}bool TryDeserializeSync{1}(NetworkPlayer player, IPacketReader reader)";
+
+		/// <summary>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string RemoteDeserializeFunctionDeclaration => @"public {0}bool TryDeserializeSync{1}(IPacketReader reader)";
 
 		/// <summary>
 		/// {0} SyncType<br/>
@@ -177,7 +184,9 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string EntireDeserializeFunctionDeclaration => @"public {0}void Deserialize{1}(IPacketReader reader)";
+		public static string EntireDeserializeFunctionDeclaration => @"public {0}bool TryDeserialize{1}(IPacketReader reader)";
+
+		public static string EmptyDeserializeImplementation => " => true;";
 
 		/// <summary>
 		/// {0} Dirty bit name<br/>
@@ -312,7 +321,8 @@ for (int i = 0; i < count; i++)
 		/// {1} Parameter name<br/>
 		/// {2} CLR type name<br/>
 		/// </summary>
-		public static string TempReadPrimitiveTypeProperty => @"{0} {1} = reader.Read{2}();";
+		//public static string TempReadPrimitiveTypeProperty => @"{0} {1} = reader.Read{2}();";
+		public static string TempReadPrimitiveTypeProperty => @"if (!reader.TryRead{2}(out {0} {1})) return false;";
 
 		/// <summary>
 		/// {0} Type name<br/>
@@ -320,14 +330,17 @@ for (int i = 0; i < count; i++)
 		/// </summary>
 		public static string TempReadByDeserializerStruct =>
 @"{0} {1} = new();
-{1}.Deserialize(reader);";
+if (!{1}.TryDeserialize(reader)) return false;";
 
 		/// <summary>
 		/// {0} Enum type name<br/>
 		/// {1} Parameter name<br/>
 		/// {2} CLR enum size type name<br/>
 		/// </summary>
-		public static string TempReadEnum => @"{0} {1} = ({0})reader.Read{2}();";
+		//public static string TempReadEnum => @"{0} {1} = ({0})reader.Read{2}();";
+		public static string TempReadEnum =>
+@"if (!reader.TryRead{2}(out var {1}Value)) return false;
+{0} {1} = ({0}){1}Value;";
 
 		/// <summary>
 		/// {0} Function name<br/>
@@ -413,25 +426,27 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} CLR type name<br/>
 		/// </summary>
-		public static string ReadEmbededTypeProperty => @"{0} = reader.Read{1}();";
+		public static string ReadEmbededTypeProperty => @"if (!reader.TryRead{1}(out {0})) return false;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// </summary>
-		public static string ReadByDeserializer => @"{0}.Deserialize(reader);";
+		public static string ReadByDeserializer => @"if (!{0}.TryDeserialize(reader)) return false;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// {1} Enum type name<br/>
 		/// {2} CLR enum size type name<br/>
 		/// </summary>
-		public static string ReadEnum => @"{0} = ({1})reader.Read{2}();";
+		public static string ReadEnum =>
+@"if (!reader.TryRead{2}(out var {0}Value)) return false;
+{0} = ({1}){0}Value;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
 		/// {1} Read function name<br/>
 		/// </summary>
-		public static string ReadSyncObject => @"{0}.Deserialize{1}(reader);";
+		public static string ReadSyncObject => @"if (!{0}.Deserialize{1}(reader)) return false;";
 
 		/// <summary>
 		/// {0} Public property name<br/>

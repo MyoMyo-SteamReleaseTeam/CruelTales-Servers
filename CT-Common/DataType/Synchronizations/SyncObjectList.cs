@@ -11,7 +11,7 @@ namespace CT.Common.DataType.Synchronizations
 	/// 동기화 객체의 배열을 동기화하는 Collection 입니다.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class SyncObjectList<T> : ISynchronizable where T : ISynchronizable, new()
+	public class SyncObjectList<T> : IRemoteSynchronizable where T : IRemoteSynchronizable, new()
 	{
 		private struct CollectionOperationToken
 		{
@@ -100,15 +100,19 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeEveryProperty(IPacketReader reader)
+		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
 				T item = new();
-				item.DeserializeEveryProperty(reader);
+				if (!item.TryDeserializeEveryProperty(reader))
+				{
+					return false;
+				}
 				_list.Add(item);
 			}
+			return true;
 		}
 
 		public void SerializeSyncReliable(IPacketWriter writer)
@@ -172,7 +176,7 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeSyncReliable(IPacketReader reader)
+		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte masterDirty = reader.ReadBitmaskByte();
 
@@ -191,7 +195,10 @@ namespace CT.Common.DataType.Synchronizations
 
 						case CollectionOperationType.Add:
 							T data = new T();
-							data.DeserializeEveryProperty(reader);
+							if (!data.TryDeserializeEveryProperty(reader))
+							{
+								return false;
+							}
 							_list.Add(data);
 							break;
 
@@ -214,15 +221,20 @@ namespace CT.Common.DataType.Synchronizations
 				for (int i = 0; i < changeCount; i++)
 				{
 					byte index = reader.ReadByte();
-					_list[index].DeserializeSyncReliable(reader);
+					if (!_list[index].TryDeserializeSyncReliable(reader))
+					{
+						return false;
+					}
 				}
 			}
+
+			return true;
 		}
 
 		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
 		public bool IsDirtyUnreliable => throw _exception;
 		public void ClearDirtyUnreliable() => throw _exception;
-		public void DeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
+		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
 		#if NET
 		public static void IgnoreSyncReliable(IPacketReader reader) => throw _exception;

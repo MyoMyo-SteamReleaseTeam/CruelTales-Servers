@@ -76,7 +76,7 @@ namespace CT.Test.NetworkCore
 
 			Assert.AreEqual(boolValue, BinaryConverter.ReadBool(buffer, pos)); pos += 1;
 
-			Assert.AreEqual(floatValue, BinaryConverter.ReadFloat(buffer, pos)); pos += sizeof(float);
+			Assert.AreEqual(floatValue, BinaryConverter.ReadSingle(buffer, pos)); pos += sizeof(float);
 			Assert.AreEqual(doubleValue, BinaryConverter.ReadDouble(buffer, pos)); pos += sizeof(double);
 
 			byte[] copyArray = new byte[byteCount];

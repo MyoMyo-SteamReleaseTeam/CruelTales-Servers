@@ -46,16 +46,20 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
 				T element = new T();
-				reader.ReadTo(element);
+				if (!reader.TryReadTo(element))
+				{
+					return false;
+				}
 				_array.Add(element);
 			}
+			return true;
 		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
@@ -138,16 +142,20 @@ namespace CT.Common.DataType
 			}
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
 			Clear();
 			int count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
 				T element = new T();
-				reader.ReadTo(element);
+				if (!reader.TryReadTo(element))
+				{
+					return false;
+				}
 				_array.Add(element);
 			}
+			return true;
 		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);

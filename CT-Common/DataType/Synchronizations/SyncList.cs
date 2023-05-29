@@ -12,7 +12,7 @@ namespace CT.Common.DataType.Synchronizations
 	/// 동기화 객체의 배열을 동기화하는 Collection 입니다.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class SyncList<T> : ISynchronizable, IList<T> where T : struct, IPacketSerializable, IEquatable<T>
+	public class SyncList<T> : IRemoteSynchronizable, IList<T> where T : struct, IPacketSerializable, IEquatable<T>
 	{
 		private struct CollectionOperationToken
 		{
@@ -177,18 +177,22 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public void DeserializeEveryProperty(IPacketReader reader)
+		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
 				T item = new();
-				item.Deserialize(reader);
+				if (!item.TryDeserialize(reader))
+				{
+					return false;
+				}
 				_list.Add(item);
 			}
+			return true;
 		}
 
-		public void DeserializeSyncReliable(IPacketReader reader)
+		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
@@ -202,7 +206,10 @@ namespace CT.Common.DataType.Synchronizations
 
 					case CollectionOperationType.Add:
 						T addData = new();
-						addData.Deserialize(reader);
+						if (!addData.TryDeserialize(reader))
+						{
+							return false;
+						}
 						_list.Add(addData);
 						break;
 
@@ -213,13 +220,19 @@ namespace CT.Common.DataType.Synchronizations
 
 					case CollectionOperationType.Change:
 						byte changeIndex = reader.ReadByte();
-						_list[i].Deserialize(reader);
+						if (!_list[i].TryDeserialize(reader))
+						{
+							return false;
+						}
 						break;
 
 					case CollectionOperationType.Insert:
 						byte insertIndex = reader.ReadByte();
 						T insertData = new();
-						insertData.Deserialize(reader);
+						if (!insertData.TryDeserialize(reader))
+						{
+							return false;
+						}
 						_list.Insert(insertIndex, insertData);
 						break;
 
@@ -228,6 +241,7 @@ namespace CT.Common.DataType.Synchronizations
 						break;
 				}
 			}
+			return true;
 		}
 
 #if NET
@@ -272,7 +286,7 @@ namespace CT.Common.DataType.Synchronizations
 		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
 		public bool IsDirtyUnreliable => throw _exception;
 		public void ClearDirtyUnreliable() => throw _exception;
-		public void DeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
+		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
 		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
 		private static void ignoreElement(IPacketReader reader)

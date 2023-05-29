@@ -15,7 +15,7 @@ namespace CT.Common.DataType
 		public NetEntityId(int value) => ID = (byte)value;
 		public NetEntityId(byte value) => ID = value;
 		public void Serialize(IPacketWriter writer) => writer.Put(ID);
-		public void Deserialize(IPacketReader reader) => ID = reader.ReadByte();
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadByte(out ID);
 		public static bool operator ==(NetEntityId lhs, NetEntityId rhs) => lhs.ID == rhs.ID;
 		public static bool operator !=(NetEntityId lhs, NetEntityId rhs) => lhs.ID != rhs.ID;
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);

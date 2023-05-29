@@ -50,9 +50,9 @@ namespace CT.Common.DataType
 			writer.Put(this);
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			Value = reader.ReadNetString();
+			return reader.TryReadNetString(out Value);
 		}
 
 		public override string ToString() => Value;
@@ -83,18 +83,6 @@ namespace CT.Common.DataType
 		public static bool operator !=(string lhs, NetString rhs) => lhs != rhs.Value;
 		public static bool operator ==(NetString lhs, NetString rhs) => lhs.Value == rhs.Value;
 		public static bool operator !=(NetString lhs, NetString rhs) => lhs.Value != rhs.Value;
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Serialize(in NetString value, IPacketWriter writer)
-		{
-			writer.Put(value);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Deserialize(ref NetString value, IPacketReader reader)
-		{
-			value = reader.ReadNetString();
-		}
 
 		public static void IgnoreStatic(IPacketReader reader)
 		{
@@ -147,9 +135,9 @@ namespace CT.Common.DataType
 			writer.Put(this);
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			Value = reader.ReadNetStringShort();
+			return reader.TryReadNetStringShort(out Value);
 		}
 
 		public override string ToString() => Value;
@@ -180,18 +168,6 @@ namespace CT.Common.DataType
 		public static bool operator !=(string lhs, NetStringShort rhs) => lhs != rhs.Value;
 		public static bool operator ==(NetStringShort lhs, NetStringShort rhs) => lhs.Value == rhs.Value;
 		public static bool operator !=(NetStringShort lhs, NetStringShort rhs) => lhs.Value != rhs.Value;
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Serialize(in NetStringShort value, IPacketWriter writer)
-		{
-			writer.Put(value);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void Deserialize(ref NetStringShort value, IPacketReader reader)
-		{
-			value = reader.ReadNetStringShort();
-		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 

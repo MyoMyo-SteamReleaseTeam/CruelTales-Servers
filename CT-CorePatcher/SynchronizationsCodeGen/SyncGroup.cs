@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
@@ -18,11 +17,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		private List<DirtyGroup> _dirtyGroups;
 		private SyncType _syncType;
+		private SyncDirection _direction;
 		private string _modifier;
 
-		public SerializeSyncGroup(List<BaseMemberToken> memberTokens, SyncType syncType, string modifier)
+		public SerializeSyncGroup(List<BaseMemberToken> memberTokens,
+								  SyncType syncType, SyncDirection direction, string modifier)
 		{
 			_syncType = syncType;
+			_direction = direction;
 			_modifier = modifier;
 			_dirtyGroups = new();
 
@@ -161,11 +163,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		private List<DirtyGroup> _dirtyGroups;
 		private SyncType _syncType;
+		private SyncDirection _direction;
 		private string _modifier;
 
-		public DeserializeSyncGroup(List<BaseMemberToken> memberTokens, SyncType syncType, string modifier)
+		public DeserializeSyncGroup(List<BaseMemberToken> memberTokens,
+									SyncType syncType, SyncDirection direction, string modifier)
 		{
 			_syncType = syncType;
+			_direction = direction;
 			_modifier = modifier;
 			_dirtyGroups = new();
 
@@ -189,10 +194,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string Remote_DeserializeSync()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.DeserializeFunctionDeclaration, _modifier, _syncType));
+			if (_direction == SyncDirection.FromMaster)
+			{
+				sb.Append(string.Format(SyncGroupFormat.MasterDeserializeFunctionDeclaration, _modifier, _syncType));
+			}
+			else
+			{
+				sb.Append(string.Format(SyncGroupFormat.RemoteDeserializeFunctionDeclaration, _modifier, _syncType));
+			}
 
 			if (_dirtyGroups.Count == 0)
-				return sb.AppendLine(" { }").ToString();
+				return sb.AppendLine(SyncGroupFormat.EmptyDeserializeImplementation).ToString();
 
 			string content;
 			if (_dirtyGroups.Count == 1)
@@ -213,6 +225,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine("");
 			sb.AppendLine("{");
 			sb.AppendLine(content);
+			sb.AppendLine("\treturn true;");
 			sb.AppendLine("}");
 			return sb.ToString();
 		}

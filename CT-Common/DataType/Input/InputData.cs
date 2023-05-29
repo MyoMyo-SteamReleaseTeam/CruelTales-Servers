@@ -25,7 +25,14 @@ namespace CT.Common.DataType.Input
 		public Vector2 GetDirectionVector2() => Quantizer.RadByteToVec2(Direction);
 		public int SerializeSize => sizeof(byte);
 		public void Serialize(IPacketWriter writer) => writer.Put(Direction);
-		public void Deserialize(IPacketReader reader) => Direction = reader.ReadByte();
+		public bool TryDeserialize(IPacketReader reader)
+		{
+			if (!reader.TryReadByte(out var value))
+				return false;
+
+			Direction = value;
+			return true;
+		}
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 	}
@@ -43,10 +50,18 @@ namespace CT.Common.DataType.Input
 			writer.Put(Direction);
 		}
 
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			MovementType = reader.ReadMovementType();
-			Direction = reader.Read<ByteDirection>();
+			if (!reader.TryReadMovementType(out var moveValue) ||
+				!reader.TryRead<ByteDirection>(out var direction))
+			{
+				return false;
+			}
+
+			MovementType = moveValue;
+			Direction = direction;
+
+			return true;
 		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
@@ -73,9 +88,16 @@ namespace CT.Common.DataType.Input
 			writer.Put((byte)movementType);
 		}
 
-		public static MovementType ReadMovementType(this IPacketReader reader)
+		public static bool TryReadMovementType(this IPacketReader reader, out MovementType value)
 		{
-			return (MovementType)reader.ReadByte();
+			if (!reader.TryReadByte(out var v))
+			{
+				value = default;
+				return false;
+			}
+
+			value = (MovementType)v;
+			return true;
 		}
 	}
 }

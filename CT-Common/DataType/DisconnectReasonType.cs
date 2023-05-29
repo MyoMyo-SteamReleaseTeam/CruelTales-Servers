@@ -41,6 +41,7 @@ namespace CT.Common.DataType
 		// Reject from server
 		Reject_ThereIsNoSuchGameInstance,
 		Reject_GameInstanceIsAlreadyFull,
+		Reject_PermissionDenied,
 	}
 
 	public static class DisconnectReasonTypeExtension

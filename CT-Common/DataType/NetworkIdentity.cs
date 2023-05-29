@@ -15,21 +15,10 @@ namespace CT.Common.DataType
 		public NetworkIdentity(int value) => Id = (byte)value;
 		public NetworkIdentity(byte value) => Id = value;
 		public NetworkIdentity(NetworkIdentity value) => this.Id = value.Id;
+		public NetworkIdentity(IPacketReader reader) => Id = reader.ReadByte();
 
-		public NetworkIdentity(IPacketReader reader)
-		{
-			Id = reader.ReadByte();
-		}
-
-		public void Serialize(IPacketWriter writer)
-		{
-			writer.Put(Id);
-		}
-
-		public void Deserialize(IPacketReader reader)
-		{
-			Id = reader.ReadByte();
-		}
+		public void Serialize(IPacketWriter writer) => writer.Put(Id);
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadByte(out Id);
 
 		public static implicit operator byte(NetworkIdentity value) => value.Id;
 		public static explicit operator NetworkIdentity(byte value) => new NetworkIdentity(value);

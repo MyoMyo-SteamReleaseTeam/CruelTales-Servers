@@ -11,7 +11,7 @@ namespace CT.Common.DataType
 
 		public UserToken(ulong token) => Token = token;
 		public void Serialize(IPacketWriter writer) => writer.Put(Token);
-		public void Deserialize(IPacketReader reader) => Token = reader.ReadUInt64();
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadUInt64(out Token);
 		public bool IsValid() => Token > 0;
 		public static bool operator ==(UserToken lhs, UserToken rhs) => lhs.Token == rhs.Token;
 		public static bool operator !=(UserToken lhs, UserToken rhs) => lhs.Token != rhs.Token;

@@ -21,7 +21,7 @@ namespace CT.Common.Serialization
 
 		public static bool IsLittleEndian() => BitConverter.IsLittleEndian;
 
-		private static readonly UTF8Encoding _utf8Encoding = new UTF8Encoding();
+		public static readonly UTF8Encoding Utf8Encoding = new UTF8Encoding();
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void WriteBool(in ArraySegment<byte> dest, int offset, bool data)
@@ -121,7 +121,7 @@ namespace CT.Common.Serialization
 		public static int WriteString(in ArraySegment<byte> dest, int offset, string data)
 		{
 			Debug.Assert(dest.Array != null);
-			int byteSize = _utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset + 2);
+			int byteSize = Utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset + 2);
 			WriteUInt16(dest, offset, (ushort)byteSize);
 			return byteSize + 2;
 		}
@@ -140,7 +140,7 @@ namespace CT.Common.Serialization
 		public static int WriteStringUnsafe(in ArraySegment<byte> dest, int offset, string data)
 		{
 			Debug.Assert(dest.Array != null);
-			return _utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset);
+			return Utf8Encoding.GetBytes(data, 0, data.Length, dest.Array, dest.Offset + offset);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -226,7 +226,7 @@ namespace CT.Common.Serialization
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static unsafe float ReadFloat(in ArraySegment<byte> src, int offset)
+		public static unsafe float ReadSingle(in ArraySegment<byte> src, int offset)
 		{
 			fixed (byte* ptr = src.Array)
 			{
@@ -249,7 +249,7 @@ namespace CT.Common.Serialization
 			Debug.Assert(src.Array != null);
 			var byteLength = ReadUInt16(src, offset);
 			read = byteLength + 2;
-			return _utf8Encoding.GetString(src.Array, src.Offset + offset + 2, byteLength);
+			return Utf8Encoding.GetString(src.Array, src.Offset + offset + 2, byteLength);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -281,7 +281,7 @@ namespace CT.Common.Serialization
 		public static string ReadStringByLength(in ArraySegment<byte> src, int offset, int length)
 		{
 			Debug.Assert(src.Array != null);
-			return _utf8Encoding.GetString(src.Array, src.Offset + offset, length);
+			return Utf8Encoding.GetString(src.Array, src.Offset + offset, length);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

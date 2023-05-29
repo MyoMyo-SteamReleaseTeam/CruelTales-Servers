@@ -40,22 +40,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer) { }
-		public override void DeserializeSyncReliable(IPacketReader reader)
+		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (_dirtyReliable_0[0])
 			{
-				_r = reader.ReadSingle();
+				if (!reader.TryReadSingle(out _r)) return false;
 				OnRChanged?.Invoke(_r);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				_g = reader.ReadSingle();
+				if (!reader.TryReadSingle(out _g)) return false;
 				OnGChanged?.Invoke(_g);
 			}
 			if (_dirtyReliable_0[2])
 			{
-				_b = reader.ReadSingle();
+				if (!reader.TryReadSingle(out _b)) return false;
 				OnBChanged?.Invoke(_b);
 			}
 			if (_dirtyReliable_0[3])
@@ -63,20 +63,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					long someMessage = reader.ReadInt64();
+					if (!reader.TryReadInt64(out long someMessage)) return false;
 					TestRPC(someMessage);
 				}
 			}
+			return true;
 		}
-		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
-		public override void DeserializeEveryProperty(IPacketReader reader)
+		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
+		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			_r = reader.ReadSingle();
+			if (!reader.TryReadSingle(out _r)) return false;
 			OnRChanged?.Invoke(_r);
-			_g = reader.ReadSingle();
+			if (!reader.TryReadSingle(out _g)) return false;
 			OnGChanged?.Invoke(_g);
-			_b = reader.ReadSingle();
+			if (!reader.TryReadSingle(out _b)) return false;
 			OnBChanged?.Invoke(_b);
+			return true;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{

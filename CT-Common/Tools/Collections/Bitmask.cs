@@ -81,7 +81,16 @@ namespace CT.Common.Tools.Collections
 
 		public void Serialize(IPacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(IPacketReader reader) => Mask = reader.ReadByte();
+		public bool TryDeserialize(IPacketReader reader)
+		{
+			if (reader.TryReadByte(out var value))
+			{
+				Mask = value;
+				return true;
+			}
+
+			return false;
+		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 
@@ -166,7 +175,16 @@ namespace CT.Common.Tools.Collections
 
 		public void Serialize(IPacketWriter writer) => writer.Put(Mask);
 
-		public void Deserialize(IPacketReader reader) => Mask = reader.ReadUInt32();
+		public bool TryDeserialize(IPacketReader reader)
+		{
+			if (reader.TryReadUInt32(out var value))
+			{
+				Mask = value;
+				return true;
+			}
+
+			return false;
+		}
 
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 

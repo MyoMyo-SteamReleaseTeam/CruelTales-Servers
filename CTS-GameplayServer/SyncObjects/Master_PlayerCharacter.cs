@@ -14,6 +14,7 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
+using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.SyncObjects
@@ -97,9 +98,8 @@ namespace CTS.Instance.SyncObjects
 			_username.Serialize(writer);
 			writer.Put(_costume);
 		}
-		public override void DeserializeSyncReliable(IPacketReader reader) { }
-		public override void DeserializeSyncUnreliable(IPacketReader reader) { }
-		public override void DeserializeEveryProperty(IPacketReader reader) { }
+		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

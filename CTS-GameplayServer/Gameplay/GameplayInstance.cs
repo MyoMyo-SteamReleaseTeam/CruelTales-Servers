@@ -12,11 +12,13 @@ namespace CTS.Instance.Gameplay
 	[StructLayout(LayoutKind.Sequential)]
 	public struct SynchronizeJob
 	{
+		public UserId Sender;
 		public SyncOperation Operation;
 		public IPacketReader SyncDataReader;
 
-		public SynchronizeJob(SyncOperation operation, IPacketReader reader)
+		public SynchronizeJob(UserId sender, SyncOperation operation, IPacketReader reader)
 		{
+			Sender = sender;
 			Operation = operation;
 			SyncDataReader = reader;
 		}
@@ -110,11 +112,25 @@ namespace CTS.Instance.Gameplay
 			userSession.Disconnect(reason);
 		}
 
+		public void DisconnectPlayer(UserId userId, DisconnectReasonType reason)
+		{
+			if (SessionHandler.TryGetUserSession(userId, out var userSession))
+			{
+				userSession.Disconnect(reason);
+			}
+		}
+
 		#region Synchronize
 
-		public void OnUserTrySync(SyncOperation syncType, IPacketReader packetReader)
+		public bool TrySync(UserId sender, SyncOperation syncType, IPacketReader packetReader)
 		{
-			_syncJobQueue.Push(new SynchronizeJob(syncType, packetReader));
+			if (!SessionHandler.IsConnected(sender))
+			{
+				return false;
+			}
+
+			_syncJobQueue.Push(new SynchronizeJob(sender, syncType, packetReader));
+			return true;
 		}
 
 		private void onSyncJobExecute(SynchronizeJob syncJob)
@@ -122,11 +138,17 @@ namespace CTS.Instance.Gameplay
 			switch (syncJob.Operation)
 			{
 				case SyncOperation.Reliable:
-					WorldManager.OnDeserializeSyncReliable(syncJob.SyncDataReader);
+					if (!WorldManager.OnDeserializeSyncReliable(syncJob.Sender, syncJob.SyncDataReader))
+					{
+						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
+					}
 					break;
 
 				case SyncOperation.Unreliable:
-					WorldManager.OnDeserializeSyncUnreliable(syncJob.SyncDataReader);
+					if (!WorldManager.OnDeserializeSyncUnreliable(syncJob.Sender, syncJob.SyncDataReader))
+					{
+						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
+					}
 					break;
 
 				case SyncOperation.Creation:

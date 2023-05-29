@@ -14,10 +14,10 @@ namespace CT.Common.Serialization
 		public bool CanRead<T>(T serializeObject) where T : IPacketSerializable;
 		public void ResetReader();
 		public void SetReadPosition(int position);
-		public void ReadTo<T>(T serializeObject) where T : IPacketSerializable;
+		public bool TryReadTo<T>(in T serializeObject) where T : IPacketSerializable;
 		public void IgnoreAll();
 		public void Ignore(int count);
-		public T Read<T>() where T : IPacketSerializable, new();
+		public bool TryRead<T>(out T value) where T : IPacketSerializable, new();
 		public bool PeekBool();
 		public byte PeekByte();
 		public sbyte PeekSByte();
@@ -44,5 +44,29 @@ namespace CT.Common.Serialization
 		public NetStringShort ReadNetStringShort();
 		public void ReadBytesCopy(ArraySegment<byte> dest, int offset);
 		public byte[] ReadBytes();
+		public bool TryPeekBool(out bool value);
+		public bool TryPeekByte(out byte value);
+		public bool TryPeekSByte(out sbyte value);
+		public bool TryPeekInt16(out short value);
+		public bool TryPeekUInt16(out ushort value);
+		public bool TryPeekInt32(out int value);
+		public bool TryPeekUInt32(out uint value);
+		public bool TryPeekInt64(out long value);
+		public bool TryPeekUInt64(out ulong value);
+		public bool TryPeekSingle(out float value);
+		public bool TryPeekDouble(out double value);
+		public bool TryReadBool(out bool value);
+		public bool TryReadByte(out byte value);
+		public bool TryReadSByte(out sbyte value);
+		public bool TryReadInt16(out short value);
+		public bool TryReadUInt16(out ushort value);
+		public bool TryReadInt32(out int value);
+		public bool TryReadUInt32(out uint value);
+		public bool TryReadInt64(out long value);
+		public bool TryReadUInt64(out ulong value);
+		public bool TryReadSingle(out float value);
+		public bool TryReadDouble(out double value);
+		public bool TryReadNetString(out string value);
+		public bool TryReadNetStringShort(out string value);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using CT.Common.DataType;
 using CT.Common.Serialization;
@@ -61,6 +62,16 @@ namespace CTS.Instance.Gameplay
 			UserList = new List<UserSession>(MaxUser);
 			_userById = new BidirectionalMap<UserId, UserSession>(MaxUser);
 			_waitingTable = new BidirectionalMap<UserId, UserSession>(MaxUser);
+		}
+
+		public bool TryGetUserSession(UserId id, [MaybeNullWhen(false)] out UserSession session)
+		{
+			return _userById.TryGetValue(id, out session);
+		}
+
+		public bool IsConnected(UserId id)
+		{
+			return _userById.Contains(id);
 		}
 
 		public void Clear() => _jobQueue.Clear();
