@@ -7,7 +7,8 @@ namespace CT.Benchmark
 		static void Main(string[] args)
 		{
 			//BenchmarkRunner.Run<StringSerializationBenchmark>();
-			BenchmarkRunner.Run<LogBenchmark>();
+			//BenchmarkRunner.Run<LogBenchmark>();
+			ActionGC.Test();
 		}
 	}
 }
