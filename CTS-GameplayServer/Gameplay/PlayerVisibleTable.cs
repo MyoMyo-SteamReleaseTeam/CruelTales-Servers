@@ -6,14 +6,23 @@ namespace CTS.Instance.Gameplay
 {
 	public class PlayerVisibleTable
 	{
+		private NetworkPlayer? _networkPlayer { get; set; }
+		public UserId UserId => _networkPlayer == null ? new UserId(0) : _networkPlayer.UserId;
+
 		/// <summary>
-		/// 곧바로 생성된 오브젝트의 집합입니다.
+		/// 가시성 내에서 생성된 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
 		public Dictionary<NetworkIdentity, MasterNetworkObject> SpawnObjects { get; private set; }
 
 		/// <summary>
-		/// 재등장하는 오브젝트의 집합입니다.
+		/// 가시성 내에서 삭제된 오브젝트의 집합입니다.
+		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
+		/// </summary>
+		public Dictionary<NetworkIdentity, MasterNetworkObject> DespawnObjects { get; private set; }
+
+		/// <summary>
+		/// 가시성에 진입한 오브젝트의 집합입니다.
 		/// 최초 1회 생성 데이터를 송신한 뒤 추적 객체로 전환됩니다.
 		/// </summary>
 		public Dictionary<NetworkIdentity, MasterNetworkObject> EnterObjects { get; private set; }
@@ -25,10 +34,10 @@ namespace CTS.Instance.Gameplay
 		public Dictionary<NetworkIdentity, MasterNetworkObject> TraceObjects { get; private set; }
 
 		/// <summary>
-		/// 삭제된 오브젝트의 집합입니다.
+		/// 가시성에서 벗어난 오브젝트의 집합입니다.
 		/// 삭제후 1회 삭제 데이터를 송신한 뒤 집합에서 제거됩니다.
 		/// </summary>
-		public Dictionary<NetworkIdentity, MasterNetworkObject> DespawnObjects { get; private set; }
+		public Dictionary<NetworkIdentity, MasterNetworkObject> LeaveObjects { get; private set; }
 
 		/// <summary>
 		/// 거리에 따른 가시성 영향을 받지 않는 생성된 오브젝트의 집합입니다.
@@ -51,21 +60,29 @@ namespace CTS.Instance.Gameplay
 		public PlayerVisibleTable(InstanceInitializeOption option)
 		{
 			SpawnObjects = new(option.SpawnObjectCapacity);
+			DespawnObjects = new(option.DespawnObjectCapacity);
 			EnterObjects = new(option.EnterObjectCapacity);
 			TraceObjects = new(option.TraceObjectCapacity);
-			DespawnObjects = new(option.DespawnObjectCapacity);
+			LeaveObjects = new(option.LeaveObjectCapacity);
 
 			GlobalSpawnObjects = new(option.GlobalSpawnObjectCapacity);
 			GlobalTraceObjects = new(option.GlobalTraceObjectCapacity);
 			GlobalDespawnObjects = new(option.GlobalDespawnObjectCapacity);
 		}
 
+		public void Initialize(NetworkPlayer player)
+		{
+			_networkPlayer = player;
+		}
+
 		public void Clear()
 		{
+			_networkPlayer = null;
+
 			SpawnObjects.Clear();
 			EnterObjects.Clear();
 			TraceObjects.Clear();
-			DespawnObjects.Clear();
+			LeaveObjects.Clear();
 
 			GlobalSpawnObjects.Clear();
 			GlobalTraceObjects.Clear();
@@ -74,6 +91,7 @@ namespace CTS.Instance.Gameplay
 
 		public void TransitionVisibilityCycle()
 		{
+			// Spawn to Trace
 			if (SpawnObjects.Count != 0)
 			{
 				foreach (var kv in SpawnObjects)
@@ -82,6 +100,8 @@ namespace CTS.Instance.Gameplay
 				}
 				SpawnObjects.Clear();
 			}
+
+			// Enter to Trace
 			if (EnterObjects.Count != 0)
 			{
 				foreach (var kv in EnterObjects)
@@ -90,13 +110,17 @@ namespace CTS.Instance.Gameplay
 				}
 				EnterObjects.Clear();
 			}
+
+			// Clear Leave, Desapwn
+			LeaveObjects.Clear();
 			DespawnObjects.Clear();
 
+			// Spawn to Trace
 			if (GlobalSpawnObjects.Count != 0)
 			{
 				foreach (var kv in GlobalSpawnObjects)
 				{
-					TraceObjects.Add(kv.Key, kv.Value);
+					GlobalTraceObjects.Add(kv.Key, kv.Value);
 				}
 				GlobalSpawnObjects.Clear();
 			}

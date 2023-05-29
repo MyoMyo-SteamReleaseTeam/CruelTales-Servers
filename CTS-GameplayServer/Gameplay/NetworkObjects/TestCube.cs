@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Numerics;
+using CT.Packets;
 using CTS.Instance.Synchronizations;
+using log4net.Util;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -13,39 +16,54 @@ namespace CTS.Instance.SyncObjects
 		private static Random _random = new Random();
 		private float _radiusFactor = 0.0f;
 
-		private Vector3 _originPosition;
+		private float _showTime;
+		private float _lifeTime;
 
 		public override void OnCreated()
 		{
-			_originPosition = Transform.Position;
+			//Console.WriteLine($"{Identity}:{Transform} OnCREATED");
+
 			_radiusFactor = (float)_random.NextDouble();
+			_lifeTime = (float)(2 + _random.NextDouble() * 3);
 
 			R = (float)_random.NextDouble();
 			G = (float)_random.NextDouble();
 			B = (float)_random.NextDouble();
 		}
 
-		private float _showTime;
-
 		public override void OnUpdate(float deltaTime)
 		{
 			float x = MathF.Cos(_radiusFactor);
 			float z = MathF.Sin(_radiusFactor);
-			Transform.SetPosition(_originPosition + new Vector3(x, 0, z) * 7);
+			Transform.SetPosition(Transform.Position + new Vector3(x, 0, z));
+			_radiusFactor += 0.128f * 1f;
+			//Console.WriteLine(Identity.ToString() + Transform.ToString());
 
-			_radiusFactor += 0.128f;
-			if (_radiusFactor > MathF.PI * 2)
+			_lifeTime -= deltaTime;
+			if (_lifeTime < 0)
 			{
-				_radiusFactor = 0;
+				this.Destroy();
 			}
 
 			_showTime -= deltaTime;
 			if (_showTime < 0)
 			{
 				_showTime += 0.5f;
-				//Console.WriteLine(Transform);
 				TestRPC(119);
 			}
+		}
+
+		public override void OnDestroyed()
+		{
+			_pool?.Remove(this);
+			_pool = null;
+		}
+
+		private IList? _pool;
+
+		public void BindPool(IList pool)
+		{
+			_pool = pool;
 		}
 	}
 }

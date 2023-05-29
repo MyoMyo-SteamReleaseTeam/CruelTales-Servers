@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Text;
 using CT.Common.DataType;
-using CT.Common.Gameplay;
 using CT.Common.Tools;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
@@ -23,18 +23,23 @@ namespace CTS.Instance.Gameplay
 		private WorldManager _worldManager;
 
 		// World cell sizes
-		public const float INVERSE_CEll_SIZE = 1.0f / 8.0f;
+		//public const float WORLD_MAX_WIDTH = 256.0f;
+		//public const float WORLD_MAX_HEIGHT = 256.0f;
+		public const float WORLD_MAX_WIDTH = 128.0f;
+		public const float WORLD_MAX_HEIGHT = 128.0f;
 
-		public const float ORIGIN_OFFSET_X = 128.0f;
-		public const float ORIGIN_OFFSET_Z = 128.0f;
+		public const float CELL_SIZE = 8.0f;
+		public const float INVERSE_CEll_SIZE = 1.0f / CELL_SIZE;
 
-		public const int CELL_WIDTH = 32;
-		public const int CELL_HEIGHT = 32;
-		public const int CELL_HALF_WIDTH = CELL_WIDTH / 2;
-		public const int CELL_HALF_HEIGHT = CELL_HEIGHT / 2;
+		public const float ORIGIN_OFFSET_X = WORLD_MAX_WIDTH / 2; //128.0f;
+		public const float ORIGIN_OFFSET_Z = WORLD_MAX_HEIGHT / 2; //128.0f;
+
+		public const int CELL_WIDTH = (int)(WORLD_MAX_WIDTH / CELL_SIZE); // 32;
+		public const int CELL_HEIGHT = (int)(WORLD_MAX_HEIGHT / CELL_SIZE); // 32;
 
 		// Partitioned visibility set
 		private List<NetworkIdentity> _spawnList;
+		private List<MasterNetworkObject> _despawnList;
 		private Dictionary<NetworkIdentity, MasterNetworkObject>[,] _networkObjectByCell;
 		private Dictionary<NetworkIdentity, MasterNetworkObject> _nullSet = new();
 
@@ -50,6 +55,7 @@ namespace CTS.Instance.Gameplay
 			_worldManager = worldManager;
 
 			_spawnList = new(option.VisibleSpawnCapacity);
+			_despawnList = new(option.VisibleDespawnCapacity);
 			_networkObjectByCell = new Dictionary<NetworkIdentity, MasterNetworkObject>[CELL_HEIGHT, CELL_WIDTH];
 			for (int z = 0; z < CELL_HEIGHT; z++)
 			{
@@ -64,27 +70,30 @@ namespace CTS.Instance.Gameplay
 			_playerVisibleBySession = new(option.SystemMaxUser);
 		}
 
-		public Dictionary<NetworkIdentity, MasterNetworkObject> GetCell(Vector3 pos)
+		[Obsolete("가능하면 이미 계산된 Cell 좌표를 사용해야합니다.")]
+		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(Vector3 pos)
 		{
-			return GetCell(GetWorldCell(pos));
+			return getCell(GetWorldCell(pos));
 		}
 
-		public Dictionary<NetworkIdentity, MasterNetworkObject> GetCell(Vector2Int internalCell)
+		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(Vector2Int internalCell)
 		{
-			if (internalCell.Y < 0 || internalCell.Y > CELL_HEIGHT ||
-				internalCell.X < 0 || internalCell.X > CELL_WIDTH)
+			if (internalCell.Y < 0 || internalCell.Y >= CELL_HEIGHT ||
+				internalCell.X < 0 || internalCell.X >= CELL_WIDTH)
 			{
+				Debug.Assert(false);
 				return _nullSet;
 			}
 
 			return _networkObjectByCell[internalCell.Y, internalCell.X];
 		}
 
-		public Dictionary<NetworkIdentity, MasterNetworkObject> GetCell(int x, int z)
+		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(int x, int z)
 		{
-			if (z < 0 || z > CELL_HEIGHT ||
-				x < 0 || x > CELL_WIDTH)
+			if (z < 0 || z >= CELL_HEIGHT ||
+				x < 0 || x >= CELL_WIDTH)
 			{
+				Debug.Assert(false);
 				return _nullSet;
 			}
 
@@ -110,8 +119,39 @@ namespace CTS.Instance.Gameplay
 		}
 
 		private Dictionary<NetworkIdentity, MasterNetworkObject> _outObjectSet = new(16);
+
+		string DEBUG_output = "";
+
 		public void UpdateVisibilityAndSendData()
 		{
+#if DEBUG
+			{
+				StringBuilder sb = new StringBuilder(1024);
+				sb.Append($"Cur Objects : ");
+
+				for (int y = 0; y < CELL_HEIGHT; y++)
+				{
+					for (int x = 0; x < CELL_WIDTH; x++)
+					{
+						foreach (var kv in _networkObjectByCell[y, x])
+						{
+							sb.Append(kv.Value.Identity);
+							sb.Append(",");
+						}
+					}
+				}
+
+				string output = sb.ToString();
+				if (DEBUG_output != output)
+				{
+					DEBUG_output = output;
+					Console.WriteLine(output);
+				}
+			}
+#endif
+
+			// TODO : 구문 최적화 필요
+			// Check visibility by player
 			foreach (var kv in _playerVisibleBySession)
 			{
 				NetworkPlayer player = kv.Key;
@@ -131,12 +171,15 @@ namespace CTS.Instance.Gameplay
 				Vector2Int inboundCellRT = GetWorldCell(inboundRT);
 
 				// Add spawn object
-				int spawnCount = _spawnList.Count;
-				for (int i = 0; i < spawnCount; i++)
+				int sCount = _spawnList.Count;
+				for (int i = 0; i < sCount; i++)
 				{
 					var spawnObjectId = _spawnList[i];
 					if (!_worldManager.TryGetNetworkObject(spawnObjectId, out var spawnObject))
+					{
+						Debug.Assert(false);
 						continue;
+					}
 
 					Vector3 objPos = spawnObject.Transform.Position;
 					if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
@@ -144,17 +187,18 @@ namespace CTS.Instance.Gameplay
 					{
 						if (spawnObject.IsValidVisibilityAuthority(player))
 						{
-							viewTable.SpawnObjects.TryAdd(spawnObject.Identity, spawnObject);
+							bool isAdded = viewTable.SpawnObjects.TryAdd(spawnObject.Identity, spawnObject);
+							Debug.Assert(isAdded);
 						}
 					}
 				}
 
-				// Add respawn object
+				// Add enter object
 				for (int cz = inboundCellLB.Y; cz <= inboundCellRT.Y; cz++)
 				{
 					for (int cx = inboundCellLB.X; cx <= inboundCellRT.X; cx++)
 					{
-						var curCell = GetCell(cx, cz);
+						var curCell = getCell(cx, cz);
 						foreach (var netObj in curCell.Values)
 						{
 							Vector3 objPos = netObj.Transform.Position;
@@ -164,27 +208,47 @@ namespace CTS.Instance.Gameplay
 								if (viewTable.TraceObjects.ContainsKey(netObj.Identity))
 								{
 									continue;
-								} 
-
-								// TODO : 초기 생성 객체는 셀 타일에 등록되지 않도록 관리되어야함
-								// 임시 코드
-								if (viewTable.SpawnObjects.ContainsKey(netObj.Identity))
-								{
-									//Debug.Assert(false);
-									continue;
 								}
-								// 임시 코드
+
+								Debug.Assert(!viewTable.SpawnObjects.ContainsKey(netObj.Identity));
 
 								if (netObj.IsValidVisibilityAuthority(player))
 								{
-									viewTable.EnterObjects.TryAdd(netObj.Identity, netObj);
+									bool isAdded = viewTable.EnterObjects.TryAdd(netObj.Identity, netObj);
+									Debug.Assert(isAdded);
 								}
 							}
 						}
 					}
 				}
 
-				// Check if it's out of the view
+				// Despawn : Check if it's despawn object
+				int dCount = _despawnList.Count;
+				for (int i = 0; i < dCount; i++)
+				{
+					var despawnObj = _despawnList[i];
+					var despawnId = despawnObj.Identity;
+					if (viewTable.TraceObjects.Remove(despawnId))
+					{
+						viewTable.DespawnObjects.Add(despawnId, despawnObj);
+					}
+					else if (viewTable.EnterObjects.Remove(despawnId))
+					{
+						// It was destroyed and entered at the same time!
+					}
+					else if (viewTable.LeaveObjects.Remove(despawnId))
+					{
+						// It was destroyed and leave at the same time!
+						Debug.Assert(false);
+					}
+					else if (viewTable.SpawnObjects.Remove(despawnId))
+					{
+						// or, it was spawned and immediately despawned
+						Debug.Assert(false);
+					}
+				}
+
+				// Leave : Check if it's out of the view
 				_outObjectSet.Clear();
 				foreach (var netObj in viewTable.TraceObjects.Values)
 				{
@@ -192,29 +256,64 @@ namespace CTS.Instance.Gameplay
 					if (objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
 						objPos.Z < outboundLB.Y || objPos.Z > outboundRT.Y)
 					{
-						_outObjectSet.TryAdd(netObj.Identity, netObj);
+						bool isAdded = _outObjectSet.TryAdd(netObj.Identity, netObj);
+						Debug.Assert(isAdded);
 					}
 				}
 
 				foreach (var outObject in _outObjectSet.Values)
 				{
-					viewTable.TraceObjects.Remove(outObject.Identity);
-					viewTable.DespawnObjects.TryAdd(outObject.Identity, outObject);
+					Debug.Assert(!viewTable.DespawnObjects.ContainsKey(outObject.Identity));
+					Debug.Assert(!viewTable.LeaveObjects.ContainsKey(outObject.Identity));
+
+					bool isTraceRemoved = viewTable.TraceObjects.Remove(outObject.Identity);
+					if (isTraceRemoved)
+					{
+						bool isAdded = viewTable.LeaveObjects.TryAdd(outObject.Identity, outObject);
+						Debug.Assert(isAdded);
+					}
+
+					// Object was destoryed before leave
+					Debug.Assert(isTraceRemoved);
 				}
 			}
 
-			// Add first spawn object to world partition
-			int transitionCount = _spawnList.Count;
-			for (int i = 0; i < transitionCount; i++)
+			// Add spawn object to world partition
+			int spawnCount = _spawnList.Count;
+			for (int i = 0; i < spawnCount; i++)
 			{
 				var transitId = _spawnList[i];
 				if (!_worldManager.TryGetNetworkObject(transitId, out var netObj))
+				{
+					Debug.Assert(false);
 					continue;
-				GetCell(netObj.Transform.Position).TryAdd(netObj.Identity, netObj);
+				}
+				var curCell = getCell(netObj.CurrentCellPos);
+				bool isAdded = curCell.TryAdd(netObj.Identity, netObj);
+				Debug.Assert(isAdded);
 			}
+			_spawnList.Clear();
+
+			// Remove despawn object from world partition
+			int despawnCount = _despawnList.Count;
+			for (int i = 0; i < despawnCount; i++)
+			{
+				var transitId = _despawnList[i];
+				if (!_worldManager.TryGetNetworkObject(transitId.Identity, out var netObj))
+				{
+					Debug.Assert(false);
+					continue;
+				}
+				var curCell = getCell(netObj.CurrentCellPos);
+				bool isRemoved = curCell.Remove(netObj.Identity);
+				Debug.Assert(isRemoved);
+			}
+			_despawnList.Clear();
 
 			// Transition visibility cycle
-			// Spawn -> Trace | Despawn -> delete
+			// Spawn, Enter -> Trace
+			// Trace -> Trace
+			// Despawn, Leave -> delete
 			foreach (var kv in _playerVisibleBySession)
 			{
 				UserSession? session = kv.Key.Session;
@@ -225,17 +324,16 @@ namespace CTS.Instance.Gameplay
 				}
 				visibleTable.TransitionVisibilityCycle();
 			}
-
-			// Reset spawn objects
-			_spawnList.Clear();
 		}
 
 		public void OnCellChanged(MasterNetworkObject netObj, Vector2Int previous, Vector2Int current)
 		{
-			var previousCell = GetCell(previous);
-			previousCell.Remove(netObj.Identity);
+			var previousCell = getCell(previous);
+			bool isRemoved = previousCell.Remove(netObj.Identity);
+			Debug.Assert(isRemoved);
 
-			var currentCell = GetCell(current);
+			var currentCell = getCell(current);
+			Debug.Assert(!currentCell.ContainsKey(netObj.Identity));
 			currentCell.Add(netObj.Identity, netObj);
 		}
 
@@ -251,7 +349,10 @@ namespace CTS.Instance.Gameplay
 			{
 				foreach (var kv in _playerVisibleBySession)
 				{
-					kv.Value.SpawnObjects.Add(id, netObj);
+					if (netObj.IsValidVisibilityAuthority(kv.Key))
+					{
+						kv.Value.GlobalSpawnObjects.Add(id, netObj);
+					}
 				}
 			}
 		}
@@ -262,16 +363,23 @@ namespace CTS.Instance.Gameplay
 
 			if (netObj.Visibility == VisibilityType.View)
 			{
-				if (!GetCell(netObj.Transform.Position).Remove(id))
-				{
-					_spawnList.Remove(id);
-				}
+				_despawnList.Add(netObj);
 			}
 			else if (netObj.Visibility == VisibilityType.Global)
 			{
 				foreach (var kv in _playerVisibleBySession)
 				{
-					kv.Value.DespawnObjects.Add(id, netObj);
+					var visibleTable = kv.Value;
+
+					if (visibleTable.GlobalTraceObjects.Remove(id))
+					{
+						visibleTable.GlobalDespawnObjects.Add(id, netObj);
+					}
+					else
+					{
+						// It's was spawning and immediately despawning
+						visibleTable.GlobalSpawnObjects.Remove(id);
+					}
 				}
 			}
 		}
@@ -279,6 +387,7 @@ namespace CTS.Instance.Gameplay
 		public void CreatePlayerVisibleTable(NetworkPlayer player)
 		{
 			var playerVisibleTable = _playerVisibleTablePool.Get();
+			playerVisibleTable.Initialize(player);
 			_playerVisibleBySession.Add(player, playerVisibleTable);
 		}
 

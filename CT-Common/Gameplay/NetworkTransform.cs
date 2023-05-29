@@ -11,15 +11,15 @@ using CT.Common.Serialization;
 
 namespace CT.Common.Gameplay
 {
-	public struct MovementJob
-	{
-		public Vector3 Position;
-		public Vector3 Velocity;
-		public bool IsTeleported;
-	}
+	//public struct MovementJob
+	//{
+	//	public Vector3 Position;
+	//	public Vector3 Velocity;
+	//	public bool IsTeleported;
+	//}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public class NetworkTransform : IUpdatable
+	public class NetworkTransform
 	{
 		private Vector3 _position;
 		public Vector3 Position
@@ -47,62 +47,78 @@ namespace CT.Common.Gameplay
 		public bool IsDirty { get; private set; }
 
 		public event Action<bool, Vector3, Vector3>? OnChanged;
-		private Queue<MovementJob> _movementJob = new(8);
+		//private Queue<MovementJob> _movementJob = new(8);
 
 		public NetworkTransform()
 		{
 #if NET
-			Position = Vector3.Zero;
-			Velocity = Vector3.Zero;
+			_position = Vector3.Zero;
+			_velocity = Vector3.Zero;
 #else
-			Position = Vector3.zero;
-			Velocity = Vector3.zero;
+			_position = Vector3.zero;
+			_velocity = Vector3.zero;
 #endif
 		}
 
-		public void FixedUpdate(float deltaTime)
+		public void Update(float deltaTime)
 		{
-			while (_movementJob.TryDequeue(out var movementJob))
-			{
-				Position = movementJob.Position;
-				Velocity = movementJob.Velocity;
-				_isTeleported |= movementJob.IsTeleported;
-			}
+			//while (_movementJob.TryDequeue(out var movementJob))
+			//{
+			//	Position = movementJob.Position;
+			//	Velocity = movementJob.Velocity;
+			//	_isTeleported |= movementJob.IsTeleported;
+			//}
 
 			IsDirty |= _isTeleported;
 			//_previousPosition = Position;
-			Position += Velocity * deltaTime;
+			_position += _velocity * deltaTime;
 			//IsDirty = Position != _previousPosition;
 		}
 
 		/// <summary>초기 생성시 좌표를 설정합니다.</summary>
 		public void Initialize(Vector3 position)
 		{
+			IsDirty = false;
+			_isTeleported = false;
+
+			//_movementJob.Clear();
 			_position = position;
+#if NET
+			_velocity = Vector3.Zero;
+#else
+			_velocity = Vector3.zero;
+#endif
 		}
 
 		/// <summary>위치를 변경합니다. 해당 위치로 순간이동합니다.</summary>
 		public void SetPosition(Vector3 position)
 		{
-			_movementJob.Enqueue(new MovementJob()
-			{
-				Position = position,
-				Velocity = this._velocity,
-				IsTeleported = true,
-			});
+			//_movementJob.Enqueue(new MovementJob()
+			//{
+			//	Position = position,
+			//	Velocity = this._velocity,
+			//	IsTeleported = true,
+			//});
+
+			_position = position;
+			_isTeleported = true;
+			IsDirty = true;
 		}
 
 		/// <summary>움직임을 변경합니다.</summary>
 		/// <param name="position"></param>
 		/// <param name="velocity"></param>
-		public void OnMovement(Vector3 position, Vector3 velocity)
+		public void Move(Vector3 position, Vector3 velocity)
 		{
-			_movementJob.Enqueue(new MovementJob()
-			{
-				Position = position,
-				Velocity = velocity,
-				IsTeleported = false,
-			});
+			//_movementJob.Enqueue(new MovementJob()
+			//{
+			//	Position = position,
+			//	Velocity = velocity,
+			//	IsTeleported = false,
+			//});
+			_position = position;
+			_velocity = velocity;
+			IsDirty = true;
 		}
 
 		public void Serialize(IPacketWriter writer)

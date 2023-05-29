@@ -9,7 +9,7 @@ using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Synchronizations
 {
-	public abstract class MasterNetworkObject : ISynchronizable, IUpdatable
+	public abstract class MasterNetworkObject : ISynchronizable
 	{
 		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
 		[AllowNull] private WorldManager _worldManager;
@@ -43,32 +43,35 @@ namespace CTS.Instance.Synchronizations
 
 		public MasterNetworkObject() {}
 
-		private Vector2Int _currentCellPos;
+		public Vector2Int CurrentCellPos { get; private set; }
 
 		/// <summary>네트워크 객체를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
-		public void FixedUpdate(float deltaTime)
+		public void Update(float deltaTime)
 		{
-			Vector2Int previousPos = _currentCellPos;
-
 			// 고정 물리 업데이트를 수행합니다.
 			if (!IsStatic)
 			{
 				fixedUpdate(deltaTime);
 			}
 
+			OnUpdate(deltaTime);
+		}
+
+		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>
+		public void UpdateWorldCell()
+		{
 			if (Visibility == VisibilityType.View)
 			{
-				_currentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
-				_worldPartitioner.OnCellChanged(this, previousPos, _currentCellPos);
+				Vector2Int previousPos = CurrentCellPos;
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				_worldPartitioner.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
-
-			OnUpdate(deltaTime);
 		}
 
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
 		private void fixedUpdate(float deltaTime)
 		{
-			Transform.FixedUpdate(deltaTime);
+			Transform.Update(deltaTime);
 		}
 
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
@@ -98,7 +101,7 @@ namespace CTS.Instance.Synchronizations
 			if (Visibility == VisibilityType.View)
 			{
 				_worldPartitioner = worldPartitioner;
-				_currentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
 				_worldPartitioner.OnCreated(this);
 			}
 		}

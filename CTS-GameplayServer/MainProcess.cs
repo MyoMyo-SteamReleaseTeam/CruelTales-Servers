@@ -10,16 +10,6 @@ using log4net;
 
 namespace CTS.Instance
 {
-	public struct ServerOption
-	{
-		public int Port { get; set; } = 60128;
-		public int FramePerMs = 66;
-		public int AlarmTickMs = 40;
-		public int GameCount = 1;
-
-		public ServerOption() {}
-	}
-
 	[SupportedOSPlatform("windows")]
 	public class MainProcess
 	{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools;
@@ -9,7 +10,7 @@ using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public class GameManager : IUpdatable
+	public class GameManager
 	{
 		// Log
 		private readonly static ILog _log = LogManager.GetLogger(typeof(GameManager));
@@ -25,6 +26,7 @@ namespace CTS.Instance.Gameplay
 		// Test
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		private InstanceInitializeOption _option;
+		private List<TestCube> _testCubes = new(30);
 
 		public GameManager(GameplayInstance gameplayInstance,
 						   InstanceInitializeOption option)
@@ -43,11 +45,27 @@ namespace CTS.Instance.Gameplay
 			_playerCharacterByPlayer = new(option.SystemMaxUser);
 		}
 
-		public void FixedUpdate(float deltaTime)
+		float timer = 0;
+
+		public void Update(float deltaTime)
 		{
 			foreach (var player in _networkPlayerByUserId.ForwardValues)
 			{
 				player.Update(deltaTime);
+			}
+
+			timer += deltaTime;
+			if (timer > 0.2f)
+			{
+				timer = 0;
+				if (_testCubes.Count < 30)
+				{
+					float x = (float)(_random.NextDouble() - 0.5) * 20;
+					float y = (float)(_random.NextDouble() - 0.5) * 20;
+					var testCube = _worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
+					testCube.BindPool(_testCubes);
+					_testCubes.Add(testCube);
+				}
 			}
 		}
 
@@ -55,17 +73,6 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
-			//float inX = _option.HalfViewInSize.X;
-			//float outX = _option.HalfViewOutSize.X;
-
-			//_worldManager.CreateObject<TestCube>(new Vector3((inX + outX) * 0.5f, 0, 0));
-
-			for (int i = 0; i < 30; i++)
-			{
-				float x = (float)(_random.NextDouble() - 0.5) * 40;
-				float y = (float)(_random.NextDouble() - 0.5) * 40;
-				_worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
-			}
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

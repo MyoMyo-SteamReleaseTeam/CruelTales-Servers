@@ -79,13 +79,16 @@ namespace CTS.Instance.Gameplay
 			_syncJobQueue.Flush();
 
 			// Update world positions and logic
-			WorldManager.FixedUpdate(deltaTime);
+			WorldManager.UpdateNetworkObjects(deltaTime);
 
 			// Update game manager logic
-			GameManager.FixedUpdate(deltaTime);
+			GameManager.Update(deltaTime);
 
 			// Send sync data to each user
 			WorldManager.UpdateVisibilityAndSendData();
+
+			// Update world partitions
+			WorldManager.UpdateWorldPartitions();
 
 			// Reset dirtys
 			WorldManager.ClearDirtys();
