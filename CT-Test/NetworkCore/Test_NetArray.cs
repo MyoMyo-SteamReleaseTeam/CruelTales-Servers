@@ -54,10 +54,16 @@ namespace CT.Test.NetworkCore
 				writer.Put(Age);
 			}
 
-			public void Deserialize(IPacketReader reader)
+			public bool TryDeserialize(IPacketReader reader)
 			{
-				Name = reader.ReadNetString();
-				Age = reader.ReadInt32();
+				if (reader.TryReadNetString(out var nameValue) &&
+					reader.TryReadInt32(out Age))
+				{
+					Name = nameValue;
+					return true;
+				}
+
+				return false;
 			}
 
 			public void Ignore(IPacketReader reader)
@@ -118,11 +124,16 @@ namespace CT.Test.NetworkCore
 				writer.Put(Height);
 			}
 
-			public void Deserialize(IPacketReader reader)
+			public bool TryDeserialize(IPacketReader reader)
 			{
-				Type = (TestType)reader.ReadByte();
-				Age = reader.ReadInt32();
-				Height = reader.ReadInt32();
+				if (reader.TryReadByte(out var typeValue) &&
+					reader.TryReadInt32(out Age) &&
+					reader.TryReadInt32(out Height))
+				{
+					Type = (TestType)typeValue;
+					return true;
+				}
+				return false;
 			}
 
 			public void Ignore(IPacketReader reader)

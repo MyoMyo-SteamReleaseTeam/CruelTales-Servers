@@ -51,7 +51,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			where T : struct, IPacketSerializable, IEquatable<T>
 		{
 			lhs.SerializeSyncReliable(pw);
-			rhs.DeserializeSyncReliable(pr);
+			Assert.IsTrue(rhs.TryDeserializeSyncReliable(pr));
 			for (int i = 0; i < lhs.Count; i++)
 			{
 				Assert.IsTrue(lhs[i].Equals(rhs[i]));
