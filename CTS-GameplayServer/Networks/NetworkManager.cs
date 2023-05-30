@@ -136,7 +136,11 @@ namespace CTS.Instance.Networks
 						}
 						else
 						{
-							var packet = _packetPool.ReadPacket(packetType, _packetReader);
+							if (!_packetPool.TryReadPacket(packetType, _packetReader, out var packet))
+							{
+								session.Disconnect(DisconnectReasonType.ServerError_CannotHandlePacket);
+								break;
+							}
 							session.OnReceive(packet);
 							_packetPool.Return(packet);
 						}

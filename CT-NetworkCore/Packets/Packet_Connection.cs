@@ -23,10 +23,11 @@ namespace CT.Packets
 			Clothes.Serialize(writer);
 		}
 	
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			Username.Deserialize(reader);
-			Clothes.Deserialize(reader);
+			if (!Username.TryDeserialize(reader)) return false;
+			if (!Clothes.TryDeserialize(reader)) return false;
+			return true;
 		}
 	
 		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
@@ -51,11 +52,12 @@ namespace CT.Packets
 			Token.Serialize(writer);
 		}
 	
-		public override void Deserialize(IPacketReader reader)
+		public override bool TryDeserialize(IPacketReader reader)
 		{
-			MatchTo.Deserialize(reader);
-			UserDataInfo.Deserialize(reader);
-			Token.Deserialize(reader);
+			if (!MatchTo.TryDeserialize(reader)) return false;
+			if (!UserDataInfo.TryDeserialize(reader)) return false;
+			if (!Token.TryDeserialize(reader)) return false;
+			return true;
 		}
 	}
 	
@@ -73,9 +75,10 @@ namespace CT.Packets
 			writer.Put(AckResult);
 		}
 	
-		public override void Deserialize(IPacketReader reader)
+		public override bool TryDeserialize(IPacketReader reader)
 		{
-			AckResult = reader.ReadAckJoinMatch();
+			if (!reader.TryReadAckJoinMatch(out AckResult)) return false;
+			return true;
 		}
 	}
 	
@@ -93,9 +96,10 @@ namespace CT.Packets
 			
 		}
 	
-		public override void Deserialize(IPacketReader reader)
+		public override bool TryDeserialize(IPacketReader reader)
 		{
 			
+			return true;
 		}
 	}
 }

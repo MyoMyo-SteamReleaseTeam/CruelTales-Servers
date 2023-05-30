@@ -14,7 +14,7 @@ namespace CT.Common.DataType
 		public static explicit operator GameInstanceGuid(ulong value) => new GameInstanceGuid(value);
 		public GameInstanceGuid(ulong value) => Guid = value;
 		public void Serialize(IPacketWriter writer) => writer.Put(Guid);
-		public bool TryDeserialize(IPacketReader reader) => !reader.TryReadUInt64(out Guid);
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadUInt64(out Guid);
 		public static bool operator==(GameInstanceGuid lhs, GameInstanceGuid rhs) => lhs.Guid == rhs.Guid;
 		public static bool operator!=(GameInstanceGuid lhs, GameInstanceGuid rhs) => lhs.Guid != rhs.Guid;
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);

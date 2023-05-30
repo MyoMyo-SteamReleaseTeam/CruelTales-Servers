@@ -6,37 +6,16 @@ using log4net;
 
 namespace CTS.Instance.Packets
 {
-	public class PacketPool
+	public class MtuBufferPool
 	{
 #pragma warning disable IDE0052
-		private static readonly ILog _log = LogManager.GetLogger(typeof(PacketPool));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(MtuBufferPool));
 #pragma warning restore IDE0052
 
 		private Dictionary<Type, Stack<PacketBase>> _packetByType = new();
 		private Dictionary<PacketType, Stack<PacketBase>> _packetByEnum = new();
 
-		public T GetPacket<T>() where T : PacketBase
-		{
-			Type type = typeof(T);
-			if (_packetByType.TryGetValue(type, out var packetStack))
-			{
-				if (packetStack.TryPop(out var poolPacket))
-				{
-					return (T)poolPacket;
-				}
-			}
-			else
-			{
-				var pool = new Stack<PacketBase>();
-				_packetByType.Add(type, pool);
-				var packetEnum = PacketFactory.GetEnumByType(type);
-				_packetByEnum.Add(packetEnum, pool);
-			}
-
-			return PacketFactory.CreatePacket<T>();
-		}
-
-		public PacketBase GetPacket(PacketType type)
+		public PacketBase GetBuffer(PacketType type)
 		{
 			if (_packetByEnum.TryGetValue(type, out var packetStack))
 			{
@@ -54,13 +33,6 @@ namespace CTS.Instance.Packets
 			}
 
 			return PacketFactory.CreatePacket(type);
-		}
-
-		public PacketBase ReadPacket(PacketType packetType, IPacketReader reader)
-		{
-			var packet = GetPacket(packetType);
-			packet.Deserialize(reader);
-			return packet;
 		}
 
 		public void Return(PacketBase packet)

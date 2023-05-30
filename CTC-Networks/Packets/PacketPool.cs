@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 using CT.Packets;
 #if NET
@@ -60,11 +61,18 @@ namespace CTC.Networks.Packets
 			return PacketFactory.CreatePacket(type);
 		}
 
-		public PacketBase ReadPacket(PacketType packetType, IPacketReader reader)
+		public bool TryReadPacket(PacketType packetType, IPacketReader reader,
+								  [MaybeNullWhen(false)] out PacketBase readPacket)
 		{
 			var packet = GetPacket(packetType);
-			packet.Deserialize(reader);
-			return packet;
+			if (packet.TryDeserialize(reader))
+			{
+				readPacket = packet;
+				return true;
+			}
+
+			readPacket = null;
+			return false;
 		}
 
 		public void Return(PacketBase packet)

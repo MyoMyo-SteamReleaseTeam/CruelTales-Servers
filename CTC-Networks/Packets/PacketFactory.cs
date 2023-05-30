@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using CT.Packets;
 using CT.Common.Serialization;
 using CT.Common.Tools.Collections;
-using CTC.Networks.PacketCustom;
 
 namespace CTC.Networks.Packets
 {

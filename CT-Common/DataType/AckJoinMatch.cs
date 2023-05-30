@@ -23,9 +23,16 @@ namespace CT.Common.DataType
 			writer.Put((byte)value);
 		}
 
-		public static AckJoinMatch ReadAckJoinMatch(this IPacketReader reader)
+		public static bool TryReadAckJoinMatch(this IPacketReader reader, out AckJoinMatch value)
 		{
-			return (AckJoinMatch)reader.ReadByte();
+			if (!reader.TryReadByte(out var enumValue))
+			{
+				value = default;
+				return false;
+			}
+
+			value = (AckJoinMatch)enumValue;
+			return true;
 		}
 	}
 }

@@ -419,7 +419,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekByte(out byte value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(byte)))
 			{
 				value = 0;
 				return false;
@@ -429,7 +429,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekSByte(out sbyte value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(sbyte)))
 			{
 				value = 0;
 				return false;
@@ -439,7 +439,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekInt16(out short value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(short)))
 			{
 				value = 0;
 				return false;
@@ -449,7 +449,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekUInt16(out ushort value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(ushort)))
 			{
 				value = 0;
 				return false;
@@ -459,7 +459,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekInt32(out int value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(int)))
 			{
 				value = 0;
 				return false;
@@ -469,7 +469,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekUInt32(out uint value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(uint)))
 			{
 				value = 0;
 				return false;
@@ -479,7 +479,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekInt64(out long value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(long)))
 			{
 				value = 0;
 				return false;
@@ -489,7 +489,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekUInt64(out ulong value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(ulong)))
 			{
 				value = 0;
 				return false;
@@ -499,7 +499,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekSingle(out float value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(float)))
 			{
 				value = 0;
 				return false;
@@ -509,7 +509,7 @@ namespace CT.Common.Serialization
 		}
 		public bool TryPeekDouble(out double value)
 		{
-			if (!CanRead(sizeof(bool)))
+			if (!CanRead(sizeof(double)))
 			{
 				value = 0;
 				return false;

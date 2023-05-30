@@ -25,11 +25,12 @@ namespace CT.Packets
 			UserCostume.Serialize(writer);
 		}
 	
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			UserId.Deserialize(reader);
-			Username.Deserialize(reader);
-			UserCostume.Deserialize(reader);
+			if (!UserId.TryDeserialize(reader)) return false;
+			if (!Username.TryDeserialize(reader)) return false;
+			if (!UserCostume.TryDeserialize(reader)) return false;
+			return true;
 		}
 	
 		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
@@ -49,10 +50,11 @@ namespace CT.Packets
 			writer.Put(Body);
 		}
 	
-		public void Deserialize(IPacketReader reader)
+		public bool TryDeserialize(IPacketReader reader)
 		{
-			Head = reader.ReadInt32();
-			Body = reader.ReadInt32();
+			if (!reader.TryReadInt32(out Head)) return false;
+			if (!reader.TryReadInt32(out Body)) return false;
+			return true;
 		}
 	
 		public static void IgnoreStatic(IPacketReader reader) => throw new System.NotImplementedException();
