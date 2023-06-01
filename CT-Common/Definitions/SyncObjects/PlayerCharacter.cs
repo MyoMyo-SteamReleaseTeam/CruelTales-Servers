@@ -32,6 +32,9 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncVar]
 		public int Costume;
+
+		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
+		public void Client_Input(float x, float z) { }
 	}
 }
 #pragma warning restore IDE0051

@@ -316,12 +316,8 @@ namespace CTS.Instance.Gameplay
 			// Despawn, Leave -> delete
 			foreach (var kv in _playerVisibleBySession)
 			{
-				UserSession? session = kv.Key.Session;
 				PlayerVisibleTable visibleTable = kv.Value;
-				if (session != null)
-				{
-					_worldManager.SendSynchronization(session, visibleTable);
-				}
+				_worldManager.SendSynchronization(kv.Key, visibleTable);
 				visibleTable.TransitionVisibilityCycle();
 			}
 		}

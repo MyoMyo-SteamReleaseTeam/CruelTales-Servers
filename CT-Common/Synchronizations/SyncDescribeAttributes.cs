@@ -56,11 +56,19 @@ namespace CT.Common.Synchronizations
 		public SyncType SyncType { get; private set; }
 		public SyncDirection SyncDirection { get; private set; }
 
+		/// <summary>
+		/// Cold data 여부입니다. Cold 데이터는 최초 1회 Spawn 및 Enter에서만 동기화되고 이후 동기화되지 않습니다.<br/>
+		/// Cold 데이터는 최초 1회 동기화 된 뒤 RPC나 다른 값 동기화를 통해 간접적으로 시뮬레이션 되는 대상에 적합합니다.
+		/// </summary>
+		public bool IsColdData { get; private set; }
+
 		public SyncVarAttribute(SyncType sync = SyncType.Reliable,
-								SyncDirection dir = SyncDirection.FromMaster)
+								SyncDirection dir = SyncDirection.FromMaster,
+								bool isColdData = false)
 		{
 			SyncType = sync;
 			SyncDirection = dir;
+			IsColdData = isColdData;
 		}
 	}
 
@@ -71,12 +79,15 @@ namespace CT.Common.Synchronizations
 	{
 		public SyncType SyncType { get; private set; }
 		public SyncDirection SyncDirection { get; private set; }
+		public RpcCallType RpcType { get; private set; }
 
 		public SyncRpcAttribute(SyncType sync = SyncType.Reliable,
-								SyncDirection dir = SyncDirection.FromMaster)
+								SyncDirection dir = SyncDirection.FromMaster,
+								RpcCallType call = RpcCallType.Broadcast)
 		{
 			SyncType = sync;
 			SyncDirection = dir;
+			RpcType = call;
 		}
 	}
 }

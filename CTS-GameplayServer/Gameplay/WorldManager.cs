@@ -190,9 +190,12 @@ namespace CTS.Instance.Gameplay
 		private ByteBuffer _reliableBuffer = new ByteBuffer(64 * 1024);
 		private ByteBuffer _mtuBuffer = new ByteBuffer(GlobalNetwork.MTU * 16);
 
-		public void SendSynchronization(UserSession userSession,
+		public void SendSynchronization(NetworkPlayer player,
 										PlayerVisibleTable visibleTable)
 		{
+			if (player.Session == null)
+				return;
+
 			_reliableBuffer.ResetWriter();
 
 			// Serialize first spawn data
@@ -283,13 +286,13 @@ namespace CTS.Instance.Gameplay
 			// Send unreliable data
 			if (_mtuBuffer.Size > 0)
 			{
-				userSession.SendUnreliable(_mtuBuffer);
+				player.Session?.SendUnreliable(_mtuBuffer);
 			}
 
 			// Send reliable data
 			if (_reliableBuffer.Size > 0)
 			{
-				userSession.SendReliable(_reliableBuffer);
+				player.Session?.SendReliable(_reliableBuffer);
 			}
 		}
 

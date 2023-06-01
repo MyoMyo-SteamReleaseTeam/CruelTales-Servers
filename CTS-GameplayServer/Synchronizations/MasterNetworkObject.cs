@@ -166,7 +166,7 @@ namespace CTS.Instance.Synchronizations
 		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
 		public abstract void SerializeEveryProperty(IPacketWriter writer);
 		public abstract bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader);
-		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);
+		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);:
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);
