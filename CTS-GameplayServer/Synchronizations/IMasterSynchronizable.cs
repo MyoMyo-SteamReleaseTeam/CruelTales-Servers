@@ -48,13 +48,6 @@ namespace CTS.Instance.Synchronizations
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);
 
 		/// <summary>
-		/// 모든 동기화 요소를 역직렬화합니다.
-		/// 이벤트를 발생시키지 않습니다.
-		/// Master 객체가 생성되었을 때 최초 1회 호출됩니다.
-		/// </summary>
-		//public bool TryDeserializeEveryProperty(IPacketReader reader);
-
-		/// <summary>
 		/// 신뢰성 Dirty Bits를 초기화합니다.
 		/// </summary>
 		public void ClearDirtyReliable();

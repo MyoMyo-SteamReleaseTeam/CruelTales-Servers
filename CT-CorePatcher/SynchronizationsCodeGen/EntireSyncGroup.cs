@@ -52,6 +52,31 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			return sb.ToString();
 		}
+
+		public string Master_InitilaizeProperties()
+		{
+			StringBuilder sb = new();
+			sb.Append(string.Format(SyncGroupFormat.InitializeProperties, _modifier));
+
+			if (!HasProperty())
+				return sb.AppendLine(" { }").ToString();
+
+			StringBuilder contents = new();
+			foreach (var m in _members)
+			{
+				if (m is FunctionMemberToken)
+					continue;
+				contents.AppendLine(m.Master_InitializeProperty());
+			}
+			CodeFormat.AddIndent(contents);
+
+			sb.AppendLine("");
+			sb.AppendLine("{");
+			sb.AppendLine(contents.ToString());
+			sb.AppendLine("}");
+
+			return sb.ToString();
+		}
 	}
 
 	public class EntireDeserializeSyncGroup

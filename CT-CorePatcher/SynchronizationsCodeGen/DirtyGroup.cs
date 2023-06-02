@@ -63,6 +63,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
+		public string Master_InitializeProperties()
+		{
+			StringBuilder sb = new();
+			foreach (var m in _members)
+				sb.AppendLine(m.Master_InitializeProperty());
+			return sb.ToString();
+		}
+
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
 
 		public string Remote_MemberDeserializeIfDirtys(bool readDirtyBit = true)

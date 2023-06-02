@@ -169,6 +169,7 @@ namespace CTS.Instance.Synchronizations
 		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
+		public abstract void InitializeProperties();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);
 		public abstract void IgnoreSyncUnreliable(IPacketReader reader);
 		public override string ToString() => $"Type:{Type}/Id:{Identity}";

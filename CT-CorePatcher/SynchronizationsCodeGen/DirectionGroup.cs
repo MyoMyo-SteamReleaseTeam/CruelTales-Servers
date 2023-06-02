@@ -58,7 +58,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			sb.AppendLine(_reliableGruop.Master_SerializeSync());
 			sb.AppendLine(_unreliableGruop.Master_SerializeSync());
+
 			sb.AppendLine(_entireGroup.Master_SerializeSyncAll());
+			sb.AppendLine(_entireGroup.Master_InitilaizeProperties());
 			return sb.ToString();
 		}
 	}

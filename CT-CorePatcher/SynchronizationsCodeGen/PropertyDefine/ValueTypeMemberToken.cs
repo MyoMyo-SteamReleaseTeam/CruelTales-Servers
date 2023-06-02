@@ -36,6 +36,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
+		}
+
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);

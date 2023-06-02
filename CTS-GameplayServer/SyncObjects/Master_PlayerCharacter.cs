@@ -100,6 +100,12 @@ namespace CTS.Instance.SyncObjects
 			_username.Serialize(writer);
 			writer.Put(_costume);
 		}
+		public override void InitializeProperties()
+		{
+			_userId = new();
+			_username = new();
+			_costume = 0;
+		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
 		{

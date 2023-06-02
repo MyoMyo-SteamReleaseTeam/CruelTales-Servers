@@ -23,6 +23,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public abstract string Master_Declaration(SyncDirection direction);
 		public abstract string Master_GetterSetter(string dirtyBitname, int memberIndex);
 		public abstract string Master_SerializeByWriter(SyncType syncType);
+		public abstract string Master_InitializeProperty();
 		public abstract string Master_CheckDirty(SyncType syncType); // Object Only
 		public abstract string Master_ClearDirty(SyncType syncType); // Object Only
 

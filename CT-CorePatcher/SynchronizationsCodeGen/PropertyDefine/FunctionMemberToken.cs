@@ -59,6 +59,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(FuncMemberFormat.ClearCallStack, _functionName);
 		}
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Empty;
+		}
+
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);

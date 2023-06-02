@@ -215,6 +215,11 @@ public partial class {0} : {1}
 		/// {2} Content<br/>
 		/// </summary>
 		public static string ClearDirtyFunctionIfEmpty => @"public {0}void ClearDirty{1}() {{ }}";
+
+		/// <summary>
+		/// {0} Modifire<br/>
+		/// </summary>
+		public static string InitializeProperties => @"public {0}void InitializeProperties()";
 	}
 
 	public static class FuncMemberFormat
@@ -447,6 +452,17 @@ public event Action<{1}>? On{3}Changed;";
 		/// {1} Read function name<br/>
 		/// </summary>
 		public static string ReadSyncObject => @"if (!{0}.Deserialize{1}(reader)) return false;";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Default content<br/>
+		/// </summary>
+		public static string InitializeProperty => @"{0} = {1};";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// </summary>
+		public static string InitializeSyncObjectProperty => @"{0}.InitializeProperties();";
 
 		/// <summary>
 		/// {0} Public property name<br/>

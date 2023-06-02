@@ -19,7 +19,6 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
-			_animationTime = 0;
 			//Console.WriteLine($"{Identity}:{Transform} OnCREATED");
 
 			_radiusFactor = (float)_random.NextDouble();
