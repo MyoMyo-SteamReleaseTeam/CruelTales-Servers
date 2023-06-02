@@ -629,6 +629,7 @@ namespace CT.Common.Serialization
 			value = BinaryConverter.Utf8Encoding.GetString(ByteSegment.Array,
 														   ByteSegment.Offset + ReadPosition,
 														   byteLength);
+			ReadPosition += byteLength;
 			return true;
 		}
 		public bool TryReadNetStringShort(out string value)
@@ -644,6 +645,7 @@ namespace CT.Common.Serialization
 			value = BinaryConverter.Utf8Encoding.GetString(ByteSegment.Array,
 														   ByteSegment.Offset + ReadPosition,
 														   byteLength);
+			ReadPosition += byteLength;
 			return true;
 		}
 
