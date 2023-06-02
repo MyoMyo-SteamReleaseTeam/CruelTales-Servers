@@ -28,7 +28,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public abstract string Master_ClearDirty(SyncType syncType); // Object Only
 
 		public abstract string Remote_Declaration(SyncDirection direction);
-		public abstract string Remote_DeserializeByReader(SyncType syncType);
+		public abstract string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction);
 		public abstract string Remote_IgnoreDeserialize(SyncType syncType);
 	}
 }

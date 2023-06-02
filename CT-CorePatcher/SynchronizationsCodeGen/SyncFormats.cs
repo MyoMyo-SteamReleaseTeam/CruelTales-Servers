@@ -2,6 +2,11 @@
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	public static class NameTable
+	{
+		public static string NetworkPlayerParameterName => "player";
+	}
+
 	public static class CommonFormat
 	{
 		public static string MasterUsingStatements =>
@@ -233,6 +238,16 @@ public partial class {0} : {1}
 		public static string Declaration =>
 @"[{0}]
 {1} partial void {2}({3});";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Access modifier<br/>
+		/// {2} Function name<br/>
+		/// {3} Parameter declaration <br/>
+		/// </summary>
+		public static string DeclarationFromRemote =>
+@"[{0}]
+{1} partial void {2}(NetworkPlayer player, {3});";
 
 		/// <summary>
 		/// {0} Access modifier<br/>

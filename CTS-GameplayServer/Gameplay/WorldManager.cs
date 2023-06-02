@@ -23,7 +23,7 @@ namespace CTS.Instance.Gameplay
 
 		// Reference
 		private GameplayInstance _gameplayInstance;
-		private GameManager _gameManager;
+		[AllowNull] private GameManager _gameManager;
 		private InstanceInitializeOption _option;
 
 		// Network Object Management
@@ -40,7 +40,6 @@ namespace CTS.Instance.Gameplay
 		{
 			// Reference
 			_gameplayInstance = gameplayInstance;
-			_gameManager = gameplayInstance.GameManager;
 			_option = option;
 
 			// Network Object Management
@@ -49,6 +48,11 @@ namespace CTS.Instance.Gameplay
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
+		}
+
+		public void Initialize()
+		{
+			_gameManager = _gameplayInstance.GameManager;
 		}
 
 		public void UpdateNetworkObjects(float deltaTime)
@@ -438,7 +442,7 @@ namespace CTS.Instance.Gameplay
 		}
 
 		// TODO : 역직렬화 실패시 Network Player 내부의 UserSession으로 연결을 종료하도록 리펙토링 할 수 있음
-		public bool OnDeserializeSyncReliable(UserId sender, IPacketReader reader)
+		public bool OnRemoteReliable(UserId sender, IPacketReader reader)
 		{
 			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
 			{
@@ -448,19 +452,14 @@ namespace CTS.Instance.Gameplay
 			int objCount = reader.ReadByte();
 			for (int i = 0; i < objCount; i++)
 			{
-				NetworkIdentity id = new NetworkIdentity(reader);
-				if (_networkObjectById.TryGetValue(id, out var netObj))
+				NetworkIdentity id = new(reader);
+				if (!_networkObjectById.TryGetValue(id, out var netObj))
 				{
-					if (!netObj.TryDeserializeSyncReliable(player, reader))
-					{
-						Debug.Assert(false);
-						reader.IgnoreAll();
-						return false;
-					}
+					return true;
 				}
-				else
+
+				if (!netObj.TryDeserializeSyncUnreliable(player, reader))
 				{
-					Debug.Assert(false);
 					reader.IgnoreAll();
 					return false;
 				}
@@ -469,7 +468,7 @@ namespace CTS.Instance.Gameplay
 			return true;
 		}
 
-		public bool OnDeserializeSyncUnreliable(UserId sender, IPacketReader reader)
+		public bool OnRemoteUnreliable(UserId sender, IPacketReader reader)
 		{
 			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
 			{
@@ -479,19 +478,16 @@ namespace CTS.Instance.Gameplay
 			int objCount = reader.ReadByte();
 			for (int i = 0; i < objCount; i++)
 			{
-				NetworkIdentity id = new NetworkIdentity(reader);
-				if (_networkObjectById.TryGetValue(id, out var netObj))
+				NetworkIdentity id = new(reader);
+				if (!_networkObjectById.TryGetValue(id, out var netObj))
 				{
-					if (!netObj.TryDeserializeSyncUnreliable(player, reader))
-					{
-						Debug.Assert(false);
-						reader.IgnoreAll();
-						return false;
-					}
+					return true;
 				}
-				else
+
+				if (!netObj.TryDeserializeSyncUnreliable(player, reader))
 				{
 					reader.IgnoreAll();
+					return false;
 				}
 			}
 

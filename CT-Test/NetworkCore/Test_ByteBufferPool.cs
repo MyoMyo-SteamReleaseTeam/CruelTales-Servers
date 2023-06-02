@@ -9,7 +9,7 @@ namespace CT.Test.NetworkCore
 		[TestMethod]
 		public void ByteBufferPoolTest()
 		{
-			ByteBufferPool pool = new ByteBufferPool(16, 2, ignoreLOH: true);
+			ConcurrentByteBufferPool pool = new ConcurrentByteBufferPool(16, 2, ignoreLOH: true);
 			ByteBuffer fakeBuffer = new ByteBuffer(15);
 			ByteBuffer realBuffer = new ByteBuffer(16);
 			var b1 = pool.Get();

@@ -50,7 +50,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, _publicMemberName, string.Empty);
 		}
 
-		public override string Remote_DeserializeByReader(SyncType syncType)
+		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _typeName, _clrEnumSizeTypeName));

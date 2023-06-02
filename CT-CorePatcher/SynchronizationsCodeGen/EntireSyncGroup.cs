@@ -119,7 +119,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m is FunctionMemberToken)
 					continue;
-				contents.AppendLine(m.Remote_DeserializeByReader(_syncType));
+				contents.AppendLine(m.Remote_DeserializeByReader(_syncType, _direction));
 			}
 			CodeFormat.AddIndent(contents);
 

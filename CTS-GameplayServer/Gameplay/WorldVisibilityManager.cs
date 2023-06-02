@@ -125,29 +125,29 @@ namespace CTS.Instance.Gameplay
 		public void UpdateVisibilityAndSendData()
 		{
 #if DEBUG
-			{
-				StringBuilder sb = new StringBuilder(1024);
-				sb.Append($"Cur Objects : ");
+			//{
+			//	StringBuilder sb = new StringBuilder(1024);
+			//	sb.Append($"Cur Objects : ");
 
-				for (int y = 0; y < CELL_HEIGHT; y++)
-				{
-					for (int x = 0; x < CELL_WIDTH; x++)
-					{
-						foreach (var kv in _networkObjectByCell[y, x])
-						{
-							sb.Append(kv.Value.Identity);
-							sb.Append(",");
-						}
-					}
-				}
+			//	for (int y = 0; y < CELL_HEIGHT; y++)
+			//	{
+			//		for (int x = 0; x < CELL_WIDTH; x++)
+			//		{
+			//			foreach (var kv in _networkObjectByCell[y, x])
+			//			{
+			//				sb.Append(kv.Value.Identity);
+			//				sb.Append(",");
+			//			}
+			//		}
+			//	}
 
-				string output = sb.ToString();
-				if (DEBUG_output != output)
-				{
-					DEBUG_output = output;
-					Console.WriteLine(output);
-				}
-			}
+			//	string output = sb.ToString();
+			//	if (DEBUG_output != output)
+			//	{
+			//		DEBUG_output = output;
+			//		Console.WriteLine(output);
+			//	}
+			//}
 #endif
 
 			// TODO : 구문 최적화 필요

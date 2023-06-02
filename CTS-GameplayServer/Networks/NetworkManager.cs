@@ -125,11 +125,17 @@ namespace CTS.Instance.Networks
 				if (_sessionManager.TryGetSessionBy(peer.Id, out session))
 				{
 					var packetSegment = reader.GetRemainingBytesSegment();
+					if (packetSegment.Count > 1024 * 16)
+					{
+						_log.Fatal($"Session {session} send big size packet! {packetSegment.Count}");
+						return;
+					}
+
 					_packetReader.Initialize(packetSegment, packetSegment.Count);
 
 					while (_packetReader.CanRead(sizeof(PacketType)))
 					{
-						PacketType packetType = _packetReader.ReadPacketType();
+						 PacketType packetType = _packetReader.ReadPacketType();
 						if (PacketDispatcher.IsCustomPacket(packetType))
 						{
 							session.OnReceiveRaw(packetType, _packetReader);

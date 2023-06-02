@@ -202,5 +202,27 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(2, reader.ReadInt32());
 			Assert.AreEqual(3, reader.ReadInt32());
 		}
+
+		[TestMethod]
+		public void CopyTest()
+		{
+			byte[] srcData = new byte[16];
+			ByteBuffer srcBuffer = new ByteBuffer(new ArraySegment<byte>(srcData, 4, 12), 0);
+			srcBuffer.Put(1);
+			srcBuffer.Put(2);
+			srcBuffer.Put(3);
+			
+			Assert.AreEqual(1, srcBuffer.ReadInt32());
+			Assert.AreEqual(2, srcBuffer.ReadInt32());
+
+			byte[] dstData = new byte[8];
+			ByteBuffer dstBuffer = new ByteBuffer(new ArraySegment<byte>(dstData, 4, 4), 0);
+
+			dstBuffer.CopyFromReader((IPacketReader)srcBuffer);
+			Assert.IsTrue(srcBuffer.IsReadEnd);
+
+			Assert.AreEqual(3, dstBuffer.ReadInt32());
+			Assert.IsTrue(dstBuffer.IsReadEnd);
+		}
 	}
 }

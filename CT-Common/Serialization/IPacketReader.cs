@@ -18,6 +18,7 @@ namespace CT.Common.Serialization
 		public void IgnoreAll();
 		public void Ignore(int count);
 		public bool TryRead<T>(out T value) where T : IPacketSerializable, new();
+		public int CopyToWriter(IPacketWriter writer);
 		public bool PeekBool();
 		public byte PeekByte();
 		public sbyte PeekSByte();

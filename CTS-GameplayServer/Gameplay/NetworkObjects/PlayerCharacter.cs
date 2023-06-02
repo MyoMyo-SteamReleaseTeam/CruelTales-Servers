@@ -15,9 +15,9 @@ namespace CTS.Instance.SyncObjects
 			player.OnViewTargetChanged(this.Transform);
 		}
 
-		public partial void Client_Input(float x, float z)
+		public partial void Client_Input(NetworkPlayer player, float x, float z)
 		{
-			Console.WriteLine($"Client input ({x}, {z})");
+			Console.WriteLine($"Client input from {player}: ({x}, {z})");
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _costume;
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_Input(float x, float z);
+		public partial void Client_Input(NetworkPlayer player, float x, float z);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -117,7 +117,7 @@ namespace CTS.Instance.SyncObjects
 				{
 					if (!reader.TryReadSingle(out float x)) return false;
 					if (!reader.TryReadSingle(out float z)) return false;
-					Client_Input(x, z);
+					Client_Input(player, x, z);
 				}
 			}
 			return true;

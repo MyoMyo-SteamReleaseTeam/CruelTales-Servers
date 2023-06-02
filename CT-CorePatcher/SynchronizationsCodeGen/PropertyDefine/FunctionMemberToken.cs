@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Cryptography;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments;
 
@@ -67,23 +68,36 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
-			return string.Format(FuncMemberFormat.Declaration,
-								 attribute, AccessModifier, _functionName,
+			string format = string.Empty;
+
+			if (direction == SyncDirection.FromRemote)
+			{
+				format = FuncMemberFormat.DeclarationFromRemote;
+			}
+			else if (direction == SyncDirection.FromMaster)
+			{
+				format = FuncMemberFormat.Declaration;
+			}
+
+			return string.Format(format, attribute, AccessModifier, _functionName,
 								 _argGroup.GetParameterDeclaration());
 		}
 
-		public override string Remote_DeserializeByReader(SyncType syncType)
+		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.DeserializeIfDirtyVoid, _functionName);
 
 			string paramContent = _argGroup.GetReadParameterContent();
 			CodeFormat.AddIndent(ref paramContent);
+			string callParameters = _argGroup.GetCallParameters();
+			if (direction == SyncDirection.FromMaster)
+			{
+				callParameters = NameTable.NetworkPlayerParameterName + ", " + callParameters;
+			}
 
 			return string.Format(FuncMemberFormat.DeserializeIfDirty,
-								 _functionName,
-								 paramContent,
-								 _argGroup.GetCallParameters());
+								 _functionName, paramContent, callParameters);
 		}
 
 		public override string Remote_IgnoreDeserialize(SyncType syncType)

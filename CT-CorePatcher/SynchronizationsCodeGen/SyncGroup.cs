@@ -232,7 +232,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string remote_DeserializeSyncOneDirtyGroup()
 		{
-			return _dirtyGroups[0].Remote_MemberDeserializeIfDirtys();
+			return _dirtyGroups[0].Remote_MemberDeserializeIfDirtys(_direction);
 		}
 
 		private string remote_DeserializeSyncTwoDirtyGroup()
@@ -242,7 +242,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				var group = _dirtyGroups[i];
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, group.GetName()));
-				string content = group.Remote_MemberDeserializeIfDirtys(false);
+				string content = group.Remote_MemberDeserializeIfDirtys(_direction, readDirtyBit: false);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
 			}
@@ -258,7 +258,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder contents = new();
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
-				string content = _dirtyGroups[i].Remote_MemberDeserializeIfDirtys();
+				string content = _dirtyGroups[i].Remote_MemberDeserializeIfDirtys(_direction);
 				CodeFormat.AddIndent(ref content);
 				contents.AppendLine(string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, content));
 			}

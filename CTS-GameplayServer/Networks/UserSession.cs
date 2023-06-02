@@ -266,10 +266,10 @@ namespace CTS.Instance.Networks
 		public void OnEnterGame(UserSessionHandler sessionHandler)
 		{
 			// 알 수 없는 이유로 세션 헨들러가 서로 다르다면 접속을 종료한다.
-			if (_gameplayInstance?.SessionHandler != sessionHandler)
+			var gameplayInstance = _gameplayInstance;
+			if (gameplayInstance?.SessionHandler != sessionHandler)
 			{
-				_gameplayInstance?.SessionHandler.Push_OnDisconnected(this);
-				_gameplayInstance?.SessionHandler?.Push_OnDisconnected(this);
+				gameplayInstance?.SessionHandler?.Push_OnDisconnected(this);
 				_gameplayInstance = null;
 				Disconnect(DisconnectReasonType.ServerError_WrongOperation);
 			}
@@ -278,12 +278,14 @@ namespace CTS.Instance.Networks
 
 		public void OnTrySync(SyncOperation syncType, IPacketReader packetReader)
 		{
-			if (_gameplayInstance == null)
+			var gameplayInstance = _gameplayInstance;
+			if (gameplayInstance == null)
 			{
+				packetReader.IgnoreAll();
 				return;
 			}
 
-			if (!_gameplayInstance.TrySync(UserId, syncType, packetReader))
+			if (!gameplayInstance.TrySync(UserId, syncType, packetReader))
 			{
 				Disconnect(DisconnectReasonType.Reject_PermissionDenied);
 			}

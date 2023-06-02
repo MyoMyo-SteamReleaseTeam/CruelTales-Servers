@@ -73,7 +73,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
 
-		public string Remote_MemberDeserializeIfDirtys(bool readDirtyBit = true)
+		public string Remote_MemberDeserializeIfDirtys(SyncDirection direction, bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -83,7 +83,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			foreach (var m in _members)
 			{
-				string content = m.Remote_DeserializeByReader(_syncType);
+				string content = m.Remote_DeserializeByReader(_syncType, direction);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
 			}

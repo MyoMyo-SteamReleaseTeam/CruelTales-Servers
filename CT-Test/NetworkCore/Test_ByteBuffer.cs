@@ -13,7 +13,7 @@ namespace CT.Test.NetworkCore
 		{
 			int testBufferCount = 5;
 
-			ByteBufferPool pool = new ByteBufferPool(15, testBufferCount, ignoreLOH: true);
+			ConcurrentByteBufferPool pool = new ConcurrentByteBufferPool(15, testBufferCount, ignoreLOH: true);
 			ByteBuffer[] b = new ByteBuffer[testBufferCount];
 
 			for (int i = 0; i < testBufferCount; i++)

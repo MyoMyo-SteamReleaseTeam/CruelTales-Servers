@@ -18,7 +18,7 @@ namespace CTS.Instance.Gameplay
 
 		// Reference
 		private GameplayInstance _gameplayInstance;
-		private WorldManager _worldManager;
+		[AllowNull] private WorldManager _worldManager;
 
 		// Manage Players
 		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
@@ -34,7 +34,6 @@ namespace CTS.Instance.Gameplay
 		{
 			// Reference
 			_gameplayInstance = gameplayInstance;
-			_worldManager = gameplayInstance.WorldManager;
 			_option = option;
 
 			// Manage Players
@@ -44,6 +43,11 @@ namespace CTS.Instance.Gameplay
 
 			// Test
 			_playerCharacterByPlayer = new(option.SystemMaxUser);
+		}
+
+		public void Initialize()
+		{
+			_worldManager = _gameplayInstance.WorldManager;
 		}
 
 		float timer = 0;

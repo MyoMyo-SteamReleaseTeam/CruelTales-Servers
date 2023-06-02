@@ -14,13 +14,13 @@ namespace CTS.Instance.Gameplay
 	{
 		public UserId Sender;
 		public SyncOperation Operation;
-		public IPacketReader SyncDataReader;
+		public IPacketReader SyncSegment;
 
 		public SynchronizeJob(UserId sender, SyncOperation operation, IPacketReader reader)
 		{
 			Sender = sender;
 			Operation = operation;
-			SyncDataReader = reader;
+			SyncSegment = reader;
 		}
 	}
 
@@ -50,14 +50,19 @@ namespace CTS.Instance.Gameplay
 
 		// Job Queue
 		private JobQueue<SynchronizeJob> _syncJobQueue;
+		private ConcurrentByteBufferPool _syncPacketPool;
 
 		public GameplayInstance(TickTimer serverTimer, InstanceInitializeOption option)
 		{
 			ServerTimer = serverTimer;
 			SessionHandler = new UserSessionHandler(this, option);
-			WorldManager = new WorldManager(this, option);
 			GameManager = new GameManager(this, option);
+			WorldManager = new WorldManager(this, option);
+			GameManager.Initialize();
+			WorldManager.Initialize();
+
 			_syncJobQueue = new(onSyncJobExecute, option.SyncJobCapacity);
+			_syncPacketPool = new ConcurrentByteBufferPool(1024 * 8, option.RemotePacketPoolCount);
 		}
 
 		public void Initialize(GameplayOption option, GameInstanceGuid guid)
@@ -129,23 +134,28 @@ namespace CTS.Instance.Gameplay
 				return false;
 			}
 
-			_syncJobQueue.Push(new SynchronizeJob(sender, syncType, packetReader));
+			ByteBuffer syncSegment = _syncPacketPool.Get();
+			syncSegment.CopyFromReader(packetReader);
+
+			_syncJobQueue.Push(new SynchronizeJob(sender, syncType, syncSegment));
 			return true;
 		}
 
 		private void onSyncJobExecute(SynchronizeJob syncJob)
 		{
+			ByteBuffer syncSeg = (ByteBuffer)syncJob.SyncSegment;
+
 			switch (syncJob.Operation)
 			{
 				case SyncOperation.Reliable:
-					if (!WorldManager.OnDeserializeSyncReliable(syncJob.Sender, syncJob.SyncDataReader))
+					if (!WorldManager.OnRemoteReliable(syncJob.Sender, syncJob.SyncSegment))
 					{
 						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
 					}
 					break;
 
 				case SyncOperation.Unreliable:
-					if (!WorldManager.OnDeserializeSyncUnreliable(syncJob.Sender, syncJob.SyncDataReader))
+					if (!WorldManager.OnRemoteUnreliable(syncJob.Sender, syncJob.SyncSegment))
 					{
 						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
 					}
@@ -160,6 +170,8 @@ namespace CTS.Instance.Gameplay
 					_log.Warn($"There is no such sync operation. Type : {syncJob.Operation}");
 					break;
 			}
+
+			_syncPacketPool.Return(syncSeg);
 		}
 
 		#endregion

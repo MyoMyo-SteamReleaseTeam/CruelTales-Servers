@@ -81,6 +81,11 @@ namespace CT.Common.Serialization
 			serializeObject.Serialize(this);
 		}
 
+		public void CopyFromReader(IPacketReader reader)
+		{
+			Size += reader.CopyToWriter(this);
+		}
+
 		public void Put(bool value)
 		{
 			BinaryConverter.WriteBool(ByteSegment, Size, value);
@@ -226,6 +231,26 @@ namespace CT.Common.Serialization
 		{
 			value = new();
 			return TryReadTo(value);
+		}
+
+		public int CopyToWriter(IPacketWriter writer)
+		{
+			var src = ByteSegment.Array;
+			var srcOffset = ByteSegment.Offset;
+			var dstSeg = writer.ByteSegment;
+			var dst = dstSeg.Array;
+			var dstOffset = dstSeg.Offset;
+
+			int copyCount = Size - ReadPosition;
+
+			Debug.Assert(src != null);
+			Debug.Assert(dst != null);
+
+			Array.Copy(src, srcOffset + ReadPosition,
+					   dst, dstOffset + writer.Size, copyCount);
+
+			IgnoreAll();
+			return copyCount;
 		}
 
 		// Peek

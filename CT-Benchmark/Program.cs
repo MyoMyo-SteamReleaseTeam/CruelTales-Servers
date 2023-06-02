@@ -8,7 +8,8 @@ namespace CT.Benchmark
 		{
 			//BenchmarkRunner.Run<StringSerializationBenchmark>();
 			//BenchmarkRunner.Run<LogBenchmark>();
-			ActionGC.Test();
+			//ActionGC.Test();
+			BufferPoolDataRaceTest.Test();
 		}
 	}
 }
