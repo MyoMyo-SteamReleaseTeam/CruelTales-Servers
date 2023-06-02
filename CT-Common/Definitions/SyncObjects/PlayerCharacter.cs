@@ -17,6 +17,9 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar]
 		public float B;
 
+		[SyncVar(SyncType.ColdData)]
+		public float AnimationTime;
+
 		[SyncRpc]
 		public void TestRPC(long someMessage) { }
 	}
@@ -32,6 +35,10 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncVar]
 		public int Costume;
+
+		////For test
+		//[SyncVar(SyncType.ColdData, SyncDirection.FromRemote)]
+		//public float TestColdDataFromRemote;
 
 		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
 		public void Client_Input(float x, float z) { }

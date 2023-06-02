@@ -59,7 +59,7 @@ namespace CTS.Instance.Gameplay
 			if (timer > 0.2f)
 			{
 				timer = 0;
-				if (_testCubes.Count < 30)
+				if (_testCubes.Count < 5)
 				{
 					float x = (float)(_random.NextDouble() - 0.5) * 20;
 					float y = (float)(_random.NextDouble() - 0.5) * 20;

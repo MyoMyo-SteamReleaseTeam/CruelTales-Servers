@@ -29,6 +29,8 @@ namespace CTS.Instance.SyncObjects
 		private NetStringShort _username = new();
 		[SyncVar]
 		private int _costume;
+		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		public partial void Client_Input(float x, float z);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -99,11 +101,49 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_costume);
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
-		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadSingle(out float x)) return false;
+					if (!reader.TryReadSingle(out float z)) return false;
+					Client_Input(x, z);
+				}
+			}
+			return true;
+		}
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
-		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
-		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
+		public override void IgnoreSyncUnreliable(IPacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(4);
+				}
+			}
+		}
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader)
+		{
+			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (_dirtyUnreliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(4);
+				}
+			}
+		}
 	}
 }
 #pragma warning restore CS0649

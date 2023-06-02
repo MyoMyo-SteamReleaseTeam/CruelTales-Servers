@@ -1,4 +1,5 @@
-﻿using CTS.Instance.Gameplay;
+﻿using System;
+using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.SyncObjects
@@ -14,9 +15,9 @@ namespace CTS.Instance.SyncObjects
 			player.OnViewTargetChanged(this.Transform);
 		}
 
-		public void Update()
+		public partial void Client_Input(float x, float z)
 		{
-			//Transform.OnMovement();
+			Console.WriteLine($"Client input ({x}, {z})");
 		}
 	}
 }

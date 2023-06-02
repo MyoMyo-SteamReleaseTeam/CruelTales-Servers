@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Numerics;
-using CT.Packets;
 using CTS.Instance.Synchronizations;
-using log4net.Util;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -21,10 +19,11 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
+			_animationTime = 0;
 			//Console.WriteLine($"{Identity}:{Transform} OnCREATED");
 
 			_radiusFactor = (float)_random.NextDouble();
-			_lifeTime = (float)(2 + _random.NextDouble() * 3);
+			_lifeTime = (float)(25 + _random.NextDouble() * 3);
 
 			R = (float)_random.NextDouble();
 			G = (float)_random.NextDouble();
@@ -33,6 +32,8 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
+			_animationTime += deltaTime;
+
 			float x = MathF.Cos(_radiusFactor);
 			float z = MathF.Sin(_radiusFactor);
 			Transform.SetPosition(Transform.Position + new Vector3(x, 0, z));

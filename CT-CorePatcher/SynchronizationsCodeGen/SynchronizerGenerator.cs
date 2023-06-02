@@ -8,6 +8,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Data;
 using CT.Common.Tools.GetOpt;
+using CT.CorePatcher.Exceptions;
 using CT.CorePatcher.Helper;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments;
@@ -256,12 +257,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					{
 						syncType = syncVarAtt.SyncType;
 						direction = syncVarAtt.SyncDirection;
+						if (direction == SyncDirection.FromRemote && syncType == SyncType.ColdData)
+						{
+							throw new WrongSyncSetting(type, field.Name,
+													   $"You can not set cold data from remote side!");
+						}
 						member = parseValueField(field, syncType);
 					}
 					else if (att is SyncObjectAttribute syncObjAtt)
 					{
 						syncType = syncObjAtt.SyncType;
 						direction = syncObjAtt.SyncDirection;
+						if (syncType == SyncType.ColdData)
+						{
+							throw new WrongSyncSetting(type, field.Name,
+													   $"You can not set cold/hot data at sync object!");
+						}
 						member = parseSyncObjectField(field, syncType);
 					}
 					else
@@ -299,7 +310,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				var sizeTypeName = ProjectReference.Instance.GetEnumSizeTypeName(typeName);
 				if (ReflectionHelper.TryGetCLRTypeByPrimitive(sizeTypeName, out string clrEnumSizeType))
 				{
-					var memberToken = new EnumMemberToken(syncType, typeName, memberName, isPublic, sizeTypeName, clrEnumSizeType);
+					var memberToken = new EnumMemberToken(syncType, typeName, memberName, isPublic,
+														  sizeTypeName, clrEnumSizeType);
 					member.Member = memberToken;
 				}
 			}
@@ -307,7 +319,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (ReflectionHelper.TryGetTypeByCLRType(typeName, out string nonClrType))
 				{
-					member.Member = new PrimitivePropertyToken(syncType, nonClrType, memberName, typeName, isPublic);
+					member.Member = new PrimitivePropertyToken(syncType, nonClrType, memberName,
+															   typeName, isPublic);
 				}
 			}
 			else if (fieldInfo.FieldType.IsValueType)

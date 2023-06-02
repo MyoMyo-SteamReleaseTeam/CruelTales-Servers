@@ -31,6 +31,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private float _b;
 		public event Action<float>? OnBChanged;
+		[SyncVar(SyncType.ColdData)]
+		private float _animationTime;
+		public event Action<float>? OnAnimationTimeChanged;
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
 		public override bool IsDirtyReliable => false;
@@ -78,6 +81,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnGChanged?.Invoke(_g);
 			if (!reader.TryReadSingle(out _b)) return false;
 			OnBChanged?.Invoke(_b);
+			if (!reader.TryReadSingle(out _animationTime)) return false;
+			OnAnimationTimeChanged?.Invoke(_animationTime);
 			return true;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)

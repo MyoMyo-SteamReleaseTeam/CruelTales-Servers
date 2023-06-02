@@ -4,6 +4,8 @@ using CT.CorePatcher.Packets;
 
 namespace CT.CorePatcher.Exceptions
 {
+	#region XML Parser
+
 	internal class WrongDefinitionException : Exception
 	{
 		internal WrongDefinitionException()
@@ -41,4 +43,16 @@ namespace CT.CorePatcher.Exceptions
 			return $"NodeType({r.NodeType}) Depth({r.Depth}) Name({r.Name})";
 		}
 	}
+
+	#endregion
+
+	#region Synchornization
+
+	internal class WrongSyncSetting : Exception
+	{
+		internal WrongSyncSetting(Type type, string memberName, string content)
+			: base($"Wrong sync setting error!\nType:{type.Name}\nMember:{memberName}!\n{content}") {}
+	}
+
+	#endregion
 }

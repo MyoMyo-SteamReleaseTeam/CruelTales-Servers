@@ -29,6 +29,8 @@ namespace CTS.Instance.SyncObjects
 		private float _g;
 		[SyncVar]
 		private float _b;
+		[SyncVar(SyncType.ColdData)]
+		private float _animationTime;
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -116,6 +118,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_r);
 			writer.Put(_g);
 			writer.Put(_b);
+			writer.Put(_animationTime);
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;

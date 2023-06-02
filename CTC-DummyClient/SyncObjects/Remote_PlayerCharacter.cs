@@ -22,6 +22,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class PlayerCharacter
 	{
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
+		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		public partial void Client_Input(float x, float z);
 		[SyncVar]
 		private UserId _userId = new();
 		public event Action<UserId>? OnUserIdChanged;
@@ -31,12 +33,45 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _costume;
 		public event Action<int>? OnCostumeChanged;
+		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public override bool IsDirtyUnreliable
+		{
+			get
+			{
+				bool isDirty = false;
+				isDirty |= _dirtyUnreliable_0.AnyTrue();
+				return isDirty;
+			}
+		}
+		public partial void Client_Input(float x, float z)
+		{
+			Client_InputCallstack.Add((x, z));
+			_dirtyUnreliable_0[0] = true;
+		}
+		private List<(float x, float z)> Client_InputCallstack = new(8);
 		public override void ClearDirtyReliable() { }
-		public override void ClearDirtyUnreliable() { }
+		public override void ClearDirtyUnreliable()
+		{
+			_dirtyUnreliable_0.Clear();
+			Client_InputCallstack.Clear();
+		}
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
-		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(IPacketWriter writer)
+		{
+			_dirtyUnreliable_0.Serialize(writer);
+			if (_dirtyUnreliable_0[0])
+			{
+				byte count = (byte)Client_InputCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Client_InputCallstack[i];
+					writer.Put(arg.x);
+					writer.Put(arg.z);
+				}
+			}
+		}
 		public override void SerializeEveryProperty(IPacketWriter writer) { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
