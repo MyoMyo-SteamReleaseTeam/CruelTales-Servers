@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
@@ -93,18 +95,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			var masterEnumContent = CodeGenerator_Enumerate
 				.Generate(CommonFormat.NetworkObjectTypeTypeName,
-							CommonFormat.MasterNamespace,
-							hasNone: true, useTab: true,
-							usingList: new List<string>(),
-							networkEnums);
+						  CommonFormat.MasterNamespace,
+						  hasNone: true, useTab: true,
+						  usingList: new List<string>(),
+						  networkEnums);
 			var masterEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, masterEnumContent);
 
 			var remoteEnumContent = CodeGenerator_Enumerate
 				.Generate(CommonFormat.NetworkObjectTypeTypeName,
-							CommonFormat.RemoteNamespace,
-							hasNone: true, useTab: true,
-							usingList: new List<string>(),
-							networkEnums);
+						  CommonFormat.RemoteNamespace,
+						  hasNone: true, useTab: true,
+						  usingList: new List<string>(),
+						  networkEnums);
 			var remoteEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, remoteEnumContent);
 
 			foreach (var targetPath in masterTargetPathList.ArgumentArray)
@@ -140,6 +142,58 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					break;
 				}
 			}
+
+#pragma warning disable CA1416 // Validate platform compatibility
+			if (MainProcess.IsDebug)
+			{
+				bool hasFocusWindow = false;
+
+				string explorerName = "explorer";
+				string openDir = Path.Combine(Directory.GetCurrentDirectory(), "Test");
+
+				var t = Type.GetTypeFromProgID("Shell.Application");
+				dynamic o = Activator.CreateInstance(t);
+				try
+				{
+					var ws = o.Windows();
+					for (int i = 0; i < ws.Count; i++)
+					{
+						var ie = ws.Item(i);
+						if (ie == null) continue;
+						var path = System.IO.Path.GetFileName((string)ie.FullName);
+						if (path.ToLower() == "explorer.exe")
+						{
+							string locationPath = ie.LocationURL;
+							Uri uri = new Uri(locationPath);
+							string curExplorerPath = Path.GetFullPath(uri.AbsolutePath);
+							if (Path.Equals(curExplorerPath, openDir))
+							{
+								hasFocusWindow = true;
+								break;
+							}
+						}
+					}
+				}
+				finally
+				{
+					Marshal.FinalReleaseComObject(o);
+				}
+
+				if (!hasFocusWindow)
+				{
+					try
+					{
+						ProcessStartInfo explorer = new(explorerName, openDir);
+						Process.Start(explorer);
+					}
+					catch (Exception e)
+					{
+						PatcherConsole.PrintError("Open test directory error!");
+						PatcherConsole.PrintError(e.Message);
+					}
+				}
+			}
+#pragma warning restore CA1416 // Validate platform compatibility
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()
