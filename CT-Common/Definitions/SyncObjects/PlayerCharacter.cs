@@ -42,6 +42,12 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
 		public void Client_Input(float x, float z) { }
+
+		[SyncRpc(SyncType.ReliableTarget)]
+		public void Server_CommandTarget(NetString command, int number) { }
+
+		[SyncRpc]
+		public void Server_CommandBroadcast(NetString command, int number) { }
 	}
 }
 #pragma warning restore IDE0051

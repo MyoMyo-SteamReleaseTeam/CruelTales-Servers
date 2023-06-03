@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using CT.Common.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments
 {
@@ -15,12 +16,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		}
 
 		/// <summary>Type value1, Type value2</summary>
-		public string GetParameterDeclaration()
+		public string GetParameterDeclaration(bool addNetworkPlayer = false)
 		{
 			if (Count == 0)
 				return string.Empty;
 
 			StringBuilder sb = new();
+			if (addNetworkPlayer)
+			{
+				sb.Append(NameTable.NetworkPlayerParameter);
+				sb.Append(", ");
+			}
 			for (int i = 0; i < Count; i++)
 			{
 				sb.Append(_args[i].GetParameterDeclaration());
@@ -31,13 +37,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		}
 
 		/// <summary>(value1, value2)</summary>
-		public string GetTupleEnqueueValue()
+		public string GetTupleEnqueueValue(bool addNetworkPlayer = false)
 		{
 			if (Count == 1)
 				return _args[0].GetParameterName();
 
 			StringBuilder sb = new();
 			sb.Append("(");
+			if (addNetworkPlayer)
+			{
+				sb.Append(NameTable.NetworkPlayerParameter);
+				sb.Append(", ");
+			}
 			for (int i = 0; i < _args.Count; i++)
 			{
 				sb.Append(_args[i].GetParameterName());
@@ -49,13 +60,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		}
 
 		/// <summary>(Type value1, Type value2)</summary>
-		public string GetTupleDeclaration()
+		public string GetTupleDeclaration(bool addNetworkPlayer = false)
 		{
 			if (Count == 1)
 				return _args[0].TypeName;
 
 			StringBuilder sb = new();
 			sb.Append("(");
+			if (addNetworkPlayer)
+			{
+				sb.Append(NameTable.NetworkPlayerParameter);
+				sb.Append(", ");
+			}
 			for (int i = 0; i < _args.Count; i++)
 			{
 				sb.Append(_args[i].GetParameterDeclaration());

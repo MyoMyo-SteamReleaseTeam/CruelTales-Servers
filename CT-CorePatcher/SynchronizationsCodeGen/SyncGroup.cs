@@ -5,6 +5,9 @@ using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	/// Sync Group의 생성자로 들어오는 MemberToken 배열은 윗단에서
+	/// SyncType이 결정 되어서 들어온다. 
+
 	/// <summary>
 	/// Dirty Group은 1 바이트의 Bitmask로 8개 요소의 변경사항을 감지할 수 있다.
 	/// - 8개 이하의 요소는 1 바이트로 Dirty 상태를 표현한다.

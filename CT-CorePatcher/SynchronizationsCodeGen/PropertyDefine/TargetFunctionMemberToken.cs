@@ -4,18 +4,18 @@ using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
-	public class FunctionMemberToken : BaseMemberToken
+	public class TargetFunctionMemberToken : BaseMemberToken
 	{
 		private string _functionName;
 		private SyncArgumentGroup _argGroup;
-
-		public FunctionMemberToken(SyncType syncType, string functionName, bool isPublic, List<BaseArgument> args)
+		public TargetFunctionMemberToken(SyncType syncType, string functionName, bool isPublic, List<BaseArgument> args)
 			: base(syncType, string.Empty, functionName, isPublic)
 		{
 			_syncType = syncType;
 			_functionName = functionName;
 			_argGroup = new SyncArgumentGroup(args);
 		}
+
 
 		public override string Master_Declaration(SyncDirection direction)
 		{

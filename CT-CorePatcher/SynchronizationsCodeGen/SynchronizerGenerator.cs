@@ -272,6 +272,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					syncType = syncAtt.SyncType;
 					direction = syncAtt.SyncDirection;
 
+					if (direction == SyncDirection.FromRemote &&
+						(syncType == SyncType.ReliableTarget || syncType == SyncType.UnreliableTarget))
+					{
+						throw new WrongSyncSetting(type, method.Name, $"You can not set target type from remote side!");
+					}
+
 					MemberToken member = parseSyncFunction(method, syncType);
 
 					if (direction == SyncDirection.FromMaster)
@@ -442,7 +448,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 			}
 
-			member.Member = new FunctionMemberToken(syncType, functionName, isPublic, arguments);
+			if (syncType == SyncType.Reliable || syncType == SyncType.Unreliable)
+			{
+				member.Member = new FunctionMemberToken(syncType, functionName, isPublic, arguments);
+			}
+			else if (syncType == SyncType.ReliableTarget || syncType == SyncType.UnreliableTarget)
+			{
+				member.Member = new TargetFunctionMemberToken(syncType, functionName, isPublic, arguments);
+			}
 			return member;
 		}
 	}

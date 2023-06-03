@@ -71,15 +71,12 @@ namespace CT.Common.Synchronizations
 	{
 		public SyncType SyncType { get; private set; }
 		public SyncDirection SyncDirection { get; private set; }
-		public RpcCallType RpcType { get; private set; }
 
 		public SyncRpcAttribute(SyncType sync = SyncType.Reliable,
-								SyncDirection dir = SyncDirection.FromMaster,
-								RpcCallType call = RpcCallType.Broadcast)
+								SyncDirection dir = SyncDirection.FromMaster)
 		{
 			SyncType = sync;
 			SyncDirection = dir;
-			RpcType = call;
 		}
 	}
 }

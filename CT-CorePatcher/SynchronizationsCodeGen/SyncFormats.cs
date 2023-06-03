@@ -5,6 +5,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	public static class NameTable
 	{
 		public static string NetworkPlayerParameterName => "player";
+		public static string NetworkPlayerTypeName => "NetworkPlayer";
+		public static string NetworkPlayerParameter => $"{NetworkPlayerTypeName} {NetworkPlayerParameterName}";
+		public static string SerializeTargetName => "Target";
 	}
 
 	public static class CommonFormat
@@ -153,7 +156,7 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string SerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(IPacketWriter writer)";
+		public static string SerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(NetworkPlayer player, IPacketWriter writer)";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -264,7 +267,7 @@ public partial class {0} : {1}
 	{1}Callstack.Add({3});
 	{5}[{6}] = true;
 }}
-private List<{4}> {1}Callstack = new(8);";
+private List<{4}> {1}Callstack = new(4);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -279,6 +282,21 @@ private List<{4}> {1}Callstack = new(8);";
 	{2}[{3}] = true;
 }}
 private byte {1}CallstackCount = 0;";
+
+		/// <summary>
+		/// {0} Access modifier<br/>
+		/// {1} Function name<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Member index<br/>
+		/// </summary>
+		public static string TargetCallWithStackVoid =>
+@"{0} partial void {1}(NetworkPlayer player)
+{{
+	{1}CallstackCount++;
+	{2}[{3}] = true;
+}}
+private byte {1}CallstackCount = 0;
+private Dictionary<NetworkPlayer, byte> {1}CallstackCount = new(7);";
 
 		/// <summary>
 		/// {0} Function name<br/>
