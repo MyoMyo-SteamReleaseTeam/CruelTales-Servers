@@ -21,22 +21,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 
 			List<BaseMemberToken> sReliableMembers = serializeMembers
-				.Where(m => m.SyncType == SyncType.Reliable || m.SyncType == SyncType.ReliableOrUnreliable)
+				.Where(m => m.SyncType == SyncType.Reliable ||
+					   m.SyncType == SyncType.ReliableOrUnreliable ||
+					   (m.Member is TargetFunctionMemberToken &&
+					    m.SyncType == SyncType.ReliableTarget))
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> sUnreliableMembers = serializeMembers
-				.Where(m => m.SyncType == SyncType.Unreliable || m.SyncType == SyncType.ReliableOrUnreliable)
+				.Where(m => m.SyncType == SyncType.Unreliable ||
+					   m.SyncType == SyncType.ReliableOrUnreliable ||
+					   (m.Member is TargetFunctionMemberToken &&
+					    m.SyncType == SyncType.UnreliableTarget))
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> sAllMembers = serializeMembers
-				.Select(m => m.Member).ToList();
-
-			List<BaseMemberToken> sReliableTargetMembers = serializeMembers
-				.Where(m => m.Member is TargetFunctionMemberToken && m.SyncType == SyncType.ReliableTarget)
-				.Select(m => m.Member).ToList();
-
-			List<BaseMemberToken> sUnreliableTargetMembers = serializeMembers
-				.Where(m => m.Member is TargetFunctionMemberToken && m.SyncType == SyncType.UnreliableTarget)
 				.Select(m => m.Member).ToList();
 
 			_reliableGruop = new SerializeSyncGroup(sReliableMembers, SyncType.Reliable, _direction, _modifier);
@@ -88,11 +86,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_modifier = modifier;
 
 			List<BaseMemberToken> dReliableMembers = deserializeMembers
-				.Where(m => m.SyncType == SyncType.Reliable || m.SyncType == SyncType.ReliableOrUnreliable)
+				.Where(m => m.SyncType == SyncType.Reliable ||
+					   m.SyncType == SyncType.ReliableOrUnreliable ||
+					   (m.Member is TargetFunctionMemberToken &&
+						m.SyncType == SyncType.ReliableTarget))
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> dUnreliableMembers = deserializeMembers
-				.Where(m => m.SyncType == SyncType.Unreliable || m.SyncType == SyncType.ReliableOrUnreliable)
+				.Where(m => m.SyncType == SyncType.Unreliable ||
+					   m.SyncType == SyncType.ReliableOrUnreliable ||
+					   (m.Member is TargetFunctionMemberToken &&
+						m.SyncType == SyncType.UnreliableTarget))
 				.Select(m => m.Member).ToList();
 
 			List<BaseMemberToken> dAllMembers = deserializeMembers

@@ -6,8 +6,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class TargetFunctionMemberToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => true;
 		private string _functionName;
 		private SyncArgumentGroup _argGroup;
+
 		public TargetFunctionMemberToken(SyncType syncType, string functionName, bool isPublic, List<BaseArgument> args)
 			: base(syncType, string.Empty, functionName, isPublic)
 		{
@@ -15,7 +17,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_functionName = functionName;
 			_argGroup = new SyncArgumentGroup(args);
 		}
-
 
 		public override string Master_Declaration(SyncDirection direction)
 		{
@@ -29,7 +30,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			if (_argGroup.Count == 0)
 			{
-				return string.Format(FuncMemberFormat.CallWithStackVoid, AccessModifier,
+				return string.Format(FuncMemberFormat.TargetCallWithStackVoid, AccessModifier,
 									 _functionName, dirtyBitname, memberIndex);
 			}
 
@@ -42,7 +43,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);

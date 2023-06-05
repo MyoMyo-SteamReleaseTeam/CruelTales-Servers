@@ -6,6 +6,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class EnumMemberToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => false;
 		private string _enumSizeTypeName;
 		private string _clrEnumSizeTypeName;
 
@@ -30,7 +31,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			return string.Format(MemberFormat.WriteEnum, _enumSizeTypeName, _privateMemberName);
 		}

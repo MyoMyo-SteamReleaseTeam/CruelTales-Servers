@@ -230,6 +230,29 @@ public partial class {0} : {1}
 		public static string InitializeProperties => @"public {0}void InitializeProperties()";
 	}
 
+	public static class DirtyGruopFormat
+	{
+		/// <summary>
+		/// {0} Dirty bits name<br/>
+		/// {1} Temp dirty bits name<br/>
+		/// </summary>
+		public static string JumpAndSerializeMask =>
+@"BitmaskByte {1} = {0};
+int {1}_pos = writer.OffsetSize(sizeof(byte));";
+
+		/// <summary>
+		/// {0} Temp dirty bits name<br/>
+		/// </summary>
+		public static string BackSerializeMask =>
+@"int preSize_{0} = writer.Size;
+writer.SetSize({0}_pos);
+if ({0}.AnyTrue())
+{{
+	{0}.Serialize(writer);
+	writer.SetSize(preSize_{0});
+}}";
+	}
+
 	public static class FuncMemberFormat
 	{
 		/// <summary>

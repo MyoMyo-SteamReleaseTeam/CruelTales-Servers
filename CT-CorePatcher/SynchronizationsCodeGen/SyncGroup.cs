@@ -114,7 +114,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string master_SerializeSyncOneDirtyGroup()
 		{
-			return _dirtyGroups[0].Master_MemberSerializeIfDirtys();
+			return _dirtyGroups[0].Master_MemberSerializeIfDirtys(putDrityBitSerialize: true);
 		}
 
 		private string master_SerializeSyncTwoDirtyGroup()
@@ -124,7 +124,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				var group = _dirtyGroups[i];
 				sb.AppendLine(string.Format(MemberFormat.WriteSerialize, group.GetName()));
-				string content = group.Master_MemberSerializeIfDirtys(false);
+				string content = group.Master_MemberSerializeIfDirtys(putDrityBitSerialize: false);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
 			}
@@ -140,7 +140,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				var dirtyGroup = _dirtyGroups[i];
 				headers.AppendLine(string.Format(SyncGroupFormat.MasterDirtyAnyTrue, i, dirtyGroup.GetName()));
-				string c = CodeFormat.AddIndent(dirtyGroup.Master_MemberSerializeIfDirtys());
+				string c = CodeFormat.AddIndent(dirtyGroup.Master_MemberSerializeIfDirtys(putDrityBitSerialize: true));
 				string content = string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, c);
 				contents.AppendLine(content);
 			}

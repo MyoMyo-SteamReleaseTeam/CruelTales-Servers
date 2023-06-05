@@ -10,6 +10,7 @@ namespace CT.Common.Synchronizations
 	public class TargetVoidCallstack<Key> where Key : notnull
 	{
 		private Dictionary<Key, byte> _callstackTable;
+		public bool IsDirty => _callstackTable.Count > 0;
 
 		public TargetVoidCallstack(int capacity)
 		{
@@ -32,12 +33,12 @@ namespace CT.Common.Synchronizations
 			_callstackTable[key]++;
 		}
 
-		public bool HasBeenCalled(Key key)
+		public int GetCallCount(Key key)
 		{
 			if (!_callstackTable.ContainsKey(key))
-				return false;
+				return 0;
 
-			return _callstackTable[key] > 0;
+			return _callstackTable[key];
 		}
 	}
 
@@ -47,6 +48,7 @@ namespace CT.Common.Synchronizations
 	{
 		private Dictionary<Key, List<Arg>> _callstackTable;
 		private ObjectPool<List<Arg>> _pool;
+		public bool IsDirty => _callstackTable.Count > 0;
 
 		public TargetCallstack(int capacity)
 		{
@@ -64,12 +66,12 @@ namespace CT.Common.Synchronizations
 			_callstackTable.Clear();
 		}
 
-		public bool HasBeenCalled(Key key)
+		public int GetCallCount(Key key)
 		{
 			if (!_callstackTable.ContainsKey(key))
-				return false;
+				return 0;
 
-			return _callstackTable[key].Count > 0;
+			return _callstackTable[key].Count;
 		}
 
 		public void Add(Key key, Arg argument)

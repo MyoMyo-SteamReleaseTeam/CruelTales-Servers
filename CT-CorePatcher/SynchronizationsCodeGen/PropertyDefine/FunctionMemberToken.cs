@@ -6,6 +6,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class FunctionMemberToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => false;
 		private string _functionName;
 		private SyncArgumentGroup _argGroup;
 
@@ -42,7 +43,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);

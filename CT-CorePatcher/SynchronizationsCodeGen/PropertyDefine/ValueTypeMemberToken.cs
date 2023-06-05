@@ -6,6 +6,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class ValueTypeMemberToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => false;
+
 		public ValueTypeMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 			: base(syncType, typeName, memberName, isPublic)
 		{
@@ -28,7 +30,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			return string.Format(MemberFormat.WriteSerialize, _privateMemberName);
 		}

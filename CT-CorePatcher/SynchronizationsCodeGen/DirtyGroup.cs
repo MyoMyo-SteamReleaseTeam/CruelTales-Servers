@@ -11,13 +11,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private List<BaseMemberToken> _members = new();
 		private SyncType _syncType;
 		private int _dirtyIndex;
+		private bool _hasTargetMember = false;
 
 		public DirtyGroup(List<BaseMemberToken> members, SyncType syncType, int dirtyIndex)
 		{
 			_members = members;
 			_syncType = syncType;
 			_dirtyIndex = dirtyIndex;
+			_hasTargetMember = members.FirstOrDefault((m) => m is TargetFunctionMemberToken) != null;
 		}
+
+		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
+		public string GetTempName() => $"dirty{_syncType}_{_dirtyIndex}";
 
 		public string Master_MemberCheckDirtys()
 		{
@@ -27,20 +32,34 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(bool putDrityBitSerialize = true)
+		public string Master_MemberSerializeIfDirtys(bool putDrityBitSerialize)
 		{
+			// TODO : Else 구문을 만들고, 만약 직렬화되지 않은 경우는 상위 비트를 false로 만들기
+			// 상위 비트가 false면 최상위 비트를 false로 만들기
+
 			StringBuilder sb = new();
 			int index = 0;
 			if (putDrityBitSerialize)
 			{
-				sb.AppendLine(string.Format(MemberFormat.WriteSerialize, GetName()));
+				if (_hasTargetMember)
+				{
+					sb.AppendLine(string.Format(DirtyGruopFormat.JumpAndSerializeMask, GetName(), GetTempName()));
+				}
+				else
+				{
+					sb.AppendLine(string.Format(MemberFormat.WriteSerialize, GetName()));
+				}
 			}
 			foreach (var m in _members)
 			{
-				string serialize = m.Master_SerializeByWriter(_syncType);
+				string serialize = m.Master_SerializeByWriter(_syncType, dirtyBitname: string.Empty);
 				CodeFormat.AddIndent(ref serialize);
 				string content = string.Format(CommonFormat.IfDirty, GetName(), index++, serialize);
 				sb.AppendLine(content);
+			}
+			if (putDrityBitSerialize && _hasTargetMember)
+			{
+				sb.AppendLine(string.Format(DirtyGruopFormat.BackSerializeMask, GetTempName()));
 			}
 			return sb.ToString();
 		}
@@ -71,21 +90,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
-
 		public string Remote_MemberDeserializeIfDirtys(SyncDirection direction, bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
 			if (readDirtyBit)
 			{
-				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetTempName()));
 			}
 			foreach (var m in _members)
 			{
 				string content = m.Remote_DeserializeByReader(_syncType, direction);
 				CodeFormat.AddIndent(ref content);
-				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
+				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetTempName(), index++, content));
 			}
 			return sb.ToString();
 		}
@@ -96,13 +113,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			int index = 0;
 			if (readDirtyBit)
 			{
-				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetName()));
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetTempName()));
 			}
 			foreach (var m in _members)
 			{
 				string content = m.Remote_IgnoreDeserialize(syncType);
 				CodeFormat.AddIndent(ref content);
-				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetName(), index++, content));
+				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetTempName(), index++, content));
 			}
 			return sb.ToString();
 		}

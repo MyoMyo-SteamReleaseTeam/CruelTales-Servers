@@ -5,6 +5,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class SyncObjectMemberToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => false;
+
 		public SyncObjectMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 			: base(syncType, typeName, memberName, isPublic)
 		{
@@ -23,7 +25,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_GetterSetter(string dirtyBitname, int memberIndex) => string.Empty;
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			if (syncType == SyncType.None)
 			{

@@ -61,9 +61,11 @@ namespace CT.Common.Serialization
 			Size = size;
 		}
 
-		public void OffsetSize(int offset)
+		public int OffsetSize(int offset)
 		{
+			int preSize = Size;
 			Size += offset;
+			return preSize;
 		}
 
 		public bool CanPut(int putSize)

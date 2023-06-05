@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.Helper;
 
@@ -7,6 +6,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
 	public class PrimitivePropertyToken : BaseMemberToken
 	{
+		public override bool ShouldRollBackMask => false;
 		private string _clrTypeName;
 
 		public PrimitivePropertyToken(SyncType syncType, string typeName, string memberName, string clrTypeName, bool isPublic)
@@ -31,7 +31,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
 		{
 			return string.Format(MemberFormat.WritePut, _privateMemberName);
 		}

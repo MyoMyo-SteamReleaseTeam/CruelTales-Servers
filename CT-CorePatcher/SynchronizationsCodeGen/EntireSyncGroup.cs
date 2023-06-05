@@ -41,7 +41,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m is FunctionMemberToken)
 					continue;
-				contents.AppendLine(m.Master_SerializeByWriter(_syncType));
+				contents.AppendLine(m.Master_SerializeByWriter(_syncType, dirtyBitname: string.Empty));
 			}
 			CodeFormat.AddIndent(contents);
 

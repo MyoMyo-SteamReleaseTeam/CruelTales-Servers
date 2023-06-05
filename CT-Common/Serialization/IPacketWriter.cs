@@ -12,7 +12,10 @@ namespace CT.Common.Serialization
 		public void ResetWriter();
 
 		public void SetSize(int size);
-		public void OffsetSize(int offset);
+		/// <summary>Offset 만큼 건너뜁니다.</summary>
+		/// <param name="offset">건너뛸 크기 입니다.</param>
+		/// <returns>건너뛰기 전의 Size 입니다.</returns>
+		public int OffsetSize(int offset);
 		public bool CanPut(int putSize);
 		public bool CanPut<T>(T serializeObject) where T : IPacketSerializable;
 		public void Put<T>(T serializeObject) where T : IPacketSerializable;
