@@ -66,10 +66,10 @@ namespace CTS.Instance.Gameplay
 			if (timer > 0.2f)
 			{
 				timer = 0;
-				if (_testCubes.Count < 5)
+				if (_testCubes.Count < 100)
 				{
-					float x = (float)(_random.NextDouble() - 0.5) * 20;
-					float y = (float)(_random.NextDouble() - 0.5) * 20;
+					float x = (float)(_random.NextDouble() - 0.5) * 50;
+					float y = (float)(_random.NextDouble() - 0.5) * 50;
 					var testCube = _worldManager.CreateObject<TestCube>(new Vector3(x, 0, y));
 					testCube.BindPool(_testCubes);
 					_testCubes.Add(testCube);

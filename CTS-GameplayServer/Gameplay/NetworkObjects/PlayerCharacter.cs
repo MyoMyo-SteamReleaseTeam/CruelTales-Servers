@@ -1,5 +1,5 @@
 ﻿using System;
-using CT.Common.DataType;
+using System.Numerics;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -7,6 +7,8 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class PlayerCharacter : MasterNetworkObject
 	{
+		public float Speed = 5.0f;
+
 		public NetworkPlayer? NetworkPlayer { get; private set; }
 
 		public override VisibilityType Visibility => VisibilityType.View;
@@ -18,12 +20,15 @@ namespace CTS.Instance.SyncObjects
 			this.UserId = player.UserId;
 			this.Username = player.Username;
 			NetworkPlayer = player;
-			NetworkPlayer.OnViewTargetChanged(this.Transform);
+			NetworkPlayer.BindViewTarget(this.Transform);
 		}
 
 		public partial void Client_Input(NetworkPlayer player, float x, float z)
 		{
-			Console.WriteLine($"Client input from {player}: ({x}, {z})");
+			if (_userId != player.UserId)
+				return;
+
+			Transform.Move(Transform.Position, new Vector3(x, 0, z) * Speed);
 		}
 	}
 }

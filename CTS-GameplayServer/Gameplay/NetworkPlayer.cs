@@ -25,6 +25,7 @@ namespace CTS.Instance.Gameplay
 		// Gameplay
 		public NetworkTransform? TargetTransform { get; private set; }
 		public NetworkTransform ViewTransform { get; private set; }
+		public bool HasViewTarget => TargetTransform != null;
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
 		public Faction Faction { get; private set; }
@@ -79,9 +80,14 @@ namespace CTS.Instance.Gameplay
 				Vector3.Zero : TargetTransform.Velocity;
 		}
 
-		public void OnViewTargetChanged(NetworkTransform target)
+		public void BindViewTarget(NetworkTransform target)
 		{
 			TargetTransform = target;
+		}
+
+		public void ReleaseViewTarget()
+		{
+			TargetTransform = null;
 		}
 
 		public override string ToString() => Username;
