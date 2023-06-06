@@ -21,7 +21,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
-			return string.Format(FuncMemberFormat.Declaration,
+			return string.Format(FuncMemberFormat.TargetDeclaration,
 								 attribute, AccessModifier, _functionName,
 								 _argGroup.GetParameterDeclaration());
 		}
@@ -34,7 +34,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 									 _functionName, dirtyBitname, memberIndex);
 			}
 
-			return string.Format(FuncMemberFormat.CallWithStack,
+			return string.Format(FuncMemberFormat.TargetCallWithStack,
 								 AccessModifier,
 								 _functionName,
 								 _argGroup.GetParameterDeclaration(),
@@ -43,14 +43,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (_argGroup.Count == 0)
-				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);
+				return string.Format(FuncMemberFormat.TargetSerializeIfDirtyVoid, _functionName, dirtyBitname, dirtyBitIndex);
 
 			string content = _argGroup.GetWriteParameterContent();
-			CodeFormat.AddIndent(ref content);
-			return string.Format(FuncMemberFormat.SerializeIfDirty, _functionName, content);
+			CodeFormat.AddIndent(ref content, 2);
+			return string.Format(FuncMemberFormat.TargetSerializeIfDirty, _functionName, content, dirtyBitname, dirtyBitIndex);
 		}
 
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;

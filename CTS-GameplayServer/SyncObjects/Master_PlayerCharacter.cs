@@ -29,6 +29,10 @@ namespace CTS.Instance.SyncObjects
 		private NetStringShort _username = new();
 		[SyncVar]
 		private int _costume;
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_CommandTarget(NetworkPlayer player, NetString command, int number);
+		[SyncRpc]
+		public partial void Server_CommandBroadcast(NetString command, int number);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_Input(NetworkPlayer player, float x, float z);
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -72,14 +76,29 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[2] = true;
 			}
 		}
+		public partial void Server_CommandTarget(NetworkPlayer player, NetString command, int number)
+		{
+			Server_CommandTargetCallstack.Add(player, (command, number));
+			_dirtyReliable_0[3] = true;
+		}
+		private TargetCallstack<NetworkPlayer, (NetString command, int number)> Server_CommandTargetCallstack = new(8);
+		public partial void Server_CommandBroadcast(NetString command, int number)
+		{
+			Server_CommandBroadcastCallstack.Add((command, number));
+			_dirtyReliable_0[4] = true;
+		}
+		private List<(NetString command, int number)> Server_CommandBroadcastCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
+			Server_CommandTargetCallstack.Clear();
+			Server_CommandBroadcastCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(IPacketWriter writer)
+		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				_userId.Serialize(writer);
@@ -92,8 +111,46 @@ namespace CTS.Instance.SyncObjects
 			{
 				writer.Put(_costume);
 			}
+			if (_dirtyReliable_0[3])
+			{
+				int Server_CommandTargetCount = Server_CommandTargetCallstack.GetCallCount(player);
+				if (Server_CommandTargetCount > 0)
+				{
+					var Server_CommandTargetcallList = Server_CommandTargetCallstack.GetCallList(player);
+					writer.Put((byte)Server_CommandTargetCount);
+					for (int i = 0; i < Server_CommandTargetCount; i++)
+					{
+						var arg = Server_CommandTargetcallList[i];
+						arg.command.Serialize(writer);
+						writer.Put(arg.number);
+					}
+				}
+				else
+				{
+					dirtyReliable_0[3] = false;
+				}
+			}
+			if (_dirtyReliable_0[4])
+			{
+				byte count = (byte)Server_CommandBroadcastCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_CommandBroadcastCallstack[i];
+					arg.command.Serialize(writer);
+					writer.Put(arg.number);
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
+			}
 		}
-		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userId.Serialize(writer);
@@ -109,8 +166,8 @@ namespace CTS.Instance.SyncObjects
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
 		{
-			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyUnreliable_0[0])
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -126,8 +183,8 @@ namespace CTS.Instance.SyncObjects
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader)
 		{
-			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyUnreliable_0[0])
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -139,8 +196,8 @@ namespace CTS.Instance.SyncObjects
 		}
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader)
 		{
-			BitmaskByte _dirtyUnreliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyUnreliable_0[0])
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using CT.Common.Serialization;
 
@@ -9,6 +10,7 @@ namespace CT.Common.DataType
 	{
 		public byte Id;
 
+		public const int SIZE = sizeof(byte);
 		public int SerializeSize => sizeof(byte);
 		public static int MaxValue => byte.MaxValue;
 
@@ -40,5 +42,13 @@ namespace CT.Common.DataType
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(byte));
 		public override string ToString() => Id.ToString();
+	}
+
+	public static class NetworkIdentityExtension
+	{
+		public static void PutTo(this IPacketWriter writer, NetworkIdentity value, int position)
+		{
+			writer.PutTo(value.Id, position);
+		}
 	}
 }

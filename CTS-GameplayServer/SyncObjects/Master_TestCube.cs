@@ -79,14 +79,14 @@ namespace CTS.Instance.SyncObjects
 			TestRPCCallstack.Add(someMessage);
 			_dirtyReliable_0[3] = true;
 		}
-		private List<long> TestRPCCallstack = new(8);
+		private List<long> TestRPCCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			TestRPCCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
-		public override void SerializeSyncReliable(IPacketWriter writer)
+		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
@@ -112,7 +112,7 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 		}
-		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put(_r);

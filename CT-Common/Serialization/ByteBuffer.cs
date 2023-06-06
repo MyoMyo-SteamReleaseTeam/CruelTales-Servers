@@ -88,6 +88,11 @@ namespace CT.Common.Serialization
 			Size += reader.CopyToWriter(this);
 		}
 
+		public void PutTo(byte value, int position)
+		{
+			BinaryConverter.WriteByte(ByteSegment, position, value);
+		}
+
 		public void Put(bool value)
 		{
 			BinaryConverter.WriteBool(ByteSegment, Size, value);

@@ -231,7 +231,7 @@ namespace CTS.Instance.Gameplay
 			if (visibleTable.TraceObjects.Count != 0)
 			{
 				// Reliable data
-				SerializeReliableData(_reliableBuffer,
+				SerializeReliableData(player, _reliableBuffer,
 									  visibleTable.TraceObjects,
 									  PacketType.SC_Sync_MasterReliable);
 
@@ -244,7 +244,7 @@ namespace CTS.Instance.Gameplay
 									  PacketType.SC_Sync_MasterMovement);
 
 				// Unreliable data
-				SerializeUnreliableData(_mtuBuffer,
+				SerializeUnreliableData(player, _mtuBuffer,
 										visibleTable.TraceObjects,
 										PacketType.SC_Sync_MasterUnreliable);
 			}
@@ -253,12 +253,12 @@ namespace CTS.Instance.Gameplay
 			if (visibleTable.GlobalTraceObjects.Count != 0)
 			{
 				// Reliable data
-				SerializeReliableData(_reliableBuffer,
+				SerializeReliableData(player, _reliableBuffer,
 									  visibleTable.GlobalTraceObjects,
 									  PacketType.SC_Sync_MasterReliable);
 
 				// Unreliable data
-				SerializeUnreliableData(_mtuBuffer,
+				SerializeUnreliableData(player, _mtuBuffer,
 										visibleTable.GlobalTraceObjects,
 										PacketType.SC_Sync_MasterUnreliable);
 			}
@@ -338,7 +338,7 @@ namespace CTS.Instance.Gameplay
 		}
 
 		private const int OFFSET_SIZE = sizeof(PacketType) + sizeof(byte);
-		public static void SerializeReliableData(IPacketWriter writer,
+		public static void SerializeReliableData(NetworkPlayer player, IPacketWriter writer,
 												 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 												 PacketType packetType)
 		{
@@ -351,9 +351,20 @@ namespace CTS.Instance.Gameplay
 			{
 				if (syncObj.IsDirtyReliable)
 				{
-					syncCount++;
-					writer.Put(syncObj.Identity);
-					syncObj.SerializeSyncReliable(writer);
+					int preSize = writer.OffsetSize(NetworkIdentity.SIZE);
+					int curSize = writer.Size;
+					syncObj.SerializeSyncReliable(player, writer);
+
+					// It's serialized
+					if (writer.Size != curSize)
+					{
+						syncCount++;
+						writer.PutTo(syncObj.Identity, preSize);
+					}
+					else
+					{
+						writer.SetSize(preSize);
+					}
 				}
 			}
 
@@ -372,7 +383,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public static void SerializeUnreliableData(IPacketWriter writer,
+		public static void SerializeUnreliableData(NetworkPlayer player, IPacketWriter writer,
 												   Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 												   PacketType packetType)
 		{
@@ -385,9 +396,20 @@ namespace CTS.Instance.Gameplay
 			{
 				if (syncObj.IsDirtyUnreliable)
 				{
-					syncCount++;
-					writer.Put(syncObj.Identity);
-					syncObj.SerializeSyncUnreliable(writer);
+					int preSize = writer.OffsetSize(NetworkIdentity.SIZE);
+					int curSize = writer.Size;
+					syncObj.SerializeSyncUnreliable(player, writer);
+
+					// It's serialized
+					if (writer.Size != curSize)
+					{
+						syncCount++;
+						writer.PutTo(syncObj.Identity, preSize);
+					}
+					else
+					{
+						writer.SetSize(preSize);
+					}
 				}
 			}
 

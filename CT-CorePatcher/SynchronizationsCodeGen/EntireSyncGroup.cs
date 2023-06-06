@@ -37,11 +37,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();
+			int index = 0;
 			foreach (var m in _members)
 			{
-				if (m is FunctionMemberToken)
+				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Master_SerializeByWriter(_syncType, dirtyBitname: string.Empty));
+				contents.AppendLine(m.Master_SerializeByWriter(_syncType, dirtyBitname: string.Empty, index++));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -64,7 +65,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder contents = new();
 			foreach (var m in _members)
 			{
-				if (m is FunctionMemberToken)
+				if (SyncRule.CanSyncEntire(m))
 					continue;
 				contents.AppendLine(m.Master_InitializeProperty());
 			}
@@ -117,7 +118,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder contents = new();
 			foreach (var m in _members)
 			{
-				if (m is FunctionMemberToken)
+				if (SyncRule.CanSyncEntire(m))
 					continue;
 				contents.AppendLine(m.Remote_DeserializeByReader(_syncType, _direction));
 			}

@@ -25,7 +25,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_GetterSetter(string dirtyBitname, int memberIndex) => string.Empty;
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (syncType == SyncType.None)
 			{

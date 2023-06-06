@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using CT.Common.Tools;
+
+#if NET
 
 namespace CT.Common.Synchronizations
 {
@@ -92,3 +90,5 @@ namespace CT.Common.Synchronizations
 		private static List<Arg> getList() => new List<Arg>(4);
 	}
 }
+
+#endif

@@ -23,12 +23,12 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>
 		/// 신뢰성 속성을 가진 동기화 요소를 직렬화합니다.
 		/// </summary>
-		public void SerializeSyncReliable(IPacketWriter writer);
+		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer);
 
 		/// <summary>
 		/// 비신뢰성 속성을 가진 동기화 요소를 역직렬화합니다.
 		/// </summary>
-		public void SerializeSyncUnreliable(IPacketWriter writer);
+		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer);
 
 		/// <summary>
 		/// 모든 동기화 요소를 직렬화합니다.

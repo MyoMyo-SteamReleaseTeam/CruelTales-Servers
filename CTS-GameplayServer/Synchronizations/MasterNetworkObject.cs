@@ -162,8 +162,8 @@ namespace CTS.Instance.Synchronizations
 
 		public abstract bool IsDirtyReliable { get; }
 		public abstract bool IsDirtyUnreliable { get; }
-		public abstract void SerializeSyncReliable(IPacketWriter writer);
-		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
+		public abstract void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer);
+		public abstract void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer);
 		public abstract void SerializeEveryProperty(IPacketWriter writer);
 		public abstract bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader);
 		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);

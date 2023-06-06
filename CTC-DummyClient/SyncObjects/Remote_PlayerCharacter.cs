@@ -33,6 +33,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _costume;
 		public event Action<int>? OnCostumeChanged;
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_CommandTarget(NetString command, int number);
+		[SyncRpc]
+		public partial void Server_CommandBroadcast(NetString command, int number);
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable
@@ -49,7 +53,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			Client_InputCallstack.Add((x, z));
 			_dirtyUnreliable_0[0] = true;
 		}
-		private List<(float x, float z)> Client_InputCallstack = new(8);
+		private List<(float x, float z)> Client_InputCallstack = new(4);
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable()
 		{
@@ -76,21 +80,43 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void InitializeProperties() { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
-			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyReliable_0[0])
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
 			{
 				if (!_userId.TryDeserialize(reader)) return false;
 				OnUserIdChanged?.Invoke(_userId);
 			}
-			if (_dirtyReliable_0[1])
+			if (dirtyReliable_0[1])
 			{
 				if (!_username.TryDeserialize(reader)) return false;
 				OnUsernameChanged?.Invoke(_username);
 			}
-			if (_dirtyReliable_0[2])
+			if (dirtyReliable_0[2])
 			{
 				if (!reader.TryReadInt32(out _costume)) return false;
 				OnCostumeChanged?.Invoke(_costume);
+			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString command = new();
+					if (!command.TryDeserialize(reader)) return false;
+					if (!reader.TryReadInt32(out int number)) return false;
+					Server_CommandTarget(command, number);
+				}
+			}
+			if (dirtyReliable_0[4])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString command = new();
+					if (!command.TryDeserialize(reader)) return false;
+					if (!reader.TryReadInt32(out int number)) return false;
+					Server_CommandBroadcast(command, number);
+				}
 			}
 			return true;
 		}
@@ -107,34 +133,70 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
-			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyReliable_0[0])
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
 			{
 				UserId.IgnoreStatic(reader);
 			}
-			if (_dirtyReliable_0[1])
+			if (dirtyReliable_0[1])
 			{
 				NetStringShort.IgnoreStatic(reader);
 			}
-			if (_dirtyReliable_0[2])
+			if (dirtyReliable_0[2])
 			{
 				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.IgnoreStatic(reader);
+					reader.Ignore(4);
+				}
+			}
+			if (dirtyReliable_0[4])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.IgnoreStatic(reader);
+					reader.Ignore(4);
+				}
 			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
-			BitmaskByte _dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (_dirtyReliable_0[0])
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
 			{
 				UserId.IgnoreStatic(reader);
 			}
-			if (_dirtyReliable_0[1])
+			if (dirtyReliable_0[1])
 			{
 				NetStringShort.IgnoreStatic(reader);
 			}
-			if (_dirtyReliable_0[2])
+			if (dirtyReliable_0[2])
 			{
 				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.IgnoreStatic(reader);
+					reader.Ignore(4);
+				}
+			}
+			if (dirtyReliable_0[4])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					NetString.IgnoreStatic(reader);
+					reader.Ignore(4);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

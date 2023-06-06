@@ -43,7 +43,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname)
+		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _functionName);

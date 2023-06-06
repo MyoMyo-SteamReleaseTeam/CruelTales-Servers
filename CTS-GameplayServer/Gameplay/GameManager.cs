@@ -26,6 +26,7 @@ namespace CTS.Instance.Gameplay
 
 		// Test
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
+		private List<PlayerCharacter> _playerCharacterList = new();
 		private InstanceInitializeOption _option;
 		private List<TestCube> _testCubes = new(30);
 
@@ -51,6 +52,8 @@ namespace CTS.Instance.Gameplay
 		}
 
 		float timer = 0;
+		float playerTimer = 0;
+		int playerIndex = 0;
 
 		public void Update(float deltaTime)
 		{
@@ -72,6 +75,24 @@ namespace CTS.Instance.Gameplay
 					_testCubes.Add(testCube);
 				}
 			}
+
+			playerTimer += deltaTime;
+			if (playerTimer > 1 && _playerCharacterList.Count > 0)
+			{
+				playerTimer = 0;
+
+				if (playerIndex >= _playerCharacterList.Count)
+				{
+					playerIndex = 0;
+				}
+
+				var pc = _playerCharacterList[playerIndex];
+				if (pc.NetworkPlayer != null)
+				{
+					pc.Server_CommandTarget(pc.NetworkPlayer, $"Target:{pc.NetworkPlayer.UserId}", playerIndex);
+					playerIndex++;
+				}
+			}
 		}
 
 		private static Random _random = new Random();
@@ -89,7 +110,11 @@ namespace CTS.Instance.Gameplay
 			
 			// Test
 			var playerCharacter = _worldManager.CreateObject<PlayerCharacter>();
+			playerCharacter.BindNetworkPlayer(player);
 			_playerCharacterByPlayer.Add(player, playerCharacter);
+
+			// DEBUG
+			_playerCharacterList.Add(playerCharacter);
 		}
 
 		public void OnUserLeaveGame(UserSession userSession)
@@ -110,6 +135,9 @@ namespace CTS.Instance.Gameplay
 			{
 				character.Destroy();
 				_playerCharacterByPlayer.TryRemove(player);
+
+				// DEBUG
+				_playerCharacterList.Remove(character);
 			}
 		}
 

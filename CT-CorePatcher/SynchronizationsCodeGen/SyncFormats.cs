@@ -1,7 +1,16 @@
 ﻿using CT.Common.Synchronizations;
+using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	public static class SyncRule
+	{
+		public static bool CanSyncEntire(BaseMemberToken token)
+		{
+			return token is FunctionMemberToken || token is TargetFunctionMemberToken;
+		}
+	}
+
 	public static class NameTable
 	{
 		public static string NetworkPlayerParameterName => "player";
@@ -156,7 +165,13 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
-		public static string SerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(NetworkPlayer player, IPacketWriter writer)";
+		public static string MasterSerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(NetworkPlayer player, IPacketWriter writer)";
+
+		/// <summary>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string RemoteSerializeFunctionDeclaration => @"public {0}void SerializeSync{1}(IPacketWriter writer)";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -244,12 +259,13 @@ int {1}_pos = writer.OffsetSize(sizeof(byte));";
 		/// {0} Temp dirty bits name<br/>
 		/// </summary>
 		public static string BackSerializeMask =>
-@"int preSize_{0} = writer.Size;
-writer.SetSize({0}_pos);
-if ({0}.AnyTrue())
+@"if ({0}.AnyTrue())
 {{
-	{0}.Serialize(writer);
-	writer.SetSize(preSize_{0});
+	writer.PutTo({0}, {0}_pos);
+}}
+else
+{{
+	writer.SetSize({0}_pos);
 }}";
 	}
 
@@ -264,6 +280,16 @@ if ({0}.AnyTrue())
 		public static string Declaration =>
 @"[{0}]
 {1} partial void {2}({3});";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Access modifier<br/>
+		/// {2} Function name<br/>
+		/// {3} Parameter declaration <br/>
+		/// </summary>
+		public static string TargetDeclaration =>
+@"[{0}]
+{1} partial void {2}(NetworkPlayer player, {3});";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -309,17 +335,39 @@ private byte {1}CallstackCount = 0;";
 		/// <summary>
 		/// {0} Access modifier<br/>
 		/// {1} Function name<br/>
+		/// {2} Parameter declaration<br/>
+		/// {3} Callstack tuple enqueue value<br/>
+		/// {4} Callstack tuple declaration<br/>
+		/// {5} Dirty bits name<br/>
+		/// {6} Dirty index<br/>
+		/// </summary>
+		public static string TargetCallWithStack =>
+@"{0} partial void {1}(NetworkPlayer player, {2})
+{{
+	{1}Callstack.Add(player, {3});
+	{5}[{6}] = true;
+}}
+private TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
+
+		/// <summary>
+		/// {0} Access modifier<br/>
+		/// {1} Function name<br/>
 		/// {2} Dirty bits name<br/>
 		/// {3} Member index<br/>
 		/// </summary>
 		public static string TargetCallWithStackVoid =>
 @"{0} partial void {1}(NetworkPlayer player)
 {{
-	{1}CallstackCount++;
+	{1}CallstackCount.Add(player);
 	{2}[{3}] = true;
 }}
-private byte {1}CallstackCount = 0;
-private Dictionary<NetworkPlayer, byte> {1}CallstackCount = new(7);";
+private TargetVoidCallstack<NetworkPlayer> {1}Callstack = new(8);";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string SerializeIfDirtyVoid =>
+@"writer.Put((byte){0}CallstackCount);";
 
 		/// <summary>
 		/// {0} Function name<br/>
@@ -334,13 +382,46 @@ for (int i = 0; i < count; i++)
 {1}
 }}";
 
-		public static string TempArgumentName => @"arg";
+		/// <summary>
+		/// {0} Function name<br/>
+		/// {1} Dirty bits name<br/>
+		/// {2} Dirty bits index<br/>
+		/// </summary>
+		public static string TargetSerializeIfDirtyVoid =>
+@"int {0}Count = {0}Callstack.GetCallCount(player);
+if ({0}Count > 0)
+{{
+	writer.Put((byte){0}Count);
+}}
+else
+{{
+	{1}[{2}] = false;
+}}";
 
 		/// <summary>
 		/// {0} Function name<br/>
+		/// {1} Callstack serialize content<br/>
+		/// {2} Dirty bits name<br/>
+		/// {3} Dirty bits index<br/>
 		/// </summary>
-		public static string SerializeIfDirtyVoid =>
-@"writer.Put((byte){0}CallstackCount);";
+		public static string TargetSerializeIfDirty =>
+@"int {0}Count = {0}Callstack.GetCallCount(player);
+if ({0}Count > 0)
+{{
+	var {0}callList = {0}Callstack.GetCallList(player);
+	writer.Put((byte){0}Count);
+	for (int i = 0; i < {0}Count; i++)
+	{{
+		var arg = {0}callList[i];
+{1}
+	}}
+}}
+else
+{{
+	{2}[{3}] = false;
+}}";
+
+		public static string TempArgumentName => @"arg";
 
 		/// <summary>
 		/// {0} Function name<br/>

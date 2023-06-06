@@ -85,7 +85,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string Master_SerializeSync()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(SyncGroupFormat.SerializeFunctionDeclaration, _modifier, _syncType));
+			if (_direction == SyncDirection.FromMaster)
+			{
+				sb.Append(string.Format(SyncGroupFormat.MasterSerializeFunctionDeclaration, _modifier, _syncType));
+			}
+			else if (_direction == SyncDirection.FromRemote)
+			{
+				sb.Append(string.Format(SyncGroupFormat.RemoteSerializeFunctionDeclaration, _modifier, _syncType));
+			}
 
 			if (_dirtyGroups.Count == 0)
 				return sb.AppendLine(" { }").ToString();

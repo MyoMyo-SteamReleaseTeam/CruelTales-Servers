@@ -198,6 +198,11 @@ namespace CT.Common.Tools.Collections
 			writer.Put(value.Mask);
 		}
 
+		public static void PutTo(this IPacketWriter writer, BitmaskByte value, int position)
+		{
+			writer.PutTo(value.Mask, position);
+		}
+
 		public static BitmaskByte ReadBitmaskByte(this IPacketReader reader)
 		{
 			return new BitmaskByte(reader.ReadByte());
