@@ -48,16 +48,14 @@ namespace CTS.Instance.Synchronizations
 
 		public Vector2Int CurrentCellPos { get; private set; }
 
-		/// <summary>네트워크 객체를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
-		public void Update(float deltaTime)
+		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
+		public void UpdatePhysics(float deltaTime)
 		{
 			// 고정 물리 업데이트를 수행합니다.
 			if (!IsStatic)
 			{
 				fixedUpdate(deltaTime);
 			}
-
-			OnUpdate(deltaTime);
 		}
 
 		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>

@@ -85,7 +85,7 @@ namespace CTS.Instance.Gameplay
 			// Sync network object from remote
 			_syncJobQueue.Flush();
 
-			// Update world positions and logic
+			// Update world network logic of objects
 			WorldManager.UpdateNetworkObjects(deltaTime);
 
 			// Update game manager logic
@@ -93,6 +93,9 @@ namespace CTS.Instance.Gameplay
 
 			// Send sync data to each user
 			WorldManager.UpdateVisibilityAndSendData();
+
+			// Update network objects physics
+			WorldManager.UpdatePhysics(deltaTime);
 
 			// Update world partitions
 			WorldManager.UpdateWorldPartitions();

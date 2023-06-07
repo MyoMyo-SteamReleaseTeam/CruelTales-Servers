@@ -57,14 +57,23 @@ namespace CTS.Instance.Gameplay
 
 		public void UpdateNetworkObjects(float deltaTime)
 		{
-			// Update every objects
 			foreach (var netObj in _networkObjectById.ForwardValues)
 			{
 				if (!netObj.IsAlive)
 					continue;
 
-				// Update positions and logic
-				netObj.Update(deltaTime);
+				netObj.OnUpdate(deltaTime);
+			}
+		}
+
+		public void UpdatePhysics(float deltaTime)
+		{
+			foreach (var netObj in _networkObjectById.ForwardValues)
+			{
+				if (!netObj.IsAlive)
+					continue;
+
+				netObj.UpdatePhysics(deltaTime);
 			}
 		}
 
