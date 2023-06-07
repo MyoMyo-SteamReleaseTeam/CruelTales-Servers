@@ -22,7 +22,7 @@ namespace CTS.Instance.Gameplay
 
 		// Manage Players
 		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
-		private ObjectPool<NetworkPlayer> _networkPlayerPool;
+		[AllowNull] private ObjectPool<NetworkPlayer> _networkPlayerPool;
 
 		// Test
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
@@ -38,17 +38,17 @@ namespace CTS.Instance.Gameplay
 			_option = option;
 
 			// Manage Players
-			_networkPlayerByUserId = new(option.SystemMaxUser);
-			_networkPlayerPool = new(() => new NetworkPlayer(this, _worldManager, option),
-									 option.SystemMaxUser);
+			_networkPlayerByUserId = new(_option.SystemMaxUser);
 
 			// Test
-			_playerCharacterByPlayer = new(option.SystemMaxUser);
+			_playerCharacterByPlayer = new(_option.SystemMaxUser);
 		}
 
 		public void Initialize()
 		{
 			_worldManager = _gameplayInstance.WorldManager;
+			_networkPlayerPool = new(() => new NetworkPlayer(this, _worldManager, _option),
+									 _option.SystemMaxUser);
 		}
 
 		float timer = 0;
@@ -66,7 +66,6 @@ namespace CTS.Instance.Gameplay
 			if (timer > 0.2f)
 			{
 				timer = 0;
-				if (_testCubes.Count < 100)
 				{
 					float x = (float)(_random.NextDouble() - 0.5) * 50;
 					float y = (float)(_random.NextDouble() - 0.5) * 50;

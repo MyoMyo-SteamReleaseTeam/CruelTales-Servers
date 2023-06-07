@@ -3,7 +3,7 @@
 namespace CTS.Instance.Gameplay
 {
 	/// <summary>서버의 초기화 옵션입니다.</summary>
-	public struct InstanceInitializeOption
+	public class InstanceInitializeOption
 	{
 		public int SystemMaxUser = 7;
 
