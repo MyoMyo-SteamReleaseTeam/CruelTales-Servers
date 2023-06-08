@@ -62,6 +62,7 @@ namespace CT.CorePatcher
 			Console.WriteLine($"# {e.GetType().Name} #");
 			Console.WriteLine($"");
 			Console.WriteLine($"{e.Message}");
+			Console.WriteLine($"{e.StackTrace}");
 			PrintSeparator();
 		}
 

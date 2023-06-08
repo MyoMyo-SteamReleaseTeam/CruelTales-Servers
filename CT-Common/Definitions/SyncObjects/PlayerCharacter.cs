@@ -1,5 +1,6 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
+using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Synchronizations;
 
@@ -36,18 +37,15 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar]
 		public int Costume;
 
+		[SyncVar]
+		public Vector2 Test;
+
 		////For test
 		//[SyncVar(SyncType.ColdData, SyncDirection.FromRemote)]
 		//public float TestColdDataFromRemote;
 
 		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
-		public void Client_Input(float x, float z) { }
-
-		[SyncRpc(SyncType.ReliableTarget)]
-		public void Server_CommandTarget(NetString command, int number) { }
-
-		[SyncRpc]
-		public void Server_CommandBroadcast(NetString command, int number) { }
+		public void Client_InputMovement(Vector2 direction) { }
 	}
 }
 #pragma warning restore IDE0051

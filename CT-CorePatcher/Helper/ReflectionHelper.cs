@@ -8,6 +8,16 @@ namespace CT.CorePatcher.Helper
 {
 	public static class ReflectionHelper
 	{
+		private static readonly HashSet<string> _nativeStructSet = new()
+		{
+			"Vector2", "Vector3"
+		};
+
+		public static bool IsNativeStruct(string typeName)
+		{
+			return _nativeStructSet.Contains(typeName);
+		}
+
 		private static readonly BidirectionalMap<string, string> _primitiyTypeByCLR = new()
 		{
 			{ "bool", "Bool" },

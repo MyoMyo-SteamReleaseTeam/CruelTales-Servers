@@ -9,6 +9,7 @@
 #pragma warning disable CS0649
 
 using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
@@ -29,12 +30,10 @@ namespace CTS.Instance.SyncObjects
 		private NetStringShort _username = new();
 		[SyncVar]
 		private int _costume;
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_CommandTarget(NetworkPlayer player, NetString command, int number);
-		[SyncRpc]
-		public partial void Server_CommandBroadcast(NetString command, int number);
+		[SyncVar]
+		private Vector2 _test = new();
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_Input(NetworkPlayer player, float x, float z);
+		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -76,29 +75,24 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[2] = true;
 			}
 		}
-		public partial void Server_CommandTarget(NetworkPlayer player, NetString command, int number)
+		public Vector2 Test
 		{
-			Server_CommandTargetCallstack.Add(player, (command, number));
-			_dirtyReliable_0[3] = true;
+			get => _test;
+			set
+			{
+				if (_test == value) return;
+				_test = value;
+				_dirtyReliable_0[3] = true;
+			}
 		}
-		private TargetCallstack<NetworkPlayer, (NetString command, int number)> Server_CommandTargetCallstack = new(8);
-		public partial void Server_CommandBroadcast(NetString command, int number)
-		{
-			Server_CommandBroadcastCallstack.Add((command, number));
-			_dirtyReliable_0[4] = true;
-		}
-		private List<(NetString command, int number)> Server_CommandBroadcastCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			Server_CommandTargetCallstack.Clear();
-			Server_CommandBroadcastCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
-			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
+			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
 				_userId.Serialize(writer);
@@ -113,41 +107,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[3])
 			{
-				int Server_CommandTargetCount = Server_CommandTargetCallstack.GetCallCount(player);
-				if (Server_CommandTargetCount > 0)
-				{
-					var Server_CommandTargetcallList = Server_CommandTargetCallstack.GetCallList(player);
-					writer.Put((byte)Server_CommandTargetCount);
-					for (int i = 0; i < Server_CommandTargetCount; i++)
-					{
-						var arg = Server_CommandTargetcallList[i];
-						arg.command.Serialize(writer);
-						writer.Put(arg.number);
-					}
-				}
-				else
-				{
-					dirtyReliable_0[3] = false;
-				}
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_CommandBroadcastCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_CommandBroadcastCallstack[i];
-					arg.command.Serialize(writer);
-					writer.Put(arg.number);
-				}
-			}
-			if (dirtyReliable_0.AnyTrue())
-			{
-				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			}
-			else
-			{
-				writer.SetSize(dirtyReliable_0_pos);
+				writer.Put(_test);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -156,12 +116,14 @@ namespace CTS.Instance.SyncObjects
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
 			writer.Put(_costume);
+			writer.Put(_test);
 		}
 		public override void InitializeProperties()
 		{
 			_userId = new();
 			_username = new();
 			_costume = 0;
+			_test = new();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
@@ -172,9 +134,8 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					if (!reader.TryReadSingle(out float x)) return false;
-					if (!reader.TryReadSingle(out float z)) return false;
-					Client_Input(player, x, z);
+					if (!reader.TryReadVector2(out var direction)) return false;
+					Client_InputMovement(player, direction);
 				}
 			}
 			return true;
@@ -189,8 +150,7 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					reader.Ignore(4);
-					reader.Ignore(4);
+					Vector2Extension.IgnoreStatic(reader);
 				}
 			}
 		}
@@ -202,8 +162,7 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					reader.Ignore(4);
-					reader.Ignore(4);
+					Vector2Extension.IgnoreStatic(reader);
 				}
 			}
 		}

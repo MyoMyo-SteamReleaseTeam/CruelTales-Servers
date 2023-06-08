@@ -7,6 +7,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	public class ValueTypeMemberToken : BaseMemberToken
 	{
 		public override bool ShouldRollBackMask => false;
+		public bool IsNativeStruct { get; private set; }
 
 		public ValueTypeMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 			: base(syncType, typeName, memberName, isPublic)
@@ -15,6 +16,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
+			IsNativeStruct = ReflectionHelper.IsNativeStruct(_typeName);
 		}
 
 		public override string Master_Declaration(SyncDirection direction)
@@ -32,7 +34,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
-			return string.Format(MemberFormat.WriteSerialize, _privateMemberName);
+			string format = IsNativeStruct ? MemberFormat.WritePut : MemberFormat.WriteSerialize;
+			return string.Format(format, _privateMemberName);
 		}
 
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
@@ -53,14 +56,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
+			if (IsNativeStruct)
+			{
+				sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _typeName));
+			}
+			else
+			{
+				sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
+			}
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}
 
 		public override string Remote_IgnoreDeserialize(SyncType syncType)
 		{
-			return string.Format(MemberFormat.IgnoreValueType, _typeName);
+			string dataTypeName = IsNativeStruct ? _typeName + "Extension" : _typeName;
+			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);
 		}
 	}
 }

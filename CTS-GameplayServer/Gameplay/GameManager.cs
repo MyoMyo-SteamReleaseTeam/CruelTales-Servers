@@ -66,6 +66,7 @@ namespace CTS.Instance.Gameplay
 			if (timer > 0.2f)
 			{
 				timer = 0;
+				if (_testCubes.Count < 50)
 				{
 					float x = (float)(_random.NextDouble() - 0.5) * 50;
 					float y = (float)(_random.NextDouble() - 0.5) * 50;
@@ -88,7 +89,7 @@ namespace CTS.Instance.Gameplay
 				var pc = _playerCharacterList[playerIndex];
 				if (pc.NetworkPlayer != null)
 				{
-					pc.Server_CommandTarget(pc.NetworkPlayer, $"Target:{pc.NetworkPlayer.UserId}", playerIndex);
+					//pc.Server_CommandTarget(pc.NetworkPlayer, $"Target:{pc.NetworkPlayer.UserId}", playerIndex);
 					playerIndex++;
 				}
 			}

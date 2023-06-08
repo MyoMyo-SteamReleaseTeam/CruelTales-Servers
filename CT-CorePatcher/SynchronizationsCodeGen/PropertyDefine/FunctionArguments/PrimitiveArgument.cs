@@ -9,8 +9,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		public PrimitiveArgument(string typeName, string parameterName, string clrTypeName)
 			: base(typeName, parameterName)
 		{
-			_typeName = typeName;
-			_parameterName = parameterName;
 			_clrTypeName = clrTypeName;
 		}
 

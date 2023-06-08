@@ -1,4 +1,10 @@
 ﻿using System;
+#if NET
+using System.Numerics;
+#elif UNITY_2021
+using UnityEngine;
+#endif
+
 using CT.Common.DataType;
 
 namespace CT.Common.Serialization
@@ -69,5 +75,12 @@ namespace CT.Common.Serialization
 		public bool TryReadDouble(out double value);
 		public bool TryReadNetString(out string value);
 		public bool TryReadNetStringShort(out string value);
+
+		#if UNITY_2021
+		public bool TryReadVector2(out UnityEngine.Vector2 value);
+		public bool TryReadVector3(out UnityEngine.Vector3 value);
+		#endif
+		public bool TryReadVector2(out System.Numerics.Vector2 value);
+		public bool TryReadVector3(out System.Numerics.Vector3 value);
 	}
 }

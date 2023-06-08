@@ -203,7 +203,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					catch (Exception e)
 					{
 						PatcherConsole.PrintError("Open test directory error!");
-						PatcherConsole.PrintError(e.Message);
+						PatcherConsole.PrintException(e);
 					}
 				}
 			}

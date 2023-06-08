@@ -66,6 +66,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 	{
 		public static string MasterUsingStatements =>
 @"using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;
@@ -81,7 +82,8 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using CTC.Networks.Synchronizations;";
+using CTC.Networks.Synchronizations;
+using UnityEngine;";
 
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
@@ -516,6 +518,13 @@ for (int i = 0; i < count; i++)
 		public static string TempReadByDeserializerStruct =>
 @"{0} {1} = new();
 if (!{1}.TryDeserialize(reader)) return false;";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Parameter name<br/>
+		/// </summary>
+		public static string TempReadByDeserializerNativeStruct =>
+@"if (!reader.TryRead{0}(out var {1})) return false;";
 
 		/// <summary>
 		/// {0} Enum type name<br/>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Numerics;
 using CT.Common.DataType;
 
 namespace CT.Common.Serialization
@@ -679,6 +680,62 @@ namespace CT.Common.Serialization
 														   byteLength);
 			ReadPosition += byteLength;
 			return true;
+		}
+
+#if UNITY_2021
+		public bool TryReadVector2(out UnityEngine.Vector2 value)
+		{
+			if (TryReadSingle(out float x) && TryReadSingle(out float y))
+			{
+				value = new UnityEngine.Vector2(x, y);
+				return true;
+			}
+
+			value = default;
+			return false;
+		}
+#endif
+
+		public bool TryReadVector2(out Vector2 value)
+		{
+			if (TryReadSingle(out float x) && TryReadSingle(out float y))
+			{
+				value = new Vector2(x, y);
+				return true;
+			}
+
+			value = default;
+			return false;
+		}
+
+#if UNITY_2021
+		public bool TryReadVector3(out UnityEngine.Vector3 value)
+		{
+			if (TryReadSingle(out float x) &&
+				TryReadSingle(out float y) && 
+				TryReadSingle(out float z))
+			{
+				value = new UnityEngine.Vector3(x, y, z);
+				return true;
+			}
+
+			value = default;
+			return false;
+		}
+#endif
+
+		public bool TryReadVector3(out Vector3 value)
+		{
+			if (TryReadSingle(out float x) &&
+				TryReadSingle(out float y) && 
+				TryReadSingle(out float z))
+			{
+				value = new Vector3(x, y, z);
+				return true;
+			}
+
+			value = default;
+			return false;
 		}
 
 		#endregion

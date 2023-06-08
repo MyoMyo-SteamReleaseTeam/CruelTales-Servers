@@ -4,19 +4,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 {
 	public class ValueTypeArgument : BaseArgument
 	{
+		public bool IsNativeStruct { get; private set; } = false;
+
 		public ValueTypeArgument(string typeName, string parameterName)
 			: base(typeName, parameterName)
 		{
-			_typeName = typeName;
-			_parameterName = parameterName;
+			IsNativeStruct = ReflectionHelper.IsNativeStruct(_typeName);
 		}
 
 		public override string GetParameterDeclaration() => $"{_typeName} {_parameterName}";
 		public override string GetParameterName() => _parameterName;
 		public override string GetTempReadParameter()
 		{
-			return string.Format(FuncMemberFormat.TempReadByDeserializerStruct,
-								 _typeName, _parameterName);
+			string format = IsNativeStruct ? 
+				FuncMemberFormat.TempReadByDeserializerNativeStruct :
+				FuncMemberFormat.TempReadByDeserializerStruct;
+
+			return string.Format(format, _typeName, _parameterName);
 		}
 		public override string GetWriteParameter(string paramName = "")
 		{
@@ -26,12 +30,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 
 		public override string GetWriteParameterInTuple(string name)
 		{
-			return string.Format(MemberFormat.WriteSerialize, GetArgTuplePropertyName());
+			string format = IsNativeStruct ? MemberFormat.WritePut : MemberFormat.WriteSerialize;
+			return string.Format(format, GetArgTuplePropertyName());
 		}
 
 		public override string GetIgnoreRead()
 		{
-			return string.Format(MemberFormat.IgnoreValueType, _typeName);
+			string dataTypeName = IsNativeStruct ? _typeName + "Extension" : _typeName;
+			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);
 		}
 	}
 }

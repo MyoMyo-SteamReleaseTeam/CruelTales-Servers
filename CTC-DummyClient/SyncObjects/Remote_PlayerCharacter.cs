@@ -15,6 +15,7 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTC.Networks.Synchronizations;
+using UnityEngine;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
@@ -23,7 +24,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_Input(float x, float z);
+		public partial void Client_InputMovement(Vector2 direction);
 		[SyncVar]
 		private UserId _userId = new();
 		public event Action<UserId>? OnUserIdChanged;
@@ -33,10 +34,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _costume;
 		public event Action<int>? OnCostumeChanged;
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_CommandTarget(NetString command, int number);
-		[SyncRpc]
-		public partial void Server_CommandBroadcast(NetString command, int number);
+		[SyncVar]
+		private Vector2 _test = new();
+		public event Action<Vector2>? OnTestChanged;
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable
@@ -48,17 +48,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				return isDirty;
 			}
 		}
-		public partial void Client_Input(float x, float z)
+		public partial void Client_InputMovement(Vector2 direction)
 		{
-			Client_InputCallstack.Add((x, z));
+			Client_InputMovementCallstack.Add(direction);
 			_dirtyUnreliable_0[0] = true;
 		}
-		private List<(float x, float z)> Client_InputCallstack = new(4);
+		private List<Vector2> Client_InputMovementCallstack = new(4);
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable()
 		{
 			_dirtyUnreliable_0.Clear();
-			Client_InputCallstack.Clear();
+			Client_InputMovementCallstack.Clear();
 		}
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer)
@@ -66,13 +66,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_dirtyUnreliable_0.Serialize(writer);
 			if (_dirtyUnreliable_0[0])
 			{
-				byte count = (byte)Client_InputCallstack.Count;
+				byte count = (byte)Client_InputMovementCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Client_InputCallstack[i];
-					writer.Put(arg.x);
-					writer.Put(arg.z);
+					var arg = Client_InputMovementCallstack[i];
+					arg.Serialize(writer);
 				}
 			}
 		}
@@ -98,25 +97,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString command = new();
-					if (!command.TryDeserialize(reader)) return false;
-					if (!reader.TryReadInt32(out int number)) return false;
-					Server_CommandTarget(command, number);
-				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString command = new();
-					if (!command.TryDeserialize(reader)) return false;
-					if (!reader.TryReadInt32(out int number)) return false;
-					Server_CommandBroadcast(command, number);
-				}
+				if (!reader.TryReadVector2(out _test)) return false;
+				OnTestChanged?.Invoke(_test);
 			}
 			return true;
 		}
@@ -129,6 +111,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnUsernameChanged?.Invoke(_username);
 			if (!reader.TryReadInt32(out _costume)) return false;
 			OnCostumeChanged?.Invoke(_costume);
+			if (!reader.TryReadVector2(out _test)) return false;
+			OnTestChanged?.Invoke(_test);
 			return true;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
@@ -148,21 +132,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString.IgnoreStatic(reader);
-					reader.Ignore(4);
-				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString.IgnoreStatic(reader);
-					reader.Ignore(4);
-				}
+				Vector2Extension.IgnoreStatic(reader);
 			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -182,21 +152,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString.IgnoreStatic(reader);
-					reader.Ignore(4);
-				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetString.IgnoreStatic(reader);
-					reader.Ignore(4);
-				}
+				Vector2Extension.IgnoreStatic(reader);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

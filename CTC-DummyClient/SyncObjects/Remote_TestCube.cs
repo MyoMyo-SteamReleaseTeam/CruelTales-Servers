@@ -15,6 +15,7 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTC.Networks.Synchronizations;
+using UnityEngine;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {

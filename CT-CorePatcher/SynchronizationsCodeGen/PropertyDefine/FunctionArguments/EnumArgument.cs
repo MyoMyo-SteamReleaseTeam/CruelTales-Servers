@@ -10,8 +10,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 		public EnumArgument(string typeName, string parameterName, string sizeTypeName, string clrSizeTypeName)
 			: base(typeName, parameterName)
 		{
-			_typeName = typeName;
-			_parameterName = parameterName;
 			_sizeTypeName = sizeTypeName;
 			_clrSizeTypeName = clrSizeTypeName;
 		}

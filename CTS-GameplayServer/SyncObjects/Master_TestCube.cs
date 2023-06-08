@@ -9,6 +9,7 @@
 #pragma warning disable CS0649
 
 using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Serialization;

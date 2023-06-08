@@ -21,9 +21,7 @@ namespace CT.CorePatcher
 			}
 			catch (Exception e)
 			{
-				PatcherConsole.PrintError(e.GetType().Name);
-				Console.WriteLine();
-				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintException(e);
 				return false;
 			}
 		}
@@ -97,7 +95,7 @@ namespace CT.CorePatcher
 			}
 			catch (Exception e)
 			{
-				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
 			}
 			finally
@@ -122,7 +120,7 @@ namespace CT.CorePatcher
 			}
 			catch (Exception e)
 			{
-				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
 			}
 			finally
@@ -197,7 +195,7 @@ namespace CT.CorePatcher
 			}
 			catch (Exception e)
 			{
-				PatcherConsole.PrintError(e.Message);
+				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
 			}
 			finally

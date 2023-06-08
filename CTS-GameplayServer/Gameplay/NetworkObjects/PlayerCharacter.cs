@@ -23,12 +23,12 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer.BindViewTarget(this.Transform);
 		}
 
-		public partial void Client_Input(NetworkPlayer player, float x, float z)
+		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction)
 		{
 			if (_userId != player.UserId)
 				return;
 
-			Transform.Move(Transform.Position, new Vector3(x, 0, z) * Speed);
+			Transform.Move(Transform.Position, new Vector3(direction.X, 0, direction.Y) * Speed);
 		}
 	}
 }
