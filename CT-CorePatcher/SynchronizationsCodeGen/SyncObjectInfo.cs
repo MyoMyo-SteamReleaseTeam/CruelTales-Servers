@@ -9,7 +9,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string ObjectName => _objectName;
 		private string _objectName;
 		private string _modifier;
-		private bool _isNetworkObject = false;
+		public  bool IsNetworkObject { get; private set; } = false;
+		public int Capacity { get; private set; } = 0;
+		public bool MultiplyByMaxUser { get; private set; } = false;
 
 		private SerializeDirectionGroup _masterSerializeGroup;
 		private DeserializeDirectionGroup _masterDeserializeGroup;
@@ -26,16 +28,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public SyncObjectInfo(string objectName,
 							  List<MemberToken> masterSideMembers,
 							  List<MemberToken> remoteSideMembers,
-							  bool isNetworkObject)
+							  bool isNetworkObject,
+							  int capacity,
+							  bool multiplyByMaxUser)
 		{
 			_objectName = objectName;
-			_isNetworkObject = isNetworkObject;
-			_modifier = _isNetworkObject ? "override " : string.Empty;
+			IsNetworkObject = isNetworkObject;
+			Capacity = capacity;
+			MultiplyByMaxUser = multiplyByMaxUser;
+			_modifier = IsNetworkObject ? "override " : string.Empty;
 
 			_masterSideMembers = masterSideMembers;
 			_remoteSideMembers = remoteSideMembers;
 
-			if (_isNetworkObject)
+			if (IsNetworkObject)
 			{
 				_masterInheritName = string.Empty; //CommonFormat.MasterNetworkObjectTypeName;
 				_remoteInheritName = string.Empty; //CommonFormat.RemoteNetworkObjectTypeName;
@@ -82,7 +88,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string getNetworkTypeDefinition()
 		{
-			if (!_isNetworkObject)
+			if (!IsNetworkObject)
 				return string.Empty;
 
 			return string.Format(CommonFormat.NetworkTypeDeclaration,

@@ -17,5 +17,7 @@ namespace CT.Networks
 		public const int MTU = 1400;
 		public const int CLIENT_NETWORK_TICK_PER_SEC = 30;
 		public const float CLIENT_NETWORK_TICK_INTERVAL = 1.0f / CLIENT_NETWORK_TICK_PER_SEC;
+
+		public const int SYSTEM_MAX_USER = 8;
 	}
 }

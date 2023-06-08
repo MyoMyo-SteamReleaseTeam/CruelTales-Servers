@@ -1,11 +1,12 @@
 ﻿using System.Numerics;
+using CT.Networks;
 
 namespace CTS.Instance.Gameplay
 {
 	/// <summary>서버의 초기화 옵션입니다.</summary>
 	public class InstanceInitializeOption
 	{
-		public int SystemMaxUser = 7;
+		public int SystemMaxUser = GlobalNetwork.SYSTEM_MAX_USER;
 
 		// Player visible table
 		public int VisibleCellCapacity = 32;

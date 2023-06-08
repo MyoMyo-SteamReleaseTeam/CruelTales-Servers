@@ -5,7 +5,7 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
-	[SyncNetworkObjectDefinition]
+	[SyncNetworkObjectDefinition(capacity: 120)]
 	public class TestCube
 	{
 		[SyncVar]
@@ -24,7 +24,7 @@ namespace CT.Common.Definitions.SyncObjects
 		public void TestRPC(long someMessage) { }
 	}
 
-	[SyncNetworkObjectDefinition]
+	[SyncNetworkObjectDefinition(1, true)]
 	public class PlayerCharacter
 	{
 		[SyncVar]

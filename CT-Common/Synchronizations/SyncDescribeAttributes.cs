@@ -8,7 +8,14 @@ namespace CT.Common.Synchronizations
 	/// </summary>
 	public class SyncNetworkObjectDefinitionAttribute : Attribute
 	{
+		public bool MultiplyByMaxUser;
+		public int Capacity;
 
+		public SyncNetworkObjectDefinitionAttribute( int capacity = 16, bool multiplyByMaxUser = false)
+		{
+			Capacity = capacity;
+			MultiplyByMaxUser = multiplyByMaxUser;
+		}
 	}
 
 	/// <summary>

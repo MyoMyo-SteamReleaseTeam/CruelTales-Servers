@@ -49,16 +49,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		public const string SYNC_MASTER_PATH = "syncMasterPath";
 		public const string SYNC_REMOTE_PATH = "syncRemotePath";
+		public const string MASTER_POOL_PATH = "masterPoolPath";
 
 		public void GenerateCode(string[] args)
 		{
 			StringArgumentArray masterTargetPathList = new();
 			StringArgumentArray remoteTargetPathList = new();
+			StringArgument masterPoolPath = new();
 
 			OptionParser op = new OptionParser();
 			OptionParser.BindArgumentArray(op, SYNC_MASTER_PATH, 2, masterTargetPathList);
 			OptionParser.BindArgumentArray(op, SYNC_REMOTE_PATH, 2, remoteTargetPathList);
-			op.TryApplyArguments(args);
+			OptionParser.BindArgument(op, MASTER_POOL_PATH, 2, masterPoolPath);
+			if (!op.TryApplyArguments(args))
+			{
+				return;
+			}
 
 			var syncObjects = parseAssemblys();
 
@@ -69,6 +75,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				masterTargetPathList.ArgumentArray = new string[] { "Test/" };
 				remoteTargetPathList.ArgumentArray = new string[] { "Test/" };
+				masterPoolPath.Argument = "Test/";
 			}
 #pragma warning restore CA1416 // Validate platform compatibility
 
@@ -90,7 +97,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Create network object enum types
-			var networkEnums = syncObjects.Select(obj => obj.ObjectName).ToList();
+			var networkEnums = syncObjects
+				.Where(obj => obj.IsNetworkObject)
+				.Select(obj => obj.ObjectName).ToList();
 			var netTypeFileName = CommonFormat.NetworkObjectTypeTypeName + ".cs";
 
 			var masterEnumContent = CodeGenerator_Enumerate
@@ -118,6 +127,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				operations.Add(new GenOperation(targetPath, netTypeFileName, remoteEumeCode));
 			}
+
+			// Create server side network object pool setting code
+			var poolCode = ObjectPoolCodeGen.GenerateMasterNetworkObjectPoolCode(syncObjects);
+			operations.Add(new GenOperation(masterPoolPath.Argument, "NetworkObjectPoolManager", poolCode));
 
 			// Remove previous files
 			foreach (var targetPath in masterTargetPathList.ArgumentArray)
@@ -152,7 +165,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				string openDir = Path.Combine(Directory.GetCurrentDirectory(), "Test");
 
 				var t = Type.GetTypeFromProgID("Shell.Application");
-				dynamic o = Activator.CreateInstance(t);
+				Debug.Assert(t != null);
+				dynamic o = Activator.CreateInstance(t) ?? new object();
 				try
 				{
 					var ws = o.Windows();
@@ -207,7 +221,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (syncObjDefinitionTypes != null && syncObjDefinitionTypes.Count > 0)
 			{
-				var syncObjs = parseTypeToSyncObjectInfo(syncObjDefinitionTypes, false);
+				var syncObjs = parseTypeToSyncObjectInfo(syncObjDefinitionTypes, isNetworkObject: false);
 				syncObjects.AddRange(syncObjs);
 			}
 
@@ -217,7 +231,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (netObjDefititionTypes != null && netObjDefititionTypes.Count > 0)
 			{
-				var syncObjs = parseTypeToSyncObjectInfo(netObjDefititionTypes, true);
+				var syncObjs = parseTypeToSyncObjectInfo(netObjDefititionTypes, isNetworkObject: true);
 				syncObjects.AddRange(syncObjs);
 			}
 
@@ -230,6 +244,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			foreach (var t in types)
 			{
+				var att = t.GetCustomAttribute<SyncNetworkObjectDefinitionAttribute>();
+				int capacity = 0;
+				bool multiplyByMaxUser = false;
+				if (att != null)
+				{
+					capacity = att.Capacity;
+					multiplyByMaxUser = att.MultiplyByMaxUser;
+				}
+
 				List<MemberToken> masterMembers = new();
 				List<MemberToken> remoteMembers = new();
 
@@ -245,7 +268,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					remoteMembers.AddRange(remoteFuncMembers);
 				}
 
-				syncObjects.Add(new(t.Name, masterMembers, remoteMembers, isNetworkObject));
+				syncObjects.Add(new(t.Name, masterMembers, remoteMembers,
+									isNetworkObject, capacity, multiplyByMaxUser));
 			}
 
 			return syncObjects;

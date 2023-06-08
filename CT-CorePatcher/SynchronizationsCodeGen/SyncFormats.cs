@@ -19,6 +19,49 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static string SerializeTargetName => "Target";
 	}
 
+	public static class ObjectPoolFormat
+	{
+		/// <summary>
+		/// {0} Pool by type content<br/>
+		/// {1} Capacity content<br/>
+		/// </summary>
+		public static string MasterNetworkObjectPool =>
+@"using System;
+using System.Collections.Generic;
+using CT.Networks;
+using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
+
+namespace CTS.Instance.Gameplay.ObjectManagements
+{{
+	public class NetworkObjectPoolManager
+	{{
+		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
+		{{
+{0}
+		}};
+
+		public T Create<T>() where T : MasterNetworkObject, new()
+		{{
+			return (T)_netObjectPoolByType[typeof(T)].Get();
+		}}
+
+		public void Return(MasterNetworkObject netObject)
+		{{
+			_netObjectPoolByType[netObject.GetType()].Return(netObject);
+		}}
+	}}
+}}";
+
+		/// <summary>
+		/// {0} Master network object type<br/>
+		/// {1} Capacity content<br/>
+		/// </summary>
+		public static string PoolByType => @"{{ typeof({0}), new NetworkObjectPool<{0}>({1}) }},";
+
+		public static string MaxUserCount => "GlobalNetwork.SYSTEM_MAX_USER";
+	}
+
 	public static class CommonFormat
 	{
 		public static string MasterUsingStatements =>

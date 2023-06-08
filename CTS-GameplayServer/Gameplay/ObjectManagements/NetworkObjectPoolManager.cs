@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using CT.Networks;
 using CTS.Instance.Synchronizations;
 using CTS.Instance.SyncObjects;
 
@@ -9,8 +10,9 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 	{
 		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
 		{
-			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(7) },
 			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
+			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
+			
 		};
 
 		public T Create<T>() where T : MasterNetworkObject, new()
