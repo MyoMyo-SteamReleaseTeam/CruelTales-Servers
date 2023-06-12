@@ -19,8 +19,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private SerializeDirectionGroup _remoteSerializeGroup;
 		private DeserializeDirectionGroup _remoteDeserializeGroup;
 
-		private string _masterInheritName = CommonFormat.InterfaceName;
-		private string _remoteInheritName = CommonFormat.InterfaceName;
+		private string _masterInheritName = CommonFormat.MasterInterfaceName;
+		private string _remoteInheritName = CommonFormat.RemoteInterfaceName;
 
 		private List<MemberToken> _masterSideMembers;
 		private List<MemberToken> _remoteSideMembers;

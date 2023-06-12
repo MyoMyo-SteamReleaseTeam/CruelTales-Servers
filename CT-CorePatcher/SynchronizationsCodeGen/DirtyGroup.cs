@@ -12,6 +12,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private SyncType _syncType;
 		private int _dirtyIndex;
 		private bool _hasTargetMember = false;
+		public bool HasTargetMember => _hasTargetMember;
 
 		public DirtyGroup(List<BaseMemberToken> members, SyncType syncType, int dirtyIndex)
 		{
@@ -32,32 +33,29 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(bool putDrityBitSerialize)
+		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName)
 		{
 			StringBuilder sb = new();
 			int index = 0;
-			if (putDrityBitSerialize)
+			if (_hasTargetMember)
 			{
-				if (_hasTargetMember)
-				{
-					sb.AppendLine(string.Format(DirtyGruopFormat.JumpAndSerializeMask, GetName(), GetTempName()));
-				}
-				else
-				{
-					sb.AppendLine(string.Format(MemberFormat.WriteSerialize, GetName()));
-				}
+				sb.AppendLine(string.Format(DirtyGruopFormat.JumpAndSerializeMask, dirtyBitName, tempDirtyBitName));
+			}
+			else
+			{
+				sb.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
 			}
 			foreach (var m in _members)
 			{
-				string serialize = m.Master_SerializeByWriter(_syncType, GetTempName(), index);
+				string serialize = m.Master_SerializeByWriter(_syncType, tempDirtyBitName, index);
 				CodeFormat.AddIndent(ref serialize);
-				string content = string.Format(CommonFormat.IfDirty, GetName(), index, serialize);
+				string content = string.Format(CommonFormat.IfDirty, dirtyBitName, index, serialize);
 				index++;
 				sb.AppendLine(content);
 			}
-			if (putDrityBitSerialize && _hasTargetMember)
+			if (_hasTargetMember)
 			{
-				sb.AppendLine(string.Format(DirtyGruopFormat.BackSerializeMask, GetTempName()));
+				sb.AppendLine(string.Format(DirtyGruopFormat.BackSerializeMask, tempDirtyBitName));
 			}
 			return sb.ToString();
 		}

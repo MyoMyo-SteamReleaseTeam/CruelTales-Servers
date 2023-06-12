@@ -73,7 +73,8 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay;
-using CTS.Instance.Synchronizations;";
+using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;";
 
 		public static string RemoteUsingStatements =>
 @"using System;
@@ -83,7 +84,9 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTC.Networks.Synchronizations;
-using UnityEngine;";
+#if UNITY_2021
+using UnityEngine;
+#endif";
 
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
@@ -91,7 +94,8 @@ using UnityEngine;";
 		public static string MasterNetworkObjectTypeName => "MasterNetworkObject";
 		public static string RemoteNetworkObjectTypeName => "RemoteNetworkObject";
 		public static string NetworkObjectTypeTypeName => "NetworkObjectType";
-		public static string InterfaceName => "ISynchronizable";
+		public static string MasterInterfaceName => "IMasterSynchronizable";
+		public static string RemoteInterfaceName => "IRemoteSynchronizable";
 
 		/// <summary>
 		/// {0} NetworkObjectType type name<br/>
