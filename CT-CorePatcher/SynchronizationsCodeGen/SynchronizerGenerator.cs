@@ -244,13 +244,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			foreach (var t in types)
 			{
-				var att = t.GetCustomAttribute<SyncNetworkObjectDefinitionAttribute>();
+				var attNetObj = t.GetCustomAttribute<SyncNetworkObjectDefinitionAttribute>();
+				var attSyncObj = t.GetCustomAttribute<SyncObjectDefinitionAttribute>();
 				int capacity = 0;
 				bool multiplyByMaxUser = false;
-				if (att != null)
+				if (attNetObj != null)
 				{
-					capacity = att.Capacity;
-					multiplyByMaxUser = att.MultiplyByMaxUser;
+					capacity = attNetObj.Capacity;
+					multiplyByMaxUser = attNetObj.MultiplyByMaxUser;
+#pragma warning disable CA1416
+					if (attNetObj.IsDebugOnly && !MainProcess.IsDebug) continue;
+#pragma warning restore CA1416
+				}
+
+				if (attSyncObj != null)
+				{
+#pragma warning disable CA1416
+					if (attSyncObj.IsDebugOnly && !MainProcess.IsDebug) continue;
+#pragma warning restore CA1416
 				}
 
 				List<MemberToken> masterMembers = new();

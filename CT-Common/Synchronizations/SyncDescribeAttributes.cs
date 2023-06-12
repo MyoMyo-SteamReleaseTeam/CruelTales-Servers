@@ -10,11 +10,13 @@ namespace CT.Common.Synchronizations
 	{
 		public bool MultiplyByMaxUser;
 		public int Capacity;
+		public bool IsDebugOnly;
 
-		public SyncNetworkObjectDefinitionAttribute( int capacity = 16, bool multiplyByMaxUser = false)
+		public SyncNetworkObjectDefinitionAttribute( int capacity = 16, bool multiplyByMaxUser = false, bool isDebugOnly = false)
 		{
 			Capacity = capacity;
 			MultiplyByMaxUser = multiplyByMaxUser;
+			IsDebugOnly = isDebugOnly;
 		}
 	}
 
@@ -29,10 +31,12 @@ namespace CT.Common.Synchronizations
 		/// 사용자가 임의로 정의한 경우 코드를 자동생성하지 않습니다.
 		/// </summary>
 		public bool IsCustom { get; private set; }
+		public bool IsDebugOnly;
 
-		public SyncObjectDefinitionAttribute(bool isCustom = false)
+		public SyncObjectDefinitionAttribute(bool isCustom = false, bool isDebugOnly = false)
 		{
 			IsCustom = isCustom;
+			IsDebugOnly = isDebugOnly;
 		}
 	}
 
