@@ -5,7 +5,7 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
-	[SyncNetworkObjectDefinition]
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_Value8
 	{
 		[SyncVar] public NetString v0;
@@ -27,7 +27,7 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar(SyncType.Unreliable)] public int uv7;
 	}
 
-	[SyncNetworkObjectDefinition]
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_Value16
 	{
 		[SyncVar] public int v0;
@@ -63,7 +63,7 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar(SyncType.Unreliable)] public int uv15;
 	}
 
-	[SyncNetworkObjectDefinition]
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_Value32
 	{
 		[SyncVar] public int v0;
@@ -133,7 +133,77 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar(SyncType.Unreliable)] public int uv32;
 	}
 
-	[SyncObjectDefinition]
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Value32NoTarget
+	{
+		[SyncVar] public int v0;
+		[SyncVar] public int v1;
+		[SyncVar] public int v2;
+		[SyncRpc] public void f3(int a) { }
+		[SyncVar] public int v4;
+		[SyncVar] public int v5;
+		[SyncVar] public int v6;
+		[SyncVar] public int v7;
+		[SyncVar] public int v8;
+		[SyncVar] public int v9;
+		[SyncVar] public int v10;
+		[SyncVar] public int v12;
+		[SyncVar] public int v13;
+		[SyncRpc] public void f14(int a) { }
+		[SyncVar] public int v15;
+		[SyncVar] public int v16;
+		[SyncRpc] public void f17(int a) { }
+		[SyncVar] public int v18;
+		[SyncVar] public int v19;
+		[SyncVar] public int v20;
+		[SyncVar] public int v21;
+		[SyncRpc] public void f22(int a) { }
+		[SyncVar] public int v23;
+		[SyncRpc] public void f24(int a) { }
+		[SyncVar] public int v25;
+		[SyncVar] public int v26;
+		[SyncVar] public int v27;
+		[SyncRpc] public void f28(int a) { }
+		[SyncVar] public int v29;
+		[SyncVar] public int v30;
+		[SyncVar] public int v31;
+		[SyncVar] public int v32;
+
+		[SyncVar(SyncType.Unreliable)] public int uv0;
+		[SyncVar(SyncType.Unreliable)] public int uv1;
+		[SyncVar(SyncType.Unreliable)] public int uv2;
+		[SyncRpc(SyncType.Unreliable)] public void uf3(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv4;
+		[SyncVar(SyncType.Unreliable)] public int uv5;
+		[SyncVar(SyncType.Unreliable)] public int uv6;
+		[SyncVar(SyncType.Unreliable)] public int uv7;
+		[SyncVar(SyncType.Unreliable)] public int uv8;
+		[SyncVar(SyncType.Unreliable)] public int uv9;
+		[SyncVar(SyncType.Unreliable)] public int uv10;
+		[SyncVar(SyncType.Unreliable)] public int uv12;
+		[SyncVar(SyncType.Unreliable)] public int uv13;
+		[SyncRpc(SyncType.Unreliable)] public void uf14(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv15;
+		[SyncVar(SyncType.Unreliable)] public int uv16;
+		[SyncRpc(SyncType.Unreliable)] public void uf17(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv18;
+		[SyncVar(SyncType.Unreliable)] public int uv19;
+		[SyncVar(SyncType.Unreliable)] public int uv20;
+		[SyncVar(SyncType.Unreliable)] public int uv21;
+		[SyncRpc(SyncType.Unreliable)] public void uf22(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv23;
+		[SyncRpc(SyncType.Unreliable)] public void uf24(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv25;
+		[SyncVar(SyncType.Unreliable)] public int uv26;
+		[SyncVar(SyncType.Unreliable)] public int uv27;
+		[SyncRpc(SyncType.Unreliable)] public void uf28(int a) { }
+		[SyncVar(SyncType.Unreliable)] public int uv29;
+		[SyncVar(SyncType.Unreliable)] public int uv30;
+		[SyncVar(SyncType.Unreliable)] public int uv31;
+		[SyncVar(SyncType.Unreliable)] public int uv32;
+	}
+
+	[SyncObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_InnerObject
 	{
 		[SyncVar]
@@ -143,7 +213,7 @@ namespace CT.Common.Definitions.SyncObjects
 		public void Server_Rename(NetStringShort newName) { }
 	}
 
-	[SyncObjectDefinition]
+	[SyncObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_FuntionObject
 	{
 		[SyncRpc] public void Server_VoidArg() { }

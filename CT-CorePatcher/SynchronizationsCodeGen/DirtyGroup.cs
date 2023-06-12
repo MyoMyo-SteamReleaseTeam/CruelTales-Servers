@@ -33,7 +33,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName)
+		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName, string rollbackContents = "")
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -55,7 +55,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			if (_hasTargetMember)
 			{
-				sb.AppendLine(string.Format(DirtyGroupFormat.BackSerializeMask, tempDirtyBitName));
+				CodeFormat.AddIndent(ref rollbackContents);
+				sb.AppendLine(string.Format(DirtyGroupFormat.RollBackSerializeMask, tempDirtyBitName, rollbackContents));
 			}
 			return sb.ToString();
 		}

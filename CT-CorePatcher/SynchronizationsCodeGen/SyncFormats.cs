@@ -88,6 +88,17 @@ using CTC.Networks.Synchronizations;
 using UnityEngine;
 #endif";
 
+		public static string DebugRemoteUsingStatements =>
+@"using System;
+using System.Collections.Generic;
+using CT.Common.DataType;
+using CT.Common.Serialization;
+using CT.Common.Synchronizations;
+using CT.Common.Tools.Collections;
+#if UNITY_2021
+using UnityEngine;
+#endif";
+
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
 
@@ -205,10 +216,27 @@ public partial class {0} : {1}
 		/// {1} Dirty bit name<br/>
 		/// </summary>
 		public static string MasterDirtyAnyTrue => @"masterDirty[{0}] = {1}.AnyTrue();";
+		
+		/// <summary>
+		/// {0} Dirty bit name<br/>
+		/// {1} Dirty bit index<br/>
+		/// {2} true or false<br/>
+		/// </summary>
+		public static string SetDirtyBit => @"{0}[{1}] = {2};";
+
+		/// <summary>
+		/// {0} Dirty bit name<br/>
+		/// </summary>
+		public static string PutDirtyBitTo => "writer.PutTo({0}, {0}_pos);";
 
 		public static string MasterDirtySerialize => @"masterDirty.Serialize(writer);";
 
 		public static string MasterDirtyBitInstantiate => @"BitmaskByte masterDirty = new BitmaskByte();";
+
+		/// <summary>
+		/// {0} Dirty bit name<br/>
+		/// </summary>
+		public static string JumpDirtyBit => @"int {0}_pos = writer.OffsetSize(sizeof(byte));";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -235,9 +263,10 @@ public partial class {0} : {1}
 		public static string RemoteDeserializeFunctionDeclaration => @"public {0}bool TryDeserializeSync{1}(IPacketReader reader)";
 
 		/// <summary>
-		/// {0} SyncType<br/>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
 		/// </summary>
-		public static string IgnoreSyncFunctionDeclaration => @"public override void IgnoreSync{0}(IPacketReader reader)";
+		public static string IgnoreSyncFunctionDeclaration => @"public {0}void IgnoreSync{1}(IPacketReader reader)";
 
 		/// <summary>
 		/// {0} SyncType<br/>
@@ -306,8 +335,9 @@ int {1}_pos = writer.OffsetSize(sizeof(byte));";
 
 		/// <summary>
 		/// {0} Temp dirty bits name<br/>
+		/// {1} Rollback contents<br/>
 		/// </summary>
-		public static string BackSerializeMask =>
+		public static string RollBackSerializeMask =>
 @"if ({0}.AnyTrue())
 {{
 	writer.PutTo({0}, {0}_pos);
@@ -315,6 +345,7 @@ int {1}_pos = writer.OffsetSize(sizeof(byte));";
 else
 {{
 	writer.SetSize({0}_pos);
+{1}
 }}";
 	}
 
@@ -544,6 +575,11 @@ if (!{1}.TryDeserialize(reader)) return false;";
 		/// {0} Function name<br/>
 		/// </summary>
 		public static string ClearCallStack => @"{0}Callstack.Clear();";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string ClearCallCount => @"{0}CallstackCount = 0;";
 	}
 
 	public static class MemberFormat

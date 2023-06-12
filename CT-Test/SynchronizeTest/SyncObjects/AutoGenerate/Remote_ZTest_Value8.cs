@@ -14,7 +14,6 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using CTC.Networks.Synchronizations;
 #if UNITY_2021
 using UnityEngine;
 #endif
@@ -24,7 +23,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	[Serializable]
 	public partial class ZTest_Value8
 	{
-		public override NetworkObjectType Type => NetworkObjectType.ZTest_Value8;
 		[SyncVar]
 		private NetString _v0 = new();
 		public event Action<NetString>? OnV0Changed;

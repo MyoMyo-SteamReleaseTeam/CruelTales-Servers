@@ -14,7 +14,6 @@ using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using CTC.Networks.Synchronizations;
 #if UNITY_2021
 using UnityEngine;
 #endif
@@ -64,7 +63,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnTestIntChanged?.Invoke(_testInt);
 			return true;
 		}
-		public override void IgnoreSyncReliable(IPacketReader reader)
+		public void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
@@ -96,7 +95,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
+		public void IgnoreSyncUnreliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }

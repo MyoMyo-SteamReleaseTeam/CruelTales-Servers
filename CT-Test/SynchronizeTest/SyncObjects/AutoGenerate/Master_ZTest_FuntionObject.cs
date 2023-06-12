@@ -17,6 +17,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -143,7 +144,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			Server_VoidArgCallstack.Clear();
+			Server_VoidArgCallstackCount = 0;
 			Server_PrimitiveArg_1Callstack.Clear();
 			Server_PrimitiveArg_2Callstack.Clear();
 			Server_PrimitiveArg_3Callstack.Clear();
@@ -161,9 +162,9 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0.AnyTrue())
 			{
+				_dirtyReliable_0.Serialize(writer);
 				if (_dirtyReliable_0[0])
 				{
 					writer.Put((byte)Server_VoidArgCallstackCount);
@@ -246,9 +247,9 @@ namespace CTS.Instance.SyncObjects
 					}
 				}
 			}
-			_dirtyReliable_1.Serialize(writer);
 			if (_dirtyReliable_1.AnyTrue())
 			{
+				_dirtyReliable_1.Serialize(writer);
 				if (_dirtyReliable_1[0])
 				{
 					byte count = (byte)Server_EnumTypeArg_2Callstack.Count;
@@ -313,9 +314,9 @@ namespace CTS.Instance.SyncObjects
 		public void InitializeProperties() { }
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
-		public override void IgnoreSyncReliable(IPacketReader reader) { }
+		public void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
-		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
+		public void IgnoreSyncUnreliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }

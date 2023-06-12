@@ -12,8 +12,5 @@ namespace CTS.Instance.SyncObjects
 		None = 0,
 		TestCube,
 		PlayerCharacter,
-		ZTest_Value8,
-		ZTest_Value16,
-		ZTest_Value32,
 	}
 }

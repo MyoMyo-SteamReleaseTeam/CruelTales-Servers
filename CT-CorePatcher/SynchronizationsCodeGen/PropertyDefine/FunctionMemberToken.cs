@@ -57,6 +57,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_ClearDirty(SyncType syncType)
 		{
+			if (_argGroup.Count == 0)
+				return string.Format(FuncMemberFormat.ClearCallCount, _functionName);
+
 			return string.Format(FuncMemberFormat.ClearCallStack, _functionName);
 		}
 

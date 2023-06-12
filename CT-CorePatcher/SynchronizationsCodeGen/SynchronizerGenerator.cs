@@ -248,21 +248,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				var attSyncObj = t.GetCustomAttribute<SyncObjectDefinitionAttribute>();
 				int capacity = 0;
 				bool multiplyByMaxUser = false;
+				bool isDebugObject = false;
+
 				if (attNetObj != null)
 				{
 					capacity = attNetObj.Capacity;
 					multiplyByMaxUser = attNetObj.MultiplyByMaxUser;
-#pragma warning disable CA1416
-					if (attNetObj.IsDebugOnly && !MainProcess.IsDebug) continue;
-#pragma warning restore CA1416
+					isDebugObject = attNetObj.IsDebugOnly;
 				}
 
 				if (attSyncObj != null)
 				{
-#pragma warning disable CA1416
-					if (attSyncObj.IsDebugOnly && !MainProcess.IsDebug) continue;
-#pragma warning restore CA1416
+					isDebugObject = attSyncObj.IsDebugOnly;
 				}
+
+#pragma warning disable CA1416
+				if (isDebugObject && !MainProcess.IsDebug) continue;
+#pragma warning restore CA1416
 
 				List<MemberToken> masterMembers = new();
 				List<MemberToken> remoteMembers = new();
@@ -280,7 +282,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 
 				syncObjects.Add(new(t.Name, masterMembers, remoteMembers,
-									isNetworkObject, capacity, multiplyByMaxUser));
+									isNetworkObject, capacity, multiplyByMaxUser, isDebugObject));
 			}
 
 			return syncObjects;

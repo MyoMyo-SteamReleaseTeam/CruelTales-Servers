@@ -17,6 +17,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.SyncObjects
 {

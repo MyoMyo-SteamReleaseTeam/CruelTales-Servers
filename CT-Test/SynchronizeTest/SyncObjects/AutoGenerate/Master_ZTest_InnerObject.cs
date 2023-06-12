@@ -17,6 +17,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -89,9 +90,9 @@ namespace CTS.Instance.SyncObjects
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
-		public override void IgnoreSyncReliable(IPacketReader reader) { }
+		public void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
-		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
+		public void IgnoreSyncUnreliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }

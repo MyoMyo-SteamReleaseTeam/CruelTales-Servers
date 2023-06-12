@@ -12,6 +12,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public  bool IsNetworkObject { get; private set; } = false;
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
+		public bool _isDebugObject = false;
 
 		private SerializeDirectionGroup _masterSerializeGroup;
 		private DeserializeDirectionGroup _masterDeserializeGroup;
@@ -30,11 +31,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							  List<MemberToken> remoteSideMembers,
 							  bool isNetworkObject,
 							  int capacity,
-							  bool multiplyByMaxUser)
+							  bool multiplyByMaxUser,
+							  bool isDebugObject)
 		{
 			_objectName = objectName;
 			IsNetworkObject = isNetworkObject;
 			Capacity = capacity;
+			_isDebugObject = isDebugObject;
 			MultiplyByMaxUser = multiplyByMaxUser;
 			_modifier = IsNetworkObject ? "override " : string.Empty;
 
@@ -73,7 +76,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Gen_RemoteCode()
 		{
-			string genCode = gnerateCode(CommonFormat.RemoteUsingStatements,
+			string usingStatements = _isDebugObject ? 
+				CommonFormat.DebugRemoteUsingStatements : 
+				CommonFormat.RemoteUsingStatements;
+
+			string genCode = gnerateCode(usingStatements,
 										 CommonFormat.RemoteNamespace,
 										 SyncDirection.FromRemote,
 										 _remoteSideMembers,
@@ -88,6 +95,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string getNetworkTypeDefinition()
 		{
+			if (_isDebugObject)
+				return string.Empty;
+
 			if (!IsNetworkObject)
 				return string.Empty;
 

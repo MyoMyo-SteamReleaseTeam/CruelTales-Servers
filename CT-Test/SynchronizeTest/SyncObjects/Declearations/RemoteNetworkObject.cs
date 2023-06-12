@@ -5,7 +5,7 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTS.Instance.SyncObjects;
 
-namespace CTC.Networks.Synchronizations
+namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	public abstract class RemoteNetworkObject : IRemoteSynchronizable
 	{
@@ -16,7 +16,7 @@ namespace CTC.Networks.Synchronizations
 		public NetworkIdentity Identity { get; protected set; }
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
-		public abstract NetworkObjectType Type { get; }
+		public abstract SyncObjects.TestSyncObjects.NetworkObjectType Type { get; }
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;

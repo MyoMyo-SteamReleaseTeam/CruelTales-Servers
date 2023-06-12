@@ -17,13 +17,13 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.SyncObjects
 {
 	[Serializable]
 	public partial class ZTest_Value8
 	{
-		public override NetworkObjectType Type => NetworkObjectType.ZTest_Value8;
 		[SyncVar]
 		private NetString _v0 = new();
 		[SyncVar]

@@ -1,9 +1,18 @@
-﻿using CT.Common.DataType;
+﻿using System;
+using CT.Common.DataType;
 using CT.Common.Synchronizations;
-using CTC.Networks.Synchronizations;
+//using CTC.Networks.Synchronizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
+	public enum NetworkObjectType
+	{
+		ZTest_Value8,
+		ZTest_Value16,
+		ZTest_Value32,
+		ZTest_Value32NoTarget,
+	}
+
 	public partial class ZTest_FuntionObject : IRemoteSynchronizable
 	{
 		public partial void Server_VoidArg() { }
@@ -23,16 +32,26 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 	public partial class ZTest_InnerObject : IRemoteSynchronizable
 	{
+		public partial void Server_Rename(NetStringShort newName)
+		{
 
+		}
 	}
 
 	public partial class ZTest_Value8 : RemoteNetworkObject
 	{
-
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public partial void f3(int a)
+		{
+		}
+		public partial void uf3(int a)
+		{
+		}
 	}
 
 	public partial class ZTest_Value16 : RemoteNetworkObject
 	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
 		public partial void f3(int a) {}
 		public partial void f14(int a) {}
 		public partial void uf3(int a) {}
@@ -42,6 +61,35 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 	public partial class ZTest_Value32 : RemoteNetworkObject
 	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public partial void f3(int a) { }
+		public partial void f14(int a) {}
+		public partial void f17(int a) {}
+		public partial void f22(int a) {}
+		public partial void f24(int a) {}
+		public partial void f28(int a) {}
+		public partial void uf3(int a) {}
+		public partial void uf14(int a) {}
+		public partial void uf17(int a) {}
+		public partial void uf22(int a) {}
+		public partial void uf24(int a) {}
+		public partial void uf28(int a) {}
+	}
 
+	public partial class ZTest_Value32NoTarget : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public partial void f3(int a) { }
+		public partial void f14(int a) { }
+		public partial void f17(int a) { }
+		public partial void f22(int a) { }
+		public partial void f24(int a) { }
+		public partial void f28(int a) { }
+		public partial void uf3(int a) { }
+		public partial void uf14(int a) { }
+		public partial void uf17(int a) { }
+		public partial void uf22(int a) { }
+		public partial void uf24(int a) { }
+		public partial void uf28(int a) { }
 	}
 }

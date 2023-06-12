@@ -142,16 +142,46 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			StringBuilder headers = new();
 			StringBuilder contents = new();
+
 			headers.AppendLine(SyncGroupFormat.MasterDirtyBitInstantiate);
+
+			bool hasTargetMember = false;
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
 				var dirtyGroup = _dirtyGroups[i];
+				hasTargetMember |= dirtyGroup.HasTargetMember;
 				headers.AppendLine(string.Format(SyncGroupFormat.MasterDirtyAnyTrue, i, dirtyGroup.GetName()));
-				string c = CodeFormat.AddIndent(dirtyGroup.Master_MemberSerializeIfDirtys(dirtyGroup.GetName(), dirtyGroup.GetTempName()));
-				string content = string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, c);
+			}
+
+			if (hasTargetMember)
+			{
+				headers.AppendLine(string.Format(SyncGroupFormat.JumpDirtyBit, SyncGroupFormat.MasterDirtyBitName));
+			}
+			else
+			{
+				headers.AppendLine(SyncGroupFormat.MasterDirtySerialize);
+			}
+
+			for (int i = 0; i < _dirtyGroups.Count; i++)
+			{
+				var dirtyGroup = _dirtyGroups[i];
+
+				string rollContent = string.Empty;
+				if (dirtyGroup.HasTargetMember)
+				{
+					rollContent = string.Format(SyncGroupFormat.SetDirtyBit, SyncGroupFormat.MasterDirtyBitName, i, "false");
+				}
+				string ctx = dirtyGroup.Master_MemberSerializeIfDirtys(dirtyGroup.GetName(), dirtyGroup.GetTempName(), rollContent);
+				ctx = CodeFormat.AddIndent(ctx);
+				string content = string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, ctx);
 				contents.AppendLine(content);
 			}
-			headers.AppendLine(SyncGroupFormat.MasterDirtySerialize);
+
+			if (hasTargetMember)
+			{
+				contents.AppendLine(string.Format(SyncGroupFormat.PutDirtyBitTo, SyncGroupFormat.MasterDirtyBitName));
+			}
+
 			headers.AppendLine(contents.ToString());
 			return headers.ToString();
 		}
@@ -276,10 +306,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return headers.ToString();
 		}
 
-		public string Remote_IgnoreSync(string delcaration)
+		public string Remote_IgnoreSync(string delcaration, bool isStatic)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append(string.Format(delcaration, _syncType));
+
+			if (isStatic)
+			{
+				sb.Append(string.Format(delcaration, _syncType));
+			}
+			else
+			{
+				sb.Append(string.Format(delcaration, _modifier, _syncType));
+			}
 
 			if (_dirtyGroups.Count == 0)
 			{
