@@ -39,7 +39,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			int index = 0;
 			if (_hasTargetMember)
 			{
-				sb.AppendLine(string.Format(DirtyGruopFormat.JumpAndSerializeMask, dirtyBitName, tempDirtyBitName));
+				sb.AppendLine(string.Format(DirtyGroupFormat.JumpAndSerializeMask, dirtyBitName, tempDirtyBitName));
 			}
 			else
 			{
@@ -55,7 +55,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			if (_hasTargetMember)
 			{
-				sb.AppendLine(string.Format(DirtyGruopFormat.BackSerializeMask, tempDirtyBitName));
+				sb.AppendLine(string.Format(DirtyGroupFormat.BackSerializeMask, tempDirtyBitName));
 			}
 			return sb.ToString();
 		}

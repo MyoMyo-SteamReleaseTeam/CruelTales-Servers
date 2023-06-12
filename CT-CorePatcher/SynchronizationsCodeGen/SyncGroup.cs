@@ -131,10 +131,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			for (int i = 0; i < 2; i++)
 			{
 				var group = _dirtyGroups[i];
-				if (!group.HasTargetMember)
-				{
-					sb.AppendLine(string.Format(MemberFormat.WriteSerialize, group.GetName()));
-				}
 				string content = group.Master_MemberSerializeIfDirtys(group.GetName(), group.GetTempName());
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));

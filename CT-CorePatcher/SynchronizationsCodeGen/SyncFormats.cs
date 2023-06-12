@@ -294,7 +294,7 @@ public partial class {0} : {1}
 		public static string InitializeProperties => @"public {0}void InitializeProperties()";
 	}
 
-	public static class DirtyGruopFormat
+	public static class DirtyGroupFormat
 	{
 		/// <summary>
 		/// {0} Dirty bits name<br/>
