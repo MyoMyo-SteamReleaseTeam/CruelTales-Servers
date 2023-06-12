@@ -31,7 +31,7 @@ namespace CT.Test.NetworkCore
 			Assert.IsFalse(callstack.IsDirty);
 			callstack.Add(p1, 11);
 			Assert.IsTrue(callstack.IsDirty);
-			Assert.IsFalse(callstack.GetCallCount(p1) > 0);
+			Assert.AreEqual(1, callstack.GetCallCount(p1));
 			Assert.IsFalse(callstack.GetCallCount(p2) > 0);
 			callstack.Add(p1, 12);
 			callstack.Add(p2, 21);
@@ -68,19 +68,12 @@ namespace CT.Test.NetworkCore
 			Assert.AreEqual(0, callstack.GetCallCount(p2));
 			callstack.Add(p1);
 			callstack.Add(p2);
-			Assert.AreEqual(2, callstack.GetCallCount(p2));
+			Assert.AreEqual(2, callstack.GetCallCount(p1));
 			Assert.AreEqual(1, callstack.GetCallCount(p2));
 			callstack.Add(p2);
 			callstack.Add(p2);
-
-			var p1List = callstack.GetCallCount(p1);
-			Assert.AreEqual(11, p1List[0]);
-			Assert.AreEqual(12, p1List[1]);
-
-			var p2List = callstack.GetCallList(p2);
-			Assert.AreEqual(21, p2List[0]);
-			Assert.AreEqual(22, p2List[1]);
-			Assert.AreEqual(23, p2List[2]);
+			Assert.AreEqual(2, callstack.GetCallCount(p1));
+			Assert.AreEqual(3, callstack.GetCallCount(p2));
 
 			callstack.Clear();
 			Assert.IsFalse(callstack.IsDirty);
