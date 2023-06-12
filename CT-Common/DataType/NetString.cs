@@ -14,6 +14,7 @@ namespace CT.Common.DataType
 	public struct NetString : IPacketSerializable, IEquatable<NetString>
 	{
 		public string Value;
+		//private StringBuilder _strBuffer;
 		public const int MAX_BYTE_LENGTH = 65536;
 
 		public int ByteSize

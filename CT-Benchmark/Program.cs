@@ -9,7 +9,10 @@ namespace CT.Benchmark
 			//BenchmarkRunner.Run<StringSerializationBenchmark>();
 			//BenchmarkRunner.Run<LogBenchmark>();
 			//ActionGC.Test();
-			BufferPoolDataRaceTest.Test();
+			//BufferPoolDataRaceTest.Test();
+			//BenchmarkRunner.Run<StringBufferBenchmark>();
+			StringBufferBenchmark sb = new();
+			sb.SBToByteArrayByIter();
 		}
 	}
 }
