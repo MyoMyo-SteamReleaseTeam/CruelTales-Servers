@@ -12,6 +12,9 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 		{
 			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
 			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
+			{ typeof(ZTest_Value8), new NetworkObjectPool<ZTest_Value8>(16) },
+			{ typeof(ZTest_Value16), new NetworkObjectPool<ZTest_Value16>(16) },
+			{ typeof(ZTest_Value32), new NetworkObjectPool<ZTest_Value32>(16) },
 			
 		};
 
