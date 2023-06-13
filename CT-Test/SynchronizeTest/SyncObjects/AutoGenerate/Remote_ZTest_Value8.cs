@@ -48,27 +48,25 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private uint _uv0;
 		public event Action<uint>? OnUv0Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private long _uv1;
-		public event Action<long>? OnUv1Changed;
-		[SyncVar(SyncType.Unreliable)]
 		private ulong _uv2;
 		public event Action<ulong>? OnUv2Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private float _uv4;
 		public event Action<float>? OnUv4Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private double _uv5;
-		public event Action<double>? OnUv5Changed;
-		[SyncVar(SyncType.Unreliable)]
 		private UserId _uv6 = new();
 		public event Action<UserId>? OnUv6Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv7;
 		public event Action<int>? OnUv7Changed;
-		[SyncRpc(SyncType.ReliableTarget)]
+		[SyncRpc]
 		public partial void f3(int a);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		public partial void uf3(int a);
+		public partial void uf1(int a, byte b);
+		[SyncRpc(SyncType.UnreliableTarget)]
+		public partial void uf3(int a, double b);
+		[SyncRpc(SyncType.UnreliableTarget)]
+		public partial void uf5();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
@@ -136,41 +134,50 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyUnreliable_0[1])
 			{
-				if (!reader.TryReadInt64(out _uv1)) return false;
-				OnUv1Changed?.Invoke(_uv1);
-			}
-			if (dirtyUnreliable_0[2])
-			{
 				if (!reader.TryReadUInt64(out _uv2)) return false;
 				OnUv2Changed?.Invoke(_uv2);
 			}
-			if (dirtyUnreliable_0[3])
+			if (dirtyUnreliable_0[2])
 			{
 				if (!reader.TryReadSingle(out _uv4)) return false;
 				OnUv4Changed?.Invoke(_uv4);
 			}
-			if (dirtyUnreliable_0[4])
-			{
-				if (!reader.TryReadDouble(out _uv5)) return false;
-				OnUv5Changed?.Invoke(_uv5);
-			}
-			if (dirtyUnreliable_0[5])
+			if (dirtyUnreliable_0[3])
 			{
 				if (!_uv6.TryDeserialize(reader)) return false;
 				OnUv6Changed?.Invoke(_uv6);
 			}
-			if (dirtyUnreliable_0[6])
+			if (dirtyUnreliable_0[4])
 			{
 				if (!reader.TryReadInt32(out _uv7)) return false;
 				OnUv7Changed?.Invoke(_uv7);
+			}
+			if (dirtyUnreliable_0[5])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadInt32(out int a)) return false;
+					if (!reader.TryReadByte(out byte b)) return false;
+					uf1(a, b);
+				}
+			}
+			if (dirtyUnreliable_0[6])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadInt32(out int a)) return false;
+					if (!reader.TryReadDouble(out double b)) return false;
+					uf3(a, b);
+				}
 			}
 			if (dirtyUnreliable_0[7])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					if (!reader.TryReadInt32(out int a)) return false;
-					uf3(a);
+					uf5();
 				}
 			}
 			return true;
@@ -193,14 +200,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV7Changed?.Invoke(_v7);
 			if (!reader.TryReadUInt32(out _uv0)) return false;
 			OnUv0Changed?.Invoke(_uv0);
-			if (!reader.TryReadInt64(out _uv1)) return false;
-			OnUv1Changed?.Invoke(_uv1);
 			if (!reader.TryReadUInt64(out _uv2)) return false;
 			OnUv2Changed?.Invoke(_uv2);
 			if (!reader.TryReadSingle(out _uv4)) return false;
 			OnUv4Changed?.Invoke(_uv4);
-			if (!reader.TryReadDouble(out _uv5)) return false;
-			OnUv5Changed?.Invoke(_uv5);
 			if (!_uv6.TryDeserialize(reader)) return false;
 			OnUv6Changed?.Invoke(_uv6);
 			if (!reader.TryReadInt32(out _uv7)) return false;
@@ -300,31 +303,37 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyUnreliable_0[2])
 			{
-				reader.Ignore(8);
+				reader.Ignore(4);
 			}
 			if (dirtyUnreliable_0[3])
 			{
-				reader.Ignore(4);
+				UserId.IgnoreStatic(reader);
 			}
 			if (dirtyUnreliable_0[4])
 			{
-				reader.Ignore(8);
-			}
-			if (dirtyUnreliable_0[5])
-			{
-				UserId.IgnoreStatic(reader);
-			}
-			if (dirtyUnreliable_0[6])
-			{
 				reader.Ignore(4);
 			}
-			if (dirtyUnreliable_0[7])
+			if (dirtyUnreliable_0[5])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(4);
+					reader.Ignore(1);
 				}
+			}
+			if (dirtyUnreliable_0[6])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(8);
+				}
+			}
+			if (dirtyUnreliable_0[7])
+			{
+				reader.Ignore(1);
 			}
 		}
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader)
@@ -340,31 +349,37 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyUnreliable_0[2])
 			{
-				reader.Ignore(8);
+				reader.Ignore(4);
 			}
 			if (dirtyUnreliable_0[3])
 			{
-				reader.Ignore(4);
+				UserId.IgnoreStatic(reader);
 			}
 			if (dirtyUnreliable_0[4])
 			{
-				reader.Ignore(8);
-			}
-			if (dirtyUnreliable_0[5])
-			{
-				UserId.IgnoreStatic(reader);
-			}
-			if (dirtyUnreliable_0[6])
-			{
 				reader.Ignore(4);
 			}
-			if (dirtyUnreliable_0[7])
+			if (dirtyUnreliable_0[5])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(4);
+					reader.Ignore(1);
 				}
+			}
+			if (dirtyUnreliable_0[6])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(8);
+				}
+			}
+			if (dirtyUnreliable_0[7])
+			{
+				reader.Ignore(1);
 			}
 		}
 	}

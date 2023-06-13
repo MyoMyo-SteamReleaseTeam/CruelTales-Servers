@@ -41,8 +41,6 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private ushort _v8;
 		[SyncVar]
-		private int _v9;
-		[SyncVar]
 		private byte _v10;
 		[SyncVar]
 		private int _v12;
@@ -52,8 +50,6 @@ namespace CTS.Instance.SyncObjects
 		private int _v15;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
-		[SyncVar(SyncType.Unreliable)]
-		private int _uv1;
 		[SyncVar(SyncType.Unreliable)]
 		private ulong _uv2;
 		[SyncVar(SyncType.Unreliable)]
@@ -67,8 +63,6 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar(SyncType.Unreliable)]
 		private ushort _uv8;
 		[SyncVar(SyncType.Unreliable)]
-		private int _uv9;
-		[SyncVar(SyncType.Unreliable)]
 		private float _uv10;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv12;
@@ -76,12 +70,18 @@ namespace CTS.Instance.SyncObjects
 		private int _uv13;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv15;
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void f3(NetworkPlayer player, int a);
 		[SyncRpc]
-		public partial void f14(int a);
+		public partial void f3(int a);
+		[SyncRpc]
+		public partial void f9();
+		[SyncRpc]
+		public partial void f14(int a, sbyte b);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		public partial void uf3(NetworkPlayer player, int a);
+		public partial void uf1(NetworkPlayer player, int a, sbyte b);
+		[SyncRpc(SyncType.UnreliableTarget)]
+		public partial void uf3(NetworkPlayer player, int a, float b, long c);
+		[SyncRpc(SyncType.UnreliableTarget)]
+		public partial void uf9(NetworkPlayer player);
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf14(NetworkPlayer player, int a);
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -188,16 +188,6 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[7] = true;
 			}
 		}
-		public int V9
-		{
-			get => _v9;
-			set
-			{
-				if (_v9 == value) return;
-				_v9 = value;
-				_dirtyReliable_1[0] = true;
-			}
-		}
 		public byte V10
 		{
 			get => _v10;
@@ -205,7 +195,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_v10 == value) return;
 				_v10 = value;
-				_dirtyReliable_1[1] = true;
+				_dirtyReliable_1[0] = true;
 			}
 		}
 		public int V12
@@ -215,7 +205,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_v12 == value) return;
 				_v12 = value;
-				_dirtyReliable_1[2] = true;
+				_dirtyReliable_1[1] = true;
 			}
 		}
 		public short V13
@@ -225,7 +215,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_v13 == value) return;
 				_v13 = value;
-				_dirtyReliable_1[3] = true;
+				_dirtyReliable_1[2] = true;
 			}
 		}
 		public int V15
@@ -235,21 +225,27 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_v15 == value) return;
 				_v15 = value;
-				_dirtyReliable_1[4] = true;
+				_dirtyReliable_1[3] = true;
 			}
 		}
-		public partial void f3(NetworkPlayer player, int a)
+		public partial void f3(int a)
 		{
-			f3Callstack.Add(player, a);
+			f3Callstack.Add(a);
+			_dirtyReliable_1[4] = true;
+		}
+		private List<int> f3Callstack = new(4);
+		public partial void f9()
+		{
+			f9CallstackCount++;
 			_dirtyReliable_1[5] = true;
 		}
-		private TargetCallstack<NetworkPlayer, int> f3Callstack = new(8);
-		public partial void f14(int a)
+		private byte f9CallstackCount = 0;
+		public partial void f14(int a, sbyte b)
 		{
-			f14Callstack.Add(a);
+			f14Callstack.Add((a, b));
 			_dirtyReliable_1[6] = true;
 		}
-		private List<int> f14Callstack = new(4);
+		private List<(int a, sbyte b)> f14Callstack = new(4);
 		public int Uv0
 		{
 			get => _uv0;
@@ -260,16 +256,6 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_0[0] = true;
 			}
 		}
-		public int Uv1
-		{
-			get => _uv1;
-			set
-			{
-				if (_uv1 == value) return;
-				_uv1 = value;
-				_dirtyUnreliable_0[1] = true;
-			}
-		}
 		public ulong Uv2
 		{
 			get => _uv2;
@@ -277,7 +263,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv2 == value) return;
 				_uv2 = value;
-				_dirtyUnreliable_0[2] = true;
+				_dirtyUnreliable_0[1] = true;
 			}
 		}
 		public int Uv4
@@ -287,7 +273,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv4 == value) return;
 				_uv4 = value;
-				_dirtyUnreliable_0[3] = true;
+				_dirtyUnreliable_0[2] = true;
 			}
 		}
 		public int Uv5
@@ -297,7 +283,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv5 == value) return;
 				_uv5 = value;
-				_dirtyUnreliable_0[4] = true;
+				_dirtyUnreliable_0[3] = true;
 			}
 		}
 		public int Uv6
@@ -307,7 +293,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv6 == value) return;
 				_uv6 = value;
-				_dirtyUnreliable_0[5] = true;
+				_dirtyUnreliable_0[4] = true;
 			}
 		}
 		public int Uv7
@@ -317,7 +303,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv7 == value) return;
 				_uv7 = value;
-				_dirtyUnreliable_0[6] = true;
+				_dirtyUnreliable_0[5] = true;
 			}
 		}
 		public ushort Uv8
@@ -327,17 +313,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv8 == value) return;
 				_uv8 = value;
-				_dirtyUnreliable_0[7] = true;
-			}
-		}
-		public int Uv9
-		{
-			get => _uv9;
-			set
-			{
-				if (_uv9 == value) return;
-				_uv9 = value;
-				_dirtyUnreliable_1[0] = true;
+				_dirtyUnreliable_0[6] = true;
 			}
 		}
 		public float Uv10
@@ -347,7 +323,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv10 == value) return;
 				_uv10 = value;
-				_dirtyUnreliable_1[1] = true;
+				_dirtyUnreliable_0[7] = true;
 			}
 		}
 		public int Uv12
@@ -357,7 +333,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv12 == value) return;
 				_uv12 = value;
-				_dirtyUnreliable_1[2] = true;
+				_dirtyUnreliable_1[0] = true;
 			}
 		}
 		public int Uv13
@@ -367,7 +343,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv13 == value) return;
 				_uv13 = value;
-				_dirtyUnreliable_1[3] = true;
+				_dirtyUnreliable_1[1] = true;
 			}
 		}
 		public int Uv15
@@ -377,15 +353,27 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_uv15 == value) return;
 				_uv15 = value;
-				_dirtyUnreliable_1[4] = true;
+				_dirtyUnreliable_1[2] = true;
 			}
 		}
-		public partial void uf3(NetworkPlayer player, int a)
+		public partial void uf1(NetworkPlayer player, int a, sbyte b)
 		{
-			uf3Callstack.Add(player, a);
+			uf1Callstack.Add(player, (a, b));
+			_dirtyUnreliable_1[3] = true;
+		}
+		private TargetCallstack<NetworkPlayer, (int a, sbyte b)> uf1Callstack = new(8);
+		public partial void uf3(NetworkPlayer player, int a, float b, long c)
+		{
+			uf3Callstack.Add(player, (a, b, c));
+			_dirtyUnreliable_1[4] = true;
+		}
+		private TargetCallstack<NetworkPlayer, (int a, float b, long c)> uf3Callstack = new(8);
+		public partial void uf9(NetworkPlayer player)
+		{
+			uf9Callstack.Add(player);
 			_dirtyUnreliable_1[5] = true;
 		}
-		private TargetCallstack<NetworkPlayer, int> uf3Callstack = new(8);
+		private TargetVoidCallstack<NetworkPlayer> uf9Callstack = new(8);
 		public partial void uf14(NetworkPlayer player, int a)
 		{
 			uf14Callstack.Add(player, a);
@@ -397,13 +385,16 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Clear();
 			_dirtyReliable_1.Clear();
 			f3Callstack.Clear();
+			f9CallstackCount = 0;
 			f14Callstack.Clear();
 		}
 		public override void ClearDirtyUnreliable()
 		{
 			_dirtyUnreliable_0.Clear();
 			_dirtyUnreliable_1.Clear();
+			uf1Callstack.Clear();
 			uf3Callstack.Clear();
+			uf9Callstack.Clear();
 			uf14Callstack.Clear();
 		}
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -446,45 +437,36 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_1.AnyTrue())
 			{
-				BitmaskByte dirtyReliable_1 = _dirtyReliable_1;
-				int dirtyReliable_1_pos = writer.OffsetSize(sizeof(byte));
+				_dirtyReliable_1.Serialize(writer);
 				if (_dirtyReliable_1[0])
-				{
-					writer.Put(_v9);
-				}
-				if (_dirtyReliable_1[1])
 				{
 					writer.Put(_v10);
 				}
-				if (_dirtyReliable_1[2])
+				if (_dirtyReliable_1[1])
 				{
 					writer.Put(_v12);
 				}
-				if (_dirtyReliable_1[3])
+				if (_dirtyReliable_1[2])
 				{
 					writer.Put(_v13);
 				}
-				if (_dirtyReliable_1[4])
+				if (_dirtyReliable_1[3])
 				{
 					writer.Put(_v15);
 				}
+				if (_dirtyReliable_1[4])
+				{
+					byte count = (byte)f3Callstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = f3Callstack[i];
+						writer.Put(arg);
+					}
+				}
 				if (_dirtyReliable_1[5])
 				{
-					int f3Count = f3Callstack.GetCallCount(player);
-					if (f3Count > 0)
-					{
-						var f3callList = f3Callstack.GetCallList(player);
-						writer.Put((byte)f3Count);
-						for (int i = 0; i < f3Count; i++)
-						{
-							var arg = f3callList[i];
-							writer.Put(arg);
-						}
-					}
-					else
-					{
-						dirtyReliable_1[5] = false;
-					}
+					writer.Put((byte)f9CallstackCount);
 				}
 				if (_dirtyReliable_1[6])
 				{
@@ -493,16 +475,9 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = f14Callstack[i];
-						writer.Put(arg);
+						writer.Put(arg.a);
+						writer.Put(arg.b);
 					}
-				}
-				if (dirtyReliable_1.AnyTrue())
-				{
-					writer.PutTo(dirtyReliable_1, dirtyReliable_1_pos);
-				}
-				else
-				{
-					writer.SetSize(dirtyReliable_1_pos);
 				}
 			}
 		}
@@ -517,31 +492,31 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyUnreliable_0[1])
 				{
-					writer.Put(_uv1);
+					writer.Put(_uv2);
 				}
 				if (_dirtyUnreliable_0[2])
 				{
-					writer.Put(_uv2);
+					writer.Put(_uv4);
 				}
 				if (_dirtyUnreliable_0[3])
 				{
-					writer.Put(_uv4);
+					writer.Put(_uv5);
 				}
 				if (_dirtyUnreliable_0[4])
 				{
-					writer.Put(_uv5);
+					writer.Put(_uv6);
 				}
 				if (_dirtyUnreliable_0[5])
 				{
-					writer.Put(_uv6);
+					writer.Put(_uv7);
 				}
 				if (_dirtyUnreliable_0[6])
 				{
-					writer.Put(_uv7);
+					writer.Put(_uv8);
 				}
 				if (_dirtyUnreliable_0[7])
 				{
-					writer.Put(_uv8);
+					writer.Put(_uv10);
 				}
 			}
 			if (_dirtyUnreliable_1.AnyTrue())
@@ -550,25 +525,36 @@ namespace CTS.Instance.SyncObjects
 				int dirtyUnreliable_1_pos = writer.OffsetSize(sizeof(byte));
 				if (_dirtyUnreliable_1[0])
 				{
-					writer.Put(_uv9);
+					writer.Put(_uv12);
 				}
 				if (_dirtyUnreliable_1[1])
 				{
-					writer.Put(_uv10);
+					writer.Put(_uv13);
 				}
 				if (_dirtyUnreliable_1[2])
 				{
-					writer.Put(_uv12);
+					writer.Put(_uv15);
 				}
 				if (_dirtyUnreliable_1[3])
 				{
-					writer.Put(_uv13);
+					int uf1Count = uf1Callstack.GetCallCount(player);
+					if (uf1Count > 0)
+					{
+						var uf1callList = uf1Callstack.GetCallList(player);
+						writer.Put((byte)uf1Count);
+						for (int i = 0; i < uf1Count; i++)
+						{
+							var arg = uf1callList[i];
+							writer.Put(arg.a);
+							writer.Put(arg.b);
+						}
+					}
+					else
+					{
+						dirtyUnreliable_1[3] = false;
+					}
 				}
 				if (_dirtyUnreliable_1[4])
-				{
-					writer.Put(_uv15);
-				}
-				if (_dirtyUnreliable_1[5])
 				{
 					int uf3Count = uf3Callstack.GetCallCount(player);
 					if (uf3Count > 0)
@@ -578,8 +564,22 @@ namespace CTS.Instance.SyncObjects
 						for (int i = 0; i < uf3Count; i++)
 						{
 							var arg = uf3callList[i];
-							writer.Put(arg);
+							writer.Put(arg.a);
+							writer.Put(arg.b);
+							writer.Put(arg.c);
 						}
+					}
+					else
+					{
+						dirtyUnreliable_1[4] = false;
+					}
+				}
+				if (_dirtyUnreliable_1[5])
+				{
+					int uf9Count = uf9Callstack.GetCallCount(player);
+					if (uf9Count > 0)
+					{
+						writer.Put((byte)uf9Count);
 					}
 					else
 					{
@@ -624,20 +624,17 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_v6);
 			writer.Put(_v7);
 			writer.Put(_v8);
-			writer.Put(_v9);
 			writer.Put(_v10);
 			writer.Put(_v12);
 			writer.Put(_v13);
 			writer.Put(_v15);
 			writer.Put(_uv0);
-			writer.Put(_uv1);
 			writer.Put(_uv2);
 			writer.Put(_uv4);
 			writer.Put(_uv5);
 			writer.Put(_uv6);
 			writer.Put(_uv7);
 			writer.Put(_uv8);
-			writer.Put(_uv9);
 			writer.Put(_uv10);
 			writer.Put(_uv12);
 			writer.Put(_uv13);
@@ -653,20 +650,17 @@ namespace CTS.Instance.SyncObjects
 			_v6 = 0;
 			_v7 = 0;
 			_v8 = 0;
-			_v9 = 0;
 			_v10 = 0;
 			_v12 = 0;
 			_v13 = 0;
 			_v15 = 0;
 			_uv0 = 0;
-			_uv1 = 0;
 			_uv2 = 0;
 			_uv4 = 0;
 			_uv5 = 0;
 			_uv6 = 0;
 			_uv7 = 0;
 			_uv8 = 0;
-			_uv9 = 0;
 			_uv10 = 0;
 			_uv12 = 0;
 			_uv13 = 0;

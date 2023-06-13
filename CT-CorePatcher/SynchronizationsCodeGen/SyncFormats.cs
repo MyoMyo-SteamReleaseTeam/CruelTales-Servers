@@ -365,6 +365,15 @@ else
 		/// {0} Attribute<br/>
 		/// {1} Access modifier<br/>
 		/// {2} Function name<br/>
+		/// </summary>
+		public static string TargetDeclarationVoid =>
+@"[{0}]
+{1} partial void {2}(NetworkPlayer player);";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Access modifier<br/>
+		/// {2} Function name<br/>
 		/// {3} Parameter declaration <br/>
 		/// </summary>
 		public static string TargetDeclaration =>
@@ -438,7 +447,7 @@ private TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
 		public static string TargetCallWithStackVoid =>
 @"{0} partial void {1}(NetworkPlayer player)
 {{
-	{1}CallstackCount.Add(player);
+	{1}Callstack.Add(player);
 	{2}[{3}] = true;
 }}
 private TargetVoidCallstack<NetworkPlayer> {1}Callstack = new(8);";

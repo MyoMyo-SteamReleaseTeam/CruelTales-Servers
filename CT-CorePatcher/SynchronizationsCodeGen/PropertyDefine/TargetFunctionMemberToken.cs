@@ -21,6 +21,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
+			if (_argGroup.Count == 0)
+				return string.Format(FuncMemberFormat.TargetDeclarationVoid,
+									 attribute, AccessModifier, _functionName);
+
 			return string.Format(FuncMemberFormat.TargetDeclaration,
 								 attribute, AccessModifier, _functionName,
 								 _argGroup.GetParameterDeclaration());

@@ -34,6 +34,15 @@ namespace CTS.Instance.Gameplay
 		// Visibility
 		public VisibilityAuthority VisibilityAuthority { get; private set; }
 
+#if DEBUG
+#pragma warning disable CS8618
+		public NetworkPlayer(UserId userId)
+		{
+			UserId = userId;
+		}
+#pragma warning restore CS8618
+#endif
+
 		public NetworkPlayer(GameManager gameManager,
 							 WorldManager worldManager,
 							 InstanceInitializeOption option)
@@ -70,10 +79,10 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-			Vector3 targetPosition = TargetTransform == null ? 
+			Vector3 targetPosition = TargetTransform == null ?
 				Vector3.Zero : TargetTransform.Position;
 
-			ViewTransform.Position = Vector3.Lerp(ViewTransform.Position, 
+			ViewTransform.Position = Vector3.Lerp(ViewTransform.Position,
 												  targetPosition,
 												  CameraSpeed * deltaTime);
 			ViewTransform.Velocity = TargetTransform == null ?
