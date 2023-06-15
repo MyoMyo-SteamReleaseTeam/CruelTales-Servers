@@ -68,6 +68,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 @"using System;
 using System.Numerics;
 using System.Collections.Generic;
+using CT.Common.Gameplay;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -79,6 +80,7 @@ using CTS.Instance.SyncObjects;";
 		public static string RemoteUsingStatements =>
 @"using System;
 using System.Collections.Generic;
+using CT.Common.Gameplay;
 using CT.Common.DataType;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -549,6 +551,16 @@ for (int i = 0; i < count; i++)
 for (int i = 0; i < count; i++)
 {{
 	{0}();
+}}";
+
+		/// <summary>
+		/// {0} Function name<br/>
+		/// </summary>
+		public static string TargetDeserializeIfDirtyVoid =>
+@"byte count = reader.ReadByte();
+for (int i = 0; i < count; i++)
+{{
+	{0}(player);
 }}";
 
 		public static string IgnoreVoid => @"reader.Ignore(1);";

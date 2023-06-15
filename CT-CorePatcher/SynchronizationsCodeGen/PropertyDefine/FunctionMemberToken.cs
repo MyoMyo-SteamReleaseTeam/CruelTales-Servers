@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArguments;
 
@@ -80,7 +81,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 			if (direction == SyncDirection.FromRemote)
 			{
-				format = FuncMemberFormat.DeclarationFromRemote;
+				format = _argGroup.Count == 0 ?
+					FuncMemberFormat.TargetDeclarationVoid :
+					FuncMemberFormat.DeclarationFromRemote;
 			}
 			else if (direction == SyncDirection.FromMaster)
 			{
@@ -94,7 +97,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			if (_argGroup.Count == 0)
-				return string.Format(FuncMemberFormat.DeserializeIfDirtyVoid, _functionName);
+			{
+				string format = string.Empty;
+
+				if (direction == SyncDirection.FromRemote)
+					format = FuncMemberFormat.DeserializeIfDirtyVoid;
+				else if (direction == SyncDirection.FromMaster)
+					format = FuncMemberFormat.TargetDeserializeIfDirtyVoid;
+
+				return string.Format(format, _functionName);
+			}
 
 			string paramContent = _argGroup.GetReadParameterContent();
 			CodeFormat.AddIndent(ref paramContent);
