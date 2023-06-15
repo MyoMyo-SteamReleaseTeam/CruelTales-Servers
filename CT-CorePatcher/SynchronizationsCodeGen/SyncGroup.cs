@@ -22,6 +22,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private SyncType _syncType;
 		private SyncDirection _direction;
 		private string _modifier;
+		private bool _hasAnyTargetMember;
 
 		public SerializeSyncGroup(List<BaseMemberToken> memberTokens,
 								  SyncType syncType, SyncDirection direction, string modifier)
@@ -46,6 +47,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 				_dirtyGroups.Add(new DirtyGroup(members, _syncType, groupCount++));
 			}
+
+			_hasAnyTargetMember = false;
+			foreach (var dirtyGroup in _dirtyGroups)
+				_hasAnyTargetMember |= dirtyGroup.HasTargetMember;
 		}
 
 		public string Master_BitmaskDeclarations()
@@ -121,21 +126,54 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string master_SerializeSyncOneDirtyGroup()
 		{
-			var group = _dirtyGroups[0];
-			return group.Master_MemberSerializeIfDirtys(group.GetName(), group.GetTempName());
+			StringBuilder contents = new StringBuilder();
+			var dirtyGroup = _dirtyGroups[0];
+			string dirtyBitName = dirtyGroup.GetName();
+			string tempDirtyBitName = dirtyGroup.GetTempName();
+
+			if (_hasAnyTargetMember)
+				contents.AppendLine(string.Format(DirtyGroupFormat.JumpSerializeDirtyMask, dirtyBitName, tempDirtyBitName));
+			else
+				contents.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
+
+			contents.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName));
+
+			if (_hasAnyTargetMember)
+				contents.AppendLine(string.Format(DirtyGroupFormat.RollBackSerializeMask, tempDirtyBitName, string.Empty));
+
+			return contents.ToString();
 		}
 
 		private string master_SerializeSyncTwoDirtyGroup()
 		{
-			StringBuilder sb = new();
+			StringBuilder contents = new();
+
+			if (_hasAnyTargetMember)
+				contents.AppendLine(SyncGroupFormat.CacheOriginSize);
+
 			for (int i = 0; i < 2; i++)
 			{
-				var group = _dirtyGroups[i];
-				string content = group.Master_MemberSerializeIfDirtys(group.GetName(), group.GetTempName());
+				var dirtyGroup = _dirtyGroups[i];
+				string dirtyBitName = dirtyGroup.GetName();
+				string tempDirtyBitName = dirtyGroup.GetTempName();
+
+				if (dirtyGroup.HasTargetMember)
+					contents.AppendLine(string.Format(DirtyGroupFormat.JumpSerializeDirtyMask, dirtyBitName, tempDirtyBitName));
+				else
+					contents.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
+
+				string content = dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName);
 				CodeFormat.AddIndent(ref content);
-				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetName(), content));
+				contents.AppendLine(string.Format(CommonFormat.IfDirtyAny, dirtyBitName, content));
+
+				if (dirtyGroup.HasTargetMember)
+					contents.AppendLine(string.Format(SyncGroupFormat.PutDirtyBitTo, tempDirtyBitName));
 			}
-			return sb.ToString();
+
+			if (_hasAnyTargetMember)
+				contents.AppendLine(string.Format(SyncGroupFormat.RollbackWriter, sizeof(byte) * 2));
+
+			return contents.ToString();
 		}
 
 		private string master_SerializeSyncMultipleDirtyGroup()
@@ -143,46 +181,55 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder headers = new();
 			StringBuilder contents = new();
 
+			// Set master dirty bits
 			headers.AppendLine(SyncGroupFormat.MasterDirtyBitInstantiate);
-
-			bool hasTargetMember = false;
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
 				var dirtyGroup = _dirtyGroups[i];
-				hasTargetMember |= dirtyGroup.HasTargetMember;
 				headers.AppendLine(string.Format(SyncGroupFormat.MasterDirtyAnyTrue, i, dirtyGroup.GetName()));
 			}
 
-			if (hasTargetMember)
-			{
+			// Jump or serialize master dirty bits
+			if (_hasAnyTargetMember)
 				headers.AppendLine(string.Format(SyncGroupFormat.JumpDirtyBit, SyncGroupFormat.MasterDirtyBitName));
-			}
 			else
-			{
-				headers.AppendLine(SyncGroupFormat.MasterDirtySerialize);
-			}
+				headers.AppendLine(string.Format(MemberFormat.WriteSerialize, SyncGroupFormat.MasterDirtyBitName));
 
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
 				var dirtyGroup = _dirtyGroups[i];
+				string dirtyBitName = dirtyGroup.GetName();
+				string tempDirtyBitName = dirtyGroup.GetTempName();
 
-				string rollContent = string.Empty;
+				StringBuilder ctx = new StringBuilder(1024);
+
+				if (dirtyGroup.HasTargetMember)
+					ctx.AppendLine(string.Format(DirtyGroupFormat.JumpSerializeDirtyMask, dirtyBitName, tempDirtyBitName));
+				else
+					ctx.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
+
+				// Content
+				ctx.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName));
+
 				if (dirtyGroup.HasTargetMember)
 				{
-					rollContent = string.Format(SyncGroupFormat.SetDirtyBit, SyncGroupFormat.MasterDirtyBitName, i, "false");
+					string rollContent = string.Format(SyncGroupFormat.SetDirtyBit, SyncGroupFormat.MasterDirtyBitName, i, "false");
+					CodeFormat.AddIndent(ref rollContent);
+					ctx.AppendLine(string.Format(DirtyGroupFormat.RollBackSerializeMask, tempDirtyBitName, rollContent));
 				}
-				string ctx = dirtyGroup.Master_MemberSerializeIfDirtys(dirtyGroup.GetName(), dirtyGroup.GetTempName(), rollContent);
-				ctx = CodeFormat.AddIndent(ctx);
-				string content = string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, ctx);
-				contents.AppendLine(content);
-			}
 
-			if (hasTargetMember)
-			{
-				contents.AppendLine(string.Format(SyncGroupFormat.PutDirtyBitTo, SyncGroupFormat.MasterDirtyBitName));
+				CodeFormat.AddIndent(ctx);
+				string content = string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, ctx.ToString());
+				contents.AppendLine(content);
+
 			}
 
 			headers.AppendLine(contents.ToString());
+
+			if (_hasAnyTargetMember)
+				headers.AppendLine(string.Format(DirtyGroupFormat.RollBackSerializeMask,
+												 SyncGroupFormat.MasterDirtyBitName, string.Empty));
+
 			return headers.ToString();
 		}
 

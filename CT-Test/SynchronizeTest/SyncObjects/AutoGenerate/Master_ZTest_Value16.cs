@@ -399,9 +399,9 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0.AnyTrue())
 			{
-				_dirtyReliable_0.Serialize(writer);
 				if (_dirtyReliable_0[0])
 				{
 					writer.Put(_v0);
@@ -435,9 +435,9 @@ namespace CTS.Instance.SyncObjects
 					writer.Put(_v8);
 				}
 			}
+			_dirtyReliable_1.Serialize(writer);
 			if (_dirtyReliable_1.AnyTrue())
 			{
-				_dirtyReliable_1.Serialize(writer);
 				if (_dirtyReliable_1[0])
 				{
 					writer.Put(_v10);
@@ -483,9 +483,10 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			int originSize = writer.Size;
+			_dirtyUnreliable_0.Serialize(writer);
 			if (_dirtyUnreliable_0.AnyTrue())
 			{
-				_dirtyUnreliable_0.Serialize(writer);
 				if (_dirtyUnreliable_0[0])
 				{
 					writer.Put(_uv0);
@@ -519,10 +520,10 @@ namespace CTS.Instance.SyncObjects
 					writer.Put(_uv10);
 				}
 			}
+			BitmaskByte dirtyUnreliable_1 = _dirtyUnreliable_1;
+			int dirtyUnreliable_1_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyUnreliable_1.AnyTrue())
 			{
-				BitmaskByte dirtyUnreliable_1 = _dirtyUnreliable_1;
-				int dirtyUnreliable_1_pos = writer.OffsetSize(sizeof(byte));
 				if (_dirtyUnreliable_1[0])
 				{
 					writer.Put(_uv12);
@@ -604,14 +605,11 @@ namespace CTS.Instance.SyncObjects
 						dirtyUnreliable_1[6] = false;
 					}
 				}
-				if (dirtyUnreliable_1.AnyTrue())
-				{
-					writer.PutTo(dirtyUnreliable_1, dirtyUnreliable_1_pos);
-				}
-				else
-				{
-					writer.SetSize(dirtyUnreliable_1_pos);
-				}
+			}
+			writer.PutTo(dirtyUnreliable_1, dirtyUnreliable_1_pos);
+			if (writer.Size == originSize + 2)
+			{
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeEveryProperty(IPacketWriter writer)

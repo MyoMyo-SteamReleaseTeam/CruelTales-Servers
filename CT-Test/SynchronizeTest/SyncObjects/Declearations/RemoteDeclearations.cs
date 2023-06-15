@@ -150,121 +150,72 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			v_uf14int = 0;
 		}
 
-		public partial void f3(int a)
-		{
-			v_f3 += a;
-		}
-
-		private partial void f9()
-		{
-
-		}
-
-		private partial void f14(int a, sbyte b)
-		{
-		}
-
+		public partial void f3(int a) => v_f3 += a;
+		private partial void f9() {}
+		private partial void f14(int a, sbyte b) {}
 		public partial void uf1(int a, sbyte b)
 		{
 			v_uf1int += a;
 			v_uf1sbyte += b;
 		}
-
 		public partial void uf3(int a, float b, TestEnumType c)
 		{
 			v_uf3int += a;
 			v_uf3float += b;
 			if (c == TestEnumType.B)
-			{
 				v_uf3enum++;
-			}
 		}
-
-		public partial void uf9()
-		{
-			v_uf9Count++;
-		}
-
-		public partial void uf14(int a)
-		{
-			v_uf14int += a;
-		}
+		public partial void uf9() => v_uf9Count++;
+		public partial void uf14(int a) => v_uf14int += a;
 	}
 
 	public partial class ZTest_Value32 : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
+		public int v_f3 = 0;
+		public int v_f14 = 0;
+		public int v_f22 = 0;
+		public int v_f28 = 0;
 
-		public partial void f3(int a)
-		{ 
+		public int v_uf3 = 0;
+		public int v_uf9 = 0;
+		public byte v_uf22byte = 0;
+		public int v_uf22int = 0;
+		public uint v_uf22uint = 0;
+		public int v_uf28 = 0;
 
-		}
-
-		public partial void f14()
+		public void ResetTestValue()
 		{
-
+			v_f3 = 0;
+			v_f14 = 0;
+			v_f22 = 0;
+			v_f28 = 0;
+			v_uf3 = 0;
+			v_uf9 = 0;
+			v_uf22byte = 0;
+			v_uf22int = 0;
+			v_uf22uint = 0;
+			v_uf28 = 0;
 		}
-
-		public partial void f17(int a)
-		{
-
-		}
-
-		public partial void f22()
-		{
-
-		}
-
-		public partial void f24(int a)
-		{
-
-		}
-
-		private partial void f28(int a)
-		{
-
-		}
-
-		public partial void uf3(int a)
-		{
-
-		}
-
-		public partial void uf9()
-		{
-
-		}
-
-		public partial void uf12(int a)
-		{
-
-		}
-
-		public partial void uf14(int a, float b)
-		{
-
-		}
-
-		private partial void uf17(int a)
-		{
-
-		}
-
+		public partial void f3(int a) => v_f3 += a;
+		public partial void f14() => v_f14++;
+		public partial void f17(int a) { }
+		public partial void f22() => v_f22++;
+		public partial void f24(int a) { }
+		private partial void f28(int a) => v_f28 += a;
+		public partial void uf3(int a) => v_uf3 += a;
+		public partial void uf9() => v_uf9++;
+		public partial void uf12(int a) { }
+		public partial void uf14(int a, float b) { }
+		private partial void uf17(int a) { }
 		public partial void uf22(byte a, int b, uint c)
 		{
-
+			v_uf22byte += a;
+			v_uf22int += b;
+			v_uf22uint += c;
 		}
-
-		public partial void uf24()
-		{
-
-		}
-
-		public partial void uf28(int a)
-		{
-
-		}
-
+		public partial void uf24() { }
+		public partial void uf28(int a) => v_uf28 += a;
 	}
 }

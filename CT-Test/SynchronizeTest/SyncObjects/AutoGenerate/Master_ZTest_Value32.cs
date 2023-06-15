@@ -1214,7 +1214,14 @@ namespace CTS.Instance.SyncObjects
 					masterDirty[3] = false;
 				}
 			}
-			writer.PutTo(masterDirty, masterDirty_pos);
+			if (masterDirty.AnyTrue())
+			{
+				writer.PutTo(masterDirty, masterDirty_pos);
+			}
+			else
+			{
+				writer.SetSize(masterDirty_pos);
+			}
 		}
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{

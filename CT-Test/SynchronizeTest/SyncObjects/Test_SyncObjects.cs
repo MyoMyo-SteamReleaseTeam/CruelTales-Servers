@@ -20,11 +20,12 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			CTS.Instance.SyncObjects.ZTest_Value8 master = new ();
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value8 remote = new();
 
-			master.SerializeSyncReliable(p1, buffer);
-			Assert.AreEqual(0, buffer.Size);
+			master.Call_uf5(p1);
+			Assert.IsTrue(master.IsDirtyUnreliable);
 
-			master.SerializeSyncUnreliable(p1, buffer);
+			master.SerializeSyncUnreliable(p2, buffer);
 			Assert.AreEqual(0, buffer.Size);
+			master.ClearDirtyUnreliable();
 
 			master.f3(10);
 			master.uf1(p1, 20, 30);
@@ -74,11 +75,11 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			CTS.Instance.SyncObjects.ZTest_Value16 master = new();
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16 remote = new();
 
-			master.SerializeSyncReliable(p1, buffer);
+			master.uf1(p1, 10, 10);
+			Assert.IsTrue(master.IsDirtyUnreliable);
+			master.SerializeSyncUnreliable(p2, buffer);
 			Assert.AreEqual(0, buffer.Size);
-
-			master.SerializeSyncUnreliable(p1, buffer);
-			Assert.AreEqual(0, buffer.Size);
+			master.ClearDirtyUnreliable();
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -98,6 +99,7 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 
 			Sync(buffer, p1, master, remote);
 
+			Assert.AreEqual(100, remote.v_f3);
 			Assert.AreEqual(100, remote.v_uf3int);
 			Assert.AreEqual(100, remote.v_uf1int);
 			Assert.AreEqual(100, remote.v_uf1sbyte);
@@ -111,13 +113,90 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 
 			Sync(buffer, p2, master, remote);
 
-			Assert.AreEqual(100, remote.v_uf3int);
+			Assert.AreEqual(100, remote.v_f3);
 			Assert.AreEqual(30, remote.v_uf1int);
 			Assert.AreEqual(30, remote.v_uf1sbyte);
 			Assert.AreEqual(30, remote.v_uf14int);
 
 			Assert.AreEqual(99, remote.V0);
 			Assert.AreEqual(99, remote.V13);
+		}
+
+		[TestMethod]
+		public void TestValue32()
+		{
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
+
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
+
+			CTS.Instance.SyncObjects.ZTest_Value32 master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value32 remote = new();
+
+			master.uf3(p1, 10);
+			Assert.IsTrue(master.IsDirtyUnreliable);
+			master.SerializeSyncUnreliable(p2, buffer);
+			Assert.AreEqual(0, buffer.Size);
+			master.ClearDirtyUnreliable();
+
+			for (int i = 0; i < 4; i++)
+			{
+				master.f3(10);
+				master.f14();
+				master.f22();
+				master.CallF28(10);
+			}
+
+			for (int i = 0; i < 3; i++)
+			{
+				master.uf3(p1, 10);
+				master.uf9(p1);
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				master.uf9(p2);
+				master.uf22(p2, 10, 10, 10);
+				master.uf28(p2, 10);
+			}
+
+			master.V0 = 99;
+			master.V5 = 99;
+			master.Uv10 = 99;
+
+			Sync(buffer, p1, master, remote);
+
+			Assert.AreEqual(40, remote.v_f3);
+			Assert.AreEqual(4, remote.v_f14);
+			Assert.AreEqual(4, remote.v_f22);
+			Assert.AreEqual(40, remote.v_f28);
+
+			Assert.AreEqual(30, remote.v_uf3);
+			Assert.AreEqual(3, remote.v_uf9);
+
+			Assert.AreEqual(99, remote.V0);
+			Assert.AreEqual(99, remote.V5);
+			Assert.AreEqual(99, remote.Uv10);
+
+			remote.ResetTestValue();
+			remote.InitializeRemoteProperties();
+
+			Sync(buffer, p2, master, remote);
+
+			Assert.AreEqual(40, remote.v_f3);
+			Assert.AreEqual(4, remote.v_f14);
+			Assert.AreEqual(4, remote.v_f22);
+			Assert.AreEqual(40, remote.v_f28);
+
+			Assert.AreEqual(20, remote.v_uf22byte);
+			Assert.AreEqual(20, remote.v_uf22int);
+			Assert.AreEqual(20U, remote.v_uf22uint);
+			Assert.AreEqual(20, remote.v_uf28);
+			Assert.AreEqual(2, remote.v_uf9);
+
+			Assert.AreEqual(99, remote.V0);
+			Assert.AreEqual(99, remote.V5);
+			Assert.AreEqual(99, remote.Uv10);
 		}
 
 		public void Sync(ByteBuffer buffer,

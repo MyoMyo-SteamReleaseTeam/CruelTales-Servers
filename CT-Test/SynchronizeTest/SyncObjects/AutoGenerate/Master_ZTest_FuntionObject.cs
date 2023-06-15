@@ -162,9 +162,9 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0.AnyTrue())
 			{
-				_dirtyReliable_0.Serialize(writer);
 				if (_dirtyReliable_0[0])
 				{
 					writer.Put((byte)Server_VoidArgCallstackCount);
@@ -247,9 +247,9 @@ namespace CTS.Instance.SyncObjects
 					}
 				}
 			}
+			_dirtyReliable_1.Serialize(writer);
 			if (_dirtyReliable_1.AnyTrue())
 			{
-				_dirtyReliable_1.Serialize(writer);
 				if (_dirtyReliable_1[0])
 				{
 					byte count = (byte)Server_EnumTypeArg_2Callstack.Count;

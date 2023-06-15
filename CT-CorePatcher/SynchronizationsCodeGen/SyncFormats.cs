@@ -326,6 +326,17 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// </summary>
 		public static string InitializeRemoteProperties => @"public {0}void InitializeRemoteProperties()";
+
+		public static string CacheOriginSize => @"int originSize = writer.Size;";
+
+		/// <summary>
+		/// {0} Offset size<br/>
+		/// </summary>
+		public static string RollbackWriter =>
+@"if (writer.Size == originSize + {0})
+{{
+	writer.SetSize(originSize);
+}}";
 	}
 
 	public static class DirtyGroupFormat
@@ -334,7 +345,7 @@ public partial class {0} : {1}
 		/// {0} Dirty bits name<br/>
 		/// {1} Temp dirty bits name<br/>
 		/// </summary>
-		public static string JumpAndSerializeMask =>
+		public static string JumpSerializeDirtyMask =>
 @"BitmaskByte {1} = {0};
 int {1}_pos = writer.OffsetSize(sizeof(byte));";
 

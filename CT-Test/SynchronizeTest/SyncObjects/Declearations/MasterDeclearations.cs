@@ -43,5 +43,7 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority VisibilityAuthority => throw new NotImplementedException();
+
+		public void CallF28(int value) => f28(value);
 	}
 }
