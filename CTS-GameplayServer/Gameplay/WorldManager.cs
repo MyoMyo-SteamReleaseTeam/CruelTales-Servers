@@ -489,7 +489,7 @@ namespace CTS.Instance.Gameplay
 					return true;
 				}
 
-				if (!netObj.TryDeserializeSyncUnreliable(player, reader))
+				if (!netObj.TryDeserializeSyncReliable(player, reader))
 				{
 					reader.IgnoreAll();
 					return false;
