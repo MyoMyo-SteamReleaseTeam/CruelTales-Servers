@@ -632,6 +632,20 @@ private {1} {2}{3};";
 {5} {1} {2}{4};
 public event Action<{1}>? On{3}Changed;";
 
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Type name<br/>
+		/// {2} Private property name<br/>
+		/// {3} Public property name<br/>
+		/// {4} Initialize<br/>
+		/// {5} Access modifier
+		/// </summary>
+		public static string RemoteDeclarationAsPublic=>
+@"[{0}]
+private {1} {2}{4};
+{5} {1} {3} => {2};
+public event Action<{1}>? On{3}Changed;";
+
 		public static string NewInitializer => " = new()";
 
 		/// <summary>

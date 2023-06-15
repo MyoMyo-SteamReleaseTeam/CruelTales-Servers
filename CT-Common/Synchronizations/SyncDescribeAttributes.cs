@@ -12,7 +12,7 @@ namespace CT.Common.Synchronizations
 		public int Capacity;
 		public bool IsDebugOnly;
 
-		public SyncNetworkObjectDefinitionAttribute( int capacity = 16, bool multiplyByMaxUser = false, bool isDebugOnly = false)
+		public SyncNetworkObjectDefinitionAttribute(int capacity = 16, bool multiplyByMaxUser = false, bool isDebugOnly = false)
 		{
 			Capacity = capacity;
 			MultiplyByMaxUser = multiplyByMaxUser;

@@ -24,28 +24,36 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class ZTest_Value16
 	{
 		[SyncVar]
-		public int V0;
+		private int _v0;
+		public int V0 => _v0;
 		public event Action<int>? OnV0Changed;
 		[SyncVar]
-		public int V1;
+		private int _v1;
+		public int V1 => _v1;
 		public event Action<int>? OnV1Changed;
 		[SyncVar]
-		public int V2;
+		private int _v2;
+		public int V2 => _v2;
 		public event Action<int>? OnV2Changed;
 		[SyncVar]
-		public NetString V4 = new();
+		private NetString _v4 = new();
+		public NetString V4 => _v4;
 		public event Action<NetString>? OnV4Changed;
 		[SyncVar]
-		public NetStringShort V5 = new();
+		private NetStringShort _v5 = new();
+		public NetStringShort V5 => _v5;
 		public event Action<NetStringShort>? OnV5Changed;
 		[SyncVar]
-		public byte V6;
+		private byte _v6;
+		public byte V6 => _v6;
 		public event Action<byte>? OnV6Changed;
 		[SyncVar]
-		public int V7;
+		private int _v7;
+		public int V7 => _v7;
 		public event Action<int>? OnV7Changed;
 		[SyncVar]
-		public ushort V8;
+		private ushort _v8;
+		public ushort V8 => _v8;
 		public event Action<ushort>? OnV8Changed;
 		[SyncVar]
 		private byte _v10;
@@ -60,19 +68,24 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v15;
 		public event Action<int>? OnV15Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv0;
+		private int _uv0;
+		public int Uv0 => _uv0;
 		public event Action<int>? OnUv0Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public ulong Uv2;
+		private ulong _uv2;
+		public ulong Uv2 => _uv2;
 		public event Action<ulong>? OnUv2Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv4;
+		private int _uv4;
+		public int Uv4 => _uv4;
 		public event Action<int>? OnUv4Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv5;
+		private int _uv5;
+		public int Uv5 => _uv5;
 		public event Action<int>? OnUv5Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv6;
+		private int _uv6;
+		public int Uv6 => _uv6;
 		public event Action<int>? OnUv6Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv7;
@@ -81,16 +94,19 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private ushort _uv8;
 		public event Action<ushort>? OnUv8Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public float Uv10;
+		private float _uv10;
+		public float Uv10 => _uv10;
 		public event Action<float>? OnUv10Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv12;
+		private int _uv12;
+		public int Uv12 => _uv12;
 		public event Action<int>? OnUv12Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv13;
 		public event Action<int>? OnUv13Changed;
 		[SyncVar(SyncType.Unreliable)]
-		public int Uv15;
+		private int _uv15;
+		public int Uv15 => _uv15;
 		public event Action<int>? OnUv15Changed;
 		[SyncRpc]
 		public partial void f3(int a);
@@ -121,43 +137,43 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				if (dirtyReliable_0[0])
 				{
-					if (!reader.TryReadInt32(out V0)) return false;
-					OnV0Changed?.Invoke(V0);
+					if (!reader.TryReadInt32(out _v0)) return false;
+					OnV0Changed?.Invoke(_v0);
 				}
 				if (dirtyReliable_0[1])
 				{
-					if (!reader.TryReadInt32(out V1)) return false;
-					OnV1Changed?.Invoke(V1);
+					if (!reader.TryReadInt32(out _v1)) return false;
+					OnV1Changed?.Invoke(_v1);
 				}
 				if (dirtyReliable_0[2])
 				{
-					if (!reader.TryReadInt32(out V2)) return false;
-					OnV2Changed?.Invoke(V2);
+					if (!reader.TryReadInt32(out _v2)) return false;
+					OnV2Changed?.Invoke(_v2);
 				}
 				if (dirtyReliable_0[3])
 				{
-					if (!V4.TryDeserialize(reader)) return false;
-					OnV4Changed?.Invoke(V4);
+					if (!_v4.TryDeserialize(reader)) return false;
+					OnV4Changed?.Invoke(_v4);
 				}
 				if (dirtyReliable_0[4])
 				{
-					if (!V5.TryDeserialize(reader)) return false;
-					OnV5Changed?.Invoke(V5);
+					if (!_v5.TryDeserialize(reader)) return false;
+					OnV5Changed?.Invoke(_v5);
 				}
 				if (dirtyReliable_0[5])
 				{
-					if (!reader.TryReadByte(out V6)) return false;
-					OnV6Changed?.Invoke(V6);
+					if (!reader.TryReadByte(out _v6)) return false;
+					OnV6Changed?.Invoke(_v6);
 				}
 				if (dirtyReliable_0[6])
 				{
-					if (!reader.TryReadInt32(out V7)) return false;
-					OnV7Changed?.Invoke(V7);
+					if (!reader.TryReadInt32(out _v7)) return false;
+					OnV7Changed?.Invoke(_v7);
 				}
 				if (dirtyReliable_0[7])
 				{
-					if (!reader.TryReadUInt16(out V8)) return false;
-					OnV8Changed?.Invoke(V8);
+					if (!reader.TryReadUInt16(out _v8)) return false;
+					OnV8Changed?.Invoke(_v8);
 				}
 			}
 			BitmaskByte dirtyReliable_1 = reader.ReadBitmaskByte();
@@ -220,28 +236,28 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				if (dirtyUnreliable_0[0])
 				{
-					if (!reader.TryReadInt32(out Uv0)) return false;
-					OnUv0Changed?.Invoke(Uv0);
+					if (!reader.TryReadInt32(out _uv0)) return false;
+					OnUv0Changed?.Invoke(_uv0);
 				}
 				if (dirtyUnreliable_0[1])
 				{
-					if (!reader.TryReadUInt64(out Uv2)) return false;
-					OnUv2Changed?.Invoke(Uv2);
+					if (!reader.TryReadUInt64(out _uv2)) return false;
+					OnUv2Changed?.Invoke(_uv2);
 				}
 				if (dirtyUnreliable_0[2])
 				{
-					if (!reader.TryReadInt32(out Uv4)) return false;
-					OnUv4Changed?.Invoke(Uv4);
+					if (!reader.TryReadInt32(out _uv4)) return false;
+					OnUv4Changed?.Invoke(_uv4);
 				}
 				if (dirtyUnreliable_0[3])
 				{
-					if (!reader.TryReadInt32(out Uv5)) return false;
-					OnUv5Changed?.Invoke(Uv5);
+					if (!reader.TryReadInt32(out _uv5)) return false;
+					OnUv5Changed?.Invoke(_uv5);
 				}
 				if (dirtyUnreliable_0[4])
 				{
-					if (!reader.TryReadInt32(out Uv6)) return false;
-					OnUv6Changed?.Invoke(Uv6);
+					if (!reader.TryReadInt32(out _uv6)) return false;
+					OnUv6Changed?.Invoke(_uv6);
 				}
 				if (dirtyUnreliable_0[5])
 				{
@@ -255,8 +271,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyUnreliable_0[7])
 				{
-					if (!reader.TryReadSingle(out Uv10)) return false;
-					OnUv10Changed?.Invoke(Uv10);
+					if (!reader.TryReadSingle(out _uv10)) return false;
+					OnUv10Changed?.Invoke(_uv10);
 				}
 			}
 			BitmaskByte dirtyUnreliable_1 = reader.ReadBitmaskByte();
@@ -264,8 +280,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				if (dirtyUnreliable_1[0])
 				{
-					if (!reader.TryReadInt32(out Uv12)) return false;
-					OnUv12Changed?.Invoke(Uv12);
+					if (!reader.TryReadInt32(out _uv12)) return false;
+					OnUv12Changed?.Invoke(_uv12);
 				}
 				if (dirtyUnreliable_1[1])
 				{
@@ -274,8 +290,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyUnreliable_1[2])
 				{
-					if (!reader.TryReadInt32(out Uv15)) return false;
-					OnUv15Changed?.Invoke(Uv15);
+					if (!reader.TryReadInt32(out _uv15)) return false;
+					OnUv15Changed?.Invoke(_uv15);
 				}
 				if (dirtyUnreliable_1[3])
 				{
@@ -321,22 +337,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			if (!reader.TryReadInt32(out V0)) return false;
-			OnV0Changed?.Invoke(V0);
-			if (!reader.TryReadInt32(out V1)) return false;
-			OnV1Changed?.Invoke(V1);
-			if (!reader.TryReadInt32(out V2)) return false;
-			OnV2Changed?.Invoke(V2);
-			if (!V4.TryDeserialize(reader)) return false;
-			OnV4Changed?.Invoke(V4);
-			if (!V5.TryDeserialize(reader)) return false;
-			OnV5Changed?.Invoke(V5);
-			if (!reader.TryReadByte(out V6)) return false;
-			OnV6Changed?.Invoke(V6);
-			if (!reader.TryReadInt32(out V7)) return false;
-			OnV7Changed?.Invoke(V7);
-			if (!reader.TryReadUInt16(out V8)) return false;
-			OnV8Changed?.Invoke(V8);
+			if (!reader.TryReadInt32(out _v0)) return false;
+			OnV0Changed?.Invoke(_v0);
+			if (!reader.TryReadInt32(out _v1)) return false;
+			OnV1Changed?.Invoke(_v1);
+			if (!reader.TryReadInt32(out _v2)) return false;
+			OnV2Changed?.Invoke(_v2);
+			if (!_v4.TryDeserialize(reader)) return false;
+			OnV4Changed?.Invoke(_v4);
+			if (!_v5.TryDeserialize(reader)) return false;
+			OnV5Changed?.Invoke(_v5);
+			if (!reader.TryReadByte(out _v6)) return false;
+			OnV6Changed?.Invoke(_v6);
+			if (!reader.TryReadInt32(out _v7)) return false;
+			OnV7Changed?.Invoke(_v7);
+			if (!reader.TryReadUInt16(out _v8)) return false;
+			OnV8Changed?.Invoke(_v8);
 			if (!reader.TryReadByte(out _v10)) return false;
 			OnV10Changed?.Invoke(_v10);
 			if (!reader.TryReadInt32(out _v12)) return false;
@@ -345,55 +361,55 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV13Changed?.Invoke(_v13);
 			if (!reader.TryReadInt32(out _v15)) return false;
 			OnV15Changed?.Invoke(_v15);
-			if (!reader.TryReadInt32(out Uv0)) return false;
-			OnUv0Changed?.Invoke(Uv0);
-			if (!reader.TryReadUInt64(out Uv2)) return false;
-			OnUv2Changed?.Invoke(Uv2);
-			if (!reader.TryReadInt32(out Uv4)) return false;
-			OnUv4Changed?.Invoke(Uv4);
-			if (!reader.TryReadInt32(out Uv5)) return false;
-			OnUv5Changed?.Invoke(Uv5);
-			if (!reader.TryReadInt32(out Uv6)) return false;
-			OnUv6Changed?.Invoke(Uv6);
+			if (!reader.TryReadInt32(out _uv0)) return false;
+			OnUv0Changed?.Invoke(_uv0);
+			if (!reader.TryReadUInt64(out _uv2)) return false;
+			OnUv2Changed?.Invoke(_uv2);
+			if (!reader.TryReadInt32(out _uv4)) return false;
+			OnUv4Changed?.Invoke(_uv4);
+			if (!reader.TryReadInt32(out _uv5)) return false;
+			OnUv5Changed?.Invoke(_uv5);
+			if (!reader.TryReadInt32(out _uv6)) return false;
+			OnUv6Changed?.Invoke(_uv6);
 			if (!reader.TryReadInt32(out _uv7)) return false;
 			OnUv7Changed?.Invoke(_uv7);
 			if (!reader.TryReadUInt16(out _uv8)) return false;
 			OnUv8Changed?.Invoke(_uv8);
-			if (!reader.TryReadSingle(out Uv10)) return false;
-			OnUv10Changed?.Invoke(Uv10);
-			if (!reader.TryReadInt32(out Uv12)) return false;
-			OnUv12Changed?.Invoke(Uv12);
+			if (!reader.TryReadSingle(out _uv10)) return false;
+			OnUv10Changed?.Invoke(_uv10);
+			if (!reader.TryReadInt32(out _uv12)) return false;
+			OnUv12Changed?.Invoke(_uv12);
 			if (!reader.TryReadInt32(out _uv13)) return false;
 			OnUv13Changed?.Invoke(_uv13);
-			if (!reader.TryReadInt32(out Uv15)) return false;
-			OnUv15Changed?.Invoke(Uv15);
+			if (!reader.TryReadInt32(out _uv15)) return false;
+			OnUv15Changed?.Invoke(_uv15);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
 		{
-			V0 = 0;
-			V1 = 0;
-			V2 = 0;
-			V4 = new();
-			V5 = new();
-			V6 = 0;
-			V7 = 0;
-			V8 = 0;
+			_v0 = 0;
+			_v1 = 0;
+			_v2 = 0;
+			_v4 = new();
+			_v5 = new();
+			_v6 = 0;
+			_v7 = 0;
+			_v8 = 0;
 			_v10 = 0;
 			_v12 = 0;
 			_v13 = 0;
 			_v15 = 0;
-			Uv0 = 0;
-			Uv2 = 0;
-			Uv4 = 0;
-			Uv5 = 0;
-			Uv6 = 0;
+			_uv0 = 0;
+			_uv2 = 0;
+			_uv4 = 0;
+			_uv5 = 0;
+			_uv6 = 0;
 			_uv7 = 0;
 			_uv8 = 0;
-			Uv10 = 0;
-			Uv12 = 0;
+			_uv10 = 0;
+			_uv12 = 0;
 			_uv13 = 0;
-			Uv15 = 0;
+			_uv15 = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{

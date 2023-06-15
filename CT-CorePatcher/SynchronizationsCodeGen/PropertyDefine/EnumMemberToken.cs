@@ -46,21 +46,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_InitializeProperty()
 		{
-			return string.Format(MemberFormat.InitializeProperty, _remoteMemberName, $"({_typeName})0");
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
-			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _remoteMemberName, _publicMemberName, string.Empty, AccessModifier);
+			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
+			return string.Format(format, attribute, _typeName, _privateMemberName,
+								 _publicMemberName, string.Empty, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _remoteMemberName, _typeName, _clrEnumSizeTypeName));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
+			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _typeName, _clrEnumSizeTypeName));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}
 

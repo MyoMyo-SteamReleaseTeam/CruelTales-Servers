@@ -12,7 +12,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		protected string _typeName;
 		protected string _privateMemberName;
 		protected string _publicMemberName;
-		protected string _remoteMemberName;
 
 		public BaseMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 		{
@@ -22,7 +21,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
-			_remoteMemberName = IsPublic ? _publicMemberName : _privateMemberName;
 		}
 
 		// Master Side

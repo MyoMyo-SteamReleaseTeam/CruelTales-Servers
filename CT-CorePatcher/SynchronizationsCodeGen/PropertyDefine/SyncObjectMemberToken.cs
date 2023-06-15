@@ -53,27 +53,28 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_InitializeProperty()
 		{
-			return string.Format(MemberFormat.InitializeSyncObjectProperty, _remoteMemberName);
+			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName);
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _remoteMemberName, _publicMemberName, string.Empty, AccessModifier);
+			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
+			return string.Format(format, attribute, _typeName, _privateMemberName,
+								 _publicMemberName, string.Empty, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _remoteMemberName, syncType));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
+			sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, syncType));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}
 
 		public override string Remote_IgnoreDeserialize(SyncType syncType)
 		{
-			return string.Format(MemberFormat.IgnoreObjectType, _remoteMemberName, syncType);
+			return string.Format(MemberFormat.IgnoreObjectType, _privateMemberName, syncType);
 		}
 	}
 }
