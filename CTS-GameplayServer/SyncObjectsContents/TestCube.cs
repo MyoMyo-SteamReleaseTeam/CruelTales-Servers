@@ -8,8 +8,7 @@ namespace CTS.Instance.SyncObjects
 	public partial class TestCube : MasterNetworkObject
 	{
 		public override VisibilityType Visibility => VisibilityType.View;
-
-		public override VisibilityAuthority VisibilityAuthority => VisibilityAuthority.All;
+		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		private static Random _random = new Random();
 		private float _radiusFactor = 0.0f;

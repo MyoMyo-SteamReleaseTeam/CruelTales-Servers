@@ -6,6 +6,22 @@ using CT.Common.Synchronizations;
 namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_FunctionDirection
+	{
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void Server_FromServerVoid() { }
+		
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void Server_FromServerArg(int a, int b) { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_FromClientVoid() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_FromServerArg(int a, int b) { }
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_Value8
 	{
 		[SyncVar] public NetString v0;

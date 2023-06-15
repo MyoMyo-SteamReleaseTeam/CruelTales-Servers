@@ -7,13 +7,12 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class PlayerCharacter : MasterNetworkObject
 	{
+		public override VisibilityType Visibility => VisibilityType.View;
+		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
+
 		public float Speed = 5.0f;
 
 		public NetworkPlayer? NetworkPlayer { get; private set; }
-
-		public override VisibilityType Visibility => VisibilityType.View;
-
-		public override VisibilityAuthority VisibilityAuthority => VisibilityAuthority.All;
 
 		public void BindNetworkPlayer(NetworkPlayer player)
 		{
@@ -21,6 +20,11 @@ namespace CTS.Instance.SyncObjects
 			this.Username = player.Username;
 			NetworkPlayer = player;
 			NetworkPlayer.BindViewTarget(this.Transform);
+		}
+
+		public override void OnDestroyed()
+		{
+			NetworkPlayer?.ReleaseViewTarget();
 		}
 
 		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction)

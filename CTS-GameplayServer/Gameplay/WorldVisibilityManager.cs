@@ -38,10 +38,13 @@ namespace CTS.Instance.Gameplay
 		public const int CELL_HEIGHT = (int)(WORLD_MAX_HEIGHT / CELL_SIZE); // 32;
 
 		// Partitioned visibility set
-		private List<NetworkIdentity> _spawnList;
-		private List<MasterNetworkObject> _despawnList;
+		private List<NetworkIdentity> _tempSpawnList;
+		private List<MasterNetworkObject> _tempDespawnList;
 		private Dictionary<NetworkIdentity, MasterNetworkObject>[,] _networkObjectByCell;
 		private Dictionary<NetworkIdentity, MasterNetworkObject> _nullSet = new();
+
+		// Global visibility set
+		private HashSet<MasterNetworkObject> _globalObjectSet;
 
 		// Player visible tables
 		private ObjectPool<PlayerVisibleTable> _playerVisibleTablePool;
@@ -54,8 +57,9 @@ namespace CTS.Instance.Gameplay
 			_gameplayInstance = gameplayInstance;
 			_worldManager = worldManager;
 
-			_spawnList = new(option.VisibleSpawnCapacity);
-			_despawnList = new(option.VisibleDespawnCapacity);
+			// Initialize partitioned visibility set
+			_tempSpawnList = new(option.VisibleSpawnCapacity);
+			_tempDespawnList = new(option.VisibleDespawnCapacity);
 			_networkObjectByCell = new Dictionary<NetworkIdentity, MasterNetworkObject>[CELL_HEIGHT, CELL_WIDTH];
 			for (int z = 0; z < CELL_HEIGHT; z++)
 			{
@@ -64,6 +68,9 @@ namespace CTS.Instance.Gameplay
 					_networkObjectByCell[z, x] = new(option.VisibleCellCapacity);
 				}
 			}
+
+			// Initialize global visibility set
+			_globalObjectSet = new(option.GlobalTraceObjectCapacity);
 
 			// Visible Table
 			_playerVisibleTablePool = new(() => new PlayerVisibleTable(option), option.SystemMaxUser);
@@ -171,10 +178,10 @@ namespace CTS.Instance.Gameplay
 				Vector2Int inboundCellRT = GetWorldCell(inboundRT);
 
 				// Add spawn object
-				int sCount = _spawnList.Count;
+				int sCount = _tempSpawnList.Count;
 				for (int i = 0; i < sCount; i++)
 				{
-					var spawnObjectId = _spawnList[i];
+					var spawnObjectId = _tempSpawnList[i];
 					if (!_worldManager.TryGetNetworkObject(spawnObjectId, out var spawnObject))
 					{
 						Debug.Assert(false);
@@ -223,10 +230,10 @@ namespace CTS.Instance.Gameplay
 				}
 
 				// Despawn : Check if it's despawn object
-				int dCount = _despawnList.Count;
+				int dCount = _tempDespawnList.Count;
 				for (int i = 0; i < dCount; i++)
 				{
-					var despawnObj = _despawnList[i];
+					var despawnObj = _tempDespawnList[i];
 					var despawnId = despawnObj.Identity;
 					if (viewTable.TraceObjects.Remove(despawnId))
 					{
@@ -254,7 +261,8 @@ namespace CTS.Instance.Gameplay
 				{
 					Vector3 objPos = netObj.Transform.Position;
 					if (objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
-						objPos.Z < outboundLB.Y || objPos.Z > outboundRT.Y)
+						objPos.Z < outboundLB.Y || objPos.Z > outboundRT.Y ||
+						!netObj.IsValidVisibilityAuthority(player))
 					{
 						bool isAdded = _outObjectSet.TryAdd(netObj.Identity, netObj);
 						Debug.Assert(isAdded);
@@ -279,10 +287,10 @@ namespace CTS.Instance.Gameplay
 			}
 
 			// Add spawn object to world partition
-			int spawnCount = _spawnList.Count;
+			int spawnCount = _tempSpawnList.Count;
 			for (int i = 0; i < spawnCount; i++)
 			{
-				var transitId = _spawnList[i];
+				var transitId = _tempSpawnList[i];
 				if (!_worldManager.TryGetNetworkObject(transitId, out var netObj))
 				{
 					Debug.Assert(false);
@@ -292,13 +300,13 @@ namespace CTS.Instance.Gameplay
 				bool isAdded = curCell.TryAdd(netObj.Identity, netObj);
 				Debug.Assert(isAdded);
 			}
-			_spawnList.Clear();
+			_tempSpawnList.Clear();
 
 			// Remove despawn object from world partition
-			int despawnCount = _despawnList.Count;
+			int despawnCount = _tempDespawnList.Count;
 			for (int i = 0; i < despawnCount; i++)
 			{
-				var transitId = _despawnList[i];
+				var transitId = _tempDespawnList[i];
 				if (!_worldManager.TryGetNetworkObject(transitId.Identity, out var netObj))
 				{
 					Debug.Assert(false);
@@ -308,7 +316,7 @@ namespace CTS.Instance.Gameplay
 				bool isRemoved = curCell.Remove(netObj.Identity);
 				Debug.Assert(isRemoved);
 			}
-			_despawnList.Clear();
+			_tempDespawnList.Clear();
 
 			// Transition visibility cycle
 			// Spawn, Enter -> Trace
@@ -339,10 +347,12 @@ namespace CTS.Instance.Gameplay
 
 			if (netObj.Visibility == VisibilityType.View)
 			{
-				_spawnList.Add(id);
+				_tempSpawnList.Add(id);
 			}
 			else if (netObj.Visibility == VisibilityType.Global)
 			{
+				_globalObjectSet.Add(netObj);
+
 				foreach (var kv in _playerVisibleBySession)
 				{
 					if (netObj.IsValidVisibilityAuthority(kv.Key))
@@ -359,10 +369,12 @@ namespace CTS.Instance.Gameplay
 
 			if (netObj.Visibility == VisibilityType.View)
 			{
-				_despawnList.Add(netObj);
+				_tempDespawnList.Add(netObj);
 			}
 			else if (netObj.Visibility == VisibilityType.Global)
 			{
+				_globalObjectSet.Remove(netObj);
+
 				foreach (var kv in _playerVisibleBySession)
 				{
 					var visibleTable = kv.Value;
@@ -384,6 +396,13 @@ namespace CTS.Instance.Gameplay
 		{
 			var playerVisibleTable = _playerVisibleTablePool.Get();
 			playerVisibleTable.Initialize(player);
+			foreach (var globalObj in _globalObjectSet)
+			{
+				if (globalObj.IsValidVisibilityAuthority(player))
+				{
+					playerVisibleTable.GlobalSpawnObjects.Add(globalObj.Identity, globalObj);
+				}
+			}
 			_playerVisibleBySession.Add(player, playerVisibleTable);
 		}
 

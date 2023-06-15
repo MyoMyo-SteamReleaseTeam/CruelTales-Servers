@@ -18,7 +18,7 @@ namespace CTS.Instance.Gameplay
 		public int TraceObjectCapacity = 32;
 		public int LeaveObjectCapacity = 16;
 		public int GlobalSpawnObjectCapacity = 16;
-		public int GlobalTraceObjectCapacity = 16;
+		public int GlobalTraceObjectCapacity = 32;
 		public int GlobalDespawnObjectCapacity = 16;
 
 		// World Manager

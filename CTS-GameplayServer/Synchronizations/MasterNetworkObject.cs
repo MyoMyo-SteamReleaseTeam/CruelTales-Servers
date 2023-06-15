@@ -18,7 +18,7 @@ namespace CTS.Instance.Synchronizations
 		[AllowNull] protected WorldManager _worldManager;
 
 		/// <summary>네트워크 가시성 매니져입니다.</summary>
-		[AllowNull] private WorldVisibilityManager _worldPartitioner;
+		[AllowNull] private WorldVisibilityManager _worldVisibilityManager;
 
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; } = new NetworkIdentity();
@@ -36,7 +36,8 @@ namespace CTS.Instance.Synchronizations
 		public abstract VisibilityType Visibility { get; }
 
 		/// <summary>네트워크 객체가 보일 대상을 결정합니다.</summary>
-		public abstract VisibilityAuthority VisibilityAuthority { get; }
+		public VisibilityAuthority VisibilityAuthority { get; protected set; }
+		public abstract VisibilityAuthority InitialVisibilityAuthority { get; }
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
@@ -65,7 +66,7 @@ namespace CTS.Instance.Synchronizations
 			{
 				Vector2Int previousPos = CurrentCellPos;
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
-				_worldPartitioner.OnCellChanged(this, previousPos, CurrentCellPos);
+				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
 		}
 
@@ -99,14 +100,18 @@ namespace CTS.Instance.Synchronizations
 			_worldManager = manager;
 			_gameManager = gameManager;
 
+			VisibilityAuthority = InitialVisibilityAuthority;
+
 			// Set position
 			Transform.Initialize(position);
+
+			// Add to trace visibility
+			_worldVisibilityManager = worldPartitioner;
 			if (Visibility == VisibilityType.View)
 			{
-				_worldPartitioner = worldPartitioner;
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
-				_worldPartitioner.OnCreated(this);
 			}
+			_worldVisibilityManager.OnCreated(this);
 		}
 
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
@@ -117,7 +122,7 @@ namespace CTS.Instance.Synchronizations
 
 			if (Visibility == VisibilityType.View)
 			{
-				_worldPartitioner.OnDestroy(this);
+				_worldVisibilityManager.OnDestroy(this);
 			}
 		}
 
@@ -130,6 +135,11 @@ namespace CTS.Instance.Synchronizations
 
 		public bool IsValidVisibilityAuthority(NetworkPlayer networkPlayer)
 		{
+			if (this.Visibility == VisibilityType.View && !networkPlayer.CanSeeViewObject)
+			{
+				return false;
+			}
+
 			switch (VisibilityAuthority)
 			{
 				case VisibilityAuthority.All:

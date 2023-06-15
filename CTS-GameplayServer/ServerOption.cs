@@ -4,7 +4,7 @@ using CT.Common.Tools.Data;
 
 namespace CTS.Instance
 {
-	public struct ServerOption
+	public class ServerOption
 	{
 		public int Port { get; set; } = 60128;
 		public int FramePerMs = 66;

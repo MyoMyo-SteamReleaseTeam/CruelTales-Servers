@@ -32,7 +32,7 @@ namespace CTS.Instance.Gameplay
 		public float CameraSpeed { get; private set; } = 10.0f;
 
 		// Visibility
-		public VisibilityAuthority VisibilityAuthority { get; private set; }
+		public bool CanSeeViewObject { get; set; } = false;
 
 #if DEBUG
 #pragma warning disable CS8618
@@ -61,6 +61,10 @@ namespace CTS.Instance.Gameplay
 			UserId = Session.UserId;
 			Username = Session.Username;
 			Costume = 119;
+
+			// Visibility
+			CanSeeViewObject = false;
+
 			_log.Debug($"Player {Username} created!");
 		}
 

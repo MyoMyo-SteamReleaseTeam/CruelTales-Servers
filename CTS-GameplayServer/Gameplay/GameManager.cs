@@ -24,6 +24,9 @@ namespace CTS.Instance.Gameplay
 		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
 		[AllowNull] private ObjectPool<NetworkPlayer> _networkPlayerPool;
 
+		// Objects
+		public GameController? GameController { get; private set; }
+
 		// Test
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		private List<PlayerCharacter> _playerCharacterList = new();
@@ -99,6 +102,7 @@ namespace CTS.Instance.Gameplay
 
 		public void StartGame()
 		{
+			GameController = _worldManager.CreateObject<GameController>();
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

@@ -10,6 +10,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public enum NetworkObjectType
 	{
 		None = 0,
+		GameController,
 		TestCube,
 		PlayerCharacter,
 	}

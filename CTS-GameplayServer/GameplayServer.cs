@@ -1,32 +1,80 @@
-﻿using CT.Networks.Runtimes;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Threading;
+#if !DEBUG
+using CT.Common.Tools.Data;
+#endif
+using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
 using log4net;
 
 namespace CTS.Instance
 {
+	[SupportedOSPlatform("windows")]
 	public class GameplayServer
 	{
-		private static ILog _log = LogManager.GetLogger(typeof(GameplayServer));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(GameplayServer));
 
-		// Global Setup
-		private readonly TickTimer _serverTimer;
-		private readonly ServerOption _serverOption;
+		// Option
+		private static readonly string ConfigurationFile = "server-config.json";
+		private static ServerOption? _serverOption;
 
-		// Network
-		private NetworkManager _networkManager;
+		// Server components
+		private static TickTimer? _serverTimer;
+		private static NetworkManager? _networkManager;
 
-		public GameplayServer(TickTimer serverTimer,
-							  ServerOption serverOption)
+		static void Main(string[] args)
 		{
-			_serverTimer = serverTimer;
-			_serverOption = serverOption;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				try { Console.SetWindowSize(200, 50); } catch { }
+			}
 
+			_serverOption = new ServerOption();
+
+#if !DEBUG
+			var configRead = JsonHandler.TryReadObject<ServerOption>(ConfigurationFile);
+			if (configRead.ResultType != JobResultType.Success)
+			{
+				_log.Warn($"There is no configuration file!");
+				var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, serverOption, true);
+				if (createDefault.ResultType != JobResultType.Success)
+				{
+					_log.Fatal($"Failed to create default configuration file!");
+					_log.Fatal(createDefault.Exception);
+				}
+				else
+				{
+					_log.Info($"Create default configuration file!");
+				}
+			}
+			else
+			{
+				_log.Info("Load server configuration file.");
+				serverOption = configRead.Value;
+			}
+#endif
+
+			_log.Info("Start gameplay server");
+
+			// Setup server option
+			_serverOption.AlarmTickMs = (int)(_serverOption.FramePerMs * 0.7f);
+
+			_log.Info($"Server Port\t: {_serverOption.Port}");
+			_log.Info($"Frame per ms\t: {_serverOption.FramePerMs}");
+			_log.Info($"Alarm Tick ms\t: {_serverOption.AlarmTickMs}");
+			_log.Info($"Max Game Count\t: {_serverOption.GameCount}");
+
+			// Start server
+			_serverTimer = new TickTimer();
 			_networkManager = new NetworkManager(_serverOption, _serverTimer);
-		}
-
-		public void Start()
-		{
 			_networkManager.Start();
+
+			while (true)
+			{
+				Thread.Sleep(10000);
+			}
 		}
 	}
 }

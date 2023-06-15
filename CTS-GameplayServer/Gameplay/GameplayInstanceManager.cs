@@ -91,11 +91,11 @@ namespace CTS.Instance.Gameplay
 			}
 			else
 			{
-				if (_currentTick % 100  == 0)
-				{
-					_log.Info($"Packet pool size : {_networkManager.NetManager.PoolCount}");
-					_log.Info($"Average tick elapsed : {_aveElapsed}");
-				}
+				//if (_currentTick % 100  == 0)
+				//{
+				//	_log.Info($"Packet pool size : {_networkManager.NetManager.PoolCount}");
+				//	_log.Info($"Average tick elapsed : {_aveElapsed}");
+				//}
 			}
 
 			// Check GC Collection
