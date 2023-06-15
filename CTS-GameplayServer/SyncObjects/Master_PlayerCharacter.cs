@@ -119,7 +119,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_costume);
 			writer.Put(_test);
 		}
-		public override void InitializeProperties()
+		public override void InitializeMasterProperties()
 		{
 			_userId = new();
 			_username = new();
@@ -141,6 +141,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			return true;
 		}
+		public override void InitializeRemoteProperties() { }
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader)

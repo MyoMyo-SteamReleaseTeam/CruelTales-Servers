@@ -24,17 +24,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class ZTest_Value8
 	{
 		[SyncVar]
-		private NetString _v0 = new();
+		public NetString V0 = new();
 		public event Action<NetString>? OnV0Changed;
 		[SyncVar]
-		private NetStringShort _v1 = new();
+		public NetStringShort V1 = new();
 		public event Action<NetStringShort>? OnV1Changed;
 		[SyncVar]
-		private byte _v2;
+		public byte V2;
 		public event Action<byte>? OnV2Changed;
 		[SyncVar]
-		private sbyte _v4;
-		public event Action<sbyte>? OnV4Changed;
+		public TestEnumType V4;
+		public event Action<TestEnumType>? OnV4Changed;
 		[SyncVar]
 		private ushort _v5;
 		public event Action<ushort>? OnV5Changed;
@@ -45,16 +45,16 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v7;
 		public event Action<int>? OnV7Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private uint _uv0;
+		public uint Uv0;
 		public event Action<uint>? OnUv0Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private ulong _uv2;
+		public ulong Uv2;
 		public event Action<ulong>? OnUv2Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private float _uv4;
+		public float Uv4;
 		public event Action<float>? OnUv4Changed;
 		[SyncVar(SyncType.Unreliable)]
-		private UserId _uv6 = new();
+		public UserId Uv6 = new();
 		public event Action<UserId>? OnUv6Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv7;
@@ -66,7 +66,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf3(int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		public partial void uf5();
+		private partial void uf5();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
@@ -74,29 +74,30 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer) { }
-		public override void InitializeProperties() { }
+		public override void InitializeMasterProperties() { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				if (!_v0.TryDeserialize(reader)) return false;
-				OnV0Changed?.Invoke(_v0);
+				if (!V0.TryDeserialize(reader)) return false;
+				OnV0Changed?.Invoke(V0);
 			}
 			if (dirtyReliable_0[1])
 			{
-				if (!_v1.TryDeserialize(reader)) return false;
-				OnV1Changed?.Invoke(_v1);
+				if (!V1.TryDeserialize(reader)) return false;
+				OnV1Changed?.Invoke(V1);
 			}
 			if (dirtyReliable_0[2])
 			{
-				if (!reader.TryReadByte(out _v2)) return false;
-				OnV2Changed?.Invoke(_v2);
+				if (!reader.TryReadByte(out V2)) return false;
+				OnV2Changed?.Invoke(V2);
 			}
 			if (dirtyReliable_0[3])
 			{
-				if (!reader.TryReadSByte(out _v4)) return false;
-				OnV4Changed?.Invoke(_v4);
+				if (!reader.TryReadInt32(out var V4Value)) return false;
+				V4 = (TestEnumType)V4Value;
+				OnV4Changed?.Invoke(V4);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -129,23 +130,23 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (dirtyUnreliable_0[0])
 			{
-				if (!reader.TryReadUInt32(out _uv0)) return false;
-				OnUv0Changed?.Invoke(_uv0);
+				if (!reader.TryReadUInt32(out Uv0)) return false;
+				OnUv0Changed?.Invoke(Uv0);
 			}
 			if (dirtyUnreliable_0[1])
 			{
-				if (!reader.TryReadUInt64(out _uv2)) return false;
-				OnUv2Changed?.Invoke(_uv2);
+				if (!reader.TryReadUInt64(out Uv2)) return false;
+				OnUv2Changed?.Invoke(Uv2);
 			}
 			if (dirtyUnreliable_0[2])
 			{
-				if (!reader.TryReadSingle(out _uv4)) return false;
-				OnUv4Changed?.Invoke(_uv4);
+				if (!reader.TryReadSingle(out Uv4)) return false;
+				OnUv4Changed?.Invoke(Uv4);
 			}
 			if (dirtyUnreliable_0[3])
 			{
-				if (!_uv6.TryDeserialize(reader)) return false;
-				OnUv6Changed?.Invoke(_uv6);
+				if (!Uv6.TryDeserialize(reader)) return false;
+				OnUv6Changed?.Invoke(Uv6);
 			}
 			if (dirtyUnreliable_0[4])
 			{
@@ -184,31 +185,47 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			if (!_v0.TryDeserialize(reader)) return false;
-			OnV0Changed?.Invoke(_v0);
-			if (!_v1.TryDeserialize(reader)) return false;
-			OnV1Changed?.Invoke(_v1);
-			if (!reader.TryReadByte(out _v2)) return false;
-			OnV2Changed?.Invoke(_v2);
-			if (!reader.TryReadSByte(out _v4)) return false;
-			OnV4Changed?.Invoke(_v4);
+			if (!V0.TryDeserialize(reader)) return false;
+			OnV0Changed?.Invoke(V0);
+			if (!V1.TryDeserialize(reader)) return false;
+			OnV1Changed?.Invoke(V1);
+			if (!reader.TryReadByte(out V2)) return false;
+			OnV2Changed?.Invoke(V2);
+			if (!reader.TryReadInt32(out var V4Value)) return false;
+			V4 = (TestEnumType)V4Value;
+			OnV4Changed?.Invoke(V4);
 			if (!reader.TryReadUInt16(out _v5)) return false;
 			OnV5Changed?.Invoke(_v5);
 			if (!reader.TryReadInt16(out _v6)) return false;
 			OnV6Changed?.Invoke(_v6);
 			if (!reader.TryReadInt32(out _v7)) return false;
 			OnV7Changed?.Invoke(_v7);
-			if (!reader.TryReadUInt32(out _uv0)) return false;
-			OnUv0Changed?.Invoke(_uv0);
-			if (!reader.TryReadUInt64(out _uv2)) return false;
-			OnUv2Changed?.Invoke(_uv2);
-			if (!reader.TryReadSingle(out _uv4)) return false;
-			OnUv4Changed?.Invoke(_uv4);
-			if (!_uv6.TryDeserialize(reader)) return false;
-			OnUv6Changed?.Invoke(_uv6);
+			if (!reader.TryReadUInt32(out Uv0)) return false;
+			OnUv0Changed?.Invoke(Uv0);
+			if (!reader.TryReadUInt64(out Uv2)) return false;
+			OnUv2Changed?.Invoke(Uv2);
+			if (!reader.TryReadSingle(out Uv4)) return false;
+			OnUv4Changed?.Invoke(Uv4);
+			if (!Uv6.TryDeserialize(reader)) return false;
+			OnUv6Changed?.Invoke(Uv6);
 			if (!reader.TryReadInt32(out _uv7)) return false;
 			OnUv7Changed?.Invoke(_uv7);
 			return true;
+		}
+		public override void InitializeRemoteProperties()
+		{
+			V0 = new();
+			V1 = new();
+			V2 = 0;
+			V4 = (TestEnumType)0;
+			_v5 = 0;
+			_v6 = 0;
+			_v7 = 0;
+			Uv0 = 0;
+			Uv2 = 0;
+			Uv4 = 0;
+			Uv6 = new();
+			_uv7 = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -227,7 +244,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				reader.Ignore(1);
+				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -267,7 +284,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				reader.Ignore(1);
+				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[4])
 			{

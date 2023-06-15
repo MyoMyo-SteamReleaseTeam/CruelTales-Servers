@@ -84,12 +84,13 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put(_testInt);
 		}
-		public void InitializeProperties()
+		public void InitializeMasterProperties()
 		{
 			_testInt = 0;
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public void InitializeRemoteProperties() { }
 		public void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public void IgnoreSyncUnreliable(IPacketReader reader) { }

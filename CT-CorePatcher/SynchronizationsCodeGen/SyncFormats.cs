@@ -320,7 +320,12 @@ public partial class {0} : {1}
 		/// <summary>
 		/// {0} Modifire<br/>
 		/// </summary>
-		public static string InitializeProperties => @"public {0}void InitializeProperties()";
+		public static string InitializeMasterProperties => @"public {0}void InitializeMasterProperties()";
+
+		/// <summary>
+		/// {0} Modifire<br/>
+		/// </summary>
+		public static string InitializeRemoteProperties => @"public {0}void InitializeRemoteProperties()";
 	}
 
 	public static class DirtyGroupFormat
@@ -609,10 +614,11 @@ private {1} {2}{3};";
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
+		/// {5} Access modifier
 		/// </summary>
 		public static string RemoteDeclaration =>
 @"[{0}]
-private {1} {2}{4};
+{5} {1} {2}{4};
 public event Action<{1}>? On{3}Changed;";
 
 		public static string NewInitializer => " = new()";

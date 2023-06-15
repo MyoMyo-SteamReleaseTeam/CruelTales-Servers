@@ -19,6 +19,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			IsNativeStruct = ReflectionHelper.IsNativeStruct(_typeName);
 		}
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
+		}
+
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
@@ -41,16 +46,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
-		public override string Master_InitializeProperty()
+		public override string Remote_InitializeProperty()
 		{
-			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
+			return string.Format(MemberFormat.InitializeProperty, _remoteMemberName, @"new()");
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _privateMemberName, _publicMemberName, MemberFormat.NewInitializer);
+								 _remoteMemberName, _publicMemberName, MemberFormat.NewInitializer, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
@@ -58,13 +63,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			StringBuilder sb = new StringBuilder();
 			if (IsNativeStruct)
 			{
-				sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _typeName));
+				sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _remoteMemberName, _typeName));
 			}
 			else
 			{
-				sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
+				sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _remoteMemberName));
 			}
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
 			return sb.ToString();
 		}
 

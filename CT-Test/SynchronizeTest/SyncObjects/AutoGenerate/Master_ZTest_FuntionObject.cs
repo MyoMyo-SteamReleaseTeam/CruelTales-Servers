@@ -39,17 +39,17 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1);
+		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1);
+		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2);
+		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1);
+		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1);
+		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2);
+		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2);
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
 		public bool IsDirtyReliable
@@ -105,42 +105,42 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0[6] = true;
 		}
 		private List<(UserId v0, NetVec2 v1, NetString v2)> Server_ValueTypeArg_3Callstack = new(4);
-		public partial void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1)
+		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1)
 		{
 			Server_EnumTypeArg_1Callstack.Add((v0, v1));
 			_dirtyReliable_0[7] = true;
 		}
-		private List<(DisconnectReasonType v0, AckJoinMatch v1)> Server_EnumTypeArg_1Callstack = new(4);
-		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1)
+		private List<(TestEnumType v0, AckJoinMatch v1)> Server_EnumTypeArg_1Callstack = new(4);
+		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1)
 		{
 			Server_EnumTypeArg_2Callstack.Add((v0, v1));
 			_dirtyReliable_1[0] = true;
 		}
-		private List<(AckJoinMatch v0, DisconnectReasonType v1)> Server_EnumTypeArg_2Callstack = new(4);
-		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2)
+		private List<(AckJoinMatch v0, TestEnumType v1)> Server_EnumTypeArg_2Callstack = new(4);
+		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2)
 		{
 			Server_EnumTypeArg_3Callstack.Add((v0, v1, v2));
 			_dirtyReliable_1[1] = true;
 		}
-		private List<(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2)> Server_EnumTypeArg_3Callstack = new(4);
-		public partial void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1)
+		private List<(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2)> Server_EnumTypeArg_3Callstack = new(4);
+		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1)
 		{
 			Server_CompositeArg_2_1Callstack.Add((v0, v1));
 			_dirtyReliable_1[2] = true;
 		}
-		private List<(int v0, DisconnectReasonType v1)> Server_CompositeArg_2_1Callstack = new(4);
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1)
+		private List<(int v0, TestEnumType v1)> Server_CompositeArg_2_1Callstack = new(4);
+		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1)
 		{
 			Server_CompositeArg_2_2Callstack.Add((v0, v1));
 			_dirtyReliable_1[3] = true;
 		}
-		private List<(NetVec2 v0, DisconnectReasonType v1)> Server_CompositeArg_2_2Callstack = new(4);
-		public partial void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2)
+		private List<(NetVec2 v0, TestEnumType v1)> Server_CompositeArg_2_2Callstack = new(4);
+		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2)
 		{
 			Server_CompositeArg_3Callstack.Add((v0, v1, v2));
 			_dirtyReliable_1[4] = true;
 		}
-		private List<(NetVec2 v0, DisconnectReasonType v1, float v2)> Server_CompositeArg_3Callstack = new(4);
+		private List<(NetVec2 v0, TestEnumType v1, float v2)> Server_CompositeArg_3Callstack = new(4);
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -242,7 +242,7 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = Server_EnumTypeArg_1Callstack[i];
-						writer.Put((byte)arg.v0);
+						writer.Put((int)arg.v0);
 						writer.Put((byte)arg.v1);
 					}
 				}
@@ -258,7 +258,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_EnumTypeArg_2Callstack[i];
 						writer.Put((byte)arg.v0);
-						writer.Put((byte)arg.v1);
+						writer.Put((int)arg.v1);
 					}
 				}
 				if (_dirtyReliable_1[1])
@@ -269,7 +269,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_EnumTypeArg_3Callstack[i];
 						writer.Put((byte)arg.v0);
-						writer.Put((byte)arg.v1);
+						writer.Put((int)arg.v1);
 						writer.Put((byte)arg.v2);
 					}
 				}
@@ -281,7 +281,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_CompositeArg_2_1Callstack[i];
 						writer.Put(arg.v0);
-						writer.Put((byte)arg.v1);
+						writer.Put((int)arg.v1);
 					}
 				}
 				if (_dirtyReliable_1[3])
@@ -292,7 +292,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_CompositeArg_2_2Callstack[i];
 						arg.v0.Serialize(writer);
-						writer.Put((byte)arg.v1);
+						writer.Put((int)arg.v1);
 					}
 				}
 				if (_dirtyReliable_1[4])
@@ -303,7 +303,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_CompositeArg_3Callstack[i];
 						arg.v0.Serialize(writer);
-						writer.Put((byte)arg.v1);
+						writer.Put((int)arg.v1);
 						writer.Put(arg.v2);
 					}
 				}
@@ -311,9 +311,10 @@ namespace CTS.Instance.SyncObjects
 		}
 		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public void SerializeEveryProperty(IPacketWriter writer) { }
-		public void InitializeProperties() { }
+		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public void InitializeRemoteProperties() { }
 		public void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public void IgnoreSyncUnreliable(IPacketReader reader) { }

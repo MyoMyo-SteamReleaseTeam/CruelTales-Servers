@@ -19,6 +19,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_clrTypeName = clrTypeName;
 		}
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, "0");
+		}
+
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
@@ -40,23 +45,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
-		public override string Master_InitializeProperty()
+		public override string Remote_InitializeProperty()
 		{
-			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, "0");
+			return string.Format(MemberFormat.InitializeProperty, _remoteMemberName, "0");
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _privateMemberName, _publicMemberName, string.Empty);
+								 _remoteMemberName, _publicMemberName, string.Empty, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _clrTypeName));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _remoteMemberName, _clrTypeName));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
 			return sb.ToString();
 		}
 

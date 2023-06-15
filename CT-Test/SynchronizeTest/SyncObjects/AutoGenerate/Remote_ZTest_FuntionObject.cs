@@ -38,17 +38,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc]
 		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1);
+		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1);
+		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2);
+		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1);
+		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1);
+		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2);
+		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2);
 		public bool IsDirtyReliable => false;
 		public bool IsDirtyUnreliable => false;
 		public void ClearDirtyReliable() { }
@@ -56,7 +56,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public void SerializeSyncReliable(IPacketWriter writer) { }
 		public void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public void SerializeEveryProperty(IPacketWriter writer) { }
-		public void InitializeProperties() { }
+		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
@@ -141,8 +141,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						if (!reader.TryReadByte(out var v0Value)) return false;
-						DisconnectReasonType v0 = (DisconnectReasonType)v0Value;
+						if (!reader.TryReadInt32(out var v0Value)) return false;
+						TestEnumType v0 = (TestEnumType)v0Value;
 						if (!reader.TryReadByte(out var v1Value)) return false;
 						AckJoinMatch v1 = (AckJoinMatch)v1Value;
 						Server_EnumTypeArg_1(v0, v1);
@@ -159,8 +159,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					{
 						if (!reader.TryReadByte(out var v0Value)) return false;
 						AckJoinMatch v0 = (AckJoinMatch)v0Value;
-						if (!reader.TryReadByte(out var v1Value)) return false;
-						DisconnectReasonType v1 = (DisconnectReasonType)v1Value;
+						if (!reader.TryReadInt32(out var v1Value)) return false;
+						TestEnumType v1 = (TestEnumType)v1Value;
 						Server_EnumTypeArg_2(v0, v1);
 					}
 				}
@@ -171,8 +171,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					{
 						if (!reader.TryReadByte(out var v0Value)) return false;
 						AckJoinMatch v0 = (AckJoinMatch)v0Value;
-						if (!reader.TryReadByte(out var v1Value)) return false;
-						DisconnectReasonType v1 = (DisconnectReasonType)v1Value;
+						if (!reader.TryReadInt32(out var v1Value)) return false;
+						TestEnumType v1 = (TestEnumType)v1Value;
 						if (!reader.TryReadByte(out var v2Value)) return false;
 						AckJoinMatch v2 = (AckJoinMatch)v2Value;
 						Server_EnumTypeArg_3(v0, v1, v2);
@@ -184,8 +184,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						if (!reader.TryReadInt32(out int v0)) return false;
-						if (!reader.TryReadByte(out var v1Value)) return false;
-						DisconnectReasonType v1 = (DisconnectReasonType)v1Value;
+						if (!reader.TryReadInt32(out var v1Value)) return false;
+						TestEnumType v1 = (TestEnumType)v1Value;
 						Server_CompositeArg_2_1(v0, v1);
 					}
 				}
@@ -196,8 +196,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					{
 						NetVec2 v0 = new();
 						if (!v0.TryDeserialize(reader)) return false;
-						if (!reader.TryReadByte(out var v1Value)) return false;
-						DisconnectReasonType v1 = (DisconnectReasonType)v1Value;
+						if (!reader.TryReadInt32(out var v1Value)) return false;
+						TestEnumType v1 = (TestEnumType)v1Value;
 						Server_CompositeArg_2_2(v0, v1);
 					}
 				}
@@ -208,8 +208,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					{
 						NetVec2 v0 = new();
 						if (!v0.TryDeserialize(reader)) return false;
-						if (!reader.TryReadByte(out var v1Value)) return false;
-						DisconnectReasonType v1 = (DisconnectReasonType)v1Value;
+						if (!reader.TryReadInt32(out var v1Value)) return false;
+						TestEnumType v1 = (TestEnumType)v1Value;
 						if (!reader.TryReadSingle(out float v2)) return false;
 						Server_CompositeArg_3(v0, v1, v2);
 					}
@@ -219,6 +219,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
 		public bool TryDeserializeEveryProperty(IPacketReader reader) => true;
+		public void InitializeRemoteProperties() { }
 		public void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
@@ -287,7 +288,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(1);
 					}
 				}
@@ -301,7 +302,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(1);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[1])
@@ -310,7 +311,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(1);
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(1);
 					}
 				}
@@ -320,7 +321,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(4);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[3])
@@ -329,7 +330,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						NetVec2.IgnoreStatic(reader);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[4])
@@ -338,7 +339,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						NetVec2.IgnoreStatic(reader);
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(4);
 					}
 				}
@@ -412,7 +413,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(1);
 					}
 				}
@@ -426,7 +427,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(1);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[1])
@@ -435,7 +436,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(1);
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(1);
 					}
 				}
@@ -445,7 +446,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						reader.Ignore(4);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[3])
@@ -454,7 +455,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						NetVec2.IgnoreStatic(reader);
-						reader.Ignore(1);
+						reader.Ignore(4);
 					}
 				}
 				if (dirtyReliable_1[4])
@@ -463,7 +464,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						NetVec2.IgnoreStatic(reader);
-						reader.Ignore(1);
+						reader.Ignore(4);
 						reader.Ignore(4);
 					}
 				}

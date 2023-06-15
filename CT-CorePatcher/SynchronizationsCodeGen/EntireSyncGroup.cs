@@ -57,7 +57,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string Master_InitilaizeProperties()
 		{
 			StringBuilder sb = new();
-			sb.Append(string.Format(SyncGroupFormat.InitializeProperties, _modifier));
+			sb.Append(string.Format(SyncGroupFormat.InitializeMasterProperties, _modifier));
 
 			if (!HasProperty())
 				return sb.AppendLine(" { }").ToString();
@@ -128,6 +128,31 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine("{");
 			sb.AppendLine(contents.ToString());
 			sb.AppendLine("\treturn true;");
+			sb.AppendLine("}");
+
+			return sb.ToString();
+		}
+
+		public string Remote_InitilaizeProperties()
+		{
+			StringBuilder sb = new();
+			sb.Append(string.Format(SyncGroupFormat.InitializeRemoteProperties, _modifier));
+
+			if (!HasProperty())
+				return sb.AppendLine(" { }").ToString();
+
+			StringBuilder contents = new();
+			foreach (var m in _members)
+			{
+				if (SyncRule.CanSyncEntire(m))
+					continue;
+				contents.AppendLine(m.Remote_InitializeProperty());
+			}
+			CodeFormat.AddIndent(contents);
+
+			sb.AppendLine("");
+			sb.AppendLine("{");
+			sb.AppendLine(contents.ToString());
 			sb.AppendLine("}");
 
 			return sb.ToString();

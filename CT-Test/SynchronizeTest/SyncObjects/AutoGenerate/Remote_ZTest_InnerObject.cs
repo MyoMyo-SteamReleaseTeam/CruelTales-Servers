@@ -35,7 +35,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public void SerializeSyncReliable(IPacketWriter writer) { }
 		public void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public void SerializeEveryProperty(IPacketWriter writer) { }
-		public void InitializeProperties() { }
+		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
@@ -62,6 +62,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (!reader.TryReadInt32(out _testInt)) return false;
 			OnTestIntChanged?.Invoke(_testInt);
 			return true;
+		}
+		public void InitializeRemoteProperties()
+		{
+			_testInt = 0;
 		}
 		public void IgnoreSyncReliable(IPacketReader reader)
 		{

@@ -122,7 +122,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_b);
 			writer.Put(_animationTime);
 		}
-		public override void InitializeProperties()
+		public override void InitializeMasterProperties()
 		{
 			_r = 0;
 			_g = 0;
@@ -131,6 +131,7 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override void InitializeRemoteProperties() { }
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

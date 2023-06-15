@@ -12,19 +12,19 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public NetStringShort v1;
 		[SyncVar] public byte v2;
 		[SyncRpc] public void f3(int a) { }
-		[SyncVar] public sbyte v4;
-		[SyncVar] public ushort v5;
-		[SyncVar] public short v6;
-		[SyncVar] public int v7;
+		[SyncVar] public TestEnumType v4;
+		[SyncVar] private ushort v5;
+		[SyncVar] private short v6;
+		[SyncVar] private int v7;
 
 		[SyncVar(SyncType.Unreliable)] public uint uv0;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, byte b) { }
 		[SyncVar(SyncType.Unreliable)] public ulong uv2;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, double b) { }
 		[SyncVar(SyncType.Unreliable)] public float uv4;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf5() { }
+		[SyncRpc(SyncType.UnreliableTarget)] private void uf5() { }
 		[SyncVar(SyncType.Unreliable)] public UserId uv6;
-		[SyncVar(SyncType.Unreliable)] public int uv7;
+		[SyncVar(SyncType.Unreliable)] private int uv7;
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
@@ -39,26 +39,26 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public byte v6;
 		[SyncVar] public int v7;
 		[SyncVar] public ushort v8;
-		[SyncRpc] public void f9() { }
-		[SyncVar] public byte v10;
-		[SyncVar] public int v12;
-		[SyncVar] public short v13;
-		[SyncRpc] public void f14(int a, sbyte b) { }
-		[SyncVar] public int v15;
+		[SyncRpc] private void f9() { }
+		[SyncVar] private byte v10;
+		[SyncVar] private int v12;
+		[SyncVar] private short v13;
+		[SyncRpc] private void f14(int a, sbyte b) { }
+		[SyncVar] private int v15;
 
 		[SyncVar(SyncType.Unreliable)] public int uv0;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, sbyte b) { }
 		[SyncVar(SyncType.Unreliable)] public ulong uv2;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, float b, long c) { }
+		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, float b, TestEnumType c) { }
 		[SyncVar(SyncType.Unreliable)] public int uv4;
 		[SyncVar(SyncType.Unreliable)] public int uv5;
 		[SyncVar(SyncType.Unreliable)] public int uv6;
-		[SyncVar(SyncType.Unreliable)] public int uv7;
-		[SyncVar(SyncType.Unreliable)] public ushort uv8;
+		[SyncVar(SyncType.Unreliable)] private int uv7;
+		[SyncVar(SyncType.Unreliable)] private ushort uv8;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf9() { }
 		[SyncVar(SyncType.Unreliable)] public float uv10;
 		[SyncVar(SyncType.Unreliable)] public int uv12;
-		[SyncVar(SyncType.Unreliable)] public int uv13;
+		[SyncVar(SyncType.Unreliable)] private int uv13;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf14(int a) { }
 		[SyncVar(SyncType.Unreliable)] public int uv15;
 	}
@@ -74,11 +74,11 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public int v5;
 		[SyncVar] public int v6;
 		[SyncVar] public int v7;
-		[SyncVar] public int v8;
-		[SyncVar] public int v9;
-		[SyncVar] public int v10;
-		[SyncVar] public int v12;
-		[SyncVar] public int v13;
+		[SyncVar] private int v8;
+		[SyncVar] private int v9;
+		[SyncVar] private int v10;
+		[SyncVar] private int v12;
+		[SyncVar] private int v13;
 		[SyncRpc] public void f14() { }
 		[SyncVar] public int v15;
 		[SyncVar] public int v16;
@@ -93,11 +93,11 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public int v25;
 		[SyncVar] public int v26;
 		[SyncVar] public int v27;
-		[SyncRpc] public void f28(int a) { }
-		[SyncVar] public int v29;
-		[SyncVar] public int v30;
-		[SyncVar] public int v31;
-		[SyncVar] public int v32;
+		[SyncRpc] private void f28(int a) { }
+		[SyncVar] private int v29;
+		[SyncVar] private int v30;
+		[SyncVar] private int v31;
+		[SyncVar] private int v32;
 
 		[SyncVar(SyncType.Unreliable)] public int uv0;
 		[SyncVar(SyncType.Unreliable)] public int uv1;
@@ -115,11 +115,11 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf14(int a, float b) { }
 		[SyncVar(SyncType.Unreliable)] public int uv15;
 		[SyncVar(SyncType.Unreliable)] public int uv16;
-		[SyncRpc(SyncType.Unreliable)] public void uf17(int a) { }
-		[SyncVar(SyncType.Unreliable)] public int uv18;
-		[SyncVar(SyncType.Unreliable)] public int uv19;
-		[SyncVar(SyncType.Unreliable)] public int uv20;
-		[SyncVar(SyncType.Unreliable)] public int uv21;
+		[SyncRpc(SyncType.Unreliable)] private void uf17(int a) { }
+		[SyncVar(SyncType.Unreliable)] private int uv18;
+		[SyncVar(SyncType.Unreliable)] private int uv19;
+		[SyncVar(SyncType.Unreliable)] private int uv20;
+		[SyncVar(SyncType.Unreliable)] private int uv21;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf22(byte a, int b, uint c) { }
 		[SyncVar(SyncType.Unreliable)] public int uv23;
 		[SyncRpc(SyncType.Unreliable)] public void uf24() { }
@@ -127,10 +127,10 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar(SyncType.Unreliable)] public int uv26;
 		[SyncVar(SyncType.Unreliable)] public int uv27;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf28(int a) { }
-		[SyncVar(SyncType.Unreliable)] public int uv29;
-		[SyncVar(SyncType.Unreliable)] public int uv30;
-		[SyncVar(SyncType.Unreliable)] public int uv31;
-		[SyncVar(SyncType.Unreliable)] public int uv32;
+		[SyncVar(SyncType.Unreliable)] private int uv29;
+		[SyncVar(SyncType.Unreliable)] private int uv30;
+		[SyncVar(SyncType.Unreliable)] private int uv31;
+		[SyncVar(SyncType.Unreliable)] private int uv32;
 	}
 
 	[SyncObjectDefinition(IsDebugOnly = true)]
@@ -153,12 +153,12 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc] public void Server_ValueTypeArg_1(NetVec2 v0) { }
 		[SyncRpc] public void Server_ValueTypeArg_2(NetVec2 v0, NetString v1) { }
 		[SyncRpc] public void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2) { }
-		[SyncRpc] public void Server_EnumTypeArg_1(DisconnectReasonType v0, AckJoinMatch v1) { }
-		[SyncRpc] public void Server_EnumTypeArg_2(AckJoinMatch v0, DisconnectReasonType v1) { }
-		[SyncRpc] public void Server_EnumTypeArg_3(AckJoinMatch v0, DisconnectReasonType v1, AckJoinMatch v2) { }
-		[SyncRpc] public void Server_CompositeArg_2_1(int v0, DisconnectReasonType v1) { }
-		[SyncRpc] public void Server_CompositeArg_2_2(NetVec2 v0, DisconnectReasonType v1) { }
-		[SyncRpc] public void Server_CompositeArg_3(NetVec2 v0, DisconnectReasonType v1, float v2) { }
+		[SyncRpc] public void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1) { }
+		[SyncRpc] public void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1) { }
+		[SyncRpc] public void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2) { }
+		[SyncRpc] public void Server_CompositeArg_2_1(int v0, TestEnumType v1) { }
+		[SyncRpc] public void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1) { }
+		[SyncRpc] public void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2) { }
 	}
 }
 #pragma warning restore IDE0051

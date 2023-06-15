@@ -31,7 +31,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private byte _v2;
 		[SyncVar]
-		private sbyte _v4;
+		private TestEnumType _v4 = new();
 		[SyncVar]
 		private ushort _v5;
 		[SyncVar]
@@ -55,7 +55,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf3(NetworkPlayer player, int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		public partial void uf5(NetworkPlayer player);
+		private partial void uf5(NetworkPlayer player);
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable
@@ -106,7 +106,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[2] = true;
 			}
 		}
-		public sbyte V4
+		public TestEnumType V4
 		{
 			get => _v4;
 			set
@@ -116,7 +116,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[3] = true;
 			}
 		}
-		public ushort V5
+		private ushort V5
 		{
 			get => _v5;
 			set
@@ -126,7 +126,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[4] = true;
 			}
 		}
-		public short V6
+		private short V6
 		{
 			get => _v6;
 			set
@@ -136,7 +136,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[5] = true;
 			}
 		}
-		public int V7
+		private int V7
 		{
 			get => _v7;
 			set
@@ -192,7 +192,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_0[3] = true;
 			}
 		}
-		public int Uv7
+		private int Uv7
 		{
 			get => _uv7;
 			set
@@ -214,7 +214,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyUnreliable_0[6] = true;
 		}
 		private TargetCallstack<NetworkPlayer, (int a, double b)> uf3Callstack = new(8);
-		public partial void uf5(NetworkPlayer player)
+		private partial void uf5(NetworkPlayer player)
 		{
 			uf5Callstack.Add(player);
 			_dirtyUnreliable_0[7] = true;
@@ -249,7 +249,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[3])
 			{
-				writer.Put(_v4);
+				writer.Put((int)_v4);
 			}
 			if (_dirtyReliable_0[4])
 			{
@@ -362,7 +362,7 @@ namespace CTS.Instance.SyncObjects
 			_v0.Serialize(writer);
 			_v1.Serialize(writer);
 			writer.Put(_v2);
-			writer.Put(_v4);
+			writer.Put((int)_v4);
 			writer.Put(_v5);
 			writer.Put(_v6);
 			writer.Put(_v7);
@@ -372,12 +372,12 @@ namespace CTS.Instance.SyncObjects
 			_uv6.Serialize(writer);
 			writer.Put(_uv7);
 		}
-		public override void InitializeProperties()
+		public override void InitializeMasterProperties()
 		{
 			_v0 = new();
 			_v1 = new();
 			_v2 = 0;
-			_v4 = 0;
+			_v4 = (TestEnumType)0;
 			_v5 = 0;
 			_v6 = 0;
 			_v7 = 0;
@@ -389,6 +389,7 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override void InitializeRemoteProperties() { }
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

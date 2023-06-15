@@ -16,6 +16,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
 		}
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName);
+		}
+
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
@@ -46,29 +51,29 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.ClearDirty, _privateMemberName, syncType);
 		}
 
-		public override string Master_InitializeProperty()
+		public override string Remote_InitializeProperty()
 		{
-			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName);
+			return string.Format(MemberFormat.InitializeSyncObjectProperty, _remoteMemberName);
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
 			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _privateMemberName, _publicMemberName, string.Empty);
+								 _remoteMemberName, _publicMemberName, string.Empty, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, syncType));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _remoteMemberName, syncType));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
 			return sb.ToString();
 		}
 
 		public override string Remote_IgnoreDeserialize(SyncType syncType)
 		{
-			return string.Format(MemberFormat.IgnoreObjectType, _privateMemberName, syncType);
+			return string.Format(MemberFormat.IgnoreObjectType, _remoteMemberName, syncType);
 		}
 	}
 }

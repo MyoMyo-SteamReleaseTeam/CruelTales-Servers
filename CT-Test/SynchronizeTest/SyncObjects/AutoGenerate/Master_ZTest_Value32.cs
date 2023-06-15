@@ -135,7 +135,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void f24(int a);
 		[SyncRpc]
-		public partial void f28(int a);
+		private partial void f28(int a);
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf3(NetworkPlayer player, int a);
 		[SyncRpc(SyncType.UnreliableTarget)]
@@ -145,7 +145,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf14(NetworkPlayer player, int a, float b);
 		[SyncRpc(SyncType.Unreliable)]
-		public partial void uf17(int a);
+		private partial void uf17(int a);
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uf22(NetworkPlayer player, byte a, int b, uint c);
 		[SyncRpc(SyncType.Unreliable)]
@@ -254,7 +254,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[6] = true;
 			}
 		}
-		public int V8
+		private int V8
 		{
 			get => _v8;
 			set
@@ -264,7 +264,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[7] = true;
 			}
 		}
-		public int V9
+		private int V9
 		{
 			get => _v9;
 			set
@@ -274,7 +274,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_1[0] = true;
 			}
 		}
-		public int V10
+		private int V10
 		{
 			get => _v10;
 			set
@@ -284,7 +284,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_1[1] = true;
 			}
 		}
-		public int V12
+		private int V12
 		{
 			get => _v12;
 			set
@@ -294,7 +294,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_1[2] = true;
 			}
 		}
-		public int V13
+		private int V13
 		{
 			get => _v13;
 			set
@@ -404,7 +404,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[5] = true;
 			}
 		}
-		public int V29
+		private int V29
 		{
 			get => _v29;
 			set
@@ -414,7 +414,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[6] = true;
 			}
 		}
-		public int V30
+		private int V30
 		{
 			get => _v30;
 			set
@@ -424,7 +424,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[7] = true;
 			}
 		}
-		public int V31
+		private int V31
 		{
 			get => _v31;
 			set
@@ -434,7 +434,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_3[0] = true;
 			}
 		}
-		public int V32
+		private int V32
 		{
 			get => _v32;
 			set
@@ -474,7 +474,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_3[6] = true;
 		}
 		private List<int> f24Callstack = new(4);
-		public partial void f28(int a)
+		private partial void f28(int a)
 		{
 			f28Callstack.Add(a);
 			_dirtyReliable_3[7] = true;
@@ -600,7 +600,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_1[3] = true;
 			}
 		}
-		public int Uv18
+		private int Uv18
 		{
 			get => _uv18;
 			set
@@ -610,7 +610,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_1[4] = true;
 			}
 		}
-		public int Uv19
+		private int Uv19
 		{
 			get => _uv19;
 			set
@@ -620,7 +620,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_1[5] = true;
 			}
 		}
-		public int Uv20
+		private int Uv20
 		{
 			get => _uv20;
 			set
@@ -630,7 +630,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_1[6] = true;
 			}
 		}
-		public int Uv21
+		private int Uv21
 		{
 			get => _uv21;
 			set
@@ -680,7 +680,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_2[3] = true;
 			}
 		}
-		public int Uv29
+		private int Uv29
 		{
 			get => _uv29;
 			set
@@ -690,7 +690,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_2[4] = true;
 			}
 		}
-		public int Uv30
+		private int Uv30
 		{
 			get => _uv30;
 			set
@@ -700,7 +700,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_2[5] = true;
 			}
 		}
-		public int Uv31
+		private int Uv31
 		{
 			get => _uv31;
 			set
@@ -710,7 +710,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyUnreliable_2[6] = true;
 			}
 		}
-		public int Uv32
+		private int Uv32
 		{
 			get => _uv32;
 			set
@@ -744,7 +744,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyUnreliable_3[3] = true;
 		}
 		private TargetCallstack<NetworkPlayer, (int a, float b)> uf14Callstack = new(8);
-		public partial void uf17(int a)
+		private partial void uf17(int a)
 		{
 			uf17Callstack.Add(a);
 			_dirtyUnreliable_3[4] = true;
@@ -1269,7 +1269,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_uv31);
 			writer.Put(_uv32);
 		}
-		public override void InitializeProperties()
+		public override void InitializeMasterProperties()
 		{
 			_v0 = 0;
 			_v1 = 0;
@@ -1324,6 +1324,7 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override void InitializeRemoteProperties() { }
 		public override void IgnoreSyncReliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

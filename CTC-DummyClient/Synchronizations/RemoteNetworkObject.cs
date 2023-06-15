@@ -56,6 +56,8 @@ namespace CTC.Networks.Synchronizations
 		public abstract bool TryDeserializeSyncReliable(IPacketReader reader);
 		public abstract bool TryDeserializeEveryProperty(IPacketReader reader);
 		public abstract bool TryDeserializeSyncUnreliable(IPacketReader reader);
+		public abstract void InitializeMasterProperties();
+		public abstract void InitializeRemoteProperties();
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);

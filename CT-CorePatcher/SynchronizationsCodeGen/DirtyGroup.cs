@@ -33,7 +33,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName, string rollbackContents = "")
+		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName,
+													 string rollbackContents = "")
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -76,14 +77,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine($"{GetName()}.Clear();");
 			foreach (var m in _members)
 				sb.AppendLine(m.Master_ClearDirty(_syncType));
-			return sb.ToString();
-		}
-
-		public string Master_InitializeProperties()
-		{
-			StringBuilder sb = new();
-			foreach (var m in _members)
-				sb.AppendLine(m.Master_InitializeProperty());
 			return sb.ToString();
 		}
 

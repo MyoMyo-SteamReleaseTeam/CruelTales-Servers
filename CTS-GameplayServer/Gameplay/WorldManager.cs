@@ -141,7 +141,8 @@ namespace CTS.Instance.Gameplay
 		public T CreateObject<T>(Vector3 position = default) where T : MasterNetworkObject, new()
 		{
 			var netObj = _objectPoolManager.Create<T>();
-			netObj.InitializeProperties();
+			netObj.InitializeMasterProperties();
+			netObj.InitializeRemoteProperties();
 			netObj.Create(this, _visibilityManager, _gameManager, getNetworkIdentityCounter(), position);
 			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.OnCreated();

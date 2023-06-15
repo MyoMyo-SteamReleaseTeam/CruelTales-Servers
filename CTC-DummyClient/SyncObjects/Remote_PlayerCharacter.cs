@@ -28,16 +28,16 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_InputMovement(Vector2 direction);
 		[SyncVar]
-		private UserId _userId = new();
+		public UserId UserId = new();
 		public event Action<UserId>? OnUserIdChanged;
 		[SyncVar]
-		private NetStringShort _username = new();
+		public NetStringShort Username = new();
 		public event Action<NetStringShort>? OnUsernameChanged;
 		[SyncVar]
-		private int _costume;
+		public int Costume;
 		public event Action<int>? OnCostumeChanged;
 		[SyncVar]
-		private Vector2 _test = new();
+		public Vector2 Test = new();
 		public event Action<Vector2>? OnTestChanged;
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
@@ -78,44 +78,51 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public override void SerializeEveryProperty(IPacketWriter writer) { }
-		public override void InitializeProperties() { }
+		public override void InitializeMasterProperties() { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				if (!_userId.TryDeserialize(reader)) return false;
-				OnUserIdChanged?.Invoke(_userId);
+				if (!UserId.TryDeserialize(reader)) return false;
+				OnUserIdChanged?.Invoke(UserId);
 			}
 			if (dirtyReliable_0[1])
 			{
-				if (!_username.TryDeserialize(reader)) return false;
-				OnUsernameChanged?.Invoke(_username);
+				if (!Username.TryDeserialize(reader)) return false;
+				OnUsernameChanged?.Invoke(Username);
 			}
 			if (dirtyReliable_0[2])
 			{
-				if (!reader.TryReadInt32(out _costume)) return false;
-				OnCostumeChanged?.Invoke(_costume);
+				if (!reader.TryReadInt32(out Costume)) return false;
+				OnCostumeChanged?.Invoke(Costume);
 			}
 			if (dirtyReliable_0[3])
 			{
-				if (!reader.TryReadVector2(out _test)) return false;
-				OnTestChanged?.Invoke(_test);
+				if (!reader.TryReadVector2(out Test)) return false;
+				OnTestChanged?.Invoke(Test);
 			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			if (!_userId.TryDeserialize(reader)) return false;
-			OnUserIdChanged?.Invoke(_userId);
-			if (!_username.TryDeserialize(reader)) return false;
-			OnUsernameChanged?.Invoke(_username);
-			if (!reader.TryReadInt32(out _costume)) return false;
-			OnCostumeChanged?.Invoke(_costume);
-			if (!reader.TryReadVector2(out _test)) return false;
-			OnTestChanged?.Invoke(_test);
+			if (!UserId.TryDeserialize(reader)) return false;
+			OnUserIdChanged?.Invoke(UserId);
+			if (!Username.TryDeserialize(reader)) return false;
+			OnUsernameChanged?.Invoke(Username);
+			if (!reader.TryReadInt32(out Costume)) return false;
+			OnCostumeChanged?.Invoke(Costume);
+			if (!reader.TryReadVector2(out Test)) return false;
+			OnTestChanged?.Invoke(Test);
 			return true;
+		}
+		public override void InitializeRemoteProperties()
+		{
+			UserId = new();
+			Username = new();
+			Costume = 0;
+			Test = new();
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{

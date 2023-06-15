@@ -18,6 +18,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_clrEnumSizeTypeName = clrEnumSizeTypeName;
 		}
 
+		public override string Master_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
+		}
+
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
@@ -36,26 +41,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.WriteEnum, _enumSizeTypeName, _privateMemberName);
 		}
 
-		public override string Master_InitializeProperty()
-		{
-			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
-		}
-
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
+
+		public override string Remote_InitializeProperty()
+		{
+			return string.Format(MemberFormat.InitializeProperty, _remoteMemberName, $"({_typeName})0");
+		}
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.RemoteDeclaration, attribute, _typeName,
-								 _privateMemberName, _publicMemberName, string.Empty);
+								 _remoteMemberName, _publicMemberName, string.Empty, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _typeName, _clrEnumSizeTypeName));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _remoteMemberName, _typeName, _clrEnumSizeTypeName));
+			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _remoteMemberName));
 			return sb.ToString();
 		}
 
