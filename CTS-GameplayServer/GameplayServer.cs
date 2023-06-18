@@ -38,7 +38,7 @@ namespace CTS.Instance
 			if (configRead.ResultType != JobResultType.Success)
 			{
 				_log.Warn($"There is no configuration file!");
-				var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, serverOption, true);
+				var createDefault = JsonHandler.TryWriteObject(ConfigurationFile, _serverOption, true);
 				if (createDefault.ResultType != JobResultType.Success)
 				{
 					_log.Fatal($"Failed to create default configuration file!");
@@ -52,7 +52,7 @@ namespace CTS.Instance
 			else
 			{
 				_log.Info("Load server configuration file.");
-				serverOption = configRead.Value;
+				_serverOption = configRead.Value;
 			}
 #endif
 
