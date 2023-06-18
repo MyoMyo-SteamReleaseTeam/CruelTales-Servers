@@ -29,7 +29,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync();
 		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_LoadGame(MiniGameMapType mapType);
+		public partial void Server_LoadGame(GameMapType mapType);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -73,7 +73,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				for (int i = 0; i < count; i++)
 				{
 					if (!reader.TryReadUInt16(out var mapTypeValue)) return false;
-					MiniGameMapType mapType = (MiniGameMapType)mapTypeValue;
+					GameMapType mapType = (GameMapType)mapTypeValue;
 					Server_LoadGame(mapType);
 				}
 			}

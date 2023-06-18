@@ -27,7 +27,7 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameController;
 		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_LoadGame(NetworkPlayer player, MiniGameMapType mapType);
+		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync(NetworkPlayer player);
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -41,12 +41,12 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 		public override bool IsDirtyUnreliable => false;
-		public partial void Server_LoadGame(NetworkPlayer player, MiniGameMapType mapType)
+		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
 		{
 			Server_LoadGameCallstack.Add(player, mapType);
 			_dirtyReliable_0[0] = true;
 		}
-		private TargetCallstack<NetworkPlayer, MiniGameMapType> Server_LoadGameCallstack = new(8);
+		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameCallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();

@@ -9,7 +9,7 @@ namespace CT.Common.Definitions.SyncObjects
 	public class GameController
 	{
 		[SyncRpc(SyncType.ReliableTarget)]
-		public void Server_LoadGame(MiniGameMapType mapType) { }
+		public void Server_LoadGame(GameMapType mapType) { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyToSync() { }

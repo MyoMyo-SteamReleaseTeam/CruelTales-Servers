@@ -19,8 +19,8 @@ namespace CT.Common.Gameplay
 
 	public class MiniGameMapData
 	{
-		public MiniGameMapType MapType;
-		public MiniGameMapTheme Theme;
+		public GameMapType MapType;
+		public GameMapTheme Theme;
 		public List<Vector3> SpawnPosition = new();
 	}
 }
