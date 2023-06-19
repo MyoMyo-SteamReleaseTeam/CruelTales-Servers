@@ -138,6 +138,7 @@ namespace CT.Common.Gameplay
 		{
 			Position = reader.ReadVector3();
 			Velocity = reader.ReadVector3();
+			OnChanged?.Invoke(true, Position, Velocity);
 		}
 
 		public void Deserialize(IPacketReader reader)
