@@ -30,6 +30,8 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync(NetworkPlayer player);
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_OnMapLoaded(NetworkPlayer player);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -102,6 +104,14 @@ namespace CTS.Instance.SyncObjects
 					Client_ReadyToSync(player);
 				}
 			}
+			if (dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					Client_OnMapLoaded(player);
+				}
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
@@ -113,11 +123,19 @@ namespace CTS.Instance.SyncObjects
 			{
 				reader.Ignore(1);
 			}
+			if (dirtyReliable_0[1])
+			{
+				reader.Ignore(1);
+			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[1])
 			{
 				reader.Ignore(1);
 			}

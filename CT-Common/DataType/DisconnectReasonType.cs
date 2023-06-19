@@ -31,6 +31,8 @@ namespace CT.Common.DataType
 		// Client error
 		ClientError_CannotHandlePacket,
 		ClientError_FailedToReceivePacket,
+		ClientError_WrongConnectionFlow,
+		ClientError_NullReference,
 
 		// Server error
 		ServerError_CannotHandlePacket,
@@ -42,6 +44,9 @@ namespace CT.Common.DataType
 		Reject_ThereIsNoSuchGameInstance,
 		Reject_GameInstanceIsAlreadyFull,
 		Reject_PermissionDenied,
+
+		// Gameplay
+		Client_GameEnd,
 	}
 
 	public static class DisconnectReasonTypeExtension

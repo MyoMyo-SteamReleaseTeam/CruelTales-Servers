@@ -13,8 +13,7 @@ namespace CTS.Instance.Networks
 {
 	public class UserSession
 	{
-		// Constant
-		public const int WAITING_TIMEOUT_SEC = 5;
+		public const int WAITING_TIMEOUT_SEC = 30;
 
 		// Log
 		public static ILog _log = LogManager.GetLogger(typeof(UserSession));
@@ -229,7 +228,7 @@ namespace CTS.Instance.Networks
 
 				// Create Ack packet
 				var ackPacket = _packetPool.GetPacket<SC_Ack_TryEnterGameInstance>();
-				ackPacket.AckResult = AckJoinMatch.Success;
+				//ackPacket.AckResult = AckJoinMatch.Success;
 				ByteBuffer writer = new ByteBuffer(20);
 				writer.Put(ackPacket);
 

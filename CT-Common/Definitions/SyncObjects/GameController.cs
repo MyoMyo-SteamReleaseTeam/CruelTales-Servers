@@ -13,6 +13,9 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyToSync() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_OnMapLoaded() { }
 	}
 }
 #pragma warning restore IDE0051

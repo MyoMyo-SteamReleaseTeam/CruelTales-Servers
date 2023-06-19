@@ -16,6 +16,10 @@ namespace CTS.Instance.SyncObjects
 		{
 			_log.Debug($"Client {player} ready to controll");
 			Server_LoadGame(player, GameMapType.MiniGame_RedHood_0);
+		}
+
+		public partial void Client_OnMapLoaded(NetworkPlayer player)
+		{
 			player.CanSeeViewObject = true;
 		}
 	}

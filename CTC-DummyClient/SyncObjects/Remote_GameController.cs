@@ -28,6 +28,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.GameController;
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync();
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_OnMapLoaded();
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(GameMapType mapType);
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -47,10 +49,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_dirtyReliable_0[0] = true;
 		}
 		private byte Client_ReadyToSyncCallstackCount = 0;
+		public partial void Client_OnMapLoaded()
+		{
+			Client_OnMapLoadedCallstackCount++;
+			_dirtyReliable_0[1] = true;
+		}
+		private byte Client_OnMapLoadedCallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			Client_ReadyToSyncCallstackCount = 0;
+			Client_OnMapLoadedCallstackCount = 0;
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer)
@@ -59,6 +68,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (_dirtyReliable_0[0])
 			{
 				writer.Put((byte)Client_ReadyToSyncCallstackCount);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				writer.Put((byte)Client_OnMapLoadedCallstackCount);
 			}
 		}
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
