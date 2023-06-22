@@ -92,7 +92,7 @@ namespace CTS.Instance.SyncObjects
 			if (checkAuthOrDisconnect(player))
 			{
 				GameplayManager.RoomOption.Password = password;
-				Password = password;
+				Password = GameplayManager.RoomOption.Password;
 			}
 		}
 
