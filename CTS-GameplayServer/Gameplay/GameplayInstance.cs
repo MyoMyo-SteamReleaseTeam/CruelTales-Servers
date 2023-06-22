@@ -24,29 +24,24 @@ namespace CTS.Instance.Gameplay
 		}
 	}
 
-	/// <summary>게임 진행을 위한 옵션입니다.</summary>
-	public struct GameplayOption
-	{
-		public int MaxUser { get; set; }
-	}
-
 	public class GameplayInstance
 	{
 		// Support
 		[AllowNull] public readonly static ILog _log = LogManager.GetLogger(typeof(GameplayInstance));
 
+		// Reference
 		public TickTimer ServerTimer { get; private set; }
+		public InstanceInitializeOption Option { get; private set; }
 
 		// Instance property
 		public GameInstanceGuid Guid { get; private set; }
-		public GameplayOption Option { get; private set; }
+		public RoomOption RoomOption { get; private set; } = new();
 
 		// Handlers
 		public UserSessionHandler SessionHandler { get; private set; }
 
 		// Managers
-		public GameManager GameManager { get; private set; }
-		public WorldManager WorldManager { get; private set; }
+		public GameplayManager GameplayManager { get; private set; }
 
 		// Job Queue
 		private JobQueue<SynchronizeJob> _syncJobQueue;
@@ -55,24 +50,24 @@ namespace CTS.Instance.Gameplay
 		public GameplayInstance(TickTimer serverTimer, InstanceInitializeOption option)
 		{
 			ServerTimer = serverTimer;
-			SessionHandler = new UserSessionHandler(this, option);
-			GameManager = new GameManager(this, option);
-			WorldManager = new WorldManager(this, option);
-			GameManager.Initialize();
-			WorldManager.Initialize();
+			Option = option;
+			RoomOption.Initialize(Option);
+			SessionHandler = new UserSessionHandler(this, Option, RoomOption);
 
-			_syncJobQueue = new(onSyncJobExecute, option.SyncJobCapacity);
-			_syncPacketPool = new ConcurrentByteBufferPool(1024 * 8, option.RemotePacketPoolCount);
+			GameplayManager = new GameplayManager(this, Option);
+			GameplayManager.Initialize();
+
+			_syncJobQueue = new(onSyncJobExecute, Option.SyncJobCapacity);
+			_syncPacketPool = new ConcurrentByteBufferPool(1024 * 8, Option.RemotePacketPoolCount);
 		}
 
-		public void Initialize(GameplayOption option, GameInstanceGuid guid)
+		public void Initialize(GameInstanceGuid guid)
 		{
-			Option = option;
 			Guid = guid;
-			WorldManager.Clear();
+			RoomOption.Initialize(Option);
 
 			// TODO : Start game properly
-			GameManager.StartGame();
+			GameplayManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>
@@ -85,26 +80,8 @@ namespace CTS.Instance.Gameplay
 			// Sync network object from remote
 			_syncJobQueue.Flush();
 
-			// Update world network logic of objects
-			WorldManager.UpdateNetworkObjects(deltaTime);
-
 			// Update game manager logic
-			GameManager.Update(deltaTime);
-
-			// Send sync data to each user
-			WorldManager.UpdateVisibilityAndSendData();
-
-			// Update network objects physics
-			WorldManager.UpdatePhysics(deltaTime);
-
-			// Update world partitions
-			WorldManager.UpdateWorldPartitions();
-
-			// Reset dirtys
-			WorldManager.ClearDirtys();
-
-			// Remove objects
-			WorldManager.UpdateRemoveObjects();
+			GameplayManager.Update(deltaTime);
 		}
 
 		public void Shutdown(DisconnectReasonType reason)
@@ -151,14 +128,14 @@ namespace CTS.Instance.Gameplay
 			switch (syncJob.Operation)
 			{
 				case SyncOperation.Reliable:
-					if (!WorldManager.OnRemoteReliable(syncJob.Sender, syncJob.SyncSegment))
+					if (!GameplayManager.WorldManager.OnRemoteReliable(syncJob.Sender, syncJob.SyncSegment))
 					{
 						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
 					}
 					break;
 
 				case SyncOperation.Unreliable:
-					if (!WorldManager.OnRemoteUnreliable(syncJob.Sender, syncJob.SyncSegment))
+					if (!GameplayManager.WorldManager.OnRemoteUnreliable(syncJob.Sender, syncJob.SyncSegment))
 					{
 						DisconnectPlayer(syncJob.Sender, DisconnectReasonType.ServerError_CannotHandlePacket);
 					}

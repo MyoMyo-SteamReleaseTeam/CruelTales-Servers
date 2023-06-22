@@ -12,10 +12,10 @@ namespace CTS.Instance.Synchronizations
 	public abstract class MasterNetworkObject : IMasterSynchronizable
 	{
 		/// <summary>게임 매니져 입니다.</summary>
-		[AllowNull] protected GameManager _gameManager;
+		[AllowNull] public GameplayManager GameplayManager { get; private set; }
 
 		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
-		[AllowNull] protected WorldManager _worldManager;
+		[AllowNull] public WorldManager WorldManager { get; private set; }
 
 		/// <summary>네트워크 가시성 매니져입니다.</summary>
 		[AllowNull] private WorldVisibilityManager _worldVisibilityManager;
@@ -88,7 +88,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 초기화합니다.</summary>
 		public void Create(WorldManager manager,
 						   WorldVisibilityManager worldPartitioner,
-						   GameManager gameManager,
+						   GameplayManager gameManager,
 						   NetworkIdentity id,
 						   Vector3 position)
 		{
@@ -97,8 +97,8 @@ namespace CTS.Instance.Synchronizations
 			IsAlive = true;
 
 			// Bind reference
-			_worldManager = manager;
-			_gameManager = gameManager;
+			WorldManager = manager;
+			GameplayManager = gameManager;
 
 			VisibilityAuthority = InitialVisibilityAuthority;
 
@@ -118,7 +118,7 @@ namespace CTS.Instance.Synchronizations
 		public void Destroy()
 		{
 			IsAlive = false;
-			_worldManager.AddDestroyStack(this);
+			WorldManager.AddDestroyStack(this);
 
 			if (Visibility == VisibilityType.View)
 			{

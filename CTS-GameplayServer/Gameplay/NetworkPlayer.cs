@@ -13,7 +13,7 @@ namespace CTS.Instance.Gameplay
 		private readonly static ILog _log = LogManager.GetLogger(typeof(NetworkPlayer));
 
 		// Referenece
-		public GameManager GameManager { get; private set; }
+		public GameplayManager GameManager { get; private set; }
 		public WorldManager WorldManager { get; private set; }
 
 		// Session Info
@@ -21,6 +21,9 @@ namespace CTS.Instance.Gameplay
 		public UserId UserId { get; private set; }
 		public NetStringShort Username { get; private set; }
 		public int Costume { get; private set; }
+		
+		// Matchmaking
+		public bool IsHost { get; set; } = false;
 
 		// Gameplay
 		public NetworkTransform? TargetTransform { get; private set; }
@@ -43,7 +46,7 @@ namespace CTS.Instance.Gameplay
 #pragma warning restore CS8618
 #endif
 
-		public NetworkPlayer(GameManager gameManager,
+		public NetworkPlayer(GameplayManager gameManager,
 							 WorldManager worldManager,
 							 InstanceInitializeOption option)
 		{

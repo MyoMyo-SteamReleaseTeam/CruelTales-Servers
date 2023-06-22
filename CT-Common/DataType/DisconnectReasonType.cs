@@ -39,6 +39,7 @@ namespace CT.Common.DataType
 		ServerError_WrongOperation,
 		ServerError_YouTryRejoin,
 		ServerError_YouAreNotInTheWaitingQueue,
+		ServerError_YouAreNotHost,
 
 		// Reject from server
 		Reject_ThereIsNoSuchGameInstance,

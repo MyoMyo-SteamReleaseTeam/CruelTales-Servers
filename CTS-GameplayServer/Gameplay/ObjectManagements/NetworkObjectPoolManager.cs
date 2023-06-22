@@ -10,7 +10,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 	{
 		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
 		{
-			{ typeof(GameController), new NetworkObjectPool<GameController>(1) },
+			{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1) },
 			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
 			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
 			

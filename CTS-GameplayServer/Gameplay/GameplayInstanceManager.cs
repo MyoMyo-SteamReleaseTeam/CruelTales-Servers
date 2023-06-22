@@ -44,13 +44,11 @@ namespace CTS.Instance.Gameplay
 			MaxGameCount = serverOption.GameCount;
 
 			var option = new InstanceInitializeOption() { SystemMaxUser = 7 };
-			var gameplayOption = new GameplayOption();
-			gameplayOption.MaxUser = 7;
 
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
 				var instance = new GameplayInstance(_serverTimer, option);
-				instance.Initialize(gameplayOption, new GameInstanceGuid((ulong)i));
+				instance.Initialize(new GameInstanceGuid((ulong)i));
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);
 			}

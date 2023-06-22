@@ -37,12 +37,14 @@ namespace CTS.Instance.Gameplay
 		// Log
 		private readonly ILog _log = LogManager.GetLogger(typeof(UserSessionHandler));
 
-		// DI
+		// Reference
 		private readonly GameplayInstance _gameplayInstance;
+
+		// Option
+		private RoomOption _roomOption;
 
 		// Settings
 		public int MemberCount => _userById.Count + _waitingTable.Count;
-		public int MaxUser { get; private set; }
 
 		// Session Map
 		public List<UserSession> UserList { get; private set; }
@@ -53,15 +55,16 @@ namespace CTS.Instance.Gameplay
 		private JobQueue<SessionJob> _jobQueue;
 
 		public UserSessionHandler(GameplayInstance gameInstance,
-								  InstanceInitializeOption option)
+								  InstanceInitializeOption option,
+								  RoomOption roomOption)
 		{
 			_gameplayInstance = gameInstance;
 			_jobQueue = new(onJobExecuted, option.SessionJobCapacity);
-			MaxUser = option.SystemMaxUser;
+			_roomOption = roomOption;
 
-			UserList = new List<UserSession>(MaxUser);
-			_userById = new BidirectionalMap<UserId, UserSession>(MaxUser);
-			_waitingTable = new BidirectionalMap<UserId, UserSession>(MaxUser);
+			UserList = new List<UserSession>(option.SystemMaxUser);
+			_userById = new BidirectionalMap<UserId, UserSession>(option.SystemMaxUser);
+			_waitingTable = new BidirectionalMap<UserId, UserSession>(option.SystemMaxUser);
 		}
 
 		public bool TryGetUserSession(UserId id, [MaybeNullWhen(false)] out UserSession session)
@@ -105,7 +108,7 @@ namespace CTS.Instance.Gameplay
 			if (_userById.TryRemove(userSession.UserId))
 			{
 				_log.Debug($"[GUID:{_gameplayInstance.Guid}][Current user:{this.MemberCount}] Session {userSession} leave the game");
-				_gameplayInstance.GameManager.OnUserLeaveGame(userSession);
+				_gameplayInstance.GameplayManager.OnUserLeaveGame(userSession);
 			}
 			else
 			{
@@ -129,7 +132,7 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
-			if (MemberCount >= MaxUser)
+			if (MemberCount >= _roomOption.MaxUser)
 			{
 				_log.Warn($"User {userSession} fail to join GameInstance {_gameplayInstance.Guid}. " +
 					$"Reason : {DisconnectReasonType.Reject_GameInstanceIsAlreadyFull}");
@@ -165,7 +168,7 @@ namespace CTS.Instance.Gameplay
 
 			_log.Debug($"[Instance:{_gameplayInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
-			this._gameplayInstance.GameManager.OnUserEnterGame(userSession);
+			this._gameplayInstance.GameplayManager.OnUserEnterGame(userSession);
 
 			if (!_waitingTable.TryRemove(userSession.UserId))
 			{

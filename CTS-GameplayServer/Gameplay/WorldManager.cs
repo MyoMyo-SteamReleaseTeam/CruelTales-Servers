@@ -22,7 +22,7 @@ namespace CTS.Instance.Gameplay
 
 		// Reference
 		private GameplayInstance _gameplayInstance;
-		[AllowNull] private GameManager _gameManager;
+		private GameplayManager _gameplayManager;
 		private InstanceInitializeOption _option;
 
 		// Network Object Management
@@ -35,10 +35,13 @@ namespace CTS.Instance.Gameplay
 		// Visibility
 		private WorldVisibilityManager _visibilityManager;
 
-		public WorldManager(GameplayInstance gameplayInstance, InstanceInitializeOption option)
+		public WorldManager(GameplayInstance gameplayInstance,
+							GameplayManager gameplayManager,
+							InstanceInitializeOption option)
 		{
 			// Reference
 			_gameplayInstance = gameplayInstance;
+			_gameplayManager = gameplayManager;
 			_option = option;
 
 			// Network Object Management
@@ -47,11 +50,6 @@ namespace CTS.Instance.Gameplay
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
-		}
-
-		public void Initialize()
-		{
-			_gameManager = _gameplayInstance.GameManager;
 		}
 
 		public void UpdateNetworkObjects(float deltaTime)
@@ -143,7 +141,7 @@ namespace CTS.Instance.Gameplay
 			var netObj = _objectPoolManager.Create<T>();
 			netObj.InitializeMasterProperties();
 			netObj.InitializeRemoteProperties();
-			netObj.Create(this, _visibilityManager, _gameManager, getNetworkIdentityCounter(), position);
+			netObj.Create(this, _visibilityManager, _gameplayManager, getNetworkIdentityCounter(), position);
 			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.OnCreated();
 			return netObj;
@@ -475,7 +473,7 @@ namespace CTS.Instance.Gameplay
 		// TODO : 역직렬화 실패시 Network Player 내부의 UserSession으로 연결을 종료하도록 리펙토링 할 수 있음
 		public bool OnRemoteReliable(UserId sender, IPacketReader reader)
 		{
-			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
+			if (!_gameplayManager.TryGetNetworkPlayer(sender, out var player))
 			{
 				return false;
 			}
@@ -501,7 +499,7 @@ namespace CTS.Instance.Gameplay
 
 		public bool OnRemoteUnreliable(UserId sender, IPacketReader reader)
 		{
-			if (!_gameManager.TryGetNetworkPlayer(sender, out var player))
+			if (!_gameplayManager.TryGetNetworkPlayer(sender, out var player))
 			{
 				return false;
 			}

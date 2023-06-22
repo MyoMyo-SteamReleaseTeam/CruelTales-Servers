@@ -7,6 +7,7 @@ namespace CTS.Instance.Gameplay
 	public class InstanceInitializeOption
 	{
 		public int SystemMaxUser = GlobalNetwork.SYSTEM_MAX_USER;
+		public int SystemMinUser = GlobalNetwork.SYSTEM_MIN_USER;
 
 		// Player visible table
 		public int VisibleCellCapacity = 32;
