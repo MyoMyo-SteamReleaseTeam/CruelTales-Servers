@@ -2,7 +2,7 @@
 
 namespace CT.Common.Tools
 {
-	public class Notifier<T> where T : struct
+	public class EnumNotifier<T> where T : Enum
 	{
 		public event Action? OnChanged;
 		public event Action<T>? OnDataChanged;
@@ -28,7 +28,56 @@ namespace CT.Common.Tools
 
 		public bool IsDirty { get; private set; }
 
-		public Notifier(T value = default, bool isDirty = false)
+		public EnumNotifier(T value = default, bool isDirty = false)
+		{ 
+			_value = value;
+
+			if (isDirty)
+			{
+				IsDirty = true;
+				OnChanged?.Invoke();
+				OnDataChanged?.Invoke(_value);
+			}
+		}
+
+		public void SetPristine()
+		{
+			IsDirty = false;
+		}
+
+		public void SetValueWithoutEvent(T value)
+		{
+			_value = value;
+		}
+	}
+
+	public class ValueNotifier<T> where T : struct, IEquatable<T>
+	{
+		public event Action? OnChanged;
+		public event Action<T>? OnDataChanged;
+
+		protected T _value;
+		public T Value
+		{
+			get
+			{
+				return _value;
+			}
+			set
+			{
+				if (!_value.Equals(value))
+				{
+					_value = value;
+					IsDirty = true;
+					OnChanged?.Invoke();
+					OnDataChanged?.Invoke(Value);
+				}
+			}
+		}
+
+		public bool IsDirty { get; private set; }
+
+		public ValueNotifier(T value = default, bool isDirty = false)
 		{
 			_value = value;
 
@@ -51,7 +100,7 @@ namespace CT.Common.Tools
 		}
 	}
 
-	public class ManualSubjectData<T> where T : struct
+	public class ManualSubjectData<T> where T : struct, IEquatable<T>
 	{
 		public event Action? OnChanged;
 		public event Action<T>? OnDataChanged;
