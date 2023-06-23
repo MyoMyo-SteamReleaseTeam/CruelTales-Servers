@@ -21,6 +21,7 @@
 		<GameInstanceGuid name="MatchTo"/>
 		<UserDataInfo name="UserDataInfo"/>
 		<UserToken name="Token"/>
+		<Int32 name="Password"/>
 	</client>
 	
 	<server name="Ack_TryEnterGameInstance">

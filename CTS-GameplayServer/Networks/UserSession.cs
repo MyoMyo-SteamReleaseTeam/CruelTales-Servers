@@ -39,6 +39,7 @@ namespace CTS.Instance.Networks
 		public UserDataInfo UserDataInfo { get; private set; }
 		public UserId UserId => UserDataInfo.UserId;
 		public NetStringShort Username => UserDataInfo.Username;
+		public int RoomPassword { get; private set; } = 0;
 
 		// Lock
 		private object _sessionLock = new object();
@@ -179,7 +180,10 @@ namespace CTS.Instance.Networks
 		/// 유저가 게임 참가를 요청했습니다.
 		/// 게임에 참가할 수 없다면 유저의 연결을 종료합니다.
 		/// </summary>
-		public void OnReqTryEnterGameInstance(UserDataInfo userDataInfo, UserToken token, GameInstanceGuid roomGuid)
+		public void OnReqTryEnterGameInstance(UserDataInfo userDataInfo,
+											  UserToken token,
+											  GameInstanceGuid roomGuid,
+											  int password)
 		{
 			lock (_sessionLock)
 			{
@@ -195,6 +199,7 @@ namespace CTS.Instance.Networks
 				UserToken = token;
 				UserDataInfo = userDataInfo;
 				GameInstanceGuid = roomGuid;
+				RoomPassword = password;
 
 				_log.Debug($"User {this} has been verified. Try to enter game [Target GUID:{GameInstanceGuid}]");
 				if (_gameInstanceManager.TryGetGameInstanceBy(GameInstanceGuid, out var instance))

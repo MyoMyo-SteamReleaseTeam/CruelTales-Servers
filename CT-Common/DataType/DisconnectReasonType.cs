@@ -44,6 +44,7 @@ namespace CT.Common.DataType
 		// Reject from server
 		Reject_ThereIsNoSuchGameInstance,
 		Reject_GameInstanceIsAlreadyFull,
+		Reject_WrongPassword,
 		Reject_PermissionDenied,
 
 		// Gameplay

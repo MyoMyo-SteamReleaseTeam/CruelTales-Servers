@@ -14,7 +14,10 @@ namespace CTS.Instance.Packets
 		internal static void Handle_CS_Req_TryEnterGameInstance(PacketBase receivedPacket, UserSession session)
 		{
 			var packet = (CS_Req_TryEnterGameInstance)receivedPacket;
-			session.OnReqTryEnterGameInstance(packet.UserDataInfo, packet.Token, packet.MatchTo);
+			session.OnReqTryEnterGameInstance(packet.UserDataInfo,
+											  packet.Token,
+											  packet.MatchTo,
+											  packet.Password);
 		}
 
 		internal static void Handle_CS_Req_ReadyToSync(PacketBase receivedPacket, UserSession session)

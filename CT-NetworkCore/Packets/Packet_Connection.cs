@@ -41,8 +41,9 @@ namespace CT.Packets
 		public GameInstanceGuid MatchTo = new();
 		public UserDataInfo UserDataInfo = new();
 		public UserToken Token = new();
+		public int Password;
 	
-		public override int SerializeSize => MatchTo.SerializeSize + UserDataInfo.SerializeSize + Token.SerializeSize + 2;
+		public override int SerializeSize => MatchTo.SerializeSize + UserDataInfo.SerializeSize + Token.SerializeSize + 6;
 	
 		public override void Serialize(IPacketWriter writer)
 		{
@@ -50,6 +51,7 @@ namespace CT.Packets
 			MatchTo.Serialize(writer);
 			UserDataInfo.Serialize(writer);
 			Token.Serialize(writer);
+			writer.Put(Password);
 		}
 	
 		public override bool TryDeserialize(IPacketReader reader)
@@ -57,6 +59,7 @@ namespace CT.Packets
 			if (!MatchTo.TryDeserialize(reader)) return false;
 			if (!UserDataInfo.TryDeserialize(reader)) return false;
 			if (!Token.TryDeserialize(reader)) return false;
+			if (!reader.TryReadInt32(out Password)) return false;
 			return true;
 		}
 	}

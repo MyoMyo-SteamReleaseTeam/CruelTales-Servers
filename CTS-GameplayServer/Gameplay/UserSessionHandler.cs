@@ -132,6 +132,12 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
+			if (_roomOption.HasPassword && _roomOption.Password != userSession.RoomPassword)
+			{
+				userSession.Disconnect(DisconnectReasonType.Reject_WrongPassword);
+				return;
+			}
+
 			if (MemberCount >= _roomOption.MaxUser)
 			{
 				_log.Warn($"User {userSession} fail to join GameInstance {_gameplayInstance.Guid}. " +
