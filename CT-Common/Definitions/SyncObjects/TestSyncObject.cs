@@ -1,10 +1,21 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_SyncCollection
+	{
+		[SyncObject]
+		public SyncList<UserId> UserIdList = new();
+
+		[SyncObject]
+		public ZTest_InnerObject SyncObj = new();
+	}
+
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_FunctionDirection
 	{
@@ -30,8 +41,10 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc] public void f3(int a) { }
 		[SyncVar] public TestEnumType v4;
 		[SyncVar] private ushort v5;
-		[SyncVar] private short v6;
-		[SyncVar] private int v7;
+		[SyncObject]
+		private SyncList<UserId> v6 = new();
+		[SyncObject(SyncType.Reliable)]
+		private ZTest_InnerObject v7 = new();
 
 		[SyncVar(SyncType.Unreliable)] public uint uv0;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, byte b) { }
@@ -39,8 +52,10 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, double b) { }
 		[SyncVar(SyncType.Unreliable)] public float uv4;
 		[SyncRpc(SyncType.UnreliableTarget)] private void uf5() { }
-		[SyncVar(SyncType.Unreliable)] public UserId uv6;
-		[SyncVar(SyncType.Unreliable)] private int uv7;
+		[SyncObject]
+		private SyncList<UserId> uv6 = new();
+		[SyncObject(SyncType.Reliable)]
+		private ZTest_InnerObject uv7 = new();
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
@@ -52,15 +67,19 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc] public void f3(int a) { }
 		[SyncVar] public NetString v4;
 		[SyncVar] public NetStringShort v5;
-		[SyncVar] public byte v6;
-		[SyncVar] public int v7;
+		[SyncObject]
+		private SyncList<UserId> v6 = new();
+		[SyncObject(SyncType.Reliable)]
+		private ZTest_InnerObject v7 = new();
 		[SyncVar] public ushort v8;
 		[SyncRpc] private void f9() { }
 		[SyncVar] private byte v10;
 		[SyncVar] private int v12;
-		[SyncVar] private short v13;
+		[SyncObject(SyncType.Reliable)]
+		private ZTest_InnerObject v13 = new();
 		[SyncRpc] private void f14(int a, sbyte b) { }
-		[SyncVar] private int v15;
+		[SyncObject(SyncType.Reliable)]
+		private SyncList<UserId> v15 = new();
 
 		[SyncVar(SyncType.Unreliable)] public int uv0;
 		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, sbyte b) { }
@@ -88,7 +107,8 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc] public void f3(int a) { }
 		[SyncVar] public int v4;
 		[SyncVar] public int v5;
-		[SyncVar] public int v6;
+		[SyncObject(SyncType.Reliable)]
+		private SyncList<UserId> v6 = new();
 		[SyncVar] public int v7;
 		[SyncVar] private int v8;
 		[SyncVar] private int v9;
@@ -100,11 +120,13 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public int v16;
 		[SyncRpc] public void f17(int a) { }
 		[SyncVar] public int v18;
-		[SyncVar] public int v19;
+		[SyncObject(SyncType.Reliable)]
+		private ZTest_InnerObject v19 = new();
 		[SyncVar] public int v20;
 		[SyncVar] public int v21;
 		[SyncRpc] public void f22() { }
-		[SyncVar] public int v23;
+		[SyncObject(SyncType.Reliable)]
+		private SyncList<UserId> v23 = new();
 		[SyncRpc] public void f24(int a) { }
 		[SyncVar] public int v25;
 		[SyncVar] public int v26;
@@ -155,7 +177,7 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar]
 		private int _testInt;
 
-		[SyncRpc]
+		[SyncRpc(SyncType.ReliableTarget)]
 		public void Server_Rename(NetStringShort newName) { }
 	}
 

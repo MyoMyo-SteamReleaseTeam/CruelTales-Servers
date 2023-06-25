@@ -19,7 +19,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_members = members;
 			_syncType = syncType;
 			_dirtyIndex = dirtyIndex;
-			_hasTargetMember = members.FirstOrDefault((m) => m is TargetFunctionMemberToken) != null;
+			_hasTargetMember |= members.Any((m) =>
+			{
+				if (m is TargetFunctionMemberToken)
+					return true;
+				else  if (m is SyncObjectMemberToken)
+				{
+					if (m.TypeName.Contains(NameTable.SyncList))
+						return false;
+
+					if (!SynchronizerGenerator.TryGetSyncObjectByTypeName(m.TypeName, out var syncObjectInfo) ||
+						syncObjectInfo == null)
+					{
+						throw new System.Exception();
+					}
+
+					return syncObjectInfo.HasTarget;
+				}
+
+				return false;
+			});
 		}
 
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
@@ -30,6 +49,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 			foreach (var m in _members)
 				sb.AppendLine(m.Master_CheckDirty(_syncType));
+			return sb.ToString();
+		}
+
+		public string Master_MarkObjectDirtyBit(string dirtyBitName)
+		{
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < _members.Count; i++)
+			{
+				if (_members[i] is not SyncObjectMemberToken token)
+					continue;
+
+				sb.AppendLine(string.Format(SyncGroupFormat.SetDirtyBit, dirtyBitName, i, token.Master_IsDirty(_syncType)));
+			}
+
 			return sb.ToString();
 		}
 
@@ -83,7 +116,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Remote_IgnoreMembers(SyncType syncType, bool readDirtyBit = true)
+		public string Remote_IgnoreMembers(SyncType syncType, bool isStatic, bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -93,7 +126,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 			foreach (var m in _members)
 			{
-				string content = m.Remote_IgnoreDeserialize(syncType);
+				string content = m.Remote_IgnoreDeserialize(syncType, isStatic);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetTempName(), index++, content));
 			}

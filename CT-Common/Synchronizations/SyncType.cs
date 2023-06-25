@@ -45,4 +45,27 @@
 		/// </summary>
 		ColdData,
 	}
+
+	public static class SyncTypeExtension
+	{
+		public static bool IsReliable(this SyncType syncType)
+		{
+			return syncType == SyncType.Reliable ||
+				   syncType == SyncType.ReliableTarget ||
+				   syncType == SyncType.ReliableOrUnreliable;
+		}
+
+		public static bool IsUnreliable(this SyncType syncType)
+		{
+			return syncType == SyncType.Unreliable ||
+				   syncType == SyncType.UnreliableTarget ||
+				   syncType == SyncType.ReliableOrUnreliable;
+		}
+
+		public static bool IsTarget(this SyncType syncType)
+		{
+			return syncType == SyncType.ReliableTarget ||
+				   syncType == SyncType.UnreliableTarget;
+		}
+	}
 }

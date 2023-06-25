@@ -12,6 +12,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		protected string _typeName;
 		protected string _privateMemberName;
 		protected string _publicMemberName;
+		public string TypeName => _typeName;
+		public string PrivateMemberName => _privateMemberName;
+		public string PublicMemberName => _publicMemberName;
 
 		public BaseMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
 		{
@@ -24,7 +27,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		}
 
 		// Master Side
-		public abstract string Master_InitializeProperty();
+		public abstract string Master_InitializeProperty(SyncDirection direction);
 		public abstract string Master_Declaration(SyncDirection direction);
 		public abstract string Master_GetterSetter(string dirtyBitname, int memberIndex);
 		public abstract string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int index);
@@ -32,9 +35,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public abstract string Master_ClearDirty(SyncType syncType); // Object Only
 
 		// Remote Side
-		public abstract string Remote_InitializeProperty();
+		public abstract string Remote_InitializeProperty(SyncDirection direction);
 		public abstract string Remote_Declaration(SyncDirection direction);
 		public abstract string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction);
-		public abstract string Remote_IgnoreDeserialize(SyncType syncType);
+		public abstract string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic);
 	}
 }

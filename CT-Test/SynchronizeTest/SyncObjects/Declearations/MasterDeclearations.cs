@@ -1,4 +1,6 @@
 ﻿using System;
+using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -14,11 +16,20 @@ namespace CTS.Instance.SyncObjects
 
 	}
 
+	public partial class ZTest_SyncCollection : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+
+		public SyncList<UserId> UserIdList => _userIdList;
+	}
+
 	public partial class ZTest_Value8 : MasterNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
-		public override VisibilityAuthority VisibilityAuthority => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
 		public void Call_uf5(NetworkPlayer player)
 		{
@@ -30,19 +41,14 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
-		public override VisibilityAuthority VisibilityAuthority => throw new NotImplementedException();
-
-		public void SetV13(short value)
-		{
-			V13 = value;
-		}
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value32 : MasterNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
-		public override VisibilityAuthority VisibilityAuthority => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
 		public void CallF28(int value) => f28(value);
 	}

@@ -17,6 +17,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static string NetworkPlayerTypeName => "NetworkPlayer";
 		public static string NetworkPlayerParameter => $"{NetworkPlayerTypeName} {NetworkPlayerParameterName}";
 		public static string SerializeTargetName => "Target";
+		public static string SyncList => "SyncList";
+
+		/// <summary>Master 혹은 Remote 문자열을 SyncDirection 로 반환받습니다.</summary>
+		public static string GetDirectionStringBy(SyncDirection direction)
+		{
+			if (direction == SyncDirection.FromMaster)
+			{
+				return "Master";
+			}
+			else if (direction == SyncDirection.FromRemote)
+			{
+				return "Remote";
+			}
+			else
+			{
+				return "NONE";
+			}
+		}
 	}
 
 	public static class ObjectPoolFormat
@@ -70,6 +88,7 @@ using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -82,6 +101,7 @@ using CTS.Instance.SyncObjects;";
 using System.Collections.Generic;
 using CT.Common.Gameplay;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -94,6 +114,7 @@ using UnityEngine;
 @"using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -710,6 +731,27 @@ public event Action<{1}>? On{3}Changed;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string WriteSyncObjectWithPlayer => @"{0}.SerializeSync{1}(player, writer);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// {2} Dirty bit name<br/>
+		/// {1} Dirty bit index<br/>
+		/// </summary>
+		public static string WriteSyncObjectWithPlayerAndRollback =>
+@"int curSize = writer.Size;
+{0}.SerializeSync{1}(player, writer);
+if (writer.Size == curSize)
+{{
+	{2}[{3}] = false;
+}}
+";
+
+		/// <summary>
+		/// {0} Private member name<br/>
 		/// {1} CLR type name<br/>
 		/// </summary>
 		public static string ReadEmbededTypeProperty => @"if (!reader.TryRead{1}(out {0})) return false;";
@@ -732,7 +774,13 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} Read function name<br/>
 		/// </summary>
-		public static string ReadSyncObject => @"if (!{0}.Deserialize{1}(reader)) return false;";
+		public static string ReadSyncObject => @"if (!{0}.TryDeserializeSync{1}(reader)) return false;";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Read function name<br/>
+		/// </summary>
+		public static string ReadSyncObjectEntire => @"if (!{0}.TryDeserializeEveryProperty(reader)) return false;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
@@ -742,8 +790,9 @@ public event Action<{1}>? On{3}Changed;";
 
 		/// <summary>
 		/// {0} Private member name<br/>
+		/// {1} Master or Remote<br/>
 		/// </summary>
-		public static string InitializeSyncObjectProperty => @"{0}.InitializeProperties();";
+		public static string InitializeSyncObjectProperty => @"{0}.Initialize{1}Properties();";
 
 		/// <summary>
 		/// {0} Public property name<br/>
@@ -761,6 +810,12 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Private member name<br/>
 		/// {1} SyncType<br/>
 		/// </summary>
+		public static string IsDirty => @"{0}.IsDirty{1}";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
 		public static string ClearDirty => @"{0}.ClearDirty{1}();";
 
 		/// <summary>
@@ -772,6 +827,12 @@ public event Action<{1}>? On{3}Changed;";
 		/// {0} Value type name<br/>
 		/// </summary>
 		public static string IgnoreValueType => @"{0}.IgnoreStatic(reader);";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} SyncType<br/>
+		/// </summary>
+		public static string IgnoreObjectTypeStatic => @"{0}.IgnoreSyncStatic{1}(reader);";
 
 		/// <summary>
 		/// {0} Private member name<br/>

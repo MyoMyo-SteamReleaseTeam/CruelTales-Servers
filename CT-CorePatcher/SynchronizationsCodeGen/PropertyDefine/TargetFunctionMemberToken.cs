@@ -18,7 +18,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_argGroup = new SyncArgumentGroup(args);
 		}
 
-		public override string Master_InitializeProperty()
+		public override string Master_InitializeProperty(SyncDirection direction)
 		{
 			return string.Empty;
 		}
@@ -69,7 +69,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(FuncMemberFormat.ClearCallStack, _functionName);
 		}
 
-		public override string Remote_InitializeProperty()
+		public override string Remote_InitializeProperty(SyncDirection direction)
 		{
 			return string.Empty;
 		}
@@ -120,7 +120,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _functionName, paramContent, callParameters);
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
 		{
 			if (_argGroup.Count == 0)
 				return FuncMemberFormat.IgnoreVoid;

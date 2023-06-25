@@ -95,7 +95,6 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			}
 
 			master.V0 = 99;
-			master.SetV13(99);
 
 			Sync(buffer, p1, master, remote);
 
@@ -106,7 +105,6 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			Assert.AreEqual(10, remote.v_uf9Count);
 
 			Assert.AreEqual(99, remote.V0);
-			Assert.AreEqual(99, remote.V13);
 
 			remote.ResetTestValue();
 			remote.InitializeRemoteProperties();
@@ -119,7 +117,6 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			Assert.AreEqual(30, remote.v_uf14int);
 
 			Assert.AreEqual(99, remote.V0);
-			Assert.AreEqual(99, remote.V13);
 		}
 
 		[TestMethod]
@@ -197,6 +194,45 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			Assert.AreEqual(99, remote.V0);
 			Assert.AreEqual(99, remote.V5);
 			Assert.AreEqual(99, remote.Uv10);
+		}
+
+		[TestMethod]
+		public void TestSyncCollection()
+		{
+			int testCount = 10;
+
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
+			NetworkPlayer p1 = new(new UserId(1));
+
+			CTS.Instance.SyncObjects.ZTest_SyncCollection master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_SyncCollection remote = new();
+
+			Assert.AreEqual(0, master.UserIdList.Count);
+			Assert.AreEqual(0, remote.UserIdList.Count);
+
+			for (int i = 0; i < testCount; i++)
+			{
+				Assert.AreEqual(i, master.UserIdList.Count);
+				master.UserIdList.Add(new UserId((ulong)(i * 10)));
+			}
+
+			Assert.AreEqual(testCount, master.UserIdList.Count);
+			Assert.AreEqual(0, remote.UserIdList.Count);
+
+			Assert.IsTrue(master.IsDirtyReliable);
+			master.SerializeSyncReliable(p1, buffer);
+
+			Sync(buffer, p1, master, remote);
+
+			Assert.AreEqual(testCount, master.UserIdList.Count);
+			Assert.AreEqual(testCount, remote.UserIdList.Count);
+
+			for (int i = 0; i < testCount; i++)
+			{
+				ulong value = (ulong)(i * 10);
+				Assert.AreEqual(value, master.UserIdList[i].Id);
+				Assert.AreEqual(value, remote.UserIdList[i].Id);
+			}
 		}
 
 		public void Sync(ByteBuffer buffer,

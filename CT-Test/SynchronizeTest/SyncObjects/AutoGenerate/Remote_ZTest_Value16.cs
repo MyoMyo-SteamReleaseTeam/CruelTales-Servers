@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -43,14 +44,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private NetStringShort _v5 = new();
 		public NetStringShort V5 => _v5;
 		public event Action<NetStringShort>? OnV5Changed;
-		[SyncVar]
-		private byte _v6;
-		public byte V6 => _v6;
-		public event Action<byte>? OnV6Changed;
-		[SyncVar]
-		private int _v7;
-		public int V7 => _v7;
-		public event Action<int>? OnV7Changed;
+		[SyncObject]
+		private SyncList<UserId> _v6 = new();
+		public event Action<SyncList<UserId>>? OnV6Changed;
+		[SyncObject]
+		private ZTest_InnerObject _v7 = new();
+		public event Action<ZTest_InnerObject>? OnV7Changed;
 		[SyncVar]
 		private ushort _v8;
 		public ushort V8 => _v8;
@@ -61,12 +60,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _v12;
 		public event Action<int>? OnV12Changed;
-		[SyncVar]
-		private short _v13;
-		public event Action<short>? OnV13Changed;
-		[SyncVar]
-		private int _v15;
-		public event Action<int>? OnV15Changed;
+		[SyncObject]
+		private ZTest_InnerObject _v13 = new();
+		public event Action<ZTest_InnerObject>? OnV13Changed;
+		[SyncObject]
+		private SyncList<UserId> _v15 = new();
+		public event Action<SyncList<UserId>>? OnV15Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
 		public int Uv0 => _uv0;
@@ -162,12 +161,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					if (!reader.TryReadByte(out _v6)) return false;
+					if (!_v6.TryDeserializeSyncReliable(reader)) return false;
 					OnV6Changed?.Invoke(_v6);
 				}
 				if (dirtyReliable_0[6])
 				{
-					if (!reader.TryReadInt32(out _v7)) return false;
+					if (!_v7.TryDeserializeSyncReliable(reader)) return false;
 					OnV7Changed?.Invoke(_v7);
 				}
 				if (dirtyReliable_0[7])
@@ -191,12 +190,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[2])
 				{
-					if (!reader.TryReadInt16(out _v13)) return false;
+					if (!_v13.TryDeserializeSyncReliable(reader)) return false;
 					OnV13Changed?.Invoke(_v13);
 				}
 				if (dirtyReliable_1[3])
 				{
-					if (!reader.TryReadInt32(out _v15)) return false;
+					if (!_v15.TryDeserializeSyncReliable(reader)) return false;
 					OnV15Changed?.Invoke(_v15);
 				}
 				if (dirtyReliable_1[4])
@@ -347,9 +346,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV4Changed?.Invoke(_v4);
 			if (!_v5.TryDeserialize(reader)) return false;
 			OnV5Changed?.Invoke(_v5);
-			if (!reader.TryReadByte(out _v6)) return false;
+			if (!_v6.TryDeserializeEveryProperty(reader)) return false;
 			OnV6Changed?.Invoke(_v6);
-			if (!reader.TryReadInt32(out _v7)) return false;
+			if (!_v7.TryDeserializeEveryProperty(reader)) return false;
 			OnV7Changed?.Invoke(_v7);
 			if (!reader.TryReadUInt16(out _v8)) return false;
 			OnV8Changed?.Invoke(_v8);
@@ -357,9 +356,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV10Changed?.Invoke(_v10);
 			if (!reader.TryReadInt32(out _v12)) return false;
 			OnV12Changed?.Invoke(_v12);
-			if (!reader.TryReadInt16(out _v13)) return false;
+			if (!_v13.TryDeserializeEveryProperty(reader)) return false;
 			OnV13Changed?.Invoke(_v13);
-			if (!reader.TryReadInt32(out _v15)) return false;
+			if (!_v15.TryDeserializeEveryProperty(reader)) return false;
 			OnV15Changed?.Invoke(_v15);
 			if (!reader.TryReadInt32(out _uv0)) return false;
 			OnUv0Changed?.Invoke(_uv0);
@@ -392,13 +391,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_v2 = 0;
 			_v4 = new();
 			_v5 = new();
-			_v6 = 0;
-			_v7 = 0;
+			_v6.InitializeRemoteProperties();
+			_v7.InitializeRemoteProperties();
 			_v8 = 0;
 			_v10 = 0;
 			_v12 = 0;
-			_v13 = 0;
-			_v15 = 0;
+			_v13.InitializeRemoteProperties();
+			_v15.InitializeRemoteProperties();
 			_uv0 = 0;
 			_uv2 = 0;
 			_uv4 = 0;
@@ -438,11 +437,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					reader.Ignore(1);
+					_v6.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_0[6])
 				{
-					reader.Ignore(4);
+					_v7.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_0[7])
 				{
@@ -462,11 +461,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[2])
 				{
-					reader.Ignore(2);
+					_v13.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_1[3])
 				{
-					reader.Ignore(4);
+					_v15.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_1[4])
 				{
@@ -518,11 +517,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					reader.Ignore(1);
+					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_0[6])
 				{
-					reader.Ignore(4);
+					ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_0[7])
 				{
@@ -542,11 +541,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[2])
 				{
-					reader.Ignore(2);
+					ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_1[3])
 				{
-					reader.Ignore(4);
+					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_1[4])
 				{

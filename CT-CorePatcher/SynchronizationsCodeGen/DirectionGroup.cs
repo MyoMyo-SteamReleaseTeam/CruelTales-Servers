@@ -116,11 +116,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll());
 			sb.AppendLine(_entireGroup.Remote_InitilaizeProperties());
 
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclaration, isStatic: false));
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic, isStatic: true));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(isStatic: false));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(isStatic: true));
 
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclaration, isStatic: false));
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic, isStatic: true));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(isStatic: false));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(isStatic: true));
 			return sb.ToString();
 		}
 	}

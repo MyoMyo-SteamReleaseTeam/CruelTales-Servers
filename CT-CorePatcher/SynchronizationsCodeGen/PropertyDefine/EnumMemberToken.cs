@@ -18,7 +18,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_clrEnumSizeTypeName = clrEnumSizeTypeName;
 		}
 
-		public override string Master_InitializeProperty()
+		public override string Master_InitializeProperty(SyncDirection direction)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
 		}
@@ -44,7 +44,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
-		public override string Remote_InitializeProperty()
+		public override string Remote_InitializeProperty(SyncDirection direction)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
 		}
@@ -65,7 +65,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return sb.ToString();
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
 		{
 			return string.Format(MemberFormat.IgnorePrimitive,
 								 ReflectionHelper.GetByteSizeByTypeName(_enumSizeTypeName));

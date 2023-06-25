@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
@@ -51,6 +52,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public const string SYNC_REMOTE_PATH = "syncRemotePath";
 		public const string MASTER_POOL_PATH = "masterPoolPath";
 
+		private static Dictionary<string, SyncObjectInfo> _syncObjectByName = new();
+
+		public static bool TryGetSyncObjectByTypeName(string typeName, out SyncObjectInfo? syncObjectInfo)
+		{
+			return _syncObjectByName.TryGetValue(typeName, out syncObjectInfo);
+		}
+
 		public void GenerateCode(string[] args)
 		{
 			StringArgumentArray masterTargetPathList = new();
@@ -66,7 +74,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				return;
 			}
 
-			var syncObjects = parseAssemblys();
+			List<SyncObjectInfo> syncObjects = parseAssemblys();
+			foreach (var syncObj in syncObjects)
+			{
+				_syncObjectByName.Add(syncObj.ObjectName, syncObj);
+			}
+
+			foreach (var syncObj in syncObjects)
+			{
+				syncObj.CheckValidation();
+				syncObj.InitializeSyncGroup();
+			}
 
 			List<GenOperation> operations = new();
 
@@ -79,6 +97,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 #pragma warning restore CA1416 // Validate platform compatibility
 
+			// Create network object synchronize code
 			foreach (var syncObj in syncObjects)
 			{
 				string masterFileName = CommonFormat.MasterPrefix + syncObj.ObjectName;
@@ -281,8 +300,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					remoteMembers.AddRange(remoteFuncMembers);
 				}
 
-				syncObjects.Add(new(t.Name, masterMembers, remoteMembers,
-									isNetworkObject, capacity, multiplyByMaxUser, isDebugObject));
+				SyncObjectInfo objectInfo = new(t.Name, masterMembers, remoteMembers,
+												isNetworkObject, capacity, multiplyByMaxUser, isDebugObject);
+				objectInfo.HasReliable = masterMembers.Any((m) => m.SyncType.IsReliable());
+				objectInfo.HasUnreliable = masterMembers.Any((m) => m.SyncType.IsUnreliable());
+				objectInfo.HasTarget = masterMembers.Any((m) => m.SyncType.IsTarget());
+				syncObjects.Add(objectInfo);
 			}
 
 			return syncObjects;
@@ -424,6 +447,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				member.Member = new ValueTypeMemberToken(syncType, typeName, memberName, isPublic);
 			}
+			else
+			{
+				throw new NotSupportedException($"Undefined field type : {fieldInfo.FieldType}");
+			}
 
 			return member;
 		}
@@ -435,7 +462,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string memberName = fieldInfo.Name;
 			MemberToken member = new();
 			member.SyncType = syncType;
-			member.Member = new SyncObjectMemberToken(syncType, typeName, memberName, isPublic);
+			bool isCollection = false;
+
+			if (fieldInfo.FieldType.IsGenericType && typeName.Contains(NameTable.SyncList))
+			{
+				var genericTypeName = fieldInfo.FieldType.GenericTypeArguments[0].Name;
+				typeName = $"{NameTable.SyncList}<{genericTypeName}>";
+				isCollection = true;
+			}
+
+			member.Member = new SyncObjectMemberToken(syncType, typeName, memberName, isPublic, isCollection);
 			return member;
 		}
 

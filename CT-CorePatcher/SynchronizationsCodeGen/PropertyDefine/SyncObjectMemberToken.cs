@@ -6,19 +6,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	public class SyncObjectMemberToken : BaseMemberToken
 	{
 		public override bool ShouldRollBackMask => false;
+		private bool _isCollection = false;
 
-		public SyncObjectMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
+		public SyncObjectMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic, bool isCollection)
 			: base(syncType, typeName, memberName, isPublic)
 		{
+			_isCollection = isCollection;
 			_syncType = syncType;
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
 		}
 
-		public override string Master_InitializeProperty()
+		public override string Master_InitializeProperty(SyncDirection direction)
 		{
-			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName);
+			string dirStr = NameTable.GetDirectionStringBy(direction);
+			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName, dirStr);
 		}
 
 		public override string Master_Declaration(SyncDirection direction)
@@ -38,7 +41,33 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 									 _privateMemberName,
 									 SyncGroupFormat.EntireFunctionSuffix);
 			}
-			return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
+
+			if (_isCollection)
+			{
+				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
+			}
+
+			SynchronizerGenerator.TryGetSyncObjectByTypeName(TypeName, out var syncObj);
+			if (syncObj == null)
+			{
+				throw new System.Exception($"There is no such sync object type : {TypeName}");
+			}
+
+			if (syncObj.HasTarget)
+			{
+				return string.Format(MemberFormat.WriteSyncObjectWithPlayerAndRollback,
+									 _privateMemberName, syncType,
+									 dirtyBitname, dirtyBitIndex);
+			}
+			else
+			{
+				return string.Format(MemberFormat.WriteSyncObjectWithPlayer, _privateMemberName, syncType);
+			}
+		}
+
+		public string Master_IsDirty(SyncType syncType)
+		{
+			return string.Format(MemberFormat.IsDirty, _privateMemberName, syncType);
 		}
 
 		public override string Master_CheckDirty(SyncType syncType)
@@ -51,9 +80,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.ClearDirty, _privateMemberName, syncType);
 		}
 
-		public override string Remote_InitializeProperty()
+		public override string Remote_InitializeProperty(SyncDirection direction)
 		{
-			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName);
+			string dirStr = NameTable.GetDirectionStringBy(direction);
+			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName, dirStr);
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)
@@ -61,20 +91,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
-								 _publicMemberName, string.Empty, AccessModifier);
+								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, syncType));
+			if (syncType == SyncType.None)
+				sb.AppendLine(string.Format(MemberFormat.ReadSyncObjectEntire, _privateMemberName));
+			else
+				sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, syncType));
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
 		{
-			return string.Format(MemberFormat.IgnoreObjectType, _privateMemberName, syncType);
+			if (isStatic)
+				return string.Format(MemberFormat.IgnoreObjectTypeStatic, _typeName, syncType);
+			else
+				return string.Format(MemberFormat.IgnoreObjectType, _privateMemberName, syncType);
 		}
 	}
 }

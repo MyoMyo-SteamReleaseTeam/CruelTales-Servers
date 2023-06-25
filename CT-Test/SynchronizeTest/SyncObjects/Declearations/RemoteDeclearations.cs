@@ -92,6 +92,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 	}
 
+	public partial class ZTest_SyncCollection : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+	}
+
 	public partial class ZTest_Value8 : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
@@ -126,8 +131,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 	public partial class ZTest_Value16 : RemoteNetworkObject
 	{
-		public short V13 => _v13;
-
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
 		public int v_f3 = 0;

@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -43,10 +44,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v5;
 		public int V5 => _v5;
 		public event Action<int>? OnV5Changed;
-		[SyncVar]
-		private int _v6;
-		public int V6 => _v6;
-		public event Action<int>? OnV6Changed;
+		[SyncObject]
+		private SyncList<UserId> _v6 = new();
+		public event Action<SyncList<UserId>>? OnV6Changed;
 		[SyncVar]
 		private int _v7;
 		public int V7 => _v7;
@@ -78,10 +78,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v18;
 		public int V18 => _v18;
 		public event Action<int>? OnV18Changed;
-		[SyncVar]
-		private int _v19;
-		public int V19 => _v19;
-		public event Action<int>? OnV19Changed;
+		[SyncObject]
+		private ZTest_InnerObject _v19 = new();
+		public event Action<ZTest_InnerObject>? OnV19Changed;
 		[SyncVar]
 		private int _v20;
 		public int V20 => _v20;
@@ -90,10 +89,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v21;
 		public int V21 => _v21;
 		public event Action<int>? OnV21Changed;
-		[SyncVar]
-		private int _v23;
-		public int V23 => _v23;
-		public event Action<int>? OnV23Changed;
+		[SyncObject]
+		private SyncList<UserId> _v23 = new();
+		public event Action<SyncList<UserId>>? OnV23Changed;
 		[SyncVar]
 		private int _v25;
 		public int V25 => _v25;
@@ -275,7 +273,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					if (!reader.TryReadInt32(out _v6)) return false;
+					if (!_v6.TryDeserializeSyncReliable(reader)) return false;
 					OnV6Changed?.Invoke(_v6);
 				}
 				if (dirtyReliable_0[6])
@@ -329,7 +327,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[7])
 				{
-					if (!reader.TryReadInt32(out _v19)) return false;
+					if (!_v19.TryDeserializeSyncReliable(reader)) return false;
 					OnV19Changed?.Invoke(_v19);
 				}
 			}
@@ -348,7 +346,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_2[2])
 				{
-					if (!reader.TryReadInt32(out _v23)) return false;
+					if (!_v23.TryDeserializeSyncReliable(reader)) return false;
 					OnV23Changed?.Invoke(_v23);
 				}
 				if (dirtyReliable_2[3])
@@ -671,7 +669,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV4Changed?.Invoke(_v4);
 			if (!reader.TryReadInt32(out _v5)) return false;
 			OnV5Changed?.Invoke(_v5);
-			if (!reader.TryReadInt32(out _v6)) return false;
+			if (!_v6.TryDeserializeEveryProperty(reader)) return false;
 			OnV6Changed?.Invoke(_v6);
 			if (!reader.TryReadInt32(out _v7)) return false;
 			OnV7Changed?.Invoke(_v7);
@@ -691,13 +689,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV16Changed?.Invoke(_v16);
 			if (!reader.TryReadInt32(out _v18)) return false;
 			OnV18Changed?.Invoke(_v18);
-			if (!reader.TryReadInt32(out _v19)) return false;
+			if (!_v19.TryDeserializeEveryProperty(reader)) return false;
 			OnV19Changed?.Invoke(_v19);
 			if (!reader.TryReadInt32(out _v20)) return false;
 			OnV20Changed?.Invoke(_v20);
 			if (!reader.TryReadInt32(out _v21)) return false;
 			OnV21Changed?.Invoke(_v21);
-			if (!reader.TryReadInt32(out _v23)) return false;
+			if (!_v23.TryDeserializeEveryProperty(reader)) return false;
 			OnV23Changed?.Invoke(_v23);
 			if (!reader.TryReadInt32(out _v25)) return false;
 			OnV25Changed?.Invoke(_v25);
@@ -770,7 +768,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_v2 = 0;
 			_v4 = 0;
 			_v5 = 0;
-			_v6 = 0;
+			_v6.InitializeRemoteProperties();
 			_v7 = 0;
 			_v8 = 0;
 			_v9 = 0;
@@ -780,10 +778,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_v15 = 0;
 			_v16 = 0;
 			_v18 = 0;
-			_v19 = 0;
+			_v19.InitializeRemoteProperties();
 			_v20 = 0;
 			_v21 = 0;
-			_v23 = 0;
+			_v23.InitializeRemoteProperties();
 			_v25 = 0;
 			_v26 = 0;
 			_v27 = 0;
@@ -844,7 +842,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					reader.Ignore(4);
+					_v6.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_0[6])
 				{
@@ -888,7 +886,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[7])
 				{
-					reader.Ignore(4);
+					_v19.IgnoreSyncReliable(reader);
 				}
 			}
 			if (masterDirty[2])
@@ -904,7 +902,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_2[2])
 				{
-					reader.Ignore(4);
+					_v23.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_2[3])
 				{
@@ -1008,7 +1006,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[5])
 				{
-					reader.Ignore(4);
+					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_0[6])
 				{
@@ -1052,7 +1050,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[7])
 				{
-					reader.Ignore(4);
+					ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
 				}
 			}
 			if (masterDirty[2])
@@ -1068,7 +1066,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_2[2])
 				{
-					reader.Ignore(4);
+					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_2[3])
 				{

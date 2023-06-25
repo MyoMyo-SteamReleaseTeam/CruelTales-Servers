@@ -50,7 +50,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			_hasAnyTargetMember = false;
 			foreach (var dirtyGroup in _dirtyGroups)
+			{
 				_hasAnyTargetMember |= dirtyGroup.HasTargetMember;
+			}
 		}
 
 		public string Master_BitmaskDeclarations()
@@ -131,6 +133,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string dirtyBitName = dirtyGroup.GetName();
 			string tempDirtyBitName = dirtyGroup.GetTempName();
 
+			contents.AppendLine(dirtyGroup.Master_MarkObjectDirtyBit(dirtyBitName));
+
 			if (_hasAnyTargetMember)
 				contents.AppendLine(string.Format(DirtyGroupFormat.JumpSerializeDirtyMask, dirtyBitName, tempDirtyBitName));
 			else
@@ -156,6 +160,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				var dirtyGroup = _dirtyGroups[i];
 				string dirtyBitName = dirtyGroup.GetName();
 				string tempDirtyBitName = dirtyGroup.GetTempName();
+
+				contents.AppendLine(dirtyGroup.Master_MarkObjectDirtyBit(dirtyBitName));
 
 				if (dirtyGroup.HasTargetMember)
 					contents.AppendLine(string.Format(DirtyGroupFormat.JumpSerializeDirtyMask, dirtyBitName, tempDirtyBitName));
@@ -186,6 +192,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
 				var dirtyGroup = _dirtyGroups[i];
+				headers.AppendLine(dirtyGroup.Master_MarkObjectDirtyBit(dirtyGroup.GetName()));
 				headers.AppendLine(string.Format(SyncGroupFormat.MasterDirtyAnyTrue, i, dirtyGroup.GetName()));
 			}
 
@@ -353,18 +360,18 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return headers.ToString();
 		}
 
-		public string Remote_IgnoreSync(string delcaration, bool isStatic)
+		public string Remote_IgnoreSync(bool isStatic)
 		{
 			StringBuilder sb = new StringBuilder();
 
+			string delcaration = isStatic ?
+				SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic :
+				SyncGroupFormat.IgnoreSyncFunctionDeclaration;
+
 			if (isStatic)
-			{
 				sb.Append(string.Format(delcaration, _syncType));
-			}
 			else
-			{
 				sb.Append(string.Format(delcaration, _modifier, _syncType));
-			}
 
 			if (_dirtyGroups.Count == 0)
 			{
@@ -373,17 +380,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			string content;
 			if (_dirtyGroups.Count == 1)
-			{
-				content = remote_IgnoreSyncOneDirtyGroup();
-			}
+				content = remote_IgnoreSyncOneDirtyGroup(isStatic);
 			else if (_dirtyGroups.Count == 2)
-			{
-				content = remote_IgnoreSyncTwoDirtyGroup();
-			}
+				content = remote_IgnoreSyncTwoDirtyGroup(isStatic);
 			else
-			{
-				content = remote_IgnoreSyncMultipleDirtyGroup();
-			}
+				content = remote_IgnoreSyncMultipleDirtyGroup(isStatic);
 
 			CodeFormat.AddIndent(ref content);
 
@@ -394,26 +395,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		private string remote_IgnoreSyncOneDirtyGroup()
+		private string remote_IgnoreSyncOneDirtyGroup(bool isStatic)
 		{
-			return _dirtyGroups[0].Remote_IgnoreMembers(_syncType);
+			return _dirtyGroups[0].Remote_IgnoreMembers(_syncType, isStatic);
 		}
 
-		private string remote_IgnoreSyncTwoDirtyGroup()
+		private string remote_IgnoreSyncTwoDirtyGroup(bool isStatic)
 		{
 			StringBuilder sb = new();
 			for (int i = 0; i < 2; i++)
 			{
 				var group = _dirtyGroups[i];
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, group.GetTempName()));
-				string content = group.Remote_IgnoreMembers(_syncType, false);
+				string content = group.Remote_IgnoreMembers(_syncType, isStatic, readDirtyBit: false);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirtyAny, group.GetTempName(), content));
 			}
 			return sb.ToString();
 		}
 
-		private string remote_IgnoreSyncMultipleDirtyGroup()
+		private string remote_IgnoreSyncMultipleDirtyGroup(bool isStatic)
 		{
 			StringBuilder headers = new();
 			headers.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize,
@@ -422,7 +423,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder contents = new();
 			for (int i = 0; i < _dirtyGroups.Count; i++)
 			{
-				string content = _dirtyGroups[i].Remote_IgnoreMembers(_syncType);
+				string content = _dirtyGroups[i].Remote_IgnoreMembers(_syncType, isStatic);
 				CodeFormat.AddIndent(ref content);
 				contents.AppendLine(string.Format(CommonFormat.IfDirty, SyncGroupFormat.MasterDirtyBitName, i, content));
 			}

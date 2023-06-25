@@ -11,7 +11,9 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using CT.Common.Gameplay;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -34,20 +36,20 @@ namespace CTS.Instance.SyncObjects
 		private NetString _v4 = new();
 		[SyncVar]
 		private NetStringShort _v5 = new();
-		[SyncVar]
-		private byte _v6;
-		[SyncVar]
-		private int _v7;
+		[SyncObject]
+		private SyncList<UserId> _v6 = new();
+		[SyncObject]
+		private ZTest_InnerObject _v7 = new();
 		[SyncVar]
 		private ushort _v8;
 		[SyncVar]
 		private byte _v10;
 		[SyncVar]
 		private int _v12;
-		[SyncVar]
-		private short _v13;
-		[SyncVar]
-		private int _v15;
+		[SyncObject]
+		private ZTest_InnerObject _v13 = new();
+		[SyncObject]
+		private SyncList<UserId> _v15 = new();
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
 		[SyncVar(SyncType.Unreliable)]
@@ -93,7 +95,11 @@ namespace CTS.Instance.SyncObjects
 			get
 			{
 				bool isDirty = false;
+				isDirty |= _v6.IsDirtyReliable;
+				isDirty |= _v7.IsDirtyReliable;
 				isDirty |= _dirtyReliable_0.AnyTrue();
+				isDirty |= _v13.IsDirtyReliable;
+				isDirty |= _v15.IsDirtyReliable;
 				isDirty |= _dirtyReliable_1.AnyTrue();
 				return isDirty;
 			}
@@ -158,26 +164,6 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[4] = true;
 			}
 		}
-		public byte V6
-		{
-			get => _v6;
-			set
-			{
-				if (_v6 == value) return;
-				_v6 = value;
-				_dirtyReliable_0[5] = true;
-			}
-		}
-		public int V7
-		{
-			get => _v7;
-			set
-			{
-				if (_v7 == value) return;
-				_v7 = value;
-				_dirtyReliable_0[6] = true;
-			}
-		}
 		public ushort V8
 		{
 			get => _v8;
@@ -206,26 +192,6 @@ namespace CTS.Instance.SyncObjects
 				if (_v12 == value) return;
 				_v12 = value;
 				_dirtyReliable_1[1] = true;
-			}
-		}
-		private short V13
-		{
-			get => _v13;
-			set
-			{
-				if (_v13 == value) return;
-				_v13 = value;
-				_dirtyReliable_1[2] = true;
-			}
-		}
-		private int V15
-		{
-			get => _v15;
-			set
-			{
-				if (_v15 == value) return;
-				_v15 = value;
-				_dirtyReliable_1[3] = true;
 			}
 		}
 		public partial void f3(int a)
@@ -383,7 +349,11 @@ namespace CTS.Instance.SyncObjects
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
+			_v6.ClearDirtyReliable();
+			_v7.ClearDirtyReliable();
 			_dirtyReliable_1.Clear();
+			_v13.ClearDirtyReliable();
+			_v15.ClearDirtyReliable();
 			f3Callstack.Clear();
 			f9CallstackCount = 0;
 			f14Callstack.Clear();
@@ -399,7 +369,11 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			int originSize = writer.Size;
+			_dirtyReliable_0[5] = _v6.IsDirtyReliable;
+			_dirtyReliable_0[6] = _v7.IsDirtyReliable;
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0.AnyTrue())
 			{
 				if (_dirtyReliable_0[0])
@@ -424,18 +398,27 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_0[5])
 				{
-					writer.Put(_v6);
+					_v6.SerializeSyncReliable(writer);
 				}
 				if (_dirtyReliable_0[6])
 				{
-					writer.Put(_v7);
+					int curSize = writer.Size;
+					_v7.SerializeSyncReliable(player, writer);
+					if (writer.Size == curSize)
+					{
+						dirtyReliable_0[6] = false;
+					}
 				}
 				if (_dirtyReliable_0[7])
 				{
 					writer.Put(_v8);
 				}
 			}
-			_dirtyReliable_1.Serialize(writer);
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1[2] = _v13.IsDirtyReliable;
+			_dirtyReliable_1[3] = _v15.IsDirtyReliable;
+			BitmaskByte dirtyReliable_1 = _dirtyReliable_1;
+			int dirtyReliable_1_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_1.AnyTrue())
 			{
 				if (_dirtyReliable_1[0])
@@ -448,11 +431,16 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_1[2])
 				{
-					writer.Put(_v13);
+					int curSize = writer.Size;
+					_v13.SerializeSyncReliable(player, writer);
+					if (writer.Size == curSize)
+					{
+						dirtyReliable_1[2] = false;
+					}
 				}
 				if (_dirtyReliable_1[3])
 				{
-					writer.Put(_v15);
+					_v15.SerializeSyncReliable(writer);
 				}
 				if (_dirtyReliable_1[4])
 				{
@@ -479,6 +467,11 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.b);
 					}
 				}
+			}
+			writer.PutTo(dirtyReliable_1, dirtyReliable_1_pos);
+			if (writer.Size == originSize + 2)
+			{
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer)
@@ -619,13 +612,13 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_v2);
 			_v4.Serialize(writer);
 			_v5.Serialize(writer);
-			writer.Put(_v6);
-			writer.Put(_v7);
+			_v6.SerializeEveryProperty(writer);
+			_v7.SerializeEveryProperty(writer);
 			writer.Put(_v8);
 			writer.Put(_v10);
 			writer.Put(_v12);
-			writer.Put(_v13);
-			writer.Put(_v15);
+			_v13.SerializeEveryProperty(writer);
+			_v15.SerializeEveryProperty(writer);
 			writer.Put(_uv0);
 			writer.Put(_uv2);
 			writer.Put(_uv4);
@@ -645,13 +638,13 @@ namespace CTS.Instance.SyncObjects
 			_v2 = 0;
 			_v4 = new();
 			_v5 = new();
-			_v6 = 0;
-			_v7 = 0;
+			_v6.InitializeMasterProperties();
+			_v7.InitializeMasterProperties();
 			_v8 = 0;
 			_v10 = 0;
 			_v12 = 0;
-			_v13 = 0;
-			_v15 = 0;
+			_v13.InitializeMasterProperties();
+			_v15.InitializeMasterProperties();
 			_uv0 = 0;
 			_uv2 = 0;
 			_uv4 = 0;

@@ -67,7 +67,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Master_InitializeProperty());
+				contents.AppendLine(m.Master_InitializeProperty(_direction));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -146,7 +146,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Remote_InitializeProperty());
+				contents.AppendLine(m.Remote_InitializeProperty(_direction));
 			}
 			CodeFormat.AddIndent(contents);
 

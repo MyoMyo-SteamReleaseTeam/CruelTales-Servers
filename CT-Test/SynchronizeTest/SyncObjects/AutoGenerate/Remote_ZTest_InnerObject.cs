@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -26,7 +27,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _testInt;
 		public event Action<int>? OnTestIntChanged;
-		[SyncRpc]
+		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_Rename(NetStringShort newName);
 		public bool IsDirtyReliable => false;
 		public bool IsDirtyUnreliable => false;

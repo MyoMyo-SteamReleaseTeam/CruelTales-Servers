@@ -11,7 +11,9 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using CT.Common.Gameplay;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -26,8 +28,8 @@ namespace CTS.Instance.SyncObjects
 	{
 		[SyncVar]
 		private int _testInt;
-		[SyncRpc]
-		public partial void Server_Rename(NetStringShort newName);
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_Rename(NetworkPlayer player, NetStringShort newName);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{
@@ -49,12 +51,12 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[0] = true;
 			}
 		}
-		public partial void Server_Rename(NetStringShort newName)
+		public partial void Server_Rename(NetworkPlayer player, NetStringShort newName)
 		{
-			Server_RenameCallstack.Add(newName);
+			Server_RenameCallstack.Add(player, newName);
 			_dirtyReliable_0[1] = true;
 		}
-		private List<NetStringShort> Server_RenameCallstack = new(4);
+		private TargetCallstack<NetworkPlayer, NetStringShort> Server_RenameCallstack = new(8);
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -63,20 +65,37 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				writer.Put(_testInt);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				byte count = (byte)Server_RenameCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				int Server_RenameCount = Server_RenameCallstack.GetCallCount(player);
+				if (Server_RenameCount > 0)
 				{
-					var arg = Server_RenameCallstack[i];
-					arg.Serialize(writer);
+					var Server_RenamecallList = Server_RenameCallstack.GetCallList(player);
+					writer.Put((byte)Server_RenameCount);
+					for (int i = 0; i < Server_RenameCount; i++)
+					{
+						var arg = Server_RenamecallList[i];
+						arg.Serialize(writer);
+					}
 				}
+				else
+				{
+					dirtyReliable_0[1] = false;
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }

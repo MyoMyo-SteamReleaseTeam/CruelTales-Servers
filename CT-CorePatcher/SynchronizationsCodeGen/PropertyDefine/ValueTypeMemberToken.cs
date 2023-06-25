@@ -19,7 +19,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			IsNativeStruct = ReflectionHelper.IsNativeStruct(_typeName);
 		}
 
-		public override string Master_InitializeProperty()
+		public override string Master_InitializeProperty(SyncDirection direction)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
@@ -46,7 +46,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
 
-		public override string Remote_InitializeProperty()
+		public override string Remote_InitializeProperty(SyncDirection direction)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
@@ -74,7 +74,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return sb.ToString();
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType)
+		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
 		{
 			string dataTypeName = IsNativeStruct ? _typeName + "Extension" : _typeName;
 			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);

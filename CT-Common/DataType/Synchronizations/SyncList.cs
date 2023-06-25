@@ -244,11 +244,25 @@ namespace CT.Common.DataType.Synchronizations
 			return true;
 		}
 
-#if NET
-		public static void IgnoreSyncReliable(IPacketReader reader)
-#else
-		public void IgnoreSyncReliable(IPacketReader reader)
-#endif
+		public void InitializeProperties()
+		{
+			this._list.Clear();
+			this._operationStack.Clear();
+		}
+
+		public void InitializeMasterProperties()
+		{
+			this._list.Clear();
+			this._operationStack.Clear();
+		}
+
+		public void InitializeRemoteProperties()
+		{
+			this._list.Clear();
+			this._operationStack.Clear();
+		}
+		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
+		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
@@ -288,6 +302,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void ClearDirtyUnreliable() => throw _exception;
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw _exception;
 		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
 		private static void ignoreElement(IPacketReader reader)
 		{
