@@ -1,4 +1,5 @@
-﻿using CT.Common.Tools;
+﻿using System;
+using CT.Common.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.Tool
@@ -6,7 +7,7 @@ namespace CT.Test.Tool
 	[TestClass]
 	public class Test_Notifier
 	{
-		public readonly struct TEST_NotiStruct
+		public readonly struct TEST_NotiStruct : IEquatable<TEST_NotiStruct>
 		{
 			public readonly int Value1;
 			public readonly int Value2;
@@ -16,12 +17,17 @@ namespace CT.Test.Tool
 				Value1 = value1;
 				Value2 = value2;
 			}
+
+			public bool Equals(TEST_NotiStruct other)
+			{
+				return Value1 == other.Value1 && Value2 == other.Value2;
+			}
 		}
 
 		[TestMethod]
 		public void Notifier()
 		{
-			Notifier<int> intNoti = new Notifier<int>(100);
+			ValueNotifier<int> intNoti = new ValueNotifier<int>(100);
 
 			intNoti.Value = 120;
 			Assert.IsTrue(intNoti.IsDirty);
@@ -35,7 +41,7 @@ namespace CT.Test.Tool
 			intNoti.Value = 130;
 			Assert.IsTrue(intNoti.IsDirty);
 
-			Notifier<TEST_NotiStruct> structNoti = new Notifier<TEST_NotiStruct>(new TEST_NotiStruct(10, 20));
+			ValueNotifier<TEST_NotiStruct> structNoti = new ValueNotifier<TEST_NotiStruct>(new TEST_NotiStruct(10, 20));
 
 			Assert.IsFalse(structNoti.IsDirty);
 
