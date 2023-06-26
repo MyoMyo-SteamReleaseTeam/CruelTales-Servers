@@ -7,25 +7,6 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
-	[SyncNetworkObjectDefinition(capacity: 120)]
-	public class TestCube
-	{
-		[SyncVar]
-		public float R;
-
-		[SyncVar]
-		public float G;
-
-		[SyncVar]
-		public float B;
-
-		[SyncVar(SyncType.ColdData)]
-		public float AnimationTime;
-
-		[SyncRpc]
-		public void TestRPC(long someMessage) { }
-	}
-
 	[SyncNetworkObjectDefinition(1, true)]
 	public class PlayerCharacter
 	{
@@ -37,6 +18,9 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncVar]
 		public int Costume;
+
+		[SyncVar]
+		public bool IsFreezed;
 
 		// Animations
 		[SyncVar(SyncType.ColdData)]

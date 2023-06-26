@@ -13,6 +13,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
+
 		public float Speed = 5.0f;
 
 		public NetworkPlayer? NetworkPlayer { get; private set; }
@@ -30,20 +31,31 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer?.ReleaseViewTarget();
 		}
 
-		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction, bool isWalk)
+		public partial void Client_InputMovement(NetworkPlayer player,
+												 Vector2 direction, bool isWalk)
 		{
 			if (_userId != player.UserId)
 				return;
 
-			Transform.Move(Transform.Position, new Vector3(direction.X, 0, direction.Y) * Speed);
+			Vector3 velocity = Vector3.Normalize(new Vector3(direction.X, 0, direction.Y)) * Speed;
+			Transform.Move(Transform.Position, velocity);
 		}
 
-		public partial void Client_InputInteraction(NetworkPlayer player, NetworkIdentity target, Input_InteractType interactType)
+		public partial void Client_InputInteraction(NetworkPlayer player,
+													NetworkIdentity target,
+													Input_InteractType interactType)
 		{
+			if (!WorldManager.TryGetNetworkObject(target, out var interactObject))
+			{
+				return;
+			}
+
 
 		}
 
-		public partial void Client_InputAction(NetworkPlayer player, Input_PlayerAction actionType, Vector2 direction)
+		public partial void Client_InputAction(NetworkPlayer player,
+											   Input_PlayerAction actionType,
+											   Vector2 direction)
 		{
 
 		}
