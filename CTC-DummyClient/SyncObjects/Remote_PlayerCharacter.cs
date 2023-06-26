@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
@@ -27,7 +28,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_InputMovement(Vector2 direction);
+		public partial void Client_InputMovement(Vector2 direction, bool isWalk);
+		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		public partial void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType);
+		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
+		public partial void Client_InputAction(Input_PlayerAction actionType, Vector2 direction);
 		[SyncVar]
 		private UserId _userId = new();
 		public UserId UserId => _userId;
@@ -40,10 +45,24 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _costume;
 		public int Costume => _costume;
 		public event Action<int>? OnCostumeChanged;
-		[SyncVar]
-		private Vector2 _test = new();
-		public Vector2 Test => _test;
-		public event Action<Vector2>? OnTestChanged;
+		[SyncVar(SyncType.ColdData)]
+		private DokzaAnimation _currentAnimation;
+		public DokzaAnimation CurrentAnimation => _currentAnimation;
+		public event Action<DokzaAnimation>? OnCurrentAnimationChanged;
+		[SyncVar(SyncType.ColdData)]
+		private float _animationTime;
+		public float AnimationTime => _animationTime;
+		public event Action<float>? OnAnimationTimeChanged;
+		[SyncVar(SyncType.ColdData)]
+		private bool _isRight;
+		public bool IsRight => _isRight;
+		public event Action<bool>? OnIsRightChanged;
+		[SyncVar(SyncType.ColdData)]
+		private bool _isUp;
+		public bool IsUp => _isUp;
+		public event Action<bool>? OnIsUpChanged;
+		[SyncRpc]
+		public partial void Server_OnAnimationChanged(DokzaAnimation animation, bool isRight, bool isUp);
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable
@@ -55,17 +74,31 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				return isDirty;
 			}
 		}
-		public partial void Client_InputMovement(Vector2 direction)
+		public partial void Client_InputMovement(Vector2 direction, bool isWalk)
 		{
-			Client_InputMovementCallstack.Add(direction);
+			Client_InputMovementCallstack.Add((direction, isWalk));
 			_dirtyUnreliable_0[0] = true;
 		}
-		private List<Vector2> Client_InputMovementCallstack = new(4);
+		private List<(Vector2 direction, bool isWalk)> Client_InputMovementCallstack = new(4);
+		public partial void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType)
+		{
+			Client_InputInteractionCallstack.Add((target, interactType));
+			_dirtyUnreliable_0[1] = true;
+		}
+		private List<(NetworkIdentity target, Input_InteractType interactType)> Client_InputInteractionCallstack = new(4);
+		public partial void Client_InputAction(Input_PlayerAction actionType, Vector2 direction)
+		{
+			Client_InputActionCallstack.Add((actionType, direction));
+			_dirtyUnreliable_0[2] = true;
+		}
+		private List<(Input_PlayerAction actionType, Vector2 direction)> Client_InputActionCallstack = new(4);
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable()
 		{
 			_dirtyUnreliable_0.Clear();
 			Client_InputMovementCallstack.Clear();
+			Client_InputInteractionCallstack.Clear();
+			Client_InputActionCallstack.Clear();
 		}
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer)
@@ -78,7 +111,30 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				for (int i = 0; i < count; i++)
 				{
 					var arg = Client_InputMovementCallstack[i];
-					arg.Serialize(writer);
+					writer.Put(arg.direction);
+					writer.Put(arg.isWalk);
+				}
+			}
+			if (_dirtyUnreliable_0[1])
+			{
+				byte count = (byte)Client_InputInteractionCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Client_InputInteractionCallstack[i];
+					arg.target.Serialize(writer);
+					writer.Put((byte)arg.interactType);
+				}
+			}
+			if (_dirtyUnreliable_0[2])
+			{
+				byte count = (byte)Client_InputActionCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Client_InputActionCallstack[i];
+					writer.Put((byte)arg.actionType);
+					writer.Put(arg.direction);
 				}
 			}
 		}
@@ -104,8 +160,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				if (!reader.TryReadVector2(out _test)) return false;
-				OnTestChanged?.Invoke(_test);
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadInt32(out var animationValue)) return false;
+					DokzaAnimation animation = (DokzaAnimation)animationValue;
+					if (!reader.TryReadBoolean(out bool isRight)) return false;
+					if (!reader.TryReadBoolean(out bool isUp)) return false;
+					Server_OnAnimationChanged(animation, isRight, isUp);
+				}
 			}
 			return true;
 		}
@@ -118,8 +181,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnUsernameChanged?.Invoke(_username);
 			if (!reader.TryReadInt32(out _costume)) return false;
 			OnCostumeChanged?.Invoke(_costume);
-			if (!reader.TryReadVector2(out _test)) return false;
-			OnTestChanged?.Invoke(_test);
+			if (!reader.TryReadInt32(out var _currentAnimationValue)) return false;
+			_currentAnimation = (DokzaAnimation)_currentAnimationValue;
+			OnCurrentAnimationChanged?.Invoke(_currentAnimation);
+			if (!reader.TryReadSingle(out _animationTime)) return false;
+			OnAnimationTimeChanged?.Invoke(_animationTime);
+			if (!reader.TryReadBoolean(out _isRight)) return false;
+			OnIsRightChanged?.Invoke(_isRight);
+			if (!reader.TryReadBoolean(out _isUp)) return false;
+			OnIsUpChanged?.Invoke(_isUp);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
@@ -127,7 +197,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_userId = new();
 			_username = new();
 			_costume = 0;
-			_test = new();
+			_currentAnimation = (DokzaAnimation)0;
+			_animationTime = 0;
+			_isRight = 0;
+			_isUp = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -146,7 +219,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				Vector2Extension.IgnoreStatic(reader);
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(1);
+					reader.Ignore(1);
+				}
 			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -166,7 +245,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				Vector2Extension.IgnoreStatic(reader);
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+					reader.Ignore(1);
+					reader.Ignore(1);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

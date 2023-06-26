@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Numerics;
+using CT.Common.DataType;
+using CT.Common.Gameplay;
+using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -27,12 +30,22 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer?.ReleaseViewTarget();
 		}
 
-		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction)
+		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction, bool isWalk)
 		{
 			if (_userId != player.UserId)
 				return;
 
 			Transform.Move(Transform.Position, new Vector3(direction.X, 0, direction.Y) * Speed);
+		}
+
+		public partial void Client_InputInteraction(NetworkPlayer player, NetworkIdentity target, Input_InteractType interactType)
+		{
+
+		}
+
+		public partial void Client_InputAction(NetworkPlayer player, Input_PlayerAction actionType, Vector2 direction)
+		{
+
 		}
 	}
 }

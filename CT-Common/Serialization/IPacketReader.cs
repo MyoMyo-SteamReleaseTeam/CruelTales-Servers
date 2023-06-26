@@ -26,6 +26,7 @@ namespace CT.Common.Serialization
 		public bool TryRead<T>(out T value) where T : IPacketSerializable, new();
 		public int CopyToWriter(IPacketWriter writer);
 		public bool PeekBool();
+		public bool PeekBoolean();
 		public byte PeekByte();
 		public sbyte PeekSByte();
 		public short PeekInt16();
@@ -37,6 +38,7 @@ namespace CT.Common.Serialization
 		public float PeekSingle();
 		public double PeekDouble();
 		public bool ReadBool();
+		public bool ReadBoolean();
 		public byte ReadByte();
 		public sbyte ReadSByte();
 		public short ReadInt16();
@@ -52,6 +54,7 @@ namespace CT.Common.Serialization
 		public void ReadBytesCopy(ArraySegment<byte> dest, int offset);
 		public byte[] ReadBytes();
 		public bool TryPeekBool(out bool value);
+		public bool TryPeekBoolean(out bool value);
 		public bool TryPeekByte(out byte value);
 		public bool TryPeekSByte(out sbyte value);
 		public bool TryPeekInt16(out short value);
@@ -63,6 +66,7 @@ namespace CT.Common.Serialization
 		public bool TryPeekSingle(out float value);
 		public bool TryPeekDouble(out double value);
 		public bool TryReadBool(out bool value);
+		public bool TryReadBoolean(out bool value);
 		public bool TryReadByte(out byte value);
 		public bool TryReadSByte(out sbyte value);
 		public bool TryReadInt16(out short value);

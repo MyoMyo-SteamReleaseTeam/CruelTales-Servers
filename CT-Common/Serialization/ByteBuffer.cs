@@ -269,6 +269,12 @@ namespace CT.Common.Serialization
 			return value;
 		}
 
+		public bool PeekBoolean()
+		{
+			var value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
+			return value;
+		}
+
 		public byte PeekByte()
 		{
 			var value = BinaryConverter.ReadByte(ByteSegment, ReadPosition);
@@ -332,6 +338,13 @@ namespace CT.Common.Serialization
 		// Read
 
 		public bool ReadBool()
+		{
+			var value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
+			ReadPosition += sizeof(byte);
+			return value;
+		}
+
+		public bool ReadBoolean()
 		{
 			var value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
 			ReadPosition += sizeof(byte);
@@ -450,6 +463,17 @@ namespace CT.Common.Serialization
 			value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
 			return true;
 		}
+
+		public bool TryPeekBoolean(out bool value)
+		{
+			if (!CanRead(sizeof(bool)))
+			{
+				value = false;
+				return false;
+			}
+			value = BinaryConverter.ReadBool(ByteSegment, ReadPosition);
+			return true;
+		}
 		public bool TryPeekByte(out byte value)
 		{
 			if (!CanRead(sizeof(byte)))
@@ -551,6 +575,15 @@ namespace CT.Common.Serialization
 			return true;
 		}
 		public bool TryReadBool(out bool value)
+		{
+			if (TryPeekBool(out value))
+			{
+				ReadPosition += sizeof(byte);
+				return true;
+			}
+			return false;
+		}
+		public bool TryReadBoolean(out bool value)
 		{
 			if (TryPeekBool(out value))
 			{
