@@ -20,6 +20,7 @@ namespace CT.CorePatcher.Helper
 
 		private static readonly BidirectionalMap<string, string> _primitiyTypeByCLR = new()
 		{
+			{ "bool", "Boolean" },
 			{ "bool", "Bool" },
 			{ "byte", "Byte" },
 			{ "sbyte", "SByte" },
@@ -62,6 +63,8 @@ namespace CT.CorePatcher.Helper
 
 		private static readonly Dictionary<string, int> _dataSizeByTypeName = new()
 		{
+			{ "Boolean", sizeof(byte) },
+			{ "boolean", sizeof(byte) },
 			{ "bool",   sizeof(byte) },
 			{ "byte",   sizeof(byte) },
 			{ "sbyte",  sizeof(sbyte) },
@@ -74,7 +77,7 @@ namespace CT.CorePatcher.Helper
 			{ "float",  sizeof(float) },
 			{ "double", sizeof(double) },
 
-			{ "Bool",    sizeof(byte) },
+			{ "Bool",   sizeof(byte) },
 			{ "Byte",   sizeof(byte) },
 			{ "SByte",  sizeof(sbyte) },
 			{ "Int16",  sizeof(short) },
