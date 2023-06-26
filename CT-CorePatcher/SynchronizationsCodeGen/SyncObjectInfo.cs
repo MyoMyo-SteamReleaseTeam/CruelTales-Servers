@@ -94,6 +94,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 				if (m.SyncType.IsReliable() != hasReliable || m.SyncType.IsUnreliable() != hasUnreliable)
 				{
+					PatcherConsole.PrintError($"Attribute error on {this.ObjectName}");
 					PatcherConsole.PrintError($"You set wrong attribute on {typeName}!");
 					PatcherConsole.PrintError($"The {typeName}'s sync attribute is currently {m.SyncType}.");
 					PatcherConsole.PrintError($"{typeName} : HasReliable [{hasReliable}], HasUnreliable [{hasUnreliable}]");

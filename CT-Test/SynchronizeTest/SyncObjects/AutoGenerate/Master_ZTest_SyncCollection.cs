@@ -28,9 +28,10 @@ namespace CTS.Instance.SyncObjects
 	{
 		[SyncObject]
 		private SyncList<UserId> _userIdList = new();
-		[SyncObject]
-		private ZTest_InnerObject _syncObj = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObjectTarget _syncObj = new();
 		private BitmaskByte _dirtyReliable_0 = new();
+		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable
 		{
 			get
@@ -42,14 +43,27 @@ namespace CTS.Instance.SyncObjects
 				return isDirty;
 			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		public override bool IsDirtyUnreliable
+		{
+			get
+			{
+				bool isDirty = false;
+				isDirty |= _syncObj.IsDirtyUnreliable;
+				isDirty |= _dirtyUnreliable_0.AnyTrue();
+				return isDirty;
+			}
+		}
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			_userIdList.ClearDirtyReliable();
 			_syncObj.ClearDirtyReliable();
 		}
-		public override void ClearDirtyUnreliable() { }
+		public override void ClearDirtyUnreliable()
+		{
+			_dirtyUnreliable_0.Clear();
+			_syncObj.ClearDirtyUnreliable();
+		}
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
 			_dirtyReliable_0[0] = _userIdList.IsDirtyReliable;
@@ -78,7 +92,29 @@ namespace CTS.Instance.SyncObjects
 				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
-		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
+		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer)
+		{
+			_dirtyUnreliable_0[0] = _syncObj.IsDirtyUnreliable;
+			BitmaskByte dirtyUnreliable_0 = _dirtyUnreliable_0;
+			int dirtyUnreliable_0_pos = writer.OffsetSize(sizeof(byte));
+			if (_dirtyUnreliable_0[0])
+			{
+				int curSize = writer.Size;
+				_syncObj.SerializeSyncUnreliable(player, writer);
+				if (writer.Size == curSize)
+				{
+					dirtyUnreliable_0[0] = false;
+				}
+			}
+			if (dirtyUnreliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyUnreliable_0, dirtyUnreliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyUnreliable_0_pos);
+			}
+		}
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userIdList.SerializeEveryProperty(writer);

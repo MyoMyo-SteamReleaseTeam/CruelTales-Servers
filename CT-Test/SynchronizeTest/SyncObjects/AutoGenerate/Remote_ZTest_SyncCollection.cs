@@ -28,10 +28,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private SyncList<UserId> _userIdList = new();
 		public SyncList<UserId> UserIdList => _userIdList;
 		public event Action<SyncList<UserId>>? OnUserIdListChanged;
-		[SyncObject]
-		private ZTest_InnerObject _syncObj = new();
-		public ZTest_InnerObject SyncObj => _syncObj;
-		public event Action<ZTest_InnerObject>? OnSyncObjChanged;
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObjectTarget _syncObj = new();
+		public ZTest_InnerObjectTarget SyncObj => _syncObj;
+		public event Action<ZTest_InnerObjectTarget>? OnSyncObjChanged;
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
@@ -55,7 +55,16 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			return true;
 		}
-		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
+		public override bool TryDeserializeSyncUnreliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
+			{
+				if (!_syncObj.TryDeserializeSyncUnreliable(reader)) return false;
+				OnSyncObjChanged?.Invoke(_syncObj);
+			}
+			return true;
+		}
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!_userIdList.TryDeserializeEveryProperty(reader)) return false;
@@ -90,11 +99,25 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[1])
 			{
-				ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
+				ZTest_InnerObjectTarget.IgnoreSyncStaticReliable(reader);
 			}
 		}
-		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
-		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
+		public override void IgnoreSyncUnreliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
+			{
+				_syncObj.IgnoreSyncUnreliable(reader);
+			}
+		}
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
+			if (dirtyUnreliable_0[0])
+			{
+				ZTest_InnerObjectTarget.IgnoreSyncStaticUnreliable(reader);
+			}
+		}
 	}
 }
 #pragma warning restore CS0649

@@ -7,13 +7,48 @@ using CT.Common.Synchronizations;
 namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Parent
+	{
+		[SyncVar]
+		public int P1;
+
+		[SyncVar]
+		public float P2;
+
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void SP1() { }
+
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void SP2(int a, int b) { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void CP1() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void CP2(int a, int b) { }
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Child : ZTest_Parent
+	{
+		[SyncVar]
+		public int C1;
+
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void SC1() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void CC1() { }
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_SyncCollection
 	{
 		[SyncObject]
 		public SyncList<UserId> UserIdList = new();
 
-		[SyncObject]
-		public ZTest_InnerObject SyncObj = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		public ZTest_InnerObjectTarget SyncObj = new();
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
@@ -33,96 +68,136 @@ namespace CT.Common.Definitions.SyncObjects
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
-	public partial class ZTest_Value8
+	public partial class ZTest_Value8Target
 	{
 		[SyncVar] public NetString v0;
 		[SyncVar] public NetStringShort v1;
-		[SyncVar] public byte v2;
-		[SyncRpc] public void f3(int a) { }
-		[SyncVar] public TestEnumType v4;
-		[SyncVar] private ushort v5;
+		[SyncVar] public TestEnumType v2;
+		[SyncVar] public int v3;
 		[SyncObject]
-		private SyncList<UserId> v6 = new();
-		[SyncObject(SyncType.Reliable)]
-		private ZTest_InnerObject v7 = new();
-
-		[SyncVar(SyncType.Unreliable)] public uint uv0;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, byte b) { }
-		[SyncVar(SyncType.Unreliable)] public ulong uv2;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, double b) { }
-		[SyncVar(SyncType.Unreliable)] public float uv4;
-		[SyncRpc(SyncType.UnreliableTarget)] private void uf5() { }
-		[SyncObject]
-		private SyncList<UserId> uv6 = new();
-		[SyncObject(SyncType.Reliable)]
-		private ZTest_InnerObject uv7 = new();
-	}
-
-	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
-	public partial class ZTest_Value16
-	{
-		[SyncVar] public int v0;
-		[SyncVar] public int v1;
-		[SyncVar] public int v2;
-		[SyncRpc] public void f3(int a) { }
-		[SyncVar] public NetString v4;
-		[SyncVar] public NetStringShort v5;
-		[SyncObject]
-		private SyncList<UserId> v6 = new();
-		[SyncObject(SyncType.Reliable)]
-		private ZTest_InnerObject v7 = new();
-		[SyncVar] public ushort v8;
-		[SyncRpc] private void f9() { }
-		[SyncVar] private byte v10;
-		[SyncVar] private int v12;
-		[SyncObject(SyncType.Reliable)]
-		private ZTest_InnerObject v13 = new();
-		[SyncRpc] private void f14(int a, sbyte b) { }
-		[SyncObject(SyncType.Reliable)]
-		private SyncList<UserId> v15 = new();
+		private SyncList<UserId> v4 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObjectTarget v5 = new();
+		[SyncRpc(SyncType.ReliableTarget)]
+		private void ft0(NetString v0, NetStringShort v1, TestEnumType v2, int v3) { }
+		[SyncRpc(SyncType.Reliable)]
+		private void f1() { }
 
 		[SyncVar(SyncType.Unreliable)] public int uv0;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf1(int a, sbyte b) { }
-		[SyncVar(SyncType.Unreliable)] public ulong uv2;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a, float b, TestEnumType c) { }
-		[SyncVar(SyncType.Unreliable)] public int uv4;
-		[SyncVar(SyncType.Unreliable)] public int uv5;
-		[SyncVar(SyncType.Unreliable)] public int uv6;
-		[SyncVar(SyncType.Unreliable)] private int uv7;
-		[SyncVar(SyncType.Unreliable)] private ushort uv8;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf9() { }
-		[SyncVar(SyncType.Unreliable)] public float uv10;
-		[SyncVar(SyncType.Unreliable)] public int uv12;
-		[SyncVar(SyncType.Unreliable)] private int uv13;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf14(int a) { }
-		[SyncVar(SyncType.Unreliable)] public int uv15;
+		[SyncRpc(SyncType.Unreliable)] public void uf0(int a, byte b) { }
+		[SyncVar(SyncType.Unreliable)] public int uv1;
+		[SyncRpc(SyncType.Unreliable)] public void uf1(int a, double b) { }
+		[SyncVar(SyncType.Unreliable)] public int uv2;
+		[SyncRpc(SyncType.UnreliableTarget)] private void uft2() { }
+		[SyncVar(SyncType.Unreliable)] public int uv3;
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
-	public partial class ZTest_Value32
+	public partial class ZTest_Value8NonTarget
+	{
+		[SyncVar] public NetString v0;
+		[SyncVar] public NetStringShort v1;
+		[SyncVar] public TestEnumType v2;
+		[SyncVar] public int v3;
+		[SyncObject]
+		private SyncList<UserId> v4 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObject v5 = new();
+		[SyncRpc(SyncType.Reliable)]
+		private void f0(NetString v0, NetStringShort v1, TestEnumType v2, int v3) { }
+		[SyncRpc(SyncType.Reliable)]
+		private void f1() { }
+
+		[SyncVar(SyncType.Unreliable)] public int uv0;
+		[SyncRpc(SyncType.Unreliable)] public void uf0(int a, byte b) { }
+		[SyncVar(SyncType.Unreliable)] public int uv1;
+		[SyncRpc(SyncType.Unreliable)] public void uf1(int a, double b) { }
+		[SyncVar(SyncType.Unreliable)] public int uv2;
+		[SyncRpc(SyncType.Unreliable)] private void uf2() { }
+		[SyncVar(SyncType.Unreliable)] public int uv3;
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Value16NonTarget
+	{
+		[SyncVar] public byte v0;
+		[SyncVar] public sbyte v1;
+		[SyncVar] public ushort v2;
+		[SyncVar] public short v3;
+		[SyncVar] public uint v4;
+		[SyncVar] public int v5;
+		[SyncVar] public ulong v6;
+		[SyncRpc] public void f0() { }
+		[SyncVar] public long v7;
+		[SyncVar] public float v8;
+		[SyncVar] public double v9;
+		[SyncVar] public NetString v10;
+		[SyncVar] public NetStringShort v11;
+		[SyncObject] public SyncList<NetString> v12 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		public ZTest_InnerObject v14 = new();
+
+		[SyncVar(SyncType.Unreliable)] public byte uv0;
+		[SyncVar(SyncType.Unreliable)] public sbyte uv1;
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Value16Target
+	{
+		[SyncVar] public byte v0;
+		[SyncVar] public sbyte v1;
+		[SyncVar] public ushort v2;
+		[SyncVar] public short v3;
+		[SyncVar] public uint v4;
+		[SyncVar] public int v5;
+		[SyncVar] public ulong v6;
+		[SyncRpc] public void f0() { }
+		[SyncVar] public long v7;
+		[SyncVar] public float v8;
+		[SyncVar] public double v9;
+		[SyncVar] public NetString v10;
+		[SyncVar] public NetStringShort v11;
+		[SyncObject] public SyncList<NetString> v12 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		public ZTest_InnerObjectTarget v13 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		public ZTest_InnerObject v14 = new();
+
+		[SyncVar(SyncType.Unreliable)] public byte uv0;
+		[SyncVar(SyncType.Unreliable)] public sbyte uv1;
+		[SyncRpc(SyncType.UnreliableTarget)] public void uft1() { }
+		[SyncRpc(SyncType.UnreliableTarget)] public void uft2(int a) { }
+		[SyncRpc(SyncType.UnreliableTarget)] public void uft3(NetString a, int b) { }
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Value32Target
 	{
 		[SyncVar] public int v0;
 		[SyncVar] public int v1;
 		[SyncVar] public int v2;
-		[SyncRpc] public void f3(int a) { }
+		[SyncVar] public int v3;
 		[SyncVar] public int v4;
 		[SyncVar] public int v5;
+		[SyncVar] public int v6;
 		[SyncObject(SyncType.Reliable)]
-		private SyncList<UserId> v6 = new();
-		[SyncVar] public int v7;
+		private SyncList<UserId> v7 = new();
 		[SyncVar] private int v8;
 		[SyncVar] private int v9;
 		[SyncVar] private int v10;
+		[SyncVar] private int v11;
 		[SyncVar] private int v12;
 		[SyncVar] private int v13;
-		[SyncRpc] public void f14() { }
-		[SyncVar] public int v15;
+		[SyncVar] public int v14;
+		[SyncRpc(SyncType.ReliableTarget)]
+		public void ft15() { }
 		[SyncVar] public int v16;
-		[SyncRpc] public void f17(int a) { }
+		[SyncVar] public int v17;
 		[SyncVar] public int v18;
-		[SyncObject(SyncType.Reliable)]
-		private ZTest_InnerObject v19 = new();
-		[SyncVar] public int v20;
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObjectTarget v19 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObject v20 = new();
 		[SyncVar] public int v21;
 		[SyncRpc] public void f22() { }
 		[SyncObject(SyncType.Reliable)]
@@ -135,50 +210,60 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] private int v29;
 		[SyncVar] private int v30;
 		[SyncVar] private int v31;
-		[SyncVar] private int v32;
+	}
 
-		[SyncVar(SyncType.Unreliable)] public int uv0;
-		[SyncVar(SyncType.Unreliable)] public int uv1;
-		[SyncVar(SyncType.Unreliable)] public int uv2;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf3(int a) { }
-		[SyncVar(SyncType.Unreliable)] public int uv4;
-		[SyncVar(SyncType.Unreliable)] public int uv5;
-		[SyncVar(SyncType.Unreliable)] public int uv6;
-		[SyncVar(SyncType.Unreliable)] public int uv7;
-		[SyncVar(SyncType.Unreliable)] public int uv8;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf9() { }
-		[SyncVar(SyncType.Unreliable)] public int uv10;
-		[SyncRpc(SyncType.Unreliable)] public void uf12(int a) { }
-		[SyncVar(SyncType.Unreliable)] public int uv13;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf14(int a, float b) { }
-		[SyncVar(SyncType.Unreliable)] public int uv15;
-		[SyncVar(SyncType.Unreliable)] public int uv16;
-		[SyncRpc(SyncType.Unreliable)] private void uf17(int a) { }
-		[SyncVar(SyncType.Unreliable)] private int uv18;
-		[SyncVar(SyncType.Unreliable)] private int uv19;
-		[SyncVar(SyncType.Unreliable)] private int uv20;
-		[SyncVar(SyncType.Unreliable)] private int uv21;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf22(byte a, int b, uint c) { }
-		[SyncVar(SyncType.Unreliable)] public int uv23;
-		[SyncRpc(SyncType.Unreliable)] public void uf24() { }
-		[SyncVar(SyncType.Unreliable)] public int uv25;
-		[SyncVar(SyncType.Unreliable)] public int uv26;
-		[SyncVar(SyncType.Unreliable)] public int uv27;
-		[SyncRpc(SyncType.UnreliableTarget)] public void uf28(int a) { }
-		[SyncVar(SyncType.Unreliable)] private int uv29;
-		[SyncVar(SyncType.Unreliable)] private int uv30;
-		[SyncVar(SyncType.Unreliable)] private int uv31;
-		[SyncVar(SyncType.Unreliable)] private int uv32;
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_Value32NonTarget
+	{
+		[SyncVar] public int v0;
+		[SyncVar] public int v1;
+		[SyncVar] public int v2;
+		[SyncVar] public int v3;
+		[SyncVar] public int v4;
+		[SyncVar] public int v5;
+		[SyncVar] public int v6;
+		[SyncObject(SyncType.Reliable)]
+		private SyncList<UserId> v7 = new();
+		[SyncVar] private int v8;
+		[SyncVar] private int v9;
+		[SyncVar] private int v10;
+		[SyncVar] private int v11;
+		[SyncVar] private int v12;
+		[SyncVar] private int v13;
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private ZTest_InnerObject v15 = new();
+		[SyncRpc(SyncType.ReliableTarget)]
+		public void ft15() { }
+		[SyncVar] public int v16;
+		[SyncVar] public int v17;
+		[SyncVar] public int v18;
+		[SyncVar] public int v20;
+		[SyncVar] public int v21;
+		[SyncRpc] public void f22() { }
+		[SyncObject(SyncType.Reliable)]
+		private SyncList<UserId> v23 = new();
+	}
+
+	[SyncObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_InnerObjectTarget
+	{
+		[SyncVar] private int v0;
+
+		[SyncRpc(SyncType.ReliableTarget)]
+		public void f1(NetStringShort a) { }
+
+		[SyncVar(SyncType.Unreliable)] private int uv1;
 	}
 
 	[SyncObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_InnerObject
 	{
-		[SyncVar]
-		private int _testInt;
+		[SyncVar] private int v0;
 
-		[SyncRpc(SyncType.ReliableTarget)]
-		public void Server_Rename(NetStringShort newName) { }
+		[SyncRpc(SyncType.Reliable)]
+		public void f1(NetStringShort a) { }
+
+		[SyncVar(SyncType.Unreliable)] private int uv1;
 	}
 
 	[SyncObjectDefinition(IsDebugOnly = true)]
