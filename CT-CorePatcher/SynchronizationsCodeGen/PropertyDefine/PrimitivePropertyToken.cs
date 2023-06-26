@@ -48,7 +48,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_InitializeProperty(SyncDirection direction)
 		{
-			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, "0");
+			string initializeValue = _clrTypeName == "Boolean" ? "false" : "0";
+			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, initializeValue);
 		}
 
 		public override string Remote_Declaration(SyncDirection direction)

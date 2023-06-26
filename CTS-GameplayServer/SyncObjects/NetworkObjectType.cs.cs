@@ -11,7 +11,7 @@ namespace CTS.Instance.SyncObjects
 	{
 		None = 0,
 		GameplayController,
-		TestCube,
 		PlayerCharacter,
+		TestCube,
 	}
 }

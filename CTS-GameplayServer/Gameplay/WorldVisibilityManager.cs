@@ -88,7 +88,7 @@ namespace CTS.Instance.Gameplay
 			if (internalCell.Y < 0 || internalCell.Y >= CELL_HEIGHT ||
 				internalCell.X < 0 || internalCell.X >= CELL_WIDTH)
 			{
-				Debug.Assert(false);
+				//Debug.Assert(false);
 				return _nullSet;
 			}
 
@@ -100,7 +100,7 @@ namespace CTS.Instance.Gameplay
 			if (z < 0 || z >= CELL_HEIGHT ||
 				x < 0 || x >= CELL_WIDTH)
 			{
-				Debug.Assert(false);
+				//Debug.Assert(false);
 				return _nullSet;
 			}
 

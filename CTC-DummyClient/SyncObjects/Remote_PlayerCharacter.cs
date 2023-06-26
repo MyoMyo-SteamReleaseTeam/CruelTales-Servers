@@ -45,6 +45,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _costume;
 		public int Costume => _costume;
 		public event Action<int>? OnCostumeChanged;
+		[SyncVar]
+		private bool _isFreezed;
+		public bool IsFreezed => _isFreezed;
+		public event Action<bool>? OnIsFreezedChanged;
 		[SyncVar(SyncType.ColdData)]
 		private DokzaAnimation _currentAnimation;
 		public DokzaAnimation CurrentAnimation => _currentAnimation;
@@ -160,6 +164,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
+				if (!reader.TryReadBoolean(out _isFreezed)) return false;
+				OnIsFreezedChanged?.Invoke(_isFreezed);
+			}
+			if (dirtyReliable_0[4])
+			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
@@ -181,6 +190,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnUsernameChanged?.Invoke(_username);
 			if (!reader.TryReadInt32(out _costume)) return false;
 			OnCostumeChanged?.Invoke(_costume);
+			if (!reader.TryReadBoolean(out _isFreezed)) return false;
+			OnIsFreezedChanged?.Invoke(_isFreezed);
 			if (!reader.TryReadInt32(out var _currentAnimationValue)) return false;
 			_currentAnimation = (DokzaAnimation)_currentAnimationValue;
 			OnCurrentAnimationChanged?.Invoke(_currentAnimation);
@@ -197,10 +208,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_userId = new();
 			_username = new();
 			_costume = 0;
+			_isFreezed = false;
 			_currentAnimation = (DokzaAnimation)0;
 			_animationTime = 0;
-			_isRight = 0;
-			_isUp = 0;
+			_isRight = false;
+			_isUp = false;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -218,6 +230,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -244,6 +260,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)

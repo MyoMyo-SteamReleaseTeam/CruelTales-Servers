@@ -11,7 +11,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		None = 0,
 		GameplayController,
-		TestCube,
 		PlayerCharacter,
+		TestCube,
 	}
 }

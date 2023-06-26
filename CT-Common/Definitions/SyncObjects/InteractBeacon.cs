@@ -4,10 +4,10 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
 {
-	[SyncNetworkObjectDefinition(20)]
-	public class InteractBeacon
-	{
-		public void OnInteracted
-	}
+	//[SyncNetworkObjectDefinition(20)]
+	//public class InteractBeacon
+	//{
+	//	//public void OnInteracted
+	//}
 }
 #pragma warning restore IDE0051
