@@ -37,7 +37,11 @@ namespace CTS.Instance.SyncObjects
 			if (_userId != player.UserId)
 				return;
 
-			Vector3 velocity = Vector3.Normalize(new Vector3(direction.X, 0, direction.Y)) * Speed;
+			Vector3 velocity = Vector3.Zero;
+			if (direction.X != 0 && direction.Y != 0)
+			{
+				velocity = Vector3.Normalize(new Vector3(direction.X, 0, direction.Y)) * Speed;
+			}
 			Transform.Move(Transform.Position, velocity);
 		}
 
