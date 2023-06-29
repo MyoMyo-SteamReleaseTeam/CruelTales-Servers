@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using FlatPhysics;
 
 namespace PhysicsTester
 {
 	public class Renderer
 	{
-		public FlatVector ScreenSize { get; set; }
-		public FlatVector ViewSize => ScreenSize / _zoom;
-		public FlatVector ViewLeftBottom => CameraWorldPosition - ViewSize * 0.5f;
-		public FlatVector ViewRightTop => CameraWorldPosition + ViewSize * 0.5f;
-		private FlatVector _cameraWolrdPosition;
-		public FlatVector CameraWorldPosition
+		public Vector2 ScreenSize { get; set; }
+		public Vector2 ViewSize => ScreenSize / _zoom;
+		public Vector2 ViewLeftBottom => CameraWorldPosition - ViewSize * 0.5f;
+		public Vector2 ViewRightTop => CameraWorldPosition + ViewSize * 0.5f;
+		private Vector2 _cameraWolrdPosition;
+		public Vector2 CameraWorldPosition
 		{
 			get => _cameraWolrdPosition;
 			set
@@ -27,7 +21,7 @@ namespace PhysicsTester
 			}
 		}
 		//public FlatVector CameraWorldPosition => (CameraPosition / _zoom + (ViewSize / 2).FlipY());
-		public FlatVector ScreenCameraPosition { get; set; } //=> (CameraWorldPosition - (ViewSize / 2).FlipY()) * _zoom;
+		public Vector2 ScreenCameraPosition { get; set; } //=> (CameraWorldPosition - (ViewSize / 2).FlipY()) * _zoom;
 
 		private float _zoom = 1;
 		public float Zoom
@@ -63,7 +57,7 @@ namespace PhysicsTester
 			DrawOriginCross();
 		}
 
-		public FlatVector GetMousePosition(FlatVector screenPos)
+		public Vector2 GetMousePosition(Vector2 screenPos)
 		{
 			float mx = screenPos.X / ScreenSize.X;
 			float my = 1.0f - screenPos.Y / ScreenSize.Y;
@@ -74,27 +68,27 @@ namespace PhysicsTester
 			mx = FlatMath.Lerp(lb.X, rt.X, mx);
 			my = FlatMath.Lerp(lb.Y, rt.Y, my);
 
-			return new FlatVector(mx, my);
+			return new Vector2(mx, my);
 		}
 
 		#region Line
 
 		public void DrawLine(int x1, int y1, int x2, int y2, Color color)
 		{
-			DrawLine(new FlatVector(x1, y1), new FlatVector(x2, y2), color);
+			DrawLine(new Vector2(x1, y1), new Vector2(x2, y2), color);
 		}
 
 		public void DrawLine(int x1, int y1, int x2, int y2)
 		{
-			DrawLine(new FlatVector(x1, y1), new FlatVector(x2, y2));
+			DrawLine(new Vector2(x1, y1), new Vector2(x2, y2));
 		}
 
-        public void DrawLine(FlatVector p1, FlatVector p2)
+        public void DrawLine(Vector2 p1, Vector2 p2)
 		{
 			this.DrawLine(p1, p2, _defaultColor);
 		}
 
-		public void DrawLine(FlatVector p1, FlatVector p2, Color color)
+		public void DrawLine(Vector2 p1, Vector2 p2, Color color)
 		{
 			p1 *= Zoom;
 			p2 *= Zoom;
@@ -110,35 +104,35 @@ namespace PhysicsTester
 
 		#region Circle
 
-		public void DrawCircleFill(FlatVector center, float radius, Color color)
+		public void DrawCircleFill(Vector2 center, float radius, Color color)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 			radius *= Zoom * 2;
-			center -= new FlatVector(radius, radius) * 0.5f;
+			center -= new Vector2(radius, radius) * 0.5f;
 			using (Brush b = new SolidBrush(color))
 			{
 				_graphics.FillEllipse(b, center.X, center.Y, radius, radius);
 			}
 		}
 
-		public void DrawCircle(FlatVector center, float radius, Color color)
+		public void DrawCircle(Vector2 center, float radius, Color color)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 			radius *= Zoom * 2;
-			center -= new FlatVector(radius, radius) * 0.5f;
+			center -= new Vector2(radius, radius) * 0.5f;
 			using (Pen p = new Pen(color))
 			{
 				_graphics.DrawEllipse(p, center.X, center.Y, radius, radius);
 			}
 		}
 
-		public void DrawCircleGUI(FlatVector center, float radius, Color color)
+		public void DrawCircleGUI(Vector2 center, float radius, Color color)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
-			center -= new FlatVector(radius, radius) * 0.5f;
+			center -= new Vector2(radius, radius) * 0.5f;
 			using (Pen p = new Pen(color))
 			{
 				_graphics.DrawEllipse(p, center.X, center.Y, radius, radius);
@@ -150,7 +144,7 @@ namespace PhysicsTester
 		#region Box
 
 		private Point[] _tempPoints = new Point[3];
-		public void DrawPolygon(FlatVector[] vertices, int[] triangles, Color color)
+		public void DrawPolygon(Vector2[] vertices, int[] triangles, Color color)
 		{
 			using (Pen p = new Pen(color))
 			{
@@ -160,7 +154,7 @@ namespace PhysicsTester
 					for (int v = 0; v < 3; v++)
 					{
 						int ti = triangles[i * 3 + v];
-						FlatVector tv = vertices[ti].FlipY() * Zoom - ScreenCameraPosition.FlipY(); ;
+						Vector2 tv = vertices[ti].FlipY() * Zoom - ScreenCameraPosition.FlipY(); ;
 						_tempPoints[v] = new Point((int)tv.X, (int)tv.Y);
 					}
 
@@ -169,7 +163,7 @@ namespace PhysicsTester
 			}
 		}
 
-		public void DrawPolygonFill(FlatVector[] vertices, int[] triangles, Color color)
+		public void DrawPolygonFill(Vector2[] vertices, int[] triangles, Color color)
 		{
 			using (Brush b = new SolidBrush(color))
 			{
@@ -179,7 +173,7 @@ namespace PhysicsTester
 					for (int v = 0; v < 3; v++)
 					{
 						int ti = triangles[i * 3 + v];
-						FlatVector tv = vertices[ti].FlipY() * Zoom - ScreenCameraPosition.FlipY(); ;
+						Vector2 tv = vertices[ti].FlipY() * Zoom - ScreenCameraPosition.FlipY(); ;
 						_tempPoints[v] = new Point((int)tv.X, (int)tv.Y);
 					}
 
@@ -188,14 +182,14 @@ namespace PhysicsTester
 			}
 		}
 
-		public void DrawBoxFill(FlatVector center, float width, float height, Color color)
+		public void DrawBoxFill(Vector2 center, float width, float height, Color color)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 
 			width *= Zoom;
 			height *= Zoom;
-			center -= new FlatVector(width, height) * 0.5f;
+			center -= new Vector2(width, height) * 0.5f;
 			
 			using (Brush b = new SolidBrush(color))
 			{
@@ -203,14 +197,14 @@ namespace PhysicsTester
 			}
 		}
 
-		public void DrawBox(FlatVector center, float width, float height, Color color)
+		public void DrawBox(Vector2 center, float width, float height, Color color)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 
 			width *= Zoom;
 			height *= Zoom;
-			center -= new FlatVector(width, height) * 0.5f;
+			center -= new Vector2(width, height) * 0.5f;
 
 			using (Pen p = new Pen(color))
 			{
@@ -218,12 +212,12 @@ namespace PhysicsTester
 			}
 		}
 
-		public void DrawBoxGUI(FlatVector center, float width, float height, Color color, int outline = 1)
+		public void DrawBoxGUI(Vector2 center, float width, float height, Color color, int outline = 1)
 		{
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 
-			center -= new FlatVector(width, height) * 0.5f;
+			center -= new Vector2(width, height) * 0.5f;
 
 			using (Pen p = new Pen(color, outline))
 			{
@@ -235,7 +229,7 @@ namespace PhysicsTester
 
 		#region Text
 
-		public void DrawTextGUI(string text, FlatVector position, Color color)
+		public void DrawTextGUI(string text, Vector2 position, Color color)
 		{
 			using (SolidBrush b = new SolidBrush(color))
 			{
@@ -243,7 +237,7 @@ namespace PhysicsTester
 			}
 		}
 
-		public void DrawText(string text, FlatVector position, Color color)
+		public void DrawText(string text, Vector2 position, Color color)
 		{
 			position *= Zoom;
 			position = position.FlipY() - ScreenCameraPosition.FlipY();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,19 +12,19 @@ namespace FlatPhysics
 		public readonly FlatBody BodyA;
 		public readonly FlatBody BodyB;
 
-		public readonly FlatVector Normal;
+		public readonly Vector2 Normal;
 		public readonly float Depth;
 
-		public readonly FlatVector Contact1;
-		public readonly FlatVector Contact2;
+		public readonly Vector2 Contact1;
+		public readonly Vector2 Contact2;
 		public readonly int ContactCount;
 
 		public FlatManifold(FlatBody bodyA,
 							FlatBody bodyB, 
-							FlatVector normal, 
+							Vector2 normal, 
 							float depth, 
-							FlatVector contact1, 
-							FlatVector contact2, 
+							Vector2 contact1, 
+							Vector2 contact2, 
 							int contactCount)
 		{
 			BodyA = bodyA;

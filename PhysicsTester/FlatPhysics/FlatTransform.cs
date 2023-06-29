@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,9 +15,9 @@ namespace FlatPhysics
 		public readonly float Cos;
 
 		public readonly static FlatTransform Zero = new FlatTransform(0f, 0f, 0f);
-		public FlatVector Position => new FlatVector(PositionX, PositionY);
+		public Vector2 Position => new Vector2(PositionX, PositionY);
 
-        public FlatTransform(FlatVector position, float angle)
+        public FlatTransform(Vector2 position, float angle)
         {
 			this.PositionX = position.X;
 			this.PositionY = position.Y;

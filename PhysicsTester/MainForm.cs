@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using FlatPhysics;
+using System.Numerics;
 
 namespace PhysicsTester
 {
@@ -22,7 +22,7 @@ namespace PhysicsTester
 			// Initialize
 			_inputManager = new InputManager();
 
-			FlatVector screenSize = new FlatVector(MainCanvas.Width, MainCanvas.Height);
+			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
 			_gameRuntimie = new GameRuntime(this, _inputManager, screenSize);
 
 			// Start tick timer
@@ -45,7 +45,7 @@ namespace PhysicsTester
 
 		private void Timer_Tick_Tick(object sender, EventArgs e)
 		{
-			FlatVector screenSize = new FlatVector(MainCanvas.Width, MainCanvas.Height);
+			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
 			_gameRuntimie.SetScreenSize(screenSize);
 
 			// Calcualte delta time
@@ -105,10 +105,10 @@ namespace PhysicsTester
 		#region Set Mouse Input
 
 		private bool _isDragging = false;
-		private FlatVector _lastMousePos = new FlatVector();
+		private Vector2 _lastMousePos = new Vector2();
 		private void Main_MouseDown(object sender, MouseEventArgs e)
 		{
-			var clickPos = new FlatVector(e.X, e.Y);
+			var clickPos = new Vector2(e.X, e.Y);
 
 			if (e.Button == MouseButtons.Left)
 			{
@@ -121,7 +121,7 @@ namespace PhysicsTester
 			else if (e.Button == MouseButtons.Middle)
 			{
 				_isDragging = true;
-				_lastMousePos = new FlatVector(e.X, e.Y);
+				_lastMousePos = new Vector2(e.X, e.Y);
 			}
 		}
 
@@ -137,8 +137,8 @@ namespace PhysicsTester
 		{
 			if (_isDragging)
 			{
-				FlatVector curMousePos = new FlatVector(e.X, e.Y);
-				FlatVector delta = _lastMousePos - curMousePos;
+				Vector2 curMousePos = new Vector2(e.X, e.Y);
+				Vector2 delta = _lastMousePos - curMousePos;
 				_gameRuntimie.Drag(delta);
 				_lastMousePos = curMousePos;
 			}

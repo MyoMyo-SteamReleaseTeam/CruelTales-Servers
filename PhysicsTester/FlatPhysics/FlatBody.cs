@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace FlatPhysics
 {
@@ -16,11 +11,11 @@ namespace FlatPhysics
 	/// <summary>RigidBody</summary>
 	public sealed class FlatBody
 	{
-		private FlatVector position;
-		private FlatVector linearVelocity;
+		private Vector2 position;
+		private Vector2 linearVelocity;
 		private float angle;
 		private float angularVelocity;
-		private FlatVector force;
+		private Vector2 force;
 
 		public readonly ShapeType ShapeType;
 		public readonly float Density;
@@ -39,18 +34,18 @@ namespace FlatPhysics
 		public readonly float StaticFriction;
 		public readonly float DynamicFriction;
 
-		private readonly FlatVector[] vertices;
+		private readonly Vector2[] vertices;
 		[Obsolete("물리에서 사용하지 않음")]
 		public readonly int[] Triangles;
-		private FlatVector[] transformedVertices;
+		private Vector2[] transformedVertices;
 		private FlatAABB aabb;
 
 		private bool transformUpdateRequired;
 		private bool aabbUpdateRequired;
 
-		public FlatVector Position => position;
+		public Vector2 Position => position;
 
-		public FlatVector LinearVelocity
+		public Vector2 LinearVelocity
 		{
 			get => this.linearVelocity;
 			internal set => this.linearVelocity = value;
@@ -65,14 +60,14 @@ namespace FlatPhysics
 		public float Angle => angle;
 
         public FlatBody(float density, float mass, float inertia, float restitution, float area,
-						bool isStatic, float radius, float width, float height, FlatVector[] vertices, ShapeType shapeType)
+						bool isStatic, float radius, float width, float height, Vector2[] vertices, ShapeType shapeType)
         {
-			this.position = FlatVector.Zero;
-			this.linearVelocity = FlatVector.Zero;
+			this.position = Vector2.Zero;
+			this.linearVelocity = Vector2.Zero;
 			this.angle = 0f;
 			this.angularVelocity = 0f;
 
-			this.force = FlatVector.Zero;
+			this.force = Vector2.Zero;
 
 			this.ShapeType = shapeType;
 			this.Density = density;
@@ -93,7 +88,7 @@ namespace FlatPhysics
 			{
 				this.vertices = vertices;
 				Triangles = CreateBoxTriangles();
-				this.transformedVertices = new FlatVector[this.vertices.Length];
+				this.transformedVertices = new Vector2[this.vertices.Length];
 			}
 			else
 			{
@@ -106,18 +101,18 @@ namespace FlatPhysics
 			this.aabbUpdateRequired = true;
 		}
 
-		private static FlatVector[] CreateBoxVertices(float width, float height)
+		private static Vector2[] CreateBoxVertices(float width, float height)
 		{
 			float left = -width / 2f;
 			float right = left + width;
 			float bottom = -height / 2f;
 			float top = bottom + height;
 
-			FlatVector[] vertices = new FlatVector[4];
-			vertices[0] = new FlatVector(left, top);
-			vertices[1] = new FlatVector(right, top);
-			vertices[2] = new FlatVector(right, bottom);
-			vertices[3] = new FlatVector(left, bottom);
+			Vector2[] vertices = new Vector2[4];
+			vertices[0] = new Vector2(left, top);
+			vertices[1] = new Vector2(right, top);
+			vertices[2] = new Vector2(right, bottom);
+			vertices[3] = new Vector2(left, bottom);
 
 			return vertices;
 		}
@@ -134,7 +129,7 @@ namespace FlatPhysics
 			return triangles;
 		}
 
-		public FlatVector[] GetTransformedVertices()
+		public Vector2[] GetTransformedVertices()
 		{
 			if (this.transformUpdateRequired)
 			{
@@ -142,8 +137,8 @@ namespace FlatPhysics
 
 				for (int i = 0; i < this.vertices.Length; i++)
 				{
-					FlatVector v = this.vertices[i];
-					this.transformedVertices[i] = FlatVector.Transform(v, transform);
+					Vector2 v = this.vertices[i];
+					this.transformedVertices[i] = v.Transform(transform);
 				}
 			}
 
@@ -162,11 +157,11 @@ namespace FlatPhysics
 
 				if (this.ShapeType is ShapeType.Box)
 				{
-					FlatVector[] vertices = this.GetTransformedVertices();
+					Vector2[] vertices = this.GetTransformedVertices();
 
 					for (int i = 0; i < vertices.Length; i++)
 					{
-						FlatVector v = vertices[i];
+						Vector2 v = vertices[i];
 
 						if (v.X < minX) { minX = v.X; }
 						if (v.X > maxX) { maxX = v.X; }
@@ -193,7 +188,7 @@ namespace FlatPhysics
 			return this.aabb;
 		}
 
-		public void Step(float time, FlatVector gravity, int iterations)
+		public void Step(float time, Vector2 gravity, int iterations)
 		{
 			if (this.IsStatic)
 			{
@@ -213,26 +208,26 @@ namespace FlatPhysics
 
 			this.angle += this.angularVelocity * time;
 
-			this.force = FlatVector.Zero;
+			this.force = Vector2.Zero;
 
 			// 움직인 경우 여러 프로퍼티를 갱신
 			this.transformUpdateRequired = true;
 			this.aabbUpdateRequired = true;
 		}
 
-		public void AddForce(FlatVector amount)
+		public void AddForce(Vector2 amount)
 		{
 			this.force = amount;
 		}
 
-		public void Move(FlatVector amount)
+		public void Move(Vector2 amount)
 		{
 			this.position += amount;
 			this.transformUpdateRequired = true;
 			this.aabbUpdateRequired = true;
 		}
 
-		public void MoveTo(FlatVector position)
+		public void MoveTo(Vector2 position)
 		{
 			this.position = position;
 			this.transformUpdateRequired = true;
@@ -343,7 +338,7 @@ namespace FlatPhysics
 				inertia = (1f / 12) * mass * width * width + height * height;
 			}
 
-			FlatVector[] vertices = CreateBoxVertices(width, height);
+			Vector2[] vertices = CreateBoxVertices(width, height);
 
 			body = new FlatBody(density, mass, inertia, restitution, area, isStatic, 0f, width, height, vertices, ShapeType.Box);
 			return true;

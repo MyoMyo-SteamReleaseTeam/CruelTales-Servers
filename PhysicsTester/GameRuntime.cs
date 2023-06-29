@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using FlatPhysics;
-using PhysicsTester.FlatPhysics;
-using static System.Windows.Forms.DataFormats;
 
 namespace PhysicsTester
 {
@@ -15,22 +14,22 @@ namespace PhysicsTester
 		private List<FlatEntity> entityList = new();
 		private List<FlatEntity> entityRemovalList = new();
 
-		public GameRuntime(MainForm mainForm, InputManager inputManager, FlatVector screenSize)
+		public GameRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
 		{
 			_mainForm = mainForm;
-			FlatVector screenHalfSize = screenSize * 0.5f;
+			Vector2 screenHalfSize = screenSize * 0.5f;
 
 			InputManager = inputManager;
 			_renderer.Zoom = 1 + 3 * 7;
 			_renderer.ScreenCameraPosition = -screenHalfSize.FlipY();
 
 			const float padding = 2f;
-			FlatVector worldHalfSize = screenHalfSize.FlipY() / _renderer.Zoom - new FlatVector(padding, padding);
+			Vector2 worldHalfSize = screenHalfSize.FlipY() / _renderer.Zoom - new Vector2(padding, padding);
 
 			this.world = new FlatWorld();
 
-			FlatVector viewLB = this._renderer.ViewLeftBottom;
-			FlatVector viewRT = this._renderer.ViewRightTop;
+			Vector2 viewLB = this._renderer.ViewLeftBottom;
+			Vector2 viewRT = this._renderer.ViewRightTop;
 
 			if (!FlatBody.CreateBoxBody(worldHalfSize.X * 2f * 0.9f, 3f, density: 0.5f, isStatic: true,
 										restitution: 0.5f, out FlatBody groundBody, out string errorMessage))
@@ -38,7 +37,7 @@ namespace PhysicsTester
 				throw new Exception(errorMessage);
 			}
 
-			groundBody.MoveTo(new FlatVector(0, -12));
+			groundBody.MoveTo(new Vector2(0, -12));
 			this.world.AddBody(groundBody);
 			this.entityList.Add(new FlatEntity(groundBody, Color.DarkGreen));
 
@@ -48,7 +47,7 @@ namespace PhysicsTester
 				throw new Exception(errorMessage);
 			}
 
-			ledgeBody1.MoveTo(new FlatVector(-10, 1));
+			ledgeBody1.MoveTo(new Vector2(-10, 1));
 			ledgeBody1.Rotate(-MathF.PI * 2 / 20f);
 			this.world.AddBody(ledgeBody1);
 			this.entityList.Add(new FlatEntity(ledgeBody1, Color.DarkGray));
@@ -59,7 +58,7 @@ namespace PhysicsTester
 				throw new Exception(errorMessage);
 			}
 
-			ledgeBody2.MoveTo(new FlatVector(10, 10));
+			ledgeBody2.MoveTo(new Vector2(10, 10));
 			ledgeBody2.Rotate(MathF.PI * 2 / 20f);
 			this.world.AddBody(ledgeBody2);
 			this.entityList.Add(new FlatEntity(ledgeBody2, Color.DarkGray));
@@ -80,15 +79,15 @@ namespace PhysicsTester
 			InputManager.Update();
 
 			// Camera move direction
-			FlatVector cameraMoveDirection = new();
+			Vector2 cameraMoveDirection = new();
 			if (InputManager.IsPressed(GameKey.CameraMoveUp))
-				cameraMoveDirection += new FlatVector(0, 1);
+				cameraMoveDirection += new Vector2(0, 1);
 			if (InputManager.IsPressed(GameKey.CameraMoveDown))
-				cameraMoveDirection += new FlatVector(0, -1);
+				cameraMoveDirection += new Vector2(0, -1);
 			if (InputManager.IsPressed(GameKey.CameraMoveLeft))
-				cameraMoveDirection += new FlatVector(-1, 0);
+				cameraMoveDirection += new Vector2(-1, 0);
 			if (InputManager.IsPressed(GameKey.CameraMoveRight))
-				cameraMoveDirection += new FlatVector(1, 0);
+				cameraMoveDirection += new Vector2(1, 0);
 
 			if (FlatMath.Length(cameraMoveDirection) != 0)
 			{
@@ -208,10 +207,10 @@ namespace PhysicsTester
 				//FlatVector lb = -rt;
 				//FlatVector vs = rt * 2;
 
-				if (body.Position.X < lb.X) { body.MoveTo(body.Position + new FlatVector(vs.X, 0f)); }
-				if (body.Position.X > rt.X) { body.MoveTo(body.Position - new FlatVector(vs.X, 0f)); }
-				if (body.Position.Y < lb.Y) { body.MoveTo(body.Position + new FlatVector(0f, vs.Y)); }
-				if (body.Position.Y > rt.Y) { body.MoveTo(body.Position - new FlatVector(0f, vs.Y)); }
+				if (body.Position.X < lb.X) { body.MoveTo(body.Position + new Vector2(vs.X, 0f)); }
+				if (body.Position.X > rt.X) { body.MoveTo(body.Position - new Vector2(vs.X, 0f)); }
+				if (body.Position.Y < lb.Y) { body.MoveTo(body.Position + new Vector2(0f, vs.Y)); }
+				if (body.Position.Y > rt.Y) { body.MoveTo(body.Position - new Vector2(0f, vs.Y)); }
 			}
 		}
 
@@ -239,12 +238,12 @@ namespace PhysicsTester
 			var cameraPos = _renderer.CameraWorldPosition;
 			var corssHairSize = 32 / _renderer.Zoom;
 
-			FlatVector marginVec = new FlatVector(margin / 2, margin / 2);
+			Vector2 marginVec = new Vector2(margin / 2, margin / 2);
 			_renderer.DrawCircleGUI(rt - marginVec, 20f, Color.Yellow);
 			_renderer.DrawCircleGUI(lb + marginVec, 20f, Color.Yellow);
 			_renderer.DrawCircleGUI(cameraPos, 10f, Color.Yellow);
-			_renderer.DrawLine(cameraPos - new FlatVector(corssHairSize, 0), cameraPos + new FlatVector(corssHairSize, 0), Color.Yellow);
-			_renderer.DrawLine(cameraPos - new FlatVector(0, corssHairSize), cameraPos + new FlatVector(0, corssHairSize), Color.Yellow);
+			_renderer.DrawLine(cameraPos - new Vector2(corssHairSize, 0), cameraPos + new Vector2(corssHairSize, 0), Color.Yellow);
+			_renderer.DrawLine(cameraPos - new Vector2(0, corssHairSize), cameraPos + new Vector2(0, corssHairSize), Color.Yellow);
 			_renderer.DrawBox((lb + rt) / 2, vs.X - margin, vs.Y - margin, Color.Yellow);
 
 			// Draw contact points
@@ -264,11 +263,11 @@ namespace PhysicsTester
 				_currentFps = 1 / _deltaTime;
 			}
 
-			_renderer.DrawTextGUI($"Body count : {world.BodyCount}", new FlatVector(10, 10), Color.White);
-			_renderer.DrawTextGUI($"Elapsed : {_stepElapsed:F3} ms", new FlatVector(10, 30), Color.White);
-			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new FlatVector(10, 50), Color.White);
+			_renderer.DrawTextGUI($"Body count : {world.BodyCount}", new Vector2(10, 10), Color.White);
+			_renderer.DrawTextGUI($"Elapsed : {_stepElapsed:F3} ms", new Vector2(10, 30), Color.White);
+			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new Vector2(10, 50), Color.White);
 
-			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new FlatVector(10, 70), Color.White);
+			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 70), Color.White);
 		}
 
 		public void Zoom(int delta)
@@ -276,32 +275,32 @@ namespace PhysicsTester
 			_renderer.Zoom += delta;
 		}
 
-		public void Drag(FlatVector delta)
+		public void Drag(Vector2 delta)
 		{
 			_renderer.CameraWorldPosition += delta.FlipY() / _renderer.Zoom * 1.0f;
 		}
 
-		public void SetScreenSize(FlatVector screenSize)
+		public void SetScreenSize(Vector2 screenSize)
 		{
 			_renderer.ScreenSize = screenSize;
 		}
 
-		public void OnMouseLeftClick(FlatVector clickPos)
+		public void OnMouseLeftClick(Vector2 clickPos)
 		{
 			float width = RandomHelper.RandomSingle(1f, 2f);
 			float height = RandomHelper.RandomSingle(1f, 2f);
 
-			FlatVector worldPos = _renderer.GetMousePosition(clickPos);
+			Vector2 worldPos = _renderer.GetMousePosition(clickPos);
 			this._mainForm.Text = worldPos.ToString();
 
 			this.entityList.Add(new FlatEntity(world, width, height, isStatic: false, worldPos));
 		}
 
-		public void OnMouseRightClick(FlatVector clickPos)
+		public void OnMouseRightClick(Vector2 clickPos)
 		{
 			float radius = RandomHelper.RandomSingle(0.75f, 1f);
 
-			FlatVector worldPos = _renderer.GetMousePosition(clickPos);
+			Vector2 worldPos = _renderer.GetMousePosition(clickPos);
 			this._mainForm.Text = worldPos.ToString();
 
 			this.entityList.Add(new FlatEntity(world, radius, isStatic: false, worldPos));

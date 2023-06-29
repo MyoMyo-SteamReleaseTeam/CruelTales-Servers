@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,11 +20,11 @@ namespace FlatPhysics
 		public static readonly int MinIterations = 1;
 		public static readonly int MaxIterations = 128;
 
-		private FlatVector gravity;
+		private Vector2 gravity;
 		private List<FlatBody> bodyList;
 		private List<(int, int)> contactPairs = new();
 
-		public List<FlatVector> ContactPointsList;
+		public List<Vector2> ContactPointsList;
 
 		public int BodyCount
 		{
@@ -32,9 +33,9 @@ namespace FlatPhysics
 
 		public FlatWorld()
 		{
-			this.gravity = new FlatVector(0f, 9.81f).FlipY();
+			this.gravity = new Vector2(0f, 9.81f).FlipY();
 			this.bodyList = new List<FlatBody>();
-			this.ContactPointsList = new List<FlatVector>();
+			this.ContactPointsList = new List<Vector2>();
 		}
 
 		public void AddBody(FlatBody body)
@@ -111,7 +112,7 @@ namespace FlatPhysics
 				FlatBody bodyA = this.bodyList[pair.Item1];
 				FlatBody bodyB = this.bodyList[pair.Item2];
 
-				if (Collisions.Collide(bodyA, bodyB, out FlatVector normal, out float depth))
+				if (Collisions.Collide(bodyA, bodyB, out Vector2 normal, out float depth))
 				{
 					this.SeparateBodies(bodyA, bodyB, normal * depth);
 					Collisions.FindContactPoints(bodyA, bodyB, out var contact1, out var contact2, out int contactCount);
@@ -149,7 +150,7 @@ namespace FlatPhysics
 		}
 
 		// mtv = normal times depth = minimum translation vector = 최소 변위 벡터
-		private void SeparateBodies(FlatBody bodyA, FlatBody bodyB, FlatVector mtv)
+		private void SeparateBodies(FlatBody bodyA, FlatBody bodyB, Vector2 mtv)
 		{
 			if (bodyA.IsStatic)
 			{
@@ -170,10 +171,10 @@ namespace FlatPhysics
 		{
 			FlatBody bodyA = contact.BodyA;
 			FlatBody bodyB = contact.BodyB;
-			FlatVector normal = contact.Normal;
+			Vector2 normal = contact.Normal;
 			float depth = contact.Depth;
 
-			FlatVector relativeVelocity = bodyB.LinearVelocity - bodyA.LinearVelocity;
+			Vector2 relativeVelocity = bodyB.LinearVelocity - bodyA.LinearVelocity;
 
 			if (FlatMath.Dot(relativeVelocity, normal) > 0f)
 			{
@@ -185,26 +186,26 @@ namespace FlatPhysics
 			float j = -(1f + e) * FlatMath.Dot(relativeVelocity, normal);
 			j /= bodyA.InvMass + bodyB.InvMass;
 
-			FlatVector impulse = j * normal;
+			Vector2 impulse = j * normal;
 
 			// 수식
 			bodyA.LinearVelocity += -impulse * bodyA.InvMass;
 			bodyB.LinearVelocity += impulse * bodyB.InvMass;
 		}
 
-		private FlatVector[] contactList = new FlatVector[2];
-		private FlatVector[] impulseList = new FlatVector[2];
-		private FlatVector[] frictionImpulseList = new FlatVector[2];
-		private FlatVector[] raList = new FlatVector[2];
-		private FlatVector[] rbList = new FlatVector[2];
+		private Vector2[] contactList = new Vector2[2];
+		private Vector2[] impulseList = new Vector2[2];
+		private Vector2[] frictionImpulseList = new Vector2[2];
+		private Vector2[] raList = new Vector2[2];
+		private Vector2[] rbList = new Vector2[2];
 		private float[] jList = new float[2];
 		public void ResolveCollisionWithRotation(in FlatManifold contact)
 		{
 			FlatBody bodyA = contact.BodyA;
 			FlatBody bodyB = contact.BodyB;
-			FlatVector normal = contact.Normal;
-			FlatVector contact1 = contact.Contact1;
-			FlatVector contact2 = contact.Contact2;
+			Vector2 normal = contact.Normal;
+			Vector2 contact1 = contact.Contact1;
+			Vector2 contact2 = contact.Contact2;
 			int contactCount = contact.ContactCount;
 
 			float e = MathF.Min(bodyA.Restitution, bodyB.Restitution);
@@ -214,28 +215,28 @@ namespace FlatPhysics
 
 			for (int i = 0; i < contactCount; i++)
 			{
-				this.impulseList[i] = FlatVector.Zero;
-				this.raList[i] = FlatVector.Zero;
-				this.rbList[i] = FlatVector.Zero;
+				this.impulseList[i] = Vector2.Zero;
+				this.raList[i] = Vector2.Zero;
+				this.rbList[i] = Vector2.Zero;
 			}
 
 			for (int i = 0; i < contactCount; i++)
 			{
 				// 중심점에서 접촉 지점 까지의 벡터
-				FlatVector ra = contactList[i] - bodyA.Position;
-				FlatVector rb = contactList[i] - bodyB.Position;
+				Vector2 ra = contactList[i] - bodyA.Position;
+				Vector2 rb = contactList[i] - bodyB.Position;
 
 				raList[i] = ra;
 				rbList[i] = rb;
 
 				// 위 벡터의 수직 벡터
-				FlatVector raPerp = new FlatVector(-ra.Y, ra.X);
-				FlatVector rbPerp = new FlatVector(-rb.Y, rb.X);
+				Vector2 raPerp = new Vector2(-ra.Y, ra.X);
+				Vector2 rbPerp = new Vector2(-rb.Y, rb.X);
 
-				FlatVector angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
-				FlatVector angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
+				Vector2 angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
+				Vector2 angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
 
-				FlatVector relativeVelocity =
+				Vector2 relativeVelocity =
 					(bodyB.LinearVelocity + angularLinearVelocityB) - 
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
@@ -257,16 +258,16 @@ namespace FlatPhysics
 				j /= denominator;
 				j /= (float)contactCount; // 접촉점 마다 힘이 있기 때문
 
-				FlatVector impulse = j * normal;
+				Vector2 impulse = j * normal;
 				impulseList[i] = impulse;
 			}
 
 			// 각 접점에서 가속도를 적용해서 변경되어 버리는것을 방지하기 위해 별도의 반복문으로 분리
 			for (int i = 0; i < contactCount; i++)
 			{
-				FlatVector impulse = impulseList[i];
-				FlatVector ra = raList[i];
-				FlatVector rb = rbList[i];
+				Vector2 impulse = impulseList[i];
+				Vector2 ra = raList[i];
+				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -impulse * bodyA.InvMass;
 				bodyA.AngularVelocity += -FlatMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
@@ -279,9 +280,9 @@ namespace FlatPhysics
 		{
 			FlatBody bodyA = contact.BodyA;
 			FlatBody bodyB = contact.BodyB;
-			FlatVector normal = contact.Normal;
-			FlatVector contact1 = contact.Contact1;
-			FlatVector contact2 = contact.Contact2;
+			Vector2 normal = contact.Normal;
+			Vector2 contact1 = contact.Contact1;
+			Vector2 contact2 = contact.Contact2;
 			int contactCount = contact.ContactCount;
 
 			float e = MathF.Min(bodyA.Restitution, bodyB.Restitution);
@@ -294,30 +295,30 @@ namespace FlatPhysics
 
 			for (int i = 0; i < contactCount; i++)
 			{
-				this.impulseList[i] = FlatVector.Zero;
-				this.raList[i] = FlatVector.Zero;
-				this.rbList[i] = FlatVector.Zero;
-				this.frictionImpulseList[i] = FlatVector.Zero;
+				this.impulseList[i] = Vector2.Zero;
+				this.raList[i] = Vector2.Zero;
+				this.rbList[i] = Vector2.Zero;
+				this.frictionImpulseList[i] = Vector2.Zero;
 				this.jList[i] = 0;
 			}
 
 			for (int i = 0; i < contactCount; i++)
 			{
 				// 중심점에서 접촉 지점 까지의 벡터
-				FlatVector ra = contactList[i] - bodyA.Position;
-				FlatVector rb = contactList[i] - bodyB.Position;
+				Vector2 ra = contactList[i] - bodyA.Position;
+				Vector2 rb = contactList[i] - bodyB.Position;
 
 				raList[i] = ra;
 				rbList[i] = rb;
 
 				// 위 벡터의 수직 벡터
-				FlatVector raPerp = new FlatVector(-ra.Y, ra.X);
-				FlatVector rbPerp = new FlatVector(-rb.Y, rb.X);
+				Vector2 raPerp = new Vector2(-ra.Y, ra.X);
+				Vector2 rbPerp = new Vector2(-rb.Y, rb.X);
 
-				FlatVector angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
-				FlatVector angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
+				Vector2 angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
+				Vector2 angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
 
-				FlatVector relativeVelocity =
+				Vector2 relativeVelocity =
 					(bodyB.LinearVelocity + angularLinearVelocityB) -
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
@@ -340,16 +341,16 @@ namespace FlatPhysics
 				j /= (float)contactCount; // 접촉점 마다 힘이 있기 때문
 
 				jList[i] = j;
-				FlatVector impulse = j * normal;
+				Vector2 impulse = j * normal;
 				impulseList[i] = impulse;
 			}
 
 			// 각 접점에서 가속도를 적용해서 변경되어 버리는것을 방지하기 위해 별도의 반복문으로 분리
 			for (int i = 0; i < contactCount; i++)
 			{
-				FlatVector impulse = impulseList[i];
-				FlatVector ra = raList[i];
-				FlatVector rb = rbList[i];
+				Vector2 impulse = impulseList[i];
+				Vector2 ra = raList[i];
+				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -impulse * bodyA.InvMass;
 				bodyA.AngularVelocity += -FlatMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
@@ -361,26 +362,26 @@ namespace FlatPhysics
 			for (int i = 0; i < contactCount; i++)
 			{
 				// 중심점에서 접촉 지점 까지의 벡터
-				FlatVector ra = contactList[i] - bodyA.Position;
-				FlatVector rb = contactList[i] - bodyB.Position;
+				Vector2 ra = contactList[i] - bodyA.Position;
+				Vector2 rb = contactList[i] - bodyB.Position;
 
 				raList[i] = ra;
 				rbList[i] = rb;
 
 				// 위 벡터의 수직 벡터
-				FlatVector raPerp = new FlatVector(-ra.Y, ra.X);
-				FlatVector rbPerp = new FlatVector(-rb.Y, rb.X);
+				Vector2 raPerp = new Vector2(-ra.Y, ra.X);
+				Vector2 rbPerp = new Vector2(-rb.Y, rb.X);
 
-				FlatVector angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
-				FlatVector angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
+				Vector2 angularLinearVelocityA = raPerp * bodyA.AngularVelocity;
+				Vector2 angularLinearVelocityB = rbPerp * bodyB.AngularVelocity;
 
-				FlatVector relativeVelocity =
+				Vector2 relativeVelocity =
 					(bodyB.LinearVelocity + angularLinearVelocityB) -
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
-				FlatVector tangent = relativeVelocity - FlatMath.Dot(relativeVelocity, normal) * normal;
+				Vector2 tangent = relativeVelocity - FlatMath.Dot(relativeVelocity, normal) * normal;
 
-				if (FlatMath.NearlyEqual(tangent, FlatVector.Zero))
+				if (FlatMath.NearlyEqual(tangent, Vector2.Zero))
 				{
 					continue;
 				}
@@ -401,7 +402,7 @@ namespace FlatPhysics
 				jt /= denominator;
 				jt /= (float)contactCount; // 접촉점 마다 힘이 있기 때문
 
-				FlatVector frictionImpluse;
+				Vector2 frictionImpluse;
 				float j = jList[i];
 
 				if (MathF.Abs(jt) < j * sf)
@@ -419,9 +420,9 @@ namespace FlatPhysics
 			// 각 접점에서 가속도를 적용해서 변경되어 버리는것을 방지하기 위해 별도의 반복문으로 분리
 			for (int i = 0; i < contactCount; i++)
 			{
-				FlatVector frictionImpluse = frictionImpulseList[i];
-				FlatVector ra = raList[i];
-				FlatVector rb = rbList[i];
+				Vector2 frictionImpluse = frictionImpulseList[i];
+				Vector2 ra = raList[i];
+				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -frictionImpluse * bodyA.InvMass;
 				bodyA.AngularVelocity += -FlatMath.Cross(ra, frictionImpluse) * bodyA.InvInertia; // 회전하는 힘

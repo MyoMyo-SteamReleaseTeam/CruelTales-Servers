@@ -1,4 +1,5 @@
-﻿using PhysicsTester;
+﻿using System.Numerics;
+using PhysicsTester;
 
 namespace FlatPhysics
 {
@@ -19,7 +20,7 @@ namespace FlatPhysics
 			Color = color;
 		}
 
-		public FlatEntity(FlatWorld world, float radius, bool isStatic, FlatVector position)
+		public FlatEntity(FlatWorld world, float radius, bool isStatic, Vector2 position)
 		{
 			if (!FlatBody.CreateCircleBody(radius, 1f, isStatic, 0.5f, out FlatBody body, out string errorMessage))
 			{
@@ -32,7 +33,7 @@ namespace FlatPhysics
 			Color = RandomHelper.RandomColor();
 		}
 
-		public FlatEntity(FlatWorld world, float width, float height, bool isStatic, FlatVector position)
+		public FlatEntity(FlatWorld world, float width, float height, bool isStatic, Vector2 position)
 		{
 			if (!FlatBody.CreateBoxBody(width, height, 1f, isStatic, 0.5f, out FlatBody body, out string errorMessage))
 			{
@@ -47,14 +48,14 @@ namespace FlatPhysics
 
 		public void Draw(Renderer renderer)
 		{
-			FlatVector position = Body.Position;
+			Vector2 position = Body.Position;
 
 			if (Body.ShapeType == ShapeType.Circle)
 			{
-				FlatVector vb = new FlatVector(Body.Radius, 0f);
+				Vector2 vb = new Vector2(Body.Radius, 0f);
 				float x = -MathF.Sin(Body.Angle);
 				float y = MathF.Cos(Body.Angle);
-				FlatVector rotationLine = new FlatVector(x, y) * Body.Radius;
+				Vector2 rotationLine = new Vector2(x, y) * Body.Radius;
 
 				renderer.DrawCircleFill(position, Body.Radius, Color);
 				renderer.DrawCircle(position, Body.Radius, Color.White);
@@ -70,10 +71,10 @@ namespace FlatPhysics
 
 			float centerPivotRadius = 5.0f / renderer.Zoom;
 
-			renderer.DrawLine(position, position + new FlatVector(1, 1) * centerPivotRadius, Color.SkyBlue);
-			renderer.DrawLine(position, position + new FlatVector(1, -1) * centerPivotRadius, Color.SkyBlue);
-			renderer.DrawLine(position, position + new FlatVector(-1, 1) * centerPivotRadius, Color.SkyBlue);
-			renderer.DrawLine(position, position + new FlatVector(-1, -1) * centerPivotRadius, Color.SkyBlue);
+			renderer.DrawLine(position, position + new Vector2(1, 1) * centerPivotRadius, Color.SkyBlue);
+			renderer.DrawLine(position, position + new Vector2(1, -1) * centerPivotRadius, Color.SkyBlue);
+			renderer.DrawLine(position, position + new Vector2(-1, 1) * centerPivotRadius, Color.SkyBlue);
+			renderer.DrawLine(position, position + new Vector2(-1, -1) * centerPivotRadius, Color.SkyBlue);
 		}
 	}
 }
