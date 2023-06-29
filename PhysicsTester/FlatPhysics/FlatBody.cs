@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using PhysicsTester;
 
 namespace FlatPhysics
 {
@@ -279,7 +280,7 @@ namespace FlatPhysics
 				return false;
 			}
 
-			restitution = FlatMath.Clamp(restitution, 0f, 1f);
+			restitution = KaMath.Clamp(restitution, 0f, 1f);
 
 			float mass = 0f;
 			float inertia = 0;
@@ -326,7 +327,7 @@ namespace FlatPhysics
 				return false;
 			}
 
-			restitution = FlatMath.Clamp(restitution, 0f, 1f);
+			restitution = KaMath.Clamp(restitution, 0f, 1f);
 
 			float mass = 0;
 			float inertia = 0;

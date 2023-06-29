@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
+using FlatPhysics;
 
-namespace FlatPhysics
+namespace PhysicsTester
 {
 	public static class VectorExtension
 	{

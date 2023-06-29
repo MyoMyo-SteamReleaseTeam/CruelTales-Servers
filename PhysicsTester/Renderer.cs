@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using FlatPhysics;
 
 namespace PhysicsTester
 {
@@ -20,8 +19,7 @@ namespace PhysicsTester
 				ScreenCameraPosition = (CameraWorldPosition - (ViewSize / 2).FlipY()) * _zoom;
 			}
 		}
-		//public FlatVector CameraWorldPosition => (CameraPosition / _zoom + (ViewSize / 2).FlipY());
-		public Vector2 ScreenCameraPosition { get; set; } //=> (CameraWorldPosition - (ViewSize / 2).FlipY()) * _zoom;
+		public Vector2 ScreenCameraPosition { get; set; }
 
 		private float _zoom = 1;
 		public float Zoom
@@ -65,8 +63,8 @@ namespace PhysicsTester
 			var lb = ViewLeftBottom;
 			var rt = ViewRightTop;
 
-			mx = FlatMath.Lerp(lb.X, rt.X, mx);
-			my = FlatMath.Lerp(lb.Y, rt.Y, my);
+			mx = KaMath.Lerp(lb.X, rt.X, mx);
+			my = KaMath.Lerp(lb.Y, rt.Y, my);
 
 			return new Vector2(mx, my);
 		}

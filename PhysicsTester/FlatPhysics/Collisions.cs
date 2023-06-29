@@ -15,8 +15,8 @@ namespace FlatPhysics
 			Vector2 ab = b - a;
 			Vector2 ap = p - a;
 
-			float proj = FlatMath.Dot(ap, ab);
-			float abLenSq = FlatMath.LengthSquared(ab);
+			float proj = Vector2.Dot(ap, ab);
+			float abLenSq = ab.LengthSquared();
 			float d = proj / abLenSq;
 
 			if (d <= 0f)
@@ -32,7 +32,7 @@ namespace FlatPhysics
 				cp = a + ab * d;
 			}
 
-			distanceSquared = FlatMath.DistanceSquared(p, cp);
+			distanceSquared = Vector2.DistanceSquared(p, cp);
 		}
 
 		public static bool IntersectAABBs(FlatAABB a, FlatAABB b)
@@ -107,9 +107,9 @@ namespace FlatPhysics
 
 					Collisions.PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
-					if (FlatMath.NearlyEqual(distSq, minDistSq))
+					if (KaMath.NearlyEqual(distSq, minDistSq))
 					{
-						if (!FlatMath.NearlyEqual(cp, contact1))
+						if (!KaMath.NearlyEqual(cp, contact1))
 						{
 							contact2 = cp;
 							contactCount = 2;
@@ -135,9 +135,9 @@ namespace FlatPhysics
 
 					Collisions.PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
-					if (FlatMath.NearlyEqual(distSq, minDistSq))
+					if (KaMath.NearlyEqual(distSq, minDistSq))
 					{
-						if (!FlatMath.NearlyEqual(cp, contact1))
+						if (!KaMath.NearlyEqual(cp, contact1))
 						{
 							contact2 = cp;
 							contactCount = 2;
@@ -180,7 +180,7 @@ namespace FlatPhysics
 		private static void FindCirclesContactPoint(Vector2 centerA, float radiusA, Vector2 centerB, out Vector2 cp)
 		{
 			Vector2 ab = centerB - centerA;
-			Vector2 dir = FlatMath.Normalize(ab);
+			Vector2 dir = Vector2.Normalize(ab);
 			cp = centerA + dir * radiusA;
 		}
 
@@ -251,7 +251,7 @@ namespace FlatPhysics
 
 				Vector2 edge = vb - va;
 				axis = new Vector2(-edge.Y, edge.X);
-				axis = FlatMath.Normalize(axis);
+				axis = Vector2.Normalize(axis);
 
 				Collisions.ProjectVertices(vertices, axis, out minA, out maxA);
 				Collisions.ProjectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
@@ -274,7 +274,7 @@ namespace FlatPhysics
 			Vector2 cp = vertices[cpIndex];
 
 			axis = cp - circleCenter;
-			axis = FlatMath.Normalize(axis);
+			axis = Vector2.Normalize(axis);
 
 			Collisions.ProjectVertices(vertices, axis, out minA, out maxA);
 			Collisions.ProjectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
@@ -294,7 +294,7 @@ namespace FlatPhysics
 
 			Vector2 direction = polygonCenter - circleCenter;
 
-			if (FlatMath.Dot(direction, normal) < 0f)
+			if (Vector2.Dot(direction, normal) < 0f)
 			{
 				normal = -normal;
 			}
@@ -310,7 +310,7 @@ namespace FlatPhysics
 			for (int i = 0; i < vertices.Length; i++)
 			{
 				Vector2 v = vertices[i];
-				float distance = FlatMath.Distance(v, circleCenter);
+				float distance = Vector2.Distance(v, circleCenter);
 
 				if (distance < minDistance)
 				{
@@ -324,14 +324,14 @@ namespace FlatPhysics
 
 		private static void ProjectCircle(Vector2 center, float radius, Vector2 axis, out float min, out float max)
 		{
-			Vector2 direction = FlatMath.Normalize(axis);
+			Vector2 direction = Vector2.Normalize(axis);
 			Vector2 directionAndRadius = direction * radius;
 
 			Vector2 p1 = center + directionAndRadius;
 			Vector2 p2 = center - directionAndRadius;
 
-			min = FlatMath.Dot(p1, axis);
-			max = FlatMath.Dot(p2, axis);
+			min = Vector2.Dot(p1, axis);
+			max = Vector2.Dot(p2, axis);
 
 			if (min > max)
 			{
@@ -354,7 +354,7 @@ namespace FlatPhysics
 
 				Vector2 edge = vb - va;
 				Vector2 axis = new Vector2(-edge.Y, edge.X);
-				axis = FlatMath.Normalize(axis);
+				axis = Vector2.Normalize(axis);
 
 				Collisions.ProjectVertices(verticesA, axis, out float minA, out float maxA);
 				Collisions.ProjectVertices(verticesB, axis, out float minB, out float maxB);
@@ -380,7 +380,7 @@ namespace FlatPhysics
 
 				Vector2 edge = vb - va;
 				Vector2 axis = new Vector2(-edge.Y, edge.X);
-				axis = FlatMath.Normalize(axis);
+				axis = Vector2.Normalize(axis);
 
 				Collisions.ProjectVertices(verticesA, axis, out float minA, out float maxA);
 				Collisions.ProjectVertices(verticesB, axis, out float minB, out float maxB);
@@ -401,7 +401,7 @@ namespace FlatPhysics
 
 			Vector2 direction = centerB - centerA;
 
-			if (FlatMath.Dot(direction, normal) < 0f)
+			if (Vector2.Dot(direction, normal) < 0f)
 			{
 				normal = -normal;
 			}
@@ -417,7 +417,7 @@ namespace FlatPhysics
 			for (int i = 0; i < vertices.Length; i++)
 			{
 				Vector2 v = vertices[i];
-				float proj = FlatMath.Dot(v, axis);
+				float proj = Vector2.Dot(v, axis);
 
 				if (proj < min) { min = proj; }
 				if (proj > max) { max = proj; }
@@ -432,7 +432,7 @@ namespace FlatPhysics
 			normal = Vector2.Zero;
 			depth = 0f;
 
-			float distance = FlatMath.Distance(centerA, centerB);
+			float distance = Vector2.Distance(centerA, centerB);
 			float radii = radiusA + radiusB;
 
 			if (distance >= radii)
@@ -440,7 +440,7 @@ namespace FlatPhysics
 				return false;
 			}
 
-			normal = FlatMath.Normalize(centerB - centerA);
+			normal = Vector2.Normalize(centerB - centerA);
 			depth = radii - distance;
 
 			return true;

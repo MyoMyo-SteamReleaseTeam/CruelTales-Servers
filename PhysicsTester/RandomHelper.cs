@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlatPhysics
+namespace PhysicsTester
 {
 	public static class RandomHelper
 	{
@@ -28,7 +28,7 @@ namespace FlatPhysics
 
 		public static float RandomSingle(float min, float max)
 		{
-			return FlatMath.Lerp(min, max, _random.NextSingle());
+			return KaMath.Lerp(min, max, _random.NextSingle());
 		}
 	}
 }

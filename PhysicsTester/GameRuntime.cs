@@ -89,9 +89,9 @@ namespace PhysicsTester
 			if (InputManager.IsPressed(GameKey.CameraMoveRight))
 				cameraMoveDirection += new Vector2(1, 0);
 
-			if (FlatMath.Length(cameraMoveDirection) != 0)
+			if (cameraMoveDirection.Length() != 0)
 			{
-				cameraMoveDirection = FlatMath.Normalize(cameraMoveDirection);
+				cameraMoveDirection = Vector2.Normalize(cameraMoveDirection);
 				_renderer.CameraWorldPosition += cameraMoveDirection / _renderer.Zoom * deltaTime * 500.0f;
 			}
 

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Drawing;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
+using PhysicsTester;
 
 namespace FlatPhysics
 {
@@ -62,7 +56,7 @@ namespace FlatPhysics
 
 		public void Step(float time, int totalIterations)
 		{
-			totalIterations = FlatMath.Clamp(totalIterations, MinIterations, MaxIterations);
+			totalIterations = KaMath.Clamp(totalIterations, MinIterations, MaxIterations);
 
 			this.ContactPointsList.Clear();
 
@@ -176,14 +170,14 @@ namespace FlatPhysics
 
 			Vector2 relativeVelocity = bodyB.LinearVelocity - bodyA.LinearVelocity;
 
-			if (FlatMath.Dot(relativeVelocity, normal) > 0f)
+			if (Vector2.Dot(relativeVelocity, normal) > 0f)
 			{
 				// 이미 떨어져서 멀어지고 있기 때문에 계산을 무시
 				return;
 			}
 
 			float e = MathF.Min(bodyA.Restitution, bodyB.Restitution);
-			float j = -(1f + e) * FlatMath.Dot(relativeVelocity, normal);
+			float j = -(1f + e) * Vector2.Dot(relativeVelocity, normal);
 			j /= bodyA.InvMass + bodyB.InvMass;
 
 			Vector2 impulse = j * normal;
@@ -240,15 +234,15 @@ namespace FlatPhysics
 					(bodyB.LinearVelocity + angularLinearVelocityB) - 
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
-				float contactVelocityMag = FlatMath.Dot(relativeVelocity, normal);
+				float contactVelocityMag = Vector2.Dot(relativeVelocity, normal);
 				if (contactVelocityMag > 0f)
 				{
 					// 이미 떨어져서 멀어지고 있기 때문에 계산을 무시
 					continue;
 				}
 
-				float raPerpDotN = FlatMath.Dot(raPerp, normal);
-				float rbPerpDotN = FlatMath.Dot(rbPerp, normal);
+				float raPerpDotN = Vector2.Dot(raPerp, normal);
+				float rbPerpDotN = Vector2.Dot(rbPerp, normal);
 
 				float denominator = bodyA.InvMass + bodyB.InvMass +
 					(raPerpDotN * raPerpDotN) * bodyA.InvInertia +
@@ -270,9 +264,9 @@ namespace FlatPhysics
 				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -impulse * bodyA.InvMass;
-				bodyA.AngularVelocity += -FlatMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
+				bodyA.AngularVelocity += -KaMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
 				bodyB.LinearVelocity += impulse * bodyB.InvMass;
-				bodyB.AngularVelocity += FlatMath.Cross(rb, impulse) * bodyB.InvInertia;
+				bodyB.AngularVelocity += KaMath.Cross(rb, impulse) * bodyB.InvInertia;
 			}
 		}
 
@@ -322,15 +316,15 @@ namespace FlatPhysics
 					(bodyB.LinearVelocity + angularLinearVelocityB) -
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
-				float contactVelocityMag = FlatMath.Dot(relativeVelocity, normal);
+				float contactVelocityMag = Vector2.Dot(relativeVelocity, normal);
 				if (contactVelocityMag > 0f)
 				{
 					// 이미 떨어져서 멀어지고 있기 때문에 계산을 무시
 					continue;
 				}
 
-				float raPerpDotN = FlatMath.Dot(raPerp, normal);
-				float rbPerpDotN = FlatMath.Dot(rbPerp, normal);
+				float raPerpDotN = Vector2.Dot(raPerp, normal);
+				float rbPerpDotN = Vector2.Dot(rbPerp, normal);
 
 				float denominator = bodyA.InvMass + bodyB.InvMass +
 					(raPerpDotN * raPerpDotN) * bodyA.InvInertia +
@@ -353,9 +347,9 @@ namespace FlatPhysics
 				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -impulse * bodyA.InvMass;
-				bodyA.AngularVelocity += -FlatMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
+				bodyA.AngularVelocity += -KaMath.Cross(ra, impulse) * bodyA.InvInertia; // 회전하는 힘
 				bodyB.LinearVelocity += impulse * bodyB.InvMass;
-				bodyB.AngularVelocity += FlatMath.Cross(rb, impulse) * bodyB.InvInertia;
+				bodyB.AngularVelocity += KaMath.Cross(rb, impulse) * bodyB.InvInertia;
 			}
 
 			// Calculate friction
@@ -379,26 +373,26 @@ namespace FlatPhysics
 					(bodyB.LinearVelocity + angularLinearVelocityB) -
 					(bodyA.LinearVelocity + angularLinearVelocityA);
 
-				Vector2 tangent = relativeVelocity - FlatMath.Dot(relativeVelocity, normal) * normal;
+				Vector2 tangent = relativeVelocity - Vector2.Dot(relativeVelocity, normal) * normal;
 
-				if (FlatMath.NearlyEqual(tangent, Vector2.Zero))
+				if (KaMath.NearlyEqual(tangent, Vector2.Zero))
 				{
 					continue;
 				}
 				else
 				{
-					tangent = FlatMath.Normalize(tangent);
+					tangent = Vector2.Normalize(tangent);
 				}
 
-				float raPerpDotT = FlatMath.Dot(raPerp, tangent);
-				float rbPerpDotT = FlatMath.Dot(rbPerp, tangent);
+				float raPerpDotT = Vector2.Dot(raPerp, tangent);
+				float rbPerpDotT = Vector2.Dot(rbPerp, tangent);
 
 				float denominator = bodyA.InvMass + bodyB.InvMass +
 					(raPerpDotT * raPerpDotT) * bodyA.InvInertia +
 					(rbPerpDotT * rbPerpDotT) * bodyB.InvInertia;
 
 				// Restitution 같은 연산을 하지 않기 때문에 e 연산 없음
-				float jt = -FlatMath.Dot(relativeVelocity, tangent);
+				float jt = -Vector2.Dot(relativeVelocity, tangent);
 				jt /= denominator;
 				jt /= (float)contactCount; // 접촉점 마다 힘이 있기 때문
 
@@ -425,9 +419,9 @@ namespace FlatPhysics
 				Vector2 rb = rbList[i];
 
 				bodyA.LinearVelocity += -frictionImpluse * bodyA.InvMass;
-				bodyA.AngularVelocity += -FlatMath.Cross(ra, frictionImpluse) * bodyA.InvInertia; // 회전하는 힘
+				bodyA.AngularVelocity += -KaMath.Cross(ra, frictionImpluse) * bodyA.InvInertia; // 회전하는 힘
 				bodyB.LinearVelocity += frictionImpluse * bodyB.InvMass;
-				bodyB.AngularVelocity += FlatMath.Cross(rb, frictionImpluse) * bodyB.InvInertia;
+				bodyB.AngularVelocity += KaMath.Cross(rb, frictionImpluse) * bodyB.InvInertia;
 			}
 		}
 	}
