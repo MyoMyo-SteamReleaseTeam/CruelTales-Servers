@@ -1,108 +1,152 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using PhysicsTester;
 
 namespace FlatPhysics
 {
+	/// <summary>물리 형체 타입</summary>
 	public enum ShapeType
 	{
+		/// <summary>원</summary>
 		Circle = 0,
+
+		/// <summary>직사각형</summary>
 		Box = 1,
 	}
 
 	/// <summary>RigidBody</summary>
 	public sealed class FlatBody
 	{
-		private Vector2 position;
-		private Vector2 linearVelocity;
-		private float angle;
-		private float angularVelocity;
-		private Vector2 force;
+		/// <summary>위치</summary>
+		private Vector2 _position;
+		public Vector2 Position => _position;
 
+		/// <summary>선속도</summary>
+		private Vector2 _linearVelocity;
+		public Vector2 LinearVelocity
+		{
+			get => _linearVelocity;
+			internal set => _linearVelocity = value;
+		}
+
+		/// <summary>각도</summary>
+		private float _angle;
+		public float Angle => _angle;
+
+		/// <summary>각속도</summary>
+		private float _angularVelocity;
+		public float AngularVelocity
+		{
+			get => _angularVelocity;
+			internal set => _angularVelocity = value;
+		}
+
+		/// <summary>힘</summary>
+		private Vector2 _force;
+
+		/// <summary>모양 타입</summary>
 		public readonly ShapeType ShapeType;
+
+		/// <summary>밀도</summary>
 		public readonly float Density;
+
+		/// <summary>질량</summary>
 		public readonly float Mass;
 		public readonly float InvMass;
+
 		/// <summary>반발 계수</summary>
 		public readonly float Restitution;
+
+		/// <summary>면적</summary>
 		public readonly float Area;
+
 		/// <summary>관성 모멘트</summary>
 		public readonly float Inertia;
 		public readonly float InvInertia;
+
+		/// <summary>정적 객체 여부</summary>
 		public readonly bool IsStatic;
+
+		/// <summary>반지름</summary>
 		public readonly float Radius;
+
+		/// <summary>너비</summary>
 		public readonly float Width;
+
+		/// <summary>높이</summary>
 		public readonly float Height;
+
+		/// <summary>정지 마찰력</summary>
 		public readonly float StaticFriction;
+
+		/// <summary>동마찰력</summary>
 		public readonly float DynamicFriction;
 
-		private readonly Vector2[] vertices;
-		[Obsolete("물리에서 사용하지 않음")]
-		public readonly int[] Triangles;
-		private Vector2[] transformedVertices;
-		private FlatAABB aabb;
+		/// <summary>정점 배열</summary>
+		[AllowNull]
+		private readonly Vector2[] _vertices;
 
-		private bool transformUpdateRequired;
-		private bool aabbUpdateRequired;
+		/// <summary>폴리곤의 삼각형 인덱스 배열</summary>
+		[AllowNull]
+		public readonly int[] Triangles; //물리에서 사용하지 않음
 
-		public Vector2 Position => position;
+		/// <summary>회전 변환이 적용된 정점 배열</summary>
+		[AllowNull]
+		private Vector2[] _transformedVertices;
 
-		public Vector2 LinearVelocity
-		{
-			get => this.linearVelocity;
-			internal set => this.linearVelocity = value;
-		}
+		/// <summary>AABB 바운딩 볼륨</summary>
+		private FlatAABB _aabb;
 
-		public float AngularVelocity
-		{
-			get => this.angularVelocity;
-			internal set => this.angularVelocity = value;
-		}
+		/// <summary>변환이 필요한지 여부</summary>
+		private bool _transformUpdateRequired;
 
-		public float Angle => angle;
+		/// <summary>AABB 바운딩 볼륨 수정이 필요한지 여부</summary>
+		private bool _aabbUpdateRequired;
 
         public FlatBody(float density, float mass, float inertia, float restitution, float area,
 						bool isStatic, float radius, float width, float height, Vector2[] vertices, ShapeType shapeType)
         {
-			this.position = Vector2.Zero;
-			this.linearVelocity = Vector2.Zero;
-			this.angle = 0f;
-			this.angularVelocity = 0f;
+			_position = Vector2.Zero;
+			_linearVelocity = Vector2.Zero;
+			_angle = 0f;
+			_angularVelocity = 0f;
 
-			this.force = Vector2.Zero;
+			_force = Vector2.Zero;
 
-			this.ShapeType = shapeType;
-			this.Density = density;
-			this.Mass = mass;
-			this.InvMass = mass > 0f ? 1f / mass : 0f;
-			this.Inertia = inertia;
-			this.InvInertia = inertia > 0f ? 1f / inertia : 0f;
-			this.Restitution = restitution;
-			this.Area = area;
-			this.IsStatic = isStatic;
-			this.Radius = radius;
-			this.Width = width;
-			this.Height = height;
-			this.StaticFriction = 0.6f;
-			this.DynamicFriction = 0.4f;
+			ShapeType = shapeType;
+			Density = density;
+			Mass = mass;
+			InvMass = mass > 0f ? 1f / mass : 0f;
+			Inertia = inertia;
+			InvInertia = inertia > 0f ? 1f / inertia : 0f;
+			Restitution = restitution;
+			Area = area;
+			IsStatic = isStatic;
+			Radius = radius;
+			Width = width;
+			Height = height;
+			StaticFriction = 0.6f;
+			DynamicFriction = 0.4f;
 
-			if (this.ShapeType is ShapeType.Box)
+			if (ShapeType is ShapeType.Box)
 			{
-				this.vertices = vertices;
-				Triangles = CreateBoxTriangles();
-				this.transformedVertices = new Vector2[this.vertices.Length];
+				_vertices = vertices;
+				Triangles = createBoxTriangles();
+				_transformedVertices = new Vector2[_vertices.Length];
 			}
 			else
 			{
-				this.vertices = null;
+				_vertices = null;
 				Triangles = null;
-				this.transformedVertices = null;
+				_transformedVertices = null;
 			}
 
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
-		private static Vector2[] CreateBoxVertices(float width, float height)
+		/// <summary>직사각형의 정점 배열을 생성합니다.</summary>
+		private static Vector2[] createBoxVertices(float width, float height)
 		{
 			float left = -width / 2f;
 			float right = left + width;
@@ -118,7 +162,8 @@ namespace FlatPhysics
 			return vertices;
 		}
 
-		private static int[] CreateBoxTriangles()
+		/// <summary>직사각형의 삼각형 정점 인덱스를 생성합니다.</summary>
+		private static int[] createBoxTriangles()
 		{
 			int[] triangles = new int[6];
 			triangles[0] = 0; // TL
@@ -130,35 +175,37 @@ namespace FlatPhysics
 			return triangles;
 		}
 
+		/// <summary>회전 행렬이 적용된 정점 배열을 반환합니다.</summary>
 		public Vector2[] GetTransformedVertices()
 		{
-			if (this.transformUpdateRequired)
+			if (_transformUpdateRequired)
 			{
-				FlatTransform transform = new FlatTransform(this.position, this.angle);
+				FlatTransform transform = new FlatTransform(_position, _angle);
 
-				for (int i = 0; i < this.vertices.Length; i++)
+				for (int i = 0; i < _vertices.Length; i++)
 				{
-					Vector2 v = this.vertices[i];
-					this.transformedVertices[i] = v.Transform(transform);
+					Vector2 v = _vertices[i];
+					_transformedVertices[i] = v.Transform(transform);
 				}
 			}
 
-			this.transformUpdateRequired = false;
-			return this.transformedVertices;
+			_transformUpdateRequired = false;
+			return _transformedVertices;
 		}
 
+		/// <summary>AABB 바운딩 볼륨을 반환합니다.</summary>
 		public FlatAABB GetAABB()
 		{
-			if (this.aabbUpdateRequired)
+			if (_aabbUpdateRequired)
 			{
 				float minX = float.MaxValue;
 				float minY = float.MaxValue;
 				float maxX = float.MinValue;
 				float maxY = float.MinValue;
 
-				if (this.ShapeType is ShapeType.Box)
+				if (ShapeType is ShapeType.Box)
 				{
-					Vector2[] vertices = this.GetTransformedVertices();
+					Vector2[] vertices = GetTransformedVertices();
 
 					for (int i = 0; i < vertices.Length; i++)
 					{
@@ -170,86 +217,94 @@ namespace FlatPhysics
 						if (v.Y > maxY) { maxY = v.Y; }
 					}
 				}
-				else if (this.ShapeType is ShapeType.Circle)
+				else if (ShapeType is ShapeType.Circle)
 				{
-					minX = this.Position.X - this.Radius;
-					minY = this.Position.Y - this.Radius;
-					maxX = this.Position.X + this.Radius;
-					maxY = this.Position.Y + this.Radius;
+					minX = Position.X - Radius;
+					minY = Position.Y - Radius;
+					maxX = Position.X + Radius;
+					maxY = Position.Y + Radius;
 				}
 				else
 				{
 					throw new Exception("Unknown ShapeType.");
 				}
 
-				this.aabb = new FlatAABB(minX, minY, maxX, maxY);
+				_aabb = new FlatAABB(minX, minY, maxX, maxY);
 			}
 
-			this.aabbUpdateRequired = false;
-			return this.aabb;
+			_aabbUpdateRequired = false;
+			return _aabb;
 		}
 
-		public void Step(float time, Vector2 gravity, int iterations)
+		/// <summary>물리 Step을 진행합니다.</summary>
+		public void Step(float stepTime, Vector2 gravity, int iterations)
 		{
-			if (this.IsStatic)
+			if (IsStatic)
 			{
 				return;
 			}
 
-			time /= (float)iterations;
+			stepTime /= (float)iterations;
 
 			// Force = Mass * Acc
 			// Acc = Force / Mass
 
-			//FlatVector acceleration = this.force / this.Mass;
-			//this.linearVelocity += acceleration * time;
+			//FlatVector acceleration = force / Mass;
+			//linearVelocity += acceleration * time;
 
-			this.linearVelocity += gravity * time;
-			this.position += this.linearVelocity * time;
+			_linearVelocity += gravity * stepTime;
+			_position += _linearVelocity * stepTime;
 
-			this.angle += this.angularVelocity * time;
+			_angle += _angularVelocity * stepTime;
 
-			this.force = Vector2.Zero;
+			_force = Vector2.Zero;
 
 			// 움직인 경우 여러 프로퍼티를 갱신
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
+		/// <summary>힘을 가합니다.</summary>
 		public void AddForce(Vector2 amount)
 		{
-			this.force = amount;
+			_force = amount;
 		}
 
+		/// <summary>상대적으로 이동합니다.</summary>
 		public void Move(Vector2 amount)
 		{
-			this.position += amount;
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_position += amount;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
+		/// <summary>해당 위치로 이동합니다.</summary>
 		public void MoveTo(Vector2 position)
 		{
-			this.position = position;
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_position = position;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
+		/// <summary>물체를 상대적으로 회전합니다.</summary>
 		public void Rotate(float amount)
 		{
-			this.angle += amount;
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_angle += amount;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
+		/// <summary>해당 각도로 회전합니다.</summary>
+		/// <param name="angle"></param>
 		public void RotateTo(float angle)
 		{
-			this.angle = angle;
-			this.transformUpdateRequired = true;
-			this.aabbUpdateRequired = true;
+			_angle = angle;
+			_transformUpdateRequired = true;
+			_aabbUpdateRequired = true;
 		}
 
-		public static bool CreateCircleBody(float radius, float density, bool isStatic, float restitution, out FlatBody body, out string errorMessage)
+		public static bool CreateCircleBody(float radius, float density, bool isStatic, float restitution,
+											out FlatBody body, out string errorMessage)
 		{
 			body = null;
 			errorMessage = string.Empty;
@@ -296,7 +351,8 @@ namespace FlatPhysics
 			return true;
 		}
 
-		public static bool CreateBoxBody(float width, float height, float density, bool isStatic, float restitution, out FlatBody body, out string errorMessage)
+		public static bool CreateBoxBody(float width, float height, float density, bool isStatic, float restitution,
+										 out FlatBody body, out string errorMessage)
 		{
 			body = null;
 			errorMessage = string.Empty;
@@ -339,7 +395,7 @@ namespace FlatPhysics
 				inertia = (1f / 12) * mass * width * width + height * height;
 			}
 
-			Vector2[] vertices = CreateBoxVertices(width, height);
+			Vector2[] vertices = createBoxVertices(width, height);
 
 			body = new FlatBody(density, mass, inertia, restitution, area, isStatic, 0f, width, height, vertices, ShapeType.Box);
 			return true;

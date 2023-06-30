@@ -5,7 +5,7 @@ using UnityEngine;
 #endif
 using CT.Common.Serialization;
 
-public static class Vector2Extension
+public static class Vector2SerializeExtension
 {
 	public static void Serialize(this Vector2 value, IPacketWriter writer)
 	{
@@ -35,7 +35,7 @@ public static class Vector2Extension
 	}
 }
 
-public static class Vector3Extension
+public static class Vector3SerializeExtension
 {
 	public static void Serialize(this Vector3 value, IPacketWriter writer)
 	{

@@ -11,7 +11,7 @@ namespace FlatPhysics
 		public FlatEntity(FlatBody body)
 		{
 			Body = body;
-			Color = RandomHelper.RandomColor();
+			Color = WinformRandomHelper.RandomColor();
 		}
 
 		public FlatEntity(FlatBody body, Color color)
@@ -30,7 +30,7 @@ namespace FlatPhysics
 			body.MoveTo(position);
 			Body = body;
 			world.AddBody(Body);
-			Color = RandomHelper.RandomColor();
+			Color = WinformRandomHelper.RandomColor();
 		}
 
 		public FlatEntity(FlatWorld world, float width, float height, bool isStatic, Vector2 position)
@@ -43,7 +43,7 @@ namespace FlatPhysics
 			body.MoveTo(position);
 			Body = body;
 			world.AddBody(Body);
-			Color = RandomHelper.RandomColor();
+			Color = WinformRandomHelper.RandomColor();
 		}
 
 		public void Draw(Renderer renderer)

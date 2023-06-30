@@ -2,34 +2,27 @@
 using System.Numerics;
 using FlatPhysics;
 
-namespace PhysicsTester
+namespace PhysicsTester.FlatPhysics
 {
-	public class GameRuntime
+	public class FlatPhysicsRuntime : PhysicsRuntime
 	{
-		private MainForm _mainForm;
-		public InputManager InputManager { get; private set; }
-		private Renderer _renderer = new();
 
-		private FlatWorld world;
+		private FlatWorld world = new();
 		private List<FlatEntity> entityList = new();
 		private List<FlatEntity> entityRemovalList = new();
 
-		public GameRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
+		public FlatPhysicsRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
+			: base(mainForm, inputManager)
 		{
-			_mainForm = mainForm;
 			Vector2 screenHalfSize = screenSize * 0.5f;
-
-			InputManager = inputManager;
 			_renderer.Zoom = 1 + 3 * 7;
 			_renderer.ScreenCameraPosition = -screenHalfSize.FlipY();
 
+			Vector2 viewLB = _renderer.ViewLeftBottom;
+			Vector2 viewRT = _renderer.ViewRightTop;
+
 			const float padding = 2f;
 			Vector2 worldHalfSize = screenHalfSize.FlipY() / _renderer.Zoom - new Vector2(padding, padding);
-
-			this.world = new FlatWorld();
-
-			Vector2 viewLB = this._renderer.ViewLeftBottom;
-			Vector2 viewRT = this._renderer.ViewRightTop;
 
 			if (!FlatBody.CreateBoxBody(worldHalfSize.X * 2f * 0.9f, 3f, density: 0.5f, isStatic: true,
 										restitution: 0.5f, out FlatBody groundBody, out string errorMessage))
@@ -38,8 +31,8 @@ namespace PhysicsTester
 			}
 
 			groundBody.MoveTo(new Vector2(0, -12));
-			this.world.AddBody(groundBody);
-			this.entityList.Add(new FlatEntity(groundBody, Color.DarkGreen));
+			world.AddBody(groundBody);
+			entityList.Add(new FlatEntity(groundBody, Color.DarkGreen));
 
 			if (!FlatBody.CreateBoxBody(20.0f, 2f, density: 1f, isStatic: true,
 										restitution: 0.5f, out FlatBody ledgeBody1, out errorMessage))
@@ -49,9 +42,9 @@ namespace PhysicsTester
 
 			ledgeBody1.MoveTo(new Vector2(-10, 1));
 			ledgeBody1.Rotate(-MathF.PI * 2 / 20f);
-			this.world.AddBody(ledgeBody1);
-			this.entityList.Add(new FlatEntity(ledgeBody1, Color.DarkGray));
-			
+			world.AddBody(ledgeBody1);
+			entityList.Add(new FlatEntity(ledgeBody1, Color.DarkGray));
+
 			if (!FlatBody.CreateBoxBody(20.0f, 2f, density: 1f, isStatic: true, restitution: 0.5f,
 										out FlatBody ledgeBody2, out errorMessage))
 			{
@@ -60,8 +53,8 @@ namespace PhysicsTester
 
 			ledgeBody2.MoveTo(new Vector2(10, 10));
 			ledgeBody2.Rotate(MathF.PI * 2 / 20f);
-			this.world.AddBody(ledgeBody2);
-			this.entityList.Add(new FlatEntity(ledgeBody2, Color.DarkGray));
+			world.AddBody(ledgeBody2);
+			entityList.Add(new FlatEntity(ledgeBody2, Color.DarkGray));
 
 			// Timer;
 			_sampleTimer.Start();
@@ -71,22 +64,23 @@ namespace PhysicsTester
 		private Stopwatch _physicsCalcTimer = new Stopwatch();
 		private long _elapsed;
 		private float _deltaTime;
-		public void OnUpdate(float deltaTime)
+
+		public override void OnUpdate(float deltaTime)
 		{
 			_deltaTime = deltaTime;
 
 			// Process Input
-			InputManager.Update();
+			_inputManager.Update();
 
 			// Camera move direction
 			Vector2 cameraMoveDirection = new();
-			if (InputManager.IsPressed(GameKey.CameraMoveUp))
+			if (_inputManager.IsPressed(GameKey.CameraMoveUp))
 				cameraMoveDirection += new Vector2(0, 1);
-			if (InputManager.IsPressed(GameKey.CameraMoveDown))
+			if (_inputManager.IsPressed(GameKey.CameraMoveDown))
 				cameraMoveDirection += new Vector2(0, -1);
-			if (InputManager.IsPressed(GameKey.CameraMoveLeft))
+			if (_inputManager.IsPressed(GameKey.CameraMoveLeft))
 				cameraMoveDirection += new Vector2(-1, 0);
-			if (InputManager.IsPressed(GameKey.CameraMoveRight))
+			if (_inputManager.IsPressed(GameKey.CameraMoveRight))
 				cameraMoveDirection += new Vector2(1, 0);
 
 			if (cameraMoveDirection.Length() != 0)
@@ -95,20 +89,20 @@ namespace PhysicsTester
 				_renderer.CameraWorldPosition += cameraMoveDirection / _renderer.Zoom * deltaTime * 500.0f;
 			}
 
-			if (!this.world.GetBody(0, out FlatBody playerBody))
+			if (!world.GetBody(0, out FlatBody playerBody))
 			{
 				throw new Exception("Could not find the body at the specified index.");
 			}
 
 			// Remove dynamic objects
-			if (InputManager.IsPressed(GameKey.Space))
+			if (_inputManager.IsPressed(GameKey.Space))
 			{
-				for (int i = 0; i < this.entityList.Count; i++)
+				for (int i = 0; i < entityList.Count; i++)
 				{
-					FlatEntity entity = this.entityList[i];
+					FlatEntity entity = entityList[i];
 					if (!entity.Body.IsStatic)
 					{
-						this.entityRemovalList.Add(entity);
+						entityRemovalList.Add(entity);
 					}
 				}
 			}
@@ -153,26 +147,31 @@ namespace PhysicsTester
 			while (deltaTime > interval)
 			{
 				deltaTime -= interval;
-				this.world.Step(interval, 1);
+				world.Step(interval, 1);
 			}
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
 
 			//WarpScreen();
 			RemoveObjectOutOfView();
 
-			for (int i = 0; i < this.entityRemovalList.Count; ++i)
+			for (int i = 0; i < entityRemovalList.Count; ++i)
 			{
-				FlatEntity entity = this.entityRemovalList[i];
+				FlatEntity entity = entityRemovalList[i];
 				entityList.Remove(entity);
 				world.RemoveBody(entity.Body);
 			}
 		}
 
+		public override void OnInvalidate(Graphics g)
+		{
+			_renderer.BindGraphics(g);
+		}
+
 		private void RemoveObjectOutOfView()
 		{
-			for (int i = 0; i < this.entityList.Count; i++)
+			for (int i = 0; i < entityList.Count; i++)
 			{
-				FlatEntity entity = this.entityList[i];
+				FlatEntity entity = entityList[i];
 				FlatBody body = entity.Body;
 
 				if (body.IsStatic)
@@ -184,7 +183,7 @@ namespace PhysicsTester
 
 				if (box.Max.Y < -12)
 				{
-					this.entityRemovalList.Add(entity);
+					entityRemovalList.Add(entity);
 				}
 			}
 		}
@@ -196,9 +195,9 @@ namespace PhysicsTester
 			var lb = _renderer.ViewLeftBottom - offset;
 			var rt = _renderer.ViewRightTop + offset;
 
-			for (int i = 0; i < this.world.BodyCount; i++)
+			for (int i = 0; i < world.BodyCount; i++)
 			{
-				if (!this.world.GetBody(i, out FlatBody body))
+				if (!world.GetBody(i, out FlatBody body))
 				{
 					throw new Exception();
 				}
@@ -214,18 +213,13 @@ namespace PhysicsTester
 			}
 		}
 
-		public void OnInvalidate(Graphics g)
-		{
-			_renderer.BindGraphics(g);
-		}
-
 		private Stopwatch _sampleTimer = new Stopwatch();
 		private double _stepElapsed;
 		private double _stepElapsedPerCount;
 		private double _currentFps;
-		public void OnDraw(Graphics g)
+		public override void OnDraw(Graphics g)
 		{
-			for (int i = 0; i < this.entityList.Count; i++)
+			for (int i = 0; i < entityList.Count; i++)
 			{
 				entityList[i].Draw(_renderer);
 			}
@@ -247,7 +241,7 @@ namespace PhysicsTester
 			_renderer.DrawBox((lb + rt) / 2, vs.X - margin, vs.Y - margin, Color.Yellow);
 
 			// Draw contact points
-			var contactPoints = this.world.ContactPointsList;
+			var contactPoints = world.ContactPointsList;
 			for (int i = 0; i < contactPoints.Count; i++)
 			{
 				var cp = contactPoints[i];
@@ -258,7 +252,7 @@ namespace PhysicsTester
 			if (_sampleTimer.Elapsed.TotalSeconds > 0.5d)
 			{
 				_stepElapsed = (double)_elapsed * 1000 / Stopwatch.Frequency;
-				_stepElapsedPerCount = ((double)_elapsed * 1000 / Stopwatch.Frequency) / world.BodyCount;
+				_stepElapsedPerCount = (double)_elapsed * 1000 / Stopwatch.Frequency / world.BodyCount;
 				_sampleTimer.Restart();
 				_currentFps = 1 / _deltaTime;
 			}
@@ -270,40 +264,17 @@ namespace PhysicsTester
 			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 70), Color.White);
 		}
 
-		public void Zoom(int delta)
-		{
-			_renderer.Zoom += delta;
-		}
-
-		public void Drag(Vector2 delta)
-		{
-			_renderer.CameraWorldPosition += delta.FlipY() / _renderer.Zoom * 1.0f;
-		}
-
-		public void SetScreenSize(Vector2 screenSize)
-		{
-			_renderer.ScreenSize = screenSize;
-		}
-
-		public void OnMouseLeftClick(Vector2 clickPos)
+		protected override void onMouseLeftClick(Vector2 clickPos)
 		{
 			float width = RandomHelper.RandomSingle(1f, 2f);
 			float height = RandomHelper.RandomSingle(1f, 2f);
-
-			Vector2 worldPos = _renderer.GetMousePosition(clickPos);
-			this._mainForm.Text = worldPos.ToString();
-
-			this.entityList.Add(new FlatEntity(world, width, height, isStatic: false, worldPos));
+			entityList.Add(new FlatEntity(world, width, height, isStatic: false, clickPos));
 		}
 
-		public void OnMouseRightClick(Vector2 clickPos)
+		protected override void onMouseRightClick(Vector2 clickPos)
 		{
 			float radius = RandomHelper.RandomSingle(0.75f, 1f);
-
-			Vector2 worldPos = _renderer.GetMousePosition(clickPos);
-			this._mainForm.Text = worldPos.ToString();
-
-			this.entityList.Add(new FlatEntity(world, radius, isStatic: false, worldPos));
+			entityList.Add(new FlatEntity(world, radius, isStatic: false, clickPos));
 		}
 	}
 }

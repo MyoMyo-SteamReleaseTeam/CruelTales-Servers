@@ -1,8 +1,41 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public static class CollectionExtension
 {
-	public static bool IsEqual<T>(this IList<T> lhs, IList<T> rhs)
+	public static bool AreEqual<T>(this IList<T> lhs, IList<T> rhs)
+		where T : IEquatable<T>
+	{
+		if (lhs.Count != rhs.Count || lhs == null || rhs == null)
+			return false;
+
+		int count = lhs.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (!lhs[i].Equals(rhs[i]))
+				return false;
+		}
+
+		return true;
+	}
+
+	public static bool AreEqualReference<T>(this IList<T> lhs, IList<T> rhs)
+		where T : notnull
+	{
+		if (lhs.Count != rhs.Count || lhs == null || rhs == null)
+			return false;
+
+		int count = lhs.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (object.ReferenceEquals(lhs[i], rhs[i]))
+				return false;
+		}
+
+		return true;
+	}
+
+	public static bool AreEqualNotNull<T>(this IList<T> lhs, IList<T> rhs)
 		where T : notnull
 	{
 		if (lhs.Count != rhs.Count || lhs == null || rhs == null)
@@ -18,7 +51,7 @@ public static class CollectionExtension
 		return true;
 	}
 
-	public static bool IsEqualNullable<T>(this IList<T> lhs, IList<T> rhs)
+	public static bool AreEqualNullable<T>(this IList<T> lhs, IList<T> rhs)
 	{
 		if (lhs.Count != rhs.Count || lhs == null || rhs == null)
 			return false;

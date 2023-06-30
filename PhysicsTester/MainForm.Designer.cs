@@ -39,7 +39,7 @@
 			MainCanvas.Dock = DockStyle.Fill;
 			MainCanvas.Location = new Point(0, 0);
 			MainCanvas.Name = "MainCanvas";
-			MainCanvas.Size = new Size(800, 450);
+			MainCanvas.Size = new Size(1184, 711);
 			MainCanvas.TabIndex = 0;
 			MainCanvas.TabStop = false;
 			MainCanvas.Paint += MainCanvas_Paint;
@@ -57,7 +57,7 @@
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(800, 450);
+			ClientSize = new Size(1184, 711);
 			Controls.Add(MainCanvas);
 			Name = "MainForm";
 			Text = "MainForm";

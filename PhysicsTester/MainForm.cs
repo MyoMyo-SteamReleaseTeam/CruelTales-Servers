@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using PhysicsTester.FlatPhysics;
 
 namespace PhysicsTester
 {
@@ -11,7 +12,7 @@ namespace PhysicsTester
 
 		// Game
 		private InputManager _inputManager;
-		private GameRuntime _gameRuntimie;
+		private PhysicsRuntime _physicsRuntime;
 		private Stopwatch _stopwatch = new Stopwatch();
 		private long _lastTick;
 
@@ -23,7 +24,7 @@ namespace PhysicsTester
 			_inputManager = new InputManager();
 
 			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
-			_gameRuntimie = new GameRuntime(this, _inputManager, screenSize);
+			_physicsRuntime = new FlatPhysicsRuntime(this, _inputManager, screenSize);
 
 			// Start tick timer
 			_stopwatch.Start();
@@ -40,13 +41,13 @@ namespace PhysicsTester
 		private void mainCanvas_MouseWheel(object? sender, MouseEventArgs e)
 		{
 			int delta = Math.Sign(e.Delta) * 3;
-			_gameRuntimie.Zoom(delta);
+			_physicsRuntime.Zoom(delta);
 		}
 
 		private void Timer_Tick_Tick(object sender, EventArgs e)
 		{
 			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
-			_gameRuntimie.SetScreenSize(screenSize);
+			_physicsRuntime.SetScreenSize(screenSize);
 
 			// Calcualte delta time
 			long currentTick = _stopwatch.ElapsedTicks;
@@ -54,7 +55,7 @@ namespace PhysicsTester
 			deltaTime = deltaTime / Stopwatch.Frequency;
 
 			// Update game loop
-			_gameRuntimie.OnUpdate((float)deltaTime);
+			_physicsRuntime.OnUpdate((float)deltaTime);
 
 			// Upate drawing
 			MainCanvas.Invalidate();
@@ -83,8 +84,8 @@ namespace PhysicsTester
 		private void MainCanvas_Paint(object sender, PaintEventArgs e)
 		{
 			e.Graphics.Clear(Color.FromArgb(20, 20, 20));
-			_gameRuntimie.OnInvalidate(e.Graphics);
-			_gameRuntimie.OnDraw(e.Graphics);
+			_physicsRuntime.OnInvalidate(e.Graphics);
+			_physicsRuntime.OnDraw(e.Graphics);
 
 		}
 
@@ -112,11 +113,11 @@ namespace PhysicsTester
 
 			if (e.Button == MouseButtons.Left)
 			{
-				_gameRuntimie.OnMouseLeftClick(clickPos);
+				_physicsRuntime.OnMouseLeftClick(clickPos);
 			}
 			else if (e.Button == MouseButtons.Right)
 			{
-				_gameRuntimie.OnMouseRightClick(clickPos);
+				_physicsRuntime.OnMouseRightClick(clickPos);
 			}
 			else if (e.Button == MouseButtons.Middle)
 			{
@@ -139,7 +140,7 @@ namespace PhysicsTester
 			{
 				Vector2 curMousePos = new Vector2(e.X, e.Y);
 				Vector2 delta = _lastMousePos - curMousePos;
-				_gameRuntimie.Drag(delta);
+				_physicsRuntime.Drag(delta);
 				_lastMousePos = curMousePos;
 			}
 		}

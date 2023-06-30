@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace FlatPhysics
 {
 	public static class Collisions
 	{
-		public static void PointSegmentDistance(Vector2 p, Vector2 a, Vector2 b, out float distanceSquared, out Vector2 cp)
+		public static void PointSegmentDistance(Vector2 p, Vector2 a, Vector2 b,
+												out float distanceSquared, out Vector2 cp)
 		{
 			Vector2 ab = b - a;
 			Vector2 ap = p - a;
@@ -20,36 +15,24 @@ namespace FlatPhysics
 			float d = proj / abLenSq;
 
 			if (d <= 0f)
-			{
 				cp = a;
-			}
 			else if (d >= 1f)
-			{
 				cp = b;
-			}
 			else
-			{
 				cp = a + ab * d;
-			}
 
 			distanceSquared = Vector2.DistanceSquared(p, cp);
 		}
 
 		public static bool IntersectAABBs(FlatAABB a, FlatAABB b)
 		{
-			if (a.Max.X <= b.Min.X || b.Max.X <= a.Min.X ||
-				a.Max.Y <= b.Min.Y || b.Max.Y <= a.Min.Y)
-			{
-				return false;
-			}
-
-			return true;
+			return !(a.Max.X <= b.Min.X || b.Max.X <= a.Min.X ||
+				a.Max.Y <= b.Min.Y || b.Max.Y <= a.Min.Y);
 		}
 
-		public static void FindContactPoints(
-			FlatBody bodyA, FlatBody bodyB,
-			out Vector2 contact1, out Vector2 contact2,
-			out int contactCount)
+		public static void FindContactPoints(FlatBody bodyA, FlatBody bodyB,
+											 out Vector2 contact1, out Vector2 contact2,
+											 out int contactCount)
 		{
 			contact1 = Vector2.Zero;
 			contact2 = Vector2.Zero;
@@ -62,12 +45,14 @@ namespace FlatPhysics
 			{
 				if (shapeTypeB is ShapeType.Box)
 				{
-					Collisions.FindPolygonsContactPoints(bodyA.GetTransformedVertices(), bodyB.GetTransformedVertices(),
-						out contact1, out contact2, out contactCount);
+					findPolygonsContactPoints(bodyA.GetTransformedVertices(),
+											  bodyB.GetTransformedVertices(),
+											  out contact1, out contact2, out contactCount);
 				}
 				else if (shapeTypeB is ShapeType.Circle)
 				{
-					Collisions.FindCirclePolygonContactPoint(bodyB.Position, bodyB.Radius, bodyA.Position, bodyA.GetTransformedVertices(), out contact1);
+					findCirclePolygonContactPoint(bodyB.Position, bodyB.Radius, bodyA.Position,
+												  bodyA.GetTransformedVertices(), out contact1);
 					contactCount = 1;
 				}
 			}
@@ -75,20 +60,21 @@ namespace FlatPhysics
 			{
 				if (shapeTypeB is ShapeType.Box)
 				{
-					Collisions.FindCirclePolygonContactPoint(bodyA.Position, bodyA.Radius, bodyB.Position, bodyB.GetTransformedVertices(), out contact1);
+					findCirclePolygonContactPoint(bodyA.Position, bodyA.Radius, bodyB.Position,
+												  bodyB.GetTransformedVertices(), out contact1);
 					contactCount = 1;
 				}
 				else if (shapeTypeB is ShapeType.Circle)
 				{
-					Collisions.FindCirclesContactPoint(bodyA.Position, bodyA.Radius, bodyB.Position, out contact1);
+					findCirclesContactPoint(bodyA.Position, bodyA.Radius, bodyB.Position, out contact1);
 					contactCount = 1;
 				}
 			}
 		}
 
-		private static void FindPolygonsContactPoints(
-			Vector2[] verticesA, Vector2[] verticesB,
-			out Vector2 contact1, out Vector2 contact2, out int contactCount)
+		private static void findPolygonsContactPoints(Vector2[] verticesA, Vector2[] verticesB,
+													  out Vector2 contact1, out Vector2 contact2,
+													  out int contactCount)
 		{
 			contact1 = Vector2.Zero;
 			contact2 = Vector2.Zero;
@@ -105,7 +91,7 @@ namespace FlatPhysics
 					Vector2 va = verticesB[j];
 					Vector2 vb = verticesB[(j + 1) % verticesB.Length];
 
-					Collisions.PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
+					PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
 					if (KaMath.NearlyEqual(distSq, minDistSq))
 					{
@@ -133,7 +119,7 @@ namespace FlatPhysics
 					Vector2 va = verticesA[j];
 					Vector2 vb = verticesA[(j + 1) % verticesA.Length];
 
-					Collisions.PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
+					PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
 					if (KaMath.NearlyEqual(distSq, minDistSq))
 					{
@@ -153,10 +139,9 @@ namespace FlatPhysics
 			}
 		}
 
-		private static void FindCirclePolygonContactPoint(
-			Vector2 circleCenter, float circleRadius,
-			Vector2 polygonCenter, Vector2[] polygonVertices,
-			out Vector2 cp)
+		private static void findCirclePolygonContactPoint(Vector2 circleCenter, float circleRadius,
+														  Vector2 polygonCenter, Vector2[] polygonVertices,
+														  out Vector2 cp)
 		{
 			cp = Vector2.Zero;
 
@@ -167,7 +152,7 @@ namespace FlatPhysics
 				Vector2 va = polygonVertices[i];
 				Vector2 vb = polygonVertices[(i + 1) % polygonVertices.Length];
 
-				Collisions.PointSegmentDistance(circleCenter, va, vb, out float distSq, out Vector2 contact);
+				PointSegmentDistance(circleCenter, va, vb, out float distSq, out Vector2 contact);
 
 				if (distSq < minDistSq)
 				{
@@ -177,14 +162,16 @@ namespace FlatPhysics
 			}
 		}
 
-		private static void FindCirclesContactPoint(Vector2 centerA, float radiusA, Vector2 centerB, out Vector2 cp)
+		private static void findCirclesContactPoint(Vector2 centerA, float radiusA,
+													Vector2 centerB, out Vector2 cp)
 		{
 			Vector2 ab = centerB - centerA;
 			Vector2 dir = Vector2.Normalize(ab);
 			cp = centerA + dir * radiusA;
 		}
 
-		public static bool Collide(FlatBody bodyA, FlatBody bodyB, out Vector2 normal, out float depth)
+		public static bool Collide(FlatBody bodyA, FlatBody bodyB,
+								   out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
 			depth = 0f;
@@ -196,17 +183,15 @@ namespace FlatPhysics
 			{
 				if (shapeTypeB is ShapeType.Box)
 				{
-					return Collisions.IntersectPolygons(
-						bodyA.Position, bodyA.GetTransformedVertices(),
-						bodyB.Position, bodyB.GetTransformedVertices(),
-						out normal, out depth);
+					return IntersectPolygons(bodyA.Position, bodyA.GetTransformedVertices(),
+											 bodyB.Position, bodyB.GetTransformedVertices(),
+											 out normal, out depth);
 				}
 				else if (shapeTypeB is ShapeType.Circle)
 				{
-					bool result = Collisions.IntersectCirclePolygon(
-						bodyB.Position, bodyB.Radius,
-						bodyA.Position, bodyA.GetTransformedVertices(),
-						out normal, out depth);
+					bool result = IntersectCirclePolygon(bodyB.Position, bodyB.Radius,
+														 bodyA.Position, bodyA.GetTransformedVertices(),
+														 out normal, out depth);
 
 					normal = -normal;
 					return result;
@@ -216,17 +201,15 @@ namespace FlatPhysics
 			{
 				if (shapeTypeB is ShapeType.Box)
 				{
-					return Collisions.IntersectCirclePolygon(
-						bodyA.Position, bodyA.Radius,
-						bodyB.Position, bodyB.GetTransformedVertices(),
-						out normal, out depth);
+					return IntersectCirclePolygon(bodyA.Position, bodyA.Radius,
+												  bodyB.Position, bodyB.GetTransformedVertices(),
+												  out normal, out depth);
 				}
 				else if (shapeTypeB is ShapeType.Circle)
 				{
-					return Collisions.IntersectCircles(
-						bodyA.Position, bodyA.Radius,
-						bodyB.Position, bodyB.Radius,
-						out normal, out depth);
+					return IntersectCircles(bodyA.Position, bodyA.Radius,
+											bodyB.Position, bodyB.Radius,
+											out normal, out depth);
 				}
 			}
 
@@ -234,8 +217,8 @@ namespace FlatPhysics
 		}
 
 		public static bool IntersectCirclePolygon(Vector2 circleCenter, float circleRadius,
-													Vector2 polygonCenter, Vector2[] vertices,
-													out Vector2 normal, out float depth)
+												  Vector2 polygonCenter, Vector2[] vertices,
+												  out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
 			depth = float.MaxValue;
@@ -253,8 +236,8 @@ namespace FlatPhysics
 				axis = new Vector2(-edge.Y, edge.X);
 				axis = Vector2.Normalize(axis);
 
-				Collisions.ProjectVertices(vertices, axis, out minA, out maxA);
-				Collisions.ProjectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
+				projectVertices(vertices, axis, out minA, out maxA);
+				projectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
 
 				if (minA >= maxB || minB >= maxA)
 				{
@@ -270,14 +253,14 @@ namespace FlatPhysics
 				}
 			}
 
-			int cpIndex = Collisions.FindClosestPointOnPolygon(circleCenter, vertices);
+			int cpIndex = findClosestPointOnPolygon(circleCenter, vertices);
 			Vector2 cp = vertices[cpIndex];
 
 			axis = cp - circleCenter;
 			axis = Vector2.Normalize(axis);
 
-			Collisions.ProjectVertices(vertices, axis, out minA, out maxA);
-			Collisions.ProjectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
+			projectVertices(vertices, axis, out minA, out maxA);
+			projectCircle(circleCenter, circleRadius, axis, out minB, out maxB);
 
 			if (minA >= maxB || minB >= maxA)
 			{
@@ -302,7 +285,7 @@ namespace FlatPhysics
 			return true;
 		}
 
-		private static int FindClosestPointOnPolygon(Vector2 circleCenter, Vector2[] vertices)
+		private static int findClosestPointOnPolygon(Vector2 circleCenter, Vector2[] vertices)
 		{
 			int result = -1;
 			float minDistance = float.MaxValue;
@@ -322,7 +305,8 @@ namespace FlatPhysics
 			return result;
 		}
 
-		private static void ProjectCircle(Vector2 center, float radius, Vector2 axis, out float min, out float max)
+		private static void projectCircle(Vector2 center, float radius, Vector2 axis,
+										  out float min, out float max)
 		{
 			Vector2 direction = Vector2.Normalize(axis);
 			Vector2 directionAndRadius = direction * radius;
@@ -342,7 +326,9 @@ namespace FlatPhysics
 			}
 		}
 
-		public static bool IntersectPolygons(Vector2 centerA, Vector2[] verticesA, Vector2 centerB, Vector2[] verticesB, out Vector2 normal, out float depth)
+		public static bool IntersectPolygons(Vector2 centerA, Vector2[] verticesA,
+											 Vector2 centerB, Vector2[] verticesB,
+											 out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
 			depth = float.MaxValue;
@@ -356,8 +342,8 @@ namespace FlatPhysics
 				Vector2 axis = new Vector2(-edge.Y, edge.X);
 				axis = Vector2.Normalize(axis);
 
-				Collisions.ProjectVertices(verticesA, axis, out float minA, out float maxA);
-				Collisions.ProjectVertices(verticesB, axis, out float minB, out float maxB);
+				projectVertices(verticesA, axis, out float minA, out float maxA);
+				projectVertices(verticesB, axis, out float minB, out float maxB);
 
 				if (minA >= maxB || minB >= maxA)
 				{
@@ -382,8 +368,8 @@ namespace FlatPhysics
 				Vector2 axis = new Vector2(-edge.Y, edge.X);
 				axis = Vector2.Normalize(axis);
 
-				Collisions.ProjectVertices(verticesA, axis, out float minA, out float maxA);
-				Collisions.ProjectVertices(verticesB, axis, out float minB, out float maxB);
+				projectVertices(verticesA, axis, out float minA, out float maxA);
+				projectVertices(verticesB, axis, out float minB, out float maxB);
 
 				if (minA >= maxB || minB >= maxA)
 				{
@@ -409,7 +395,8 @@ namespace FlatPhysics
 			return true;
 		}
 
-		private static void ProjectVertices(Vector2[] vertices, Vector2 axis, out float min, out float max)
+		private static void projectVertices(Vector2[] vertices, Vector2 axis,
+											out float min, out float max)
 		{
 			min = float.MaxValue;
 			max = float.MinValue;
@@ -424,10 +411,9 @@ namespace FlatPhysics
 			}
 		}
 
-		public static bool IntersectCircles(
-			Vector2 centerA, float radiusA,
-			Vector2 centerB, float radiusB,
-			out Vector2 normal, out float depth)
+		public static bool IntersectCircles(Vector2 centerA, float radiusA,
+											Vector2 centerB, float radiusB,
+											out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
 			depth = 0f;
@@ -436,15 +422,12 @@ namespace FlatPhysics
 			float radii = radiusA + radiusB;
 
 			if (distance >= radii)
-			{
 				return false;
-			}
 
 			normal = Vector2.Normalize(centerB - centerA);
 			depth = radii - distance;
 
 			return true;
 		}
-
 	}
 }
