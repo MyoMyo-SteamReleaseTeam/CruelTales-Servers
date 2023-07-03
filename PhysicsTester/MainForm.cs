@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using KaNet.Physics;
 using PhysicsTester.FlatPhysics;
 
 namespace PhysicsTester
@@ -24,7 +25,8 @@ namespace PhysicsTester
 			_inputManager = new InputManager();
 
 			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
-			_physicsRuntime = new FlatPhysicsRuntime(this, _inputManager, screenSize);
+			//_physicsRuntime = new FlatPhysicsRuntime(this, _inputManager, screenSize);
+			_physicsRuntime = new KaNetPhysicsRuntime(this, _inputManager, screenSize);
 
 			// Start tick timer
 			_stopwatch.Start();

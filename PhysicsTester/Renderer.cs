@@ -139,7 +139,7 @@ namespace PhysicsTester
 
 		#endregion
 
-		#region Box
+		#region Polygon
 
 		private Point[] _tempPoints = new Point[3];
 		public void DrawPolygon(Vector2[] vertices, int[] triangles, Color color)
@@ -179,6 +179,10 @@ namespace PhysicsTester
 				}
 			}
 		}
+
+		#endregion
+
+		#region Box
 
 		public void DrawBoxFill(Vector2 center, float width, float height, Color color)
 		{
