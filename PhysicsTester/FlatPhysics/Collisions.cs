@@ -192,7 +192,6 @@ namespace FlatPhysics
 					bool result = IntersectCirclePolygon(bodyB.Position, bodyB.Radius,
 														 bodyA.Position, bodyA.GetTransformedVertices(),
 														 out normal, out depth);
-
 					normal = -normal;
 					return result;
 				}

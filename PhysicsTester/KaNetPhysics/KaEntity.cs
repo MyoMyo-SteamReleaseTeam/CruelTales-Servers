@@ -1,50 +1,40 @@
 ﻿using System.Numerics;
-using System.Security.Cryptography;
 using PhysicsTester;
 
 namespace KaNet.Physics
 {
 	internal class KaEntity
 	{
-		public readonly KaRigidBody Body;
+		private PhysicsWorld _world;
+
+		public readonly RigidBody Body;
 		public Color Color { get; set; }
 		private static int[] _vertexIndices = new int[6] { 0, 1, 2, 0, 2, 3 };
 
-		public KaEntity(KaRigidBody body)
-		{
-			Body = body;
-			Color = WinformRandomHelper.RandomColor();
-		}
-
-		public KaEntity(KaRigidBody body, Color color)
-		{
-			Body = body;
-			Color = color;
-		}
-
-		public KaEntity(KaPhysicsWorld world, float radius, bool isStatic,
+		public KaEntity(PhysicsWorld world, float radius, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
-			Body = KaPhysicsWorld.CreateCircle(radius, isStatic);
+			_world = world;
+
+			Body = _world.CreateCircle(radius, isStatic);
 			Body.MoveTo(position);
-			Body.Rotate(rotation);
-			world.AddRigidBody(Body);
 			Color = WinformRandomHelper.RandomColor();
 		}
 
-		public KaEntity(KaPhysicsWorld world, float width, float height, bool isStatic,
+		public KaEntity(PhysicsWorld world, float width, float height, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
+			_world = world;
+
 			if (rotation == 0)
 			{
-				Body = KaPhysicsWorld.CreateBox(width, height, isStatic);
+				Body = _world.CreateBoxAABB(width, height, isStatic);
 			}
 			else
 			{
-				Body = KaPhysicsWorld.CreateBoxOBB(width, height, rotation, isStatic);
+				Body = _world.CreateBoxOBB(width, height, rotation, isStatic);
 			}
 			Body.MoveTo(position);
-			world.AddRigidBody(Body);
 			Color = WinformRandomHelper.RandomColor();
 		}
 
@@ -59,30 +49,34 @@ namespace KaNet.Physics
 
 				case PhysicsShapeType.Box_AABB:
 					{
-						renderer.DrawBoxFill(Body.Position, Body.Width, Body.Height, Color);
-						renderer.DrawBox(Body.Position, Body.Width, Body.Height, Color.White);
-						renderer.DrawText(Body.Angle.ToString("F3"), position, Color.Orange);
+						BoxAABBRigidBody body = (BoxAABBRigidBody)Body;
+						renderer.DrawBoxFill(body.Position, body.Width, body.Height, Color);
+						renderer.DrawBox(body.Position, body.Width, body.Height, Color.White);
+						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
 					}
 					break;
 
 				case PhysicsShapeType.Box_OBB:
 					{
-						renderer.DrawPolygonFill(Body.GetTransformedVertices(), _vertexIndices, Color);
-						renderer.DrawPolygon(Body.GetTransformedVertices(), _vertexIndices, Color.White);
-						renderer.DrawText(Body.Angle.ToString("F3"), position, Color.Orange);
+						BoxOBBRigidBody body = (BoxOBBRigidBody)Body;
+						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, Color);
+						renderer.DrawPolygon(body.GetTransformedVertices(), _vertexIndices, Color.White);
+						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
 					}
 					break;
 
 				case PhysicsShapeType.Circle:
 					{
-						float x = -MathF.Sin(Body.Angle);
-						float y = MathF.Cos(Body.Angle);
-						Vector2 rotationLine = new Vector2(x, y) * Body.Radius;
+						CircleRigidBody body = (CircleRigidBody)Body;
 
-						renderer.DrawCircleFill(position, Body.Radius, Color);
-						renderer.DrawCircle(position, Body.Radius, Color.White);
-						renderer.DrawText(Body.Angle.ToString("F3"), position, Color.Orange);
-						renderer.DrawLine(position, rotationLine + Body.Position, Color.White);
+						float x = -MathF.Sin(body.Angle);
+						float y = MathF.Cos(body.Angle);
+						Vector2 rotationLine = new Vector2(x, y) * body.Radius;
+
+						renderer.DrawCircleFill(position, body.Radius, Color);
+						renderer.DrawCircle(position, body.Radius, Color.White);
+						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
+						renderer.DrawLine(position, rotationLine + body.Position, Color.White);
 					}
 					break;
 

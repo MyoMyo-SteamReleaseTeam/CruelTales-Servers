@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using FlatPhysics;
 using PhysicsTester;
 
 namespace KaNet.Physics
 {
 	public class KaNetPhysicsRuntime : PhysicsRuntime
 	{
-		private KaPhysicsWorld _world = new();
+		private PhysicsWorld _world = new();
 		private List<KaEntity> _entityList = new();
 		private List<KaEntity> _entityRemovalList = new();
 
@@ -24,31 +23,31 @@ namespace KaNet.Physics
 			const float padding = 2f;
 			Vector2 worldHalfSize = screenHalfSize.FlipY() / _renderer.Zoom - new Vector2(padding, padding);
 
-			var groundEntity = new KaEntity(_world,
-											width: worldHalfSize.X * 2f * 0.9f,
-											height: 3f,
-											isStatic: true,
-											position: new Vector2(0, -12));
-			groundEntity.Color = Color.DarkGreen;
-			_entityList.Add(groundEntity);
+			//var groundEntity = new KaEntity(_world,
+			//								width: worldHalfSize.X * 2f * 0.9f,
+			//								height: 3f,
+			//								isStatic: true,
+			//								position: new Vector2(0, -12));
+			//groundEntity.Color = Color.DarkGreen;
+			//_entityList.Add(groundEntity);
 
-			var ledgeBody1 = new KaEntity(_world,
-										  width: 20.0f,
-										  height: 2.0f,
-										  isStatic: true,
-										  position: new Vector2(-10, 1),
-										  rotation: -MathF.PI * 2 / 20f);
-			ledgeBody1.Color = Color.DarkGray;
-			_entityList.Add(ledgeBody1);
+			//var ledgeBody1 = new KaEntity(_world,
+			//							  width: 20.0f,
+			//							  height: 2.0f,
+			//							  isStatic: true,
+			//							  position: new Vector2(-10, 1),
+			//							  rotation: -MathF.PI * 2 / 20f);
+			//ledgeBody1.Color = Color.DarkGray;
+			//_entityList.Add(ledgeBody1);
 
-			var ledgeBody2 = new KaEntity(_world,
-										  width: 20.0f,
-										  height: 2.0f,
-										  isStatic: true,
-										  position: new Vector2(10, 10),
-										  rotation: MathF.PI * 2 / 20f);
-			ledgeBody2.Color = Color.DarkGray;
-			_entityList.Add(ledgeBody2);
+			//var ledgeBody2 = new KaEntity(_world,
+			//							  width: 20.0f,
+			//							  height: 2.0f,
+			//							  isStatic: true,
+			//							  position: new Vector2(10, 10),
+			//							  rotation: MathF.PI * 2 / 20f);
+			//ledgeBody2.Color = Color.DarkGray;
+			//_entityList.Add(ledgeBody2);
 
 			// Timer;
 			_sampleTimer.Start();
@@ -161,7 +160,7 @@ namespace KaNet.Physics
 			for (int i = 0; i < _entityList.Count; i++)
 			{
 				KaEntity entity = _entityList[i];
-				KaRigidBody body = entity.Body;
+				RigidBody body = entity.Body;
 
 				if (body.IsStatic)
 					continue;
@@ -182,7 +181,7 @@ namespace KaNet.Physics
 
 			for (int i = 0; i < _world.BodyCount; i++)
 			{
-				if (!_world.TryGetBody(i, out KaRigidBody? body))
+				if (!_world.TryGetBody(i, out RigidBody? body))
 				{
 					continue;
 				}
