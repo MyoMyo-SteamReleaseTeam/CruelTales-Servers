@@ -1,8 +1,17 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 public static class RandomHelper
 {
 	private static Random _random = new Random();
+
+#if UNITY_2021
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static float NextSingle(this Random random)
+	{
+		return (float)random.NextDouble();
+	}
+#endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool RandomBollean()

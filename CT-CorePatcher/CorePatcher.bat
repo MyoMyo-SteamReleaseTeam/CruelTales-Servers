@@ -13,13 +13,17 @@ REM Run core patcher
  --outputServer "../CT-NetworkCore/Packets/" ^
  -baseNamespace "CT.Packets" ^
  -packetTypeName "PacketType" ^
- --patchCount "3" ^
+ --patchCount "5" ^
  --source_0 "../CT-NetworkCore" ^
  --target_0 "../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-NetworkCore" ^
  --source_1 "../CT-Common" ^
  --target_1 "../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CT-Common" ^
  --source_2 "../CTC-Networks" ^
  --target_2 "../../CruelTales-Client/CruelTales-Client/Assets/Plugins/CTC-Networks" ^
+ --source_3 "../KaNetTool" ^
+ --target_3 "../../CruelTales-Client/CruelTales-Client/Assets/Plugins/KaNetTool" ^
+ --source_4 "../KaNetPhysics" ^
+ --target_4 "../../CruelTales-Client/CruelTales-Client/Assets/Plugins/KaNetPhysics" ^
  --factoryServerPath "../CTS-GameplayServer/Packets/" ^
  --factoryClientPath "../CTC-Networks/Packets/" ^
  --sdispatcher "../CTS-GameplayServer/Packets/" ^
