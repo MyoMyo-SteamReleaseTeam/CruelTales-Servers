@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using KaNet.Physics.RigidBodies;
 using PhysicsTester;
 
 namespace KaNet.Physics

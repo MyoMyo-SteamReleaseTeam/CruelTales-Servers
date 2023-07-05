@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using KaNet.Physics.RigidBodies;
 
 namespace KaNet.Physics
 {
