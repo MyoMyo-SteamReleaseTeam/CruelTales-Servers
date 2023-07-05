@@ -40,6 +40,11 @@ namespace KaNet.Physics.RigidBodies
 			//LinearVelocity += _force * stepTime;
 			Position += LinearVelocity * stepTime;
 
+			if (LinearVelocity.LengthSquared() > 0)
+			{
+				LinearVelocity = Vector2.Lerp(LinearVelocity, Vector2.Zero, 3.0f * stepTime);
+			}
+
 			//_force = Vector2.Zero;
 			_isTransformDirty = true;
 		}

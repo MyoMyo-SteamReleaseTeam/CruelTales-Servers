@@ -13,7 +13,8 @@ namespace KaNet.Physics
 
 		// Entity
 		private KaEntityManager _entityManager = new();
-		private int _selectedEntity = 0;
+		private int _selectedEntity = 1;
+		private bool _isRun;
 
 		// Loop Timer
 		private Stopwatch _physicsCalcTimer = new Stopwatch();
@@ -27,7 +28,11 @@ namespace KaNet.Physics
 		private double _currentFps;
 
 		// Inputs
+		private Action? OnProcessUpdate;
 		private Action? OnPressSpaceBar;
+		private Action? OnPressEnter;
+		private Action<Vector2>? OnPressLeftMouseClick;
+		private Action<Vector2>? OnPressRightMouseClick;
 
 		public KaNetPhysicsRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
 			: base(mainForm, inputManager)
@@ -57,10 +62,13 @@ namespace KaNet.Physics
 			};
 
 			// Bind Inputs
+			inputManager.GetInputData(GameKey.ShiftKey).OnPressed += () => _isRun = true;
+			inputManager.GetInputData(GameKey.ShiftKey).OnReleased += () => _isRun = false;
+
 			inputManager.GetInputData(GameKey.F1).OnPressed += () => setupStaticGameWorld(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F2).OnPressed += () => setupForCircleTest(viewLB, viewRT, viewHalfSize);
 
-			inputManager.GetInputData(GameKey.F1).ForceInvokePressed();
+			inputManager.GetInputData(GameKey.F2).ForceInvokePressed();
 
 			inputManager.GetInputData(GameKey.Num0).OnPressed += () => selectEntity(0);
 			inputManager.GetInputData(GameKey.Num1).OnPressed += () => selectEntity(1);
@@ -81,6 +89,26 @@ namespace KaNet.Physics
 		private void setupStaticGameWorld(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
 			_entityManager.Clear();
+
+			int dynamicCount = 20;
+			int staticCount = 10;
+			float radiusMin = 1.0f;
+			float radiusMax = 2.0f;
+
+			// Bind inputs
+			OnPressLeftMouseClick += (worldPos) =>
+			{
+				float width = RandomHelper.NextSingle(radiusMin, radiusMax);
+				float height = RandomHelper.NextSingle(radiusMin, radiusMax);
+				_entityManager.AddEntity(new KaEntity(_world, width, height, isStatic: false, worldPos));
+			};
+
+			// Create world
+			OnPressRightMouseClick += (worldPos) =>
+			{
+				float radius = RandomHelper.NextSingle(radiusMin, radiusMax);
+				_entityManager.AddEntity(new KaEntity(_world, radius, isStatic: false, worldPos));
+			};
 
 			var groundEntity = new KaEntity(_world,
 											width: viewHalfSize.X * 2f * 0.9f,
@@ -115,9 +143,34 @@ namespace KaNet.Physics
 
 			int dynamicCount = 20;
 			int staticCount = 10;
-			float radiusMin = 2.0f;
-			float radiusMax = 4.0f;
+			float radiusMin = 1.0f;
+			float radiusMax = 2.0f;
 
+			// Bind Events
+			OnProcessUpdate += () =>
+			{
+				if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+				{
+					_renderer.CameraWorldPosition = entity.Body.Position;
+				}
+			};
+
+			// Bind inputs
+			OnPressLeftMouseClick += (worldPos) =>
+			{
+			};
+
+			OnPressRightMouseClick += (worldPos) =>
+			{
+				if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+				{
+					RigidBody body = entity.Body;
+					Vector2 direction = Vector2.Normalize(worldPos - body.Position);
+					body.LinearVelocity =  direction * 60.0f;
+				}
+			};
+
+			// Create world
 			for (int i = 0; i < dynamicCount; i++)
 			{
 				float radius = RandomHelper.NextSingle(radiusMin, radiusMax);
@@ -144,12 +197,6 @@ namespace KaNet.Physics
 			// Bind delta time
 			_deltaTime = deltaTime;
 
-			// Remove dynamic objects
-			if (_inputManager.IsPressed(GameKey.Space))
-			{
-				OnPressSpaceBar?.Invoke();
-			}
-
 			processCameraInput(deltaTime);
 			processEntityInput(deltaTime);
 
@@ -163,6 +210,8 @@ namespace KaNet.Physics
 				_world.Step(interval);
 			}
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
+
+			OnProcessUpdate?.Invoke();
 
 			//WarpScreen();
 			//RemoveObjectOutOfView();
@@ -187,6 +236,7 @@ namespace KaNet.Physics
 			}
 		}
 
+		private bool _isMoved = false;
 		private void processEntityInput(float deltaTime)
 		{
 			if (!_entityManager.TryGetEntity(_selectedEntity, out var entity))
@@ -195,7 +245,8 @@ namespace KaNet.Physics
 			RigidBody controlBody = entity.Body;
 
 			// Process movement direction
-			float forceMagnitude = 20f;
+			float forceMagnitude = 10f;
+			forceMagnitude *= _isRun ? 2 : 1;
 
 			Vector2 forceDirection = new();
 			if (_inputManager.IsPressed(GameKey.MoveUp))
@@ -212,10 +263,12 @@ namespace KaNet.Physics
 				forceDirection = Vector2.Normalize(forceDirection);
 				Vector2 force = forceDirection * forceMagnitude;
 				controlBody.LinearVelocity = force;
+				_isMoved = true;
 			}
-			else
+			else if (_isMoved)
 			{
 				controlBody.LinearVelocity = Vector2.Zero;
+				_isMoved = false;
 			}
 
 			// Process rotation
@@ -284,17 +337,14 @@ namespace KaNet.Physics
 			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 90), Color.White);
 		}
 
-		protected override void onMouseLeftClick(Vector2 clickPos)
+		protected override void onMouseLeftClick(Vector2 worldPos)
 		{
-			float width = RandomHelper.NextSingle(1f, 2f);
-			float height = RandomHelper.NextSingle(1f, 2f);
-			_entityManager.AddEntity(new KaEntity(_world, width, height, isStatic: false, clickPos));
+			this.OnPressLeftMouseClick?.Invoke(worldPos);
 		}
 
-		protected override void onMouseRightClick(Vector2 clickPos)
+		protected override void onMouseRightClick(Vector2 worldPos)
 		{
-			float radius = RandomHelper.NextSingle(0.75f, 1f);
-			_entityManager.AddEntity(new KaEntity(_world, radius, isStatic: false, clickPos));
+			this.OnPressRightMouseClick?.Invoke(worldPos);
 		}
 
 		private void selectEntity(int entityId)
