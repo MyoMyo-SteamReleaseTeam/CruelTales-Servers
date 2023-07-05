@@ -232,14 +232,14 @@ namespace KaNet.Physics
 
 		protected override void onMouseLeftClick(Vector2 clickPos)
 		{
-			float width = RandomHelper.RandomSingle(1f, 2f);
-			float height = RandomHelper.RandomSingle(1f, 2f);
+			float width = RandomHelper.NextSingle(1f, 2f);
+			float height = RandomHelper.NextSingle(1f, 2f);
 			_entityManager.AddEntity(new KaEntity(_world, width, height, isStatic: false, clickPos));
 		}
 
 		protected override void onMouseRightClick(Vector2 clickPos)
 		{
-			float radius = RandomHelper.RandomSingle(0.75f, 1f);
+			float radius = RandomHelper.NextSingle(0.75f, 1f);
 			_entityManager.AddEntity(new KaEntity(_world, radius, isStatic: false, clickPos));
 		}
 

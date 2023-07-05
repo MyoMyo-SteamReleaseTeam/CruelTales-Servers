@@ -19,6 +19,6 @@ public static class VectorExtension
 	/// <returns>렌덤한 값</returns>
 	public static float GetRandomFromMinMax(this Vector2 v)
 	{
-		return RandomHelper.RandomSingle(v.X, v.Y);
+		return RandomHelper.NextSingle(v.X, v.Y);
 	}
 }
