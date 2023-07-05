@@ -29,6 +29,18 @@ namespace KaNet.Physics.RigidBodies
 			_vertices[1] = new Vector2(hw, hh);
 			_vertices[2] = new Vector2(hw, -hh);
 			_vertices[3] = new Vector2(-hw, -hh);
+
+			_boundingBox = new BoundingBox(Position, Width, Height);
+		}
+
+		public override BoundingBox GetBoundingBox()
+		{
+			if (_isTransformDirty)
+			{
+				_boundingBox = new BoundingBox(Position, Width, Height);
+			}
+
+			return _boundingBox;
 		}
 
 		public Vector2[] GetTransformedVertices()

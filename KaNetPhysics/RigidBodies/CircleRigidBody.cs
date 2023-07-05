@@ -7,11 +7,23 @@ namespace KaNet.Physics.RigidBodies
 	{
 		/// <summary>반지름</summary>
 		public readonly float Radius;
+		public readonly float Diameter;
 
 		public CircleRigidBody(float radius, bool isStatic)
 			: base(PhysicsShapeType.Circle, isStatic)
 		{
 			Radius = radius;
+			Diameter = radius * 2;
+		}
+
+		public override BoundingBox GetBoundingBox()
+		{
+			if (_isTransformDirty)
+			{
+				_boundingBox = new BoundingBox(Position, Diameter, Diameter);
+			}
+
+			return _boundingBox;
 		}
 
 		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)
