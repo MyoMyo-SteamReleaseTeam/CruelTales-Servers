@@ -73,12 +73,14 @@ namespace KaNet.Physics
 			{
 				float depthAmount = bodyB.IsStatic ? depth : depth * 0.5f;
 				bodyA.Move(-normal, depthAmount);
+				bodyA.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
 			}
 
 			if (!bodyB.IsStatic)
 			{
 				float depthAmount = bodyA.IsStatic ? depth : depth * 0.5f;
 				bodyB.Move(normal, depthAmount);
+				bodyA.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
 			}
 		}
 

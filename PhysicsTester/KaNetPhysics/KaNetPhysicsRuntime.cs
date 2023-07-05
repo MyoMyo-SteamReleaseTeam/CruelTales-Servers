@@ -166,7 +166,7 @@ namespace KaNet.Physics
 				{
 					RigidBody body = entity.Body;
 					Vector2 direction = Vector2.Normalize(worldPos - body.Position);
-					body.LinearVelocity =  direction * 60.0f;
+					body.ForceVelocity =  direction * 60.0f;
 				}
 			};
 

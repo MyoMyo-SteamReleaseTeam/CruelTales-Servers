@@ -18,6 +18,12 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>선속도</summary>
 		public Vector2 LinearVelocity { get; set; }
 
+		/// <summary>힘<summary>
+		public Vector2 ForceVelocity { get; set; }
+
+		/// <summary>힘 마찰력</summary>
+		public float ForceFriction { get; set; } = 3.0f;
+
 		/// <summary>정적 객체 여부</summary>
 		public readonly bool IsStatic;
 
@@ -38,11 +44,15 @@ namespace KaNet.Physics.RigidBodies
 				return;
 
 			//LinearVelocity += _force * stepTime;
-			Position += LinearVelocity * stepTime;
+			Position += (LinearVelocity + ForceVelocity) * stepTime;
 
-			if (LinearVelocity.LengthSquared() > 0)
+			if (ForceVelocity.LengthSquared() > 0.001f)
 			{
-				LinearVelocity = Vector2.Lerp(LinearVelocity, Vector2.Zero, 3.0f * stepTime);
+				ForceVelocity = Vector2.Lerp(ForceVelocity, Vector2.Zero, ForceFriction * stepTime);
+			}
+			else
+			{
+				ForceVelocity = Vector2.Zero;
 			}
 
 			//_force = Vector2.Zero;
