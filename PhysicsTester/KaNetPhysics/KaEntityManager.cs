@@ -1,4 +1,5 @@
-﻿using KaNet.Physics;
+﻿using System.Diagnostics.CodeAnalysis;
+using KaNet.Physics;
 
 namespace PhysicsTester.KaNetPhysics
 {
@@ -43,6 +44,23 @@ namespace PhysicsTester.KaNetPhysics
 		public void RemoveEntity(KaEntity entity)
 		{
 			_entityRemovalList.Add(entity);
+		}
+
+		public bool TryGetEntity(int id, [MaybeNullWhen(false)] out KaEntity entity)
+		{
+			return _entityById.TryGetValue(id, out entity);
+		}
+
+		public void Clear()
+		{
+			foreach (KaEntity entity in this.Entities)
+			{
+				entity.World.RemoveRigidBody(entity.Body);
+			}
+
+			_idCounter = 0;
+			_idStack.Clear();
+			_entityById.Clear();
 		}
 	}
 }

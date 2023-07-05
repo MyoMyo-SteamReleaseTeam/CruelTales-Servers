@@ -69,9 +69,6 @@ namespace PhysicsTester.FlatPhysics
 		{
 			_deltaTime = deltaTime;
 
-			// Process Input
-			_inputManager.Update();
-
 			// Camera move direction
 			Vector2 cameraMoveDirection = new();
 			if (_inputManager.IsPressed(GameKey.CameraMoveUp))

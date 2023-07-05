@@ -59,7 +59,6 @@ namespace KaNet.Physics
 						BoxAABBRigidBody body = (BoxAABBRigidBody)Body;
 						renderer.DrawBoxFill(body.Position, body.Width, body.Height, Color);
 						renderer.DrawBox(body.Position, body.Width, body.Height, Color.White);
-						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
 					}
 					break;
 
@@ -68,7 +67,6 @@ namespace KaNet.Physics
 						BoxOBBRigidBody body = (BoxOBBRigidBody)Body;
 						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, Color);
 						renderer.DrawPolygon(body.GetTransformedVertices(), _vertexIndices, Color.White);
-						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
 					}
 					break;
 
@@ -82,7 +80,6 @@ namespace KaNet.Physics
 
 						renderer.DrawCircleFill(position, body.Radius, Color);
 						renderer.DrawCircle(position, body.Radius, Color.White);
-						renderer.DrawText(body.Angle.ToString("F3"), position, Color.Orange);
 						renderer.DrawLine(position, rotationLine + body.Position, Color.White);
 					}
 					break;
@@ -97,6 +94,10 @@ namespace KaNet.Physics
 			renderer.DrawLine(position, position + new Vector2(1, -1) * centerPivotRadius, Color.SkyBlue);
 			renderer.DrawLine(position, position + new Vector2(-1, 1) * centerPivotRadius, Color.SkyBlue);
 			renderer.DrawLine(position, position + new Vector2(-1, -1) * centerPivotRadius, Color.SkyBlue);
+
+			//renderer.DrawText(Body.Angle.ToString("F3"), position, Color.Orange);
+			renderer.DrawText(this.Id.ToString(), position, Color.LightGreen, Color.Black,
+							  isCenter: true, font: renderer.DefaultFont16);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Numerics;
 
 namespace PhysicsTester
@@ -40,7 +41,8 @@ namespace PhysicsTester
 		private Color _defaultColor = Color.White;
 
 		// Font
-		private Font _defaultFont = new Font("Aial", 10);
+		public Font DefaultFont10 { get; private set; } = new Font("Aial", 10);
+		public Font DefaultFont16 { get; private set; } = new Font("Aial", 16);
 
 		// Property
 		private int _crossHairLength = 1000;
@@ -231,22 +233,63 @@ namespace PhysicsTester
 
 		#region Text
 
-		public void DrawTextGUI(string text, Vector2 position, Color color)
+		public void DrawTextGUI(string text, Vector2 position, Color color, Font? font = null)
 		{
+			Font f = font is null ? DefaultFont10 : font;
 			using (SolidBrush b = new SolidBrush(color))
 			{
-				_graphics.DrawString(text, _defaultFont, b, position.X, position.Y);
+				_graphics.DrawString(text, f, b, position.X, position.Y);
 			}
 		}
 
-		public void DrawText(string text, Vector2 position, Color color)
+		public void DrawText(string text, Vector2 position, Color color,
+							 bool isCenter = false, Font? font = null)
 		{
+			Font f = font is null ? DefaultFont10 : font;
+
 			position *= Zoom;
 			position = position.FlipY() - ScreenCameraPosition.FlipY();
 
+			if (isCenter)
+			{
+				SizeF textSize = this._graphics.MeasureString(text, f);
+				position.X -= textSize.Width * 0.5f;
+				position.Y -= textSize.Height * 0.5f;
+			}
+
 			using (SolidBrush b = new SolidBrush(color))
 			{
-				_graphics.DrawString(text, _defaultFont, b, position.X, position.Y);
+				_graphics.DrawString(text, f, b, position.X, position.Y);
+			}
+		}
+
+
+		public void DrawText(string text, Vector2 position, Color foreground, Color outlineColor,
+							 bool isCenter = false, Font? font = null)
+		{
+			Font f = font is null ? DefaultFont10 : font;
+
+			position *= Zoom;
+			position = position.FlipY() - ScreenCameraPosition.FlipY();
+
+			if (isCenter)
+			{
+				SizeF textSize = this._graphics.MeasureString(text, f);
+				position.X -= textSize.Width * 0.5f;
+				position.Y -= textSize.Height * 0.5f;
+			}
+
+			using (SolidBrush b = new SolidBrush(outlineColor))
+			{
+				_graphics.DrawString(text, f, b, position.X + 1, position.Y + 1);
+				_graphics.DrawString(text, f, b, position.X - 1, position.Y + 1);
+				_graphics.DrawString(text, f, b, position.X + 1, position.Y - 1);
+				_graphics.DrawString(text, f, b, position.X - 1, position.Y - 1);
+			}
+
+			using (SolidBrush b = new SolidBrush(foreground))
+			{
+				_graphics.DrawString(text, f, b, position.X, position.Y);
 			}
 		}
 
