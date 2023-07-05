@@ -40,13 +40,20 @@ namespace KaNet.Physics
 			return rigid;
 		}
 
-		public void Step(float interval, int iterateCount)
+		public void Step(float interval)
 		{
-			for (int a = 0; a < BodyCount - 1; a++)
+			int bodyCount = _rigidBodies.Count;
+
+			for (int i = 0; i < bodyCount; i++)
+			{
+				_rigidBodies[i].Step(interval);
+			}
+
+			for (int a = 0; a < bodyCount - 1; a++)
 			{
 				RigidBody bodyA = _rigidBodies[a];
 
-				for (int b = a + 1; b < BodyCount; b++)
+				for (int b = a + 1; b < bodyCount; b++)
 				{
 					RigidBody bodyB = _rigidBodies[b];
 

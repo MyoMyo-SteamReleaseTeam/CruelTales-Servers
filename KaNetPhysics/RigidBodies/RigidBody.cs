@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
@@ -15,7 +16,7 @@ namespace KaNet.Physics.RigidBodies
 		public float Angle { get; private set; }
 
 		/// <summary>선속도</summary>
-		public Vector2 LinearVelocity { get; private set; }
+		public Vector2 LinearVelocity { get; set; }
 
 		/// <summary>정적 객체 여부</summary>
 		public readonly bool IsStatic;
@@ -23,10 +24,24 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>변환이 필요한지 여부입니다.</summary>
 		protected bool _isTransformDirty = true;
 
+		//private Vector2 _force;
+
 		public RigidBody(PhysicsShapeType shapeType, bool isStatic)
 		{
 			ShapeType = shapeType;
 			IsStatic = isStatic;
+		}
+
+		public void Step(float stepTime)
+		{
+			if (IsStatic)
+				return;
+
+			//LinearVelocity += _force * stepTime;
+			Position += LinearVelocity * stepTime;
+
+			//_force = Vector2.Zero;
+			_isTransformDirty = true;
 		}
 
 		public void MoveTo(Vector2 position)
@@ -44,6 +59,12 @@ namespace KaNet.Physics.RigidBodies
 		public void RotateTo(float angle)
 		{
 			Angle = angle;
+			_isTransformDirty = true;
+		}
+
+		public void Rotate(float angle)
+		{
+			Angle += angle;
 			_isTransformDirty = true;
 		}
 

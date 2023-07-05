@@ -11,8 +11,4 @@
     <ProjectReference Include="..\KaNetTool\KaNetTool.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="RigidBodies\" />
-  </ItemGroup>
-
 </Project>

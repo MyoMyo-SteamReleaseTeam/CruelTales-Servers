@@ -2,65 +2,107 @@
 using System.Numerics;
 using KaNet.Physics.RigidBodies;
 using PhysicsTester;
+using PhysicsTester.KaNetPhysics;
 
 namespace KaNet.Physics
 {
 	public class KaNetPhysicsRuntime : PhysicsRuntime
 	{
+		// Physics
 		private PhysicsWorld _world = new();
-		private List<KaEntity> _entityList = new();
-		private List<KaEntity> _entityRemovalList = new();
 
-		public KaNetPhysicsRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
-			: base(mainForm, inputManager)
-		{
-			Vector2 screenHalfSize = screenSize * 0.5f;
-			_renderer.Zoom = 1 + 3 * 7;
-			_renderer.ScreenCameraPosition = -screenHalfSize.FlipY();
+		// Entity
+		private KaEntityManager _entityManager = new();
 
-			Vector2 viewLB = _renderer.ViewLeftBottom;
-			Vector2 viewRT = _renderer.ViewRightTop;
-
-			const float padding = 2f;
-			Vector2 worldHalfSize = screenHalfSize.FlipY() / _renderer.Zoom - new Vector2(padding, padding);
-
-			//var groundEntity = new KaEntity(_world,
-			//								width: worldHalfSize.X * 2f * 0.9f,
-			//								height: 3f,
-			//								isStatic: true,
-			//								position: new Vector2(0, -12));
-			//groundEntity.Color = Color.DarkGreen;
-			//_entityList.Add(groundEntity);
-
-			//var ledgeBody1 = new KaEntity(_world,
-			//							  width: 20.0f,
-			//							  height: 2.0f,
-			//							  isStatic: true,
-			//							  position: new Vector2(-10, 1),
-			//							  rotation: -MathF.PI * 2 / 20f);
-			//ledgeBody1.Color = Color.DarkGray;
-			//_entityList.Add(ledgeBody1);
-
-			//var ledgeBody2 = new KaEntity(_world,
-			//							  width: 20.0f,
-			//							  height: 2.0f,
-			//							  isStatic: true,
-			//							  position: new Vector2(10, 10),
-			//							  rotation: MathF.PI * 2 / 20f);
-			//ledgeBody2.Color = Color.DarkGray;
-			//_entityList.Add(ledgeBody2);
-
-			// Timer;
-			_sampleTimer.Start();
-			_physicsCalcTimer.Start();
-		}
-
+		// Loop Timer
 		private Stopwatch _physicsCalcTimer = new Stopwatch();
 		private long _elapsed;
 		private float _deltaTime;
 
+		// Physics Step Timer
+		private Stopwatch _sampleTimer = new Stopwatch();
+		private double _stepElapsed;
+		private double _stepElapsedPerCount;
+		private double _currentFps;
+
+		// Control
+		private RigidBody? _controlBody;
+
+		private Action? OnPressSpaceBar;
+
+		public KaNetPhysicsRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
+			: base(mainForm, inputManager)
+		{
+			// Set camera to world center
+			Vector2 screenHalfSize = screenSize * 0.5f;
+			_renderer.Zoom = 1 + 3 * 7;
+			_renderer.ScreenCameraPosition = -screenHalfSize.FlipY();
+
+			// View diameter for initial setup
+			Vector2 viewLB = _renderer.ViewLeftBottom;
+			Vector2 viewRT = _renderer.ViewRightTop;
+			Vector2 viewHalfSize = screenHalfSize.FlipY() / _renderer.Zoom;
+
+			// Setup
+			setupStaticGameWorld(viewLB, viewRT, viewHalfSize);
+			//setupForCircleTest(viewLB, viewRT, viewHalfSize);
+
+			// Start Timers
+			_sampleTimer.Start();
+			_physicsCalcTimer.Start();
+		}
+
+		private void setupStaticGameWorld(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		{
+			this.OnPressSpaceBar = () =>
+			{
+				foreach (KaEntity entity in _entityManager.Entities)
+				{
+					if (!entity.Body.IsStatic)
+					{
+						_entityManager.RemoveEntity(entity);
+					}
+				}
+			};
+
+			var groundEntity = new KaEntity(_world,
+											width: viewHalfSize.X * 2f * 0.9f,
+											height: 3f,
+											isStatic: true,
+											position: new Vector2(0, -12));
+			groundEntity.Color = Color.DarkGreen;
+			_entityManager.AddEntity(groundEntity);
+
+			var ledgeBody1 = new KaEntity(_world,
+										  width: 20.0f,
+										  height: 2.0f,
+										  isStatic: true,
+										  position: new Vector2(-10, 1),
+										  rotation: -MathF.PI * 2 / 20f);
+			ledgeBody1.Color = Color.DarkGray;
+			_entityManager.AddEntity(ledgeBody1);
+
+			var ledgeBody2 = new KaEntity(_world,
+										  width: 20.0f,
+										  height: 2.0f,
+										  isStatic: true,
+										  position: new Vector2(10, 10),
+										  rotation: MathF.PI * 2 / 20f);
+			ledgeBody2.Color = Color.DarkGray;
+			_entityManager.AddEntity(ledgeBody2);
+		}
+
+		private void setupForCircleTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		{
+
+		}
+
 		public override void OnUpdate(float deltaTime)
 		{
+			// Update entity manager
+			_entityManager.Update();
+
+			// Bind delta time
 			_deltaTime = deltaTime;
 
 			// Process Input
@@ -86,49 +128,41 @@ namespace KaNet.Physics
 			// Remove dynamic objects
 			if (_inputManager.IsPressed(GameKey.Space))
 			{
-				for (int i = 0; i < _entityList.Count; i++)
-				{
-					KaEntity entity = _entityList[i];
-					if (!entity.Body.IsStatic)
-					{
-						_entityRemovalList.Add(entity);
-					}
-				}
+				OnPressSpaceBar?.Invoke();
 			}
 
-#if false
 			// Process movement direction
 			float forceMagnitude = 48f;
 
-			FlatVector forceDirection = new();
-			if (InputManager.IsPressed(GameKey.MoveUp))
-				forceDirection += new FlatVector(0, 1);
-			if (InputManager.IsPressed(GameKey.MoveDown))
-				forceDirection += new FlatVector(0, -1);
-			if (InputManager.IsPressed(GameKey.MoveLeft))
-				forceDirection += new FlatVector(-1, 0);
-			if (InputManager.IsPressed(GameKey.MoveRight))
-				forceDirection += new FlatVector(1, 0);
+			Vector2 forceDirection = new();
+			if (_inputManager.IsPressed(GameKey.MoveUp))
+				forceDirection += new Vector2(0, 1);
+			if (_inputManager.IsPressed(GameKey.MoveDown))
+				forceDirection += new Vector2(0, -1);
+			if (_inputManager.IsPressed(GameKey.MoveLeft))
+				forceDirection += new Vector2(-1, 0);
+			if (_inputManager.IsPressed(GameKey.MoveRight))
+				forceDirection += new Vector2(1, 0);
 
-			if (FlatMath.Length(forceDirection) != 0)
+			if (_controlBody != null && forceDirection.Length() != 0)
 			{
-				forceDirection = FlatMath.Normalize(forceDirection);
-				FlatVector force = forceDirection * forceMagnitude;
-				body.AddForce(force);
+				forceDirection = Vector2.Normalize(forceDirection);
+				Vector2 force = forceDirection * forceMagnitude;
+				_controlBody.LinearVelocity = force;
 			}
 
 			// Process rotation
 			float rotateDirection = 0f;
-			if (InputManager.IsPressed(GameKey.RotateLeft))
+			if (_inputManager.IsPressed(GameKey.RotateLeft))
 				rotateDirection += -1;
-			if (InputManager.IsPressed(GameKey.RotateRight))
+			if (_inputManager.IsPressed(GameKey.RotateRight))
 				rotateDirection += 1;
 
-			if (rotateDirection != 0)
+			if (_controlBody != null || rotateDirection != 0)
 			{
-				body.Rotate(MathF.PI / 2f * rotateDirection * deltaTime);
+				_controlBody?.Rotate(MathF.PI / 2f * rotateDirection * deltaTime);
 			}
-#endif
+
 			_physicsCalcTimer.Restart();
 			//this.world.Step(0.01f, 1);
 			//this.world.Step(deltaTime, 1);
@@ -136,19 +170,12 @@ namespace KaNet.Physics
 			while (deltaTime > interval)
 			{
 				deltaTime -= interval;
-				_world.Step(interval, 1);
+				_world.Step(interval);
 			}
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
 
 			//WarpScreen();
 			//RemoveObjectOutOfView();
-
-			for (int i = 0; i < _entityRemovalList.Count; ++i)
-			{
-				KaEntity entity = _entityRemovalList[i];
-				_entityList.Remove(entity);
-				_world.RemoveRigidBody(entity.Body);
-			}
 		}
 
 		public override void OnInvalidate(Graphics g)
@@ -156,56 +183,11 @@ namespace KaNet.Physics
 			_renderer.BindGraphics(g);
 		}
 
-		private void RemoveObjectOutOfView()
-		{
-			for (int i = 0; i < _entityList.Count; i++)
-			{
-				KaEntity entity = _entityList[i];
-				RigidBody body = entity.Body;
-
-				if (body.IsStatic)
-					continue;
-
-				if (body.Position.Y < -12)
-				{
-					_entityRemovalList.Add(entity);
-				}
-			}
-		}
-
-		private void WarpScreen()
-		{
-			var vs = _renderer.ViewSize * 1.2f;
-			var offset = _renderer.ViewSize * 0.1f;
-			var lb = _renderer.ViewLeftBottom - offset;
-			var rt = _renderer.ViewRightTop + offset;
-
-			for (int i = 0; i < _world.BodyCount; i++)
-			{
-				if (!_world.TryGetBody(i, out RigidBody? body))
-				{
-					continue;
-				}
-				//FlatVector rt = new FlatVector(16, 8);
-				//FlatVector lb = -rt;
-				//FlatVector vs = rt * 2;
-
-				if (body.Position.X < lb.X) { body.MoveTo(body.Position + new Vector2(vs.X, 0f)); }
-				if (body.Position.X > rt.X) { body.MoveTo(body.Position - new Vector2(vs.X, 0f)); }
-				if (body.Position.Y < lb.Y) { body.MoveTo(body.Position + new Vector2(0f, vs.Y)); }
-				if (body.Position.Y > rt.Y) { body.MoveTo(body.Position - new Vector2(0f, vs.Y)); }
-			}
-		}
-
-		private Stopwatch _sampleTimer = new Stopwatch();
-		private double _stepElapsed;
-		private double _stepElapsedPerCount;
-		private double _currentFps;
 		public override void OnDraw(Graphics g)
 		{
-			for (int i = 0; i < _entityList.Count; i++)
+			foreach (KaEntity entity in _entityManager.Entities)
 			{
-				_entityList[i].Draw(_renderer);
+				entity.Draw(_renderer);
 			}
 
 			// Draw camera
@@ -252,13 +234,53 @@ namespace KaNet.Physics
 		{
 			float width = RandomHelper.RandomSingle(1f, 2f);
 			float height = RandomHelper.RandomSingle(1f, 2f);
-			_entityList.Add(new KaEntity(_world, width, height, isStatic: false, clickPos));
+			_entityManager.AddEntity(new KaEntity(_world, width, height, isStatic: false, clickPos));
 		}
 
 		protected override void onMouseRightClick(Vector2 clickPos)
 		{
 			float radius = RandomHelper.RandomSingle(0.75f, 1f);
-			_entityList.Add(new KaEntity(_world, radius, isStatic: false, clickPos));
+			_entityManager.AddEntity(new KaEntity(_world, radius, isStatic: false, clickPos));
+		}
+
+		private void RemoveObjectOutOfView()
+		{
+			foreach (KaEntity entity in _entityManager.Entities)
+			{
+				RigidBody body = entity.Body;
+
+				if (body.IsStatic)
+					continue;
+
+				if (body.Position.Y < -12)
+				{
+					_entityManager.RemoveEntity(entity);
+				}
+			}
+		}
+
+		private void WarpScreen()
+		{
+			var vs = _renderer.ViewSize * 1.2f;
+			var offset = _renderer.ViewSize * 0.1f;
+			var lb = _renderer.ViewLeftBottom - offset;
+			var rt = _renderer.ViewRightTop + offset;
+
+			for (int i = 0; i < _world.BodyCount; i++)
+			{
+				if (!_world.TryGetBody(i, out RigidBody? body))
+				{
+					continue;
+				}
+				//FlatVector rt = new FlatVector(16, 8);
+				//FlatVector lb = -rt;
+				//FlatVector vs = rt * 2;
+
+				if (body.Position.X < lb.X) { body.MoveTo(body.Position + new Vector2(vs.X, 0f)); }
+				if (body.Position.X > rt.X) { body.MoveTo(body.Position - new Vector2(vs.X, 0f)); }
+				if (body.Position.Y < lb.Y) { body.MoveTo(body.Position + new Vector2(0f, vs.Y)); }
+				if (body.Position.Y > rt.Y) { body.MoveTo(body.Position - new Vector2(0f, vs.Y)); }
+			}
 		}
 	}
 }

@@ -6,7 +6,8 @@ namespace KaNet.Physics
 {
 	internal class KaEntity
 	{
-		private PhysicsWorld _world;
+		public PhysicsWorld World { get; private set; }
+		public int Id { get; private set; }
 
 		public readonly RigidBody Body;
 		public Color Color { get; set; }
@@ -15,9 +16,9 @@ namespace KaNet.Physics
 		public KaEntity(PhysicsWorld world, float radius, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
-			_world = world;
+			World = world;
 
-			Body = _world.CreateCircle(radius, isStatic);
+			Body = World.CreateCircle(radius, isStatic);
 			Body.MoveTo(position);
 			Color = WinformRandomHelper.RandomColor();
 		}
@@ -25,18 +26,23 @@ namespace KaNet.Physics
 		public KaEntity(PhysicsWorld world, float width, float height, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
-			_world = world;
+			World = world;
 
 			if (rotation == 0)
 			{
-				Body = _world.CreateBoxAABB(width, height, isStatic);
+				Body = World.CreateBoxAABB(width, height, isStatic);
 			}
 			else
 			{
-				Body = _world.CreateBoxOBB(width, height, rotation, isStatic);
+				Body = World.CreateBoxOBB(width, height, rotation, isStatic);
 			}
 			Body.MoveTo(position);
 			Color = WinformRandomHelper.RandomColor();
+		}
+
+		public void SetID(int id)
+		{
+			this.Id = id;
 		}
 
 		public void Draw(Renderer renderer)
