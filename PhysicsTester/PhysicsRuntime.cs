@@ -15,7 +15,11 @@ namespace PhysicsTester
 		}
 
 		public abstract void OnUpdate(float deltaTime);
-		public abstract void OnInvalidate(Graphics g);
+		public virtual void OnInvalidate(Graphics g)
+		{
+			_renderer.BindGraphics(g);
+			_renderer.OnBeforeDraw();
+		}
 		public abstract void OnDraw(Graphics g);
 
 		public void Zoom(int delta)

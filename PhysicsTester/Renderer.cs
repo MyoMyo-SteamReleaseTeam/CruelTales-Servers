@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Numerics;
+using KaNet.Physics;
 
 namespace PhysicsTester
 {
@@ -21,6 +21,7 @@ namespace PhysicsTester
 			}
 		}
 		public Vector2 ScreenCameraPosition { get; set; }
+		public BoundingBox _cameraViewBound;
 
 		private float _zoom = 1;
 		public float Zoom
@@ -46,6 +47,7 @@ namespace PhysicsTester
 
 		// Property
 		private int _crossHairLength = 1000;
+		private int _textCullingSize = 3;
 
         public Renderer()
         {
@@ -55,6 +57,12 @@ namespace PhysicsTester
 		{
 			_graphics = g;
 			DrawOriginCross();
+		}
+
+		public void OnBeforeDraw()
+		{
+			_cameraViewBound = new BoundingBox(CameraWorldPosition,
+											   ViewSize.X, ViewSize.Y);
 		}
 
 		public Vector2 GetMousePosition(Vector2 screenPos)
@@ -106,10 +114,14 @@ namespace PhysicsTester
 
 		public void DrawCircleFill(Vector2 center, float radius, Color color)
 		{
+			if (IsCulled(center, radius))
+				return;
+
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 			radius *= Zoom * 2;
 			center -= new Vector2(radius, radius) * 0.5f;
+
 			using (Brush b = new SolidBrush(color))
 			{
 				_graphics.FillEllipse(b, center.X, center.Y, radius, radius);
@@ -118,10 +130,14 @@ namespace PhysicsTester
 
 		public void DrawCircle(Vector2 center, float radius, Color color)
 		{
+			if (IsCulled(center, radius))
+				return;
+
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 			radius *= Zoom * 2;
 			center -= new Vector2(radius, radius) * 0.5f;
+
 			using (Pen p = new Pen(color))
 			{
 				_graphics.DrawEllipse(p, center.X, center.Y, radius, radius);
@@ -133,6 +149,7 @@ namespace PhysicsTester
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 			center -= new Vector2(radius, radius) * 0.5f;
+
 			using (Pen p = new Pen(color))
 			{
 				_graphics.DrawEllipse(p, center.X, center.Y, radius, radius);
@@ -146,6 +163,9 @@ namespace PhysicsTester
 		private Point[] _tempPoints = new Point[3];
 		public void DrawPolygon(Vector2[] vertices, int[] triangles, Color color)
 		{
+			if (IsCulled(vertices))
+				return;
+
 			using (Pen p = new Pen(color))
 			{
 				int triangleCount = triangles.Length / 3;
@@ -165,6 +185,9 @@ namespace PhysicsTester
 
 		public void DrawPolygonFill(Vector2[] vertices, int[] triangles, Color color)
 		{
+			if (IsCulled(vertices))
+				return;
+
 			using (Brush b = new SolidBrush(color))
 			{
 				int triangleCount = triangles.Length / 3;
@@ -188,13 +211,16 @@ namespace PhysicsTester
 
 		public void DrawBoxFill(Vector2 center, float width, float height, Color color)
 		{
+			if (IsCulled(center, width, height))
+				return;
+
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 
 			width *= Zoom;
 			height *= Zoom;
 			center -= new Vector2(width, height) * 0.5f;
-			
+
 			using (Brush b = new SolidBrush(color))
 			{
 				_graphics.FillRectangle(b, center.X, center.Y, width, height);
@@ -203,6 +229,9 @@ namespace PhysicsTester
 
 		public void DrawBox(Vector2 center, float width, float height, Color color)
 		{
+			if (IsCulled(center, width, height))
+				return;
+
 			center *= Zoom;
 			center = center.FlipY() - ScreenCameraPosition.FlipY();
 
@@ -245,6 +274,9 @@ namespace PhysicsTester
 		public void DrawText(string text, Vector2 position, Color color,
 							 bool isCenter = false, Font? font = null)
 		{
+			if (IsCulled(position, _textCullingSize, _textCullingSize))
+				return;
+
 			Font f = font is null ? DefaultFont10 : font;
 
 			position *= Zoom;
@@ -267,6 +299,9 @@ namespace PhysicsTester
 		public void DrawText(string text, Vector2 position, Color foreground, Color outlineColor,
 							 bool isCenter = false, Font? font = null)
 		{
+			if (IsCulled(position, _textCullingSize, _textCullingSize))
+				return;
+
 			Font f = font is null ? DefaultFont10 : font;
 
 			position *= Zoom;
@@ -299,6 +334,40 @@ namespace PhysicsTester
 		{
 			this.DrawLine(-_crossHairLength, 0, _crossHairLength, 0, _crossColor);
 			this.DrawLine(0, -_crossHairLength, 0, _crossHairLength, _crossColor);
+		}
+
+		public bool IsCulled(Vector2 worldPos, float width, float height)
+		{
+			BoundingBox objBound = new BoundingBox(worldPos, width, height);
+			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
+		}
+
+		public bool IsCulled(Vector2 worldPos, float radius)
+		{
+			float diameter = radius * 2;
+			BoundingBox objBound = new BoundingBox(worldPos, diameter, diameter);
+			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
+		}
+
+		public bool IsCulled(Vector2[] vertices)
+		{
+			float minX = 0;
+			float minY = 0;
+			float maxX = 0;
+			float maxY = 0;
+
+			foreach (Vector2 v in vertices)
+			{
+				MathF.Min(minX, v.X);
+				MathF.Min(minY, v.Y);
+				MathF.Max(maxX, v.X);
+				MathF.Max(maxY, v.Y);
+			}
+
+			BoundingBox objBound = new(new Vector2(minX, minY),
+										new Vector2(maxX, maxY));
+
+			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
 		}
 	}
 }

@@ -26,6 +26,7 @@ namespace KaNet.Physics
 		private double _stepElapsed;
 		private double _stepElapsedPerCount;
 		private double _currentFps;
+		private float _deltaTimeStack = 0;
 
 		// Inputs
 		private Action? OnProcessUpdate;
@@ -255,6 +256,7 @@ namespace KaNet.Physics
 
 			// Bind delta time
 			_deltaTime = deltaTime;
+			_deltaTimeStack += deltaTime;
 
 			processCameraInput(deltaTime);
 			processEntityInput(deltaTime);
@@ -262,11 +264,14 @@ namespace KaNet.Physics
 			_physicsCalcTimer.Restart();
 			//_world.Step(0.01f);
 			//_world.Step(deltaTime);
-			float interval = 0.0016f;
-			while (deltaTime > interval)
+			float interval = 0.01f;
+			int exitCount = 15;
+			while (_deltaTimeStack > interval)
 			{
-				deltaTime -= interval;
+				_deltaTimeStack -= interval;
 				_world.Step(interval);
+				if (--exitCount < 0)
+					break;
 			}
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
 
@@ -343,11 +348,6 @@ namespace KaNet.Physics
 			}
 		}
 
-		public override void OnInvalidate(Graphics g)
-		{
-			_renderer.BindGraphics(g);
-		}
-
 		public override void OnDraw(Graphics g)
 		{
 			foreach (KaEntity entity in _entityManager.Entities)
@@ -393,7 +393,8 @@ namespace KaNet.Physics
 			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new Vector2(10, 50), Color.White);
 
 			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 70), Color.White);
-			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 90), Color.White);
+			_renderer.DrawTextGUI($"DeltaTime : {_deltaTime:F4} ms", new Vector2(10, 90), Color.White);
+			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 110), Color.White);
 		}
 
 		protected override void onMouseLeftClick(Vector2 worldPos)
