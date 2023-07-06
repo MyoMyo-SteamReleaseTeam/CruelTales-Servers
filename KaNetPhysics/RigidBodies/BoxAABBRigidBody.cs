@@ -15,6 +15,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _vertices;
 
+		/// <summary>변환이 적용된 정점 배열</summary>
+		[AllowNull] public readonly Vector2[] _transformedVertices;
+
 		public BoxAABBRigidBody(float width, float height, bool isStatic)
 			: base(PhysicsShapeType.Box_AABB, isStatic)
 		{
@@ -30,13 +33,16 @@ namespace KaNet.Physics.RigidBodies
 			_vertices[2] = new Vector2(hw, -hh);
 			_vertices[3] = new Vector2(-hw, -hh);
 
+			_transformedVertices = new Vector2[4];
+
 			_boundingBox = new BoundingBox(Position, Width, Height);
 		}
 
 		public override BoundingBox GetBoundingBox()
 		{
-			if (_isTransformDirty)
+			if (_isBoundingBoxDirty)
 			{
+				_isBoundingBoxDirty = false;
 				_boundingBox = new BoundingBox(Position, Width, Height);
 			}
 
@@ -45,7 +51,12 @@ namespace KaNet.Physics.RigidBodies
 
 		public Vector2[] GetTransformedVertices()
 		{
-			return _vertices;
+			if (!_isTransformDirty)
+				return _transformedVertices;
+			_isTransformDirty = false;
+
+			Physics.ComputeTransform(_vertices, _transformedVertices, Position);
+			return _transformedVertices;
 		}
 
 		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)

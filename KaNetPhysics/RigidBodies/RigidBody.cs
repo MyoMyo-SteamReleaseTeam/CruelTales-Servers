@@ -29,6 +29,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>변환이 필요한지 여부입니다.</summary>
 		protected bool _isTransformDirty = true;
 
+		/// <summary>바운딩 볼륨의 변환이 필요한지 여부입니다.</summary>
+		protected bool _isBoundingBoxDirty = true;
+
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
 
@@ -52,6 +55,7 @@ namespace KaNet.Physics.RigidBodies
 				Vector2.Lerp(ForceVelocity, Vector2.Zero, ForceFriction * stepTime) : Vector2.Zero;
 
 			_isTransformDirty = true;
+			_isBoundingBoxDirty = true;
 		}
 
 		/// <summary>해당 위치로 이동합니다.</summary>
@@ -59,6 +63,7 @@ namespace KaNet.Physics.RigidBodies
 		{
 			Position = position;
 			_isTransformDirty = true;
+			_isBoundingBoxDirty = true;
 		}
 
 		/// <summary>각도와 거리만큼 상대적으로 이동합니다.</summary>
@@ -66,6 +71,7 @@ namespace KaNet.Physics.RigidBodies
 		{
 			Position += direction * distance;
 			_isTransformDirty = true;
+			_isBoundingBoxDirty = true;
 		}
 
 		/// <summary>해당 각도로 회전합니다.</summary>

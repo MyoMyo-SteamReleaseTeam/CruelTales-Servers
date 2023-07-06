@@ -41,15 +41,16 @@ namespace KaNet.Physics.RigidBodies
 			_vertices[3] = new Vector2(-hw, -hh);
 
 			BoundaryRadius = new Vector2(hw, hh).Length();
-			BoundaryDiameter = BoundaryDiameter * 2;
+			BoundaryDiameter = BoundaryRadius * 2;
 
 			Physics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
 		}
 
 		public override BoundingBox GetBoundingBox()
 		{
-			if (_isTransformDirty)
+			if (_isBoundingBoxDirty)
 			{
+				_isBoundingBoxDirty = false;
 				_boundingBox = new BoundingBox(Position, BoundaryDiameter, BoundaryDiameter);
 			}
 

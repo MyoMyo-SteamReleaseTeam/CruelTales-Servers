@@ -3,6 +3,7 @@
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using KaNet.Physics.RigidBodies;
 
 namespace KaNet.Physics
@@ -26,6 +27,17 @@ namespace KaNet.Physics
 			for (int i = 0; i < length; i++)
 			{
 				transformed[i] = Vector2.Transform(vertices[i], r) + position;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void ComputeTransform(in Vector2[] vertices, in Vector2[] transformed,
+											in Vector2 position)
+		{
+			int length = vertices.Length;
+			for (int i = 0; i < length; i++)
+			{
+				transformed[i] = vertices[i] + position;
 			}
 		}
 
@@ -301,21 +313,19 @@ namespace KaNet.Physics
 			for (int i = 0; i < 2; i++)
 			{
 				Vector2 normalA = Vector2.Normalize(aVertices[i + 1] - aVertices[i]).RotateLeft();
-				float maxA = Vector2.Dot(aVertices[i], normalA);
 				float minA = Vector2.Dot(aVertices[i + 2], normalA);
+				float maxA = Vector2.Dot(aVertices[i], normalA);
 
-				float maxB = float.MinValue;
 				float minB = float.MaxValue;
+				float maxB = float.MinValue;
 
 				float projection;
-				Vector2 vb;
 
 				for (int b = 0; b < 4; b++)
 				{
-					vb = bVertices[b];
-					projection = Vector2.Dot(vb, normalA);
-					if (projection < minB) { minB = projection; }
+					projection = Vector2.Dot(bVertices[b], normalA);
 					if (projection > maxB) { maxB = projection; }
+					if (projection < minB) { minB = projection; }
 				}
 
 				if (maxA <= minB || maxB <= minA)
@@ -332,19 +342,17 @@ namespace KaNet.Physics
 			for (int i = 0; i < 2; i++)
 			{
 				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
-				float maxB = Vector2.Dot(bVertices[i], normalB);
 				float minB = Vector2.Dot(bVertices[i + 2], normalB);
+				float maxB = Vector2.Dot(bVertices[i], normalB);
 
-				float maxA = float.MinValue;
 				float minA = float.MaxValue;
+				float maxA = float.MinValue;
 
 				float projection;
-				Vector2 va;
 
 				for (int a = 0; a < 4; a++)
 				{
-					va = aVertices[a];
-					projection = Vector2.Dot(va, normalB);
+					projection = Vector2.Dot(aVertices[a], normalB);
 					if (projection < minA) { minA = projection; }
 					if (projection > maxA) { maxA = projection; }
 				}
@@ -383,8 +391,114 @@ namespace KaNet.Physics
 											out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
-			depth = 0;
-			return false;
+			depth = float.MaxValue;
+
+			Vector2 centerA = bodyA.Position;
+			Vector2 centerB = bodyB.Position;
+
+			BoundingBox boundBoxA = bodyA.GetBoundingBox();
+			BoundingBox boundBoxB = bodyB.GetBoundingBox();
+
+			if (!IsIntersectAABBs(boundBoxA, boundBoxB))
+				return false;
+
+			Vector2[] bVertices = bodyB.GetTransformedVertices();
+
+			{
+				Vector2 normalA = new Vector2(0, 1);
+				float minA = boundBoxA.Min.Y;
+				float maxA = boundBoxA.Max.Y;
+
+				float minB = float.MaxValue;
+				float maxB = float.MinValue;
+
+				float projection;
+
+				for (int b = 0; b < 4; b++)
+				{
+					projection = bVertices[b].Y;;
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalA;
+				}
+			}
+
+			{
+				Vector2 normalA = new Vector2(1, 0);
+				float minA = boundBoxA.Min.X;
+				float maxA = boundBoxA.Max.X;
+
+				float minB = float.MaxValue;
+				float maxB = float.MinValue;
+
+				float projection;
+
+				for (int b = 0; b < 4; b++)
+				{
+					projection = bVertices[b].X;
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalA;
+				}
+			}
+
+			Vector2[] aVertices = bodyA.GetTransformedVertices();
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
+				float minB = Vector2.Dot(bVertices[i + 2], normalB);
+				float maxB = Vector2.Dot(bVertices[i], normalB);
+
+				float minA = float.MaxValue;
+				float maxA = float.MinValue;
+
+				float projection;
+				Vector2 va;
+
+				for (int a = 0; a < 4; a++)
+				{
+					va = aVertices[a];
+					projection = Vector2.Dot(va, normalB);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalB;
+				}
+			}
+
+			if (Vector2.Dot(centerB - centerA, normal) < 0)
+			{
+				normal = -normal;
+			}
+
+			return true;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

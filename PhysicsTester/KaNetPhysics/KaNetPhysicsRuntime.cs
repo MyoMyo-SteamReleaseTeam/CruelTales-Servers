@@ -236,8 +236,8 @@ namespace KaNet.Physics
 		{
 			_entityManager.Clear();
 
-			int dynamicCount = 10;
-			int staticCount = 10;
+			int dynamicCount = 0;
+			int staticCount = 1;
 			float sizeMin = 2.0f;
 			float sizeMax = 4.0f;
 
@@ -255,14 +255,6 @@ namespace KaNet.Physics
 			{
 				for (int i = 0; i < 1; i++)
 				{
-					createRandomWorld(1, 1, sizeMin, sizeMax, viewLB, viewRT);
-				}
-			};
-
-			OnPressRightMouseClick = (worldPos) =>
-			{
-				for (int i = 0; i < 100; i++)
-				{
 					float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
 					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
 					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
@@ -270,15 +262,26 @@ namespace KaNet.Physics
 				}
 			};
 
-			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
-			//					viewLB, viewRT, PhysicsShapeType.Box_AABB);
+			OnPressRightMouseClick = (worldPos) =>
+			{
+				for (int i = 0; i < 1; i++)
+				{
+					float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
+					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
+					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
+					_entityManager.AddEntity(KaEntity.CreateAABBEntity(_world, width, height, isStatic: false, worldPos));
+				}
+			};
+
+			createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
+								viewLB, viewRT, PhysicsShapeType.Box_AABB);
 
 			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
 			//					viewLB, viewRT, PhysicsShapeType.Circle);
 
-			//// Create world
-			//createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax,
-			//					viewLB, viewRT, PhysicsShapeType.Box_OBB);
+			// Create world
+			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax,
+								viewLB, viewRT, PhysicsShapeType.Box_OBB);
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -296,7 +299,7 @@ namespace KaNet.Physics
 			_physicsCalcTimer.Restart();
 			//_world.Step(0.01f);
 			//_world.Step(deltaTime);
-			float interval = 0.03f;
+			float interval = 0.01f;
 			int iterCount = 0;
 			while (_deltaTimeStack > interval)
 			{

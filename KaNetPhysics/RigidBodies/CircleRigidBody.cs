@@ -18,8 +18,9 @@ namespace KaNet.Physics.RigidBodies
 
 		public override BoundingBox GetBoundingBox()
 		{
-			if (_isTransformDirty)
+			if (_isBoundingBoxDirty)
 			{
+				_isBoundingBoxDirty = false;
 				_boundingBox = new BoundingBox(Position, Diameter, Diameter);
 			}
 
