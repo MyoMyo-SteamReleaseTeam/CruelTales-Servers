@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Windows.Forms;
 using KaNet.Physics.RigidBodies;
 using PhysicsTester;
 using PhysicsTester.KaNetPhysics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
 
 namespace KaNet.Physics
 {
@@ -19,12 +21,15 @@ namespace KaNet.Physics
 		// Loop Timer
 		private Stopwatch _physicsCalcTimer = new Stopwatch();
 		private long _elapsed;
+		private long _currentIterateCount;
+		private long _iterateCount;
 		private float _deltaTime;
 
 		// Physics Step Timer
 		private Stopwatch _sampleTimer = new Stopwatch();
 		private double _stepElapsed;
 		private double _stepElapsedPerCount;
+		private double _stepElapsedPerIter;
 		private double _currentFps;
 		private float _deltaTimeStack = 0;
 
@@ -72,8 +77,9 @@ namespace KaNet.Physics
 			inputManager.GetInputData(GameKey.F1).OnPressed += () => setupStaticGameWorld(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F2).OnPressed += () => setupForCirclesTest(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F3).OnPressed += () => setupForAABBsTest(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F4).OnPressed += () => setupForOBBsTest(viewLB, viewRT, viewHalfSize);
 
-			inputManager.GetInputData(GameKey.F3).ForceInvokePressed();
+			inputManager.GetInputData(GameKey.F4).ForceInvokePressed();
 
 			inputManager.GetInputData(GameKey.Num0).OnPressed += () => selectEntity(0);
 			inputManager.GetInputData(GameKey.Num1).OnPressed += () => selectEntity(1);
@@ -181,35 +187,15 @@ namespace KaNet.Physics
 			};
 
 			// Create world
-			for (int i = 0; i < dynamicCount + staticCount; i++)
-			{
-				bool isStatic = i >= dynamicCount;
-
-				if (RandomHelper.NextBollean())
-				{
-					float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
-					Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
-					KaEntity entity = KaEntity.CreateCircleEntity(_world, radius, isStatic, randPos);
-					entity.Color = isStatic ? _staticObjectColor : entity.Color;
-					_entityManager.AddEntity(entity);
-				}
-				else
-				{
-					float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
-					Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
-					KaEntity entity = KaEntity.CreateAABBEntity(_world, radius, radius, isStatic, randPos);
-					entity.Color = isStatic ? _staticObjectColor : entity.Color;
-					_entityManager.AddEntity(entity);
-				}
-			}
+			createRandomWorld(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT);
 		}
 
 		private void setupForAABBsTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
 			_entityManager.Clear();
 
-			int dynamicCount = 2;
-			int staticCount = 0;
+			int dynamicCount = 10;
+			int staticCount = 10;
 			float sizeMin = 2.0f;
 			float sizeMax = 4.0f;
 
@@ -225,28 +211,74 @@ namespace KaNet.Physics
 			// Bind inputs
 			OnPressLeftMouseClick = (worldPos) =>
 			{
-				float radius = RandomHelper.NextSingle(sizeMin * 0.5f, sizeMax * 0.5f);
-				_entityManager.AddEntity(KaEntity.CreateCircleEntity(_world, radius, isStatic: false, worldPos));
+				for (int i = 0; i < 1; i++)
+				{
+					float radius = RandomHelper.NextSingle(sizeMin * 0.5f, sizeMax * 0.5f);
+					_entityManager.AddEntity(KaEntity.CreateCircleEntity(_world, radius, isStatic: false, worldPos));
+				}
 			};
 
 			OnPressRightMouseClick = (worldPos) =>
 			{
-				float width = RandomHelper.NextSingle(sizeMin, sizeMax);
-				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
-				_entityManager.AddEntity(KaEntity.CreateAABBEntity(_world, width, height, isStatic: false, worldPos));
+				for (int i = 0; i < 1; i++)
+				{
+					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
+					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
+					_entityManager.AddEntity(KaEntity.CreateAABBEntity(_world, width, height, isStatic: false, worldPos));
+				}
 			};
 
+			// Create world
+			createRandomWorld(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT);
+		}
+
+		private void setupForOBBsTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		{
+			_entityManager.Clear();
+
+			int dynamicCount = 10;
+			int staticCount = 10;
+			float sizeMin = 2.0f;
+			float sizeMax = 4.0f;
+
+			// Bind Events
+			OnProcessUpdate = () =>
+			{
+				if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+				{
+					_renderer.CameraWorldPosition = entity.Body.Position;
+				}
+			};
+
+			// Bind inputs
+			OnPressLeftMouseClick = (worldPos) =>
+			{
+				for (int i = 0; i < 1; i++)
+				{
+					createRandomWorld(1, 1, sizeMin, sizeMax, viewLB, viewRT);
+				}
+			};
+
+			OnPressRightMouseClick = (worldPos) =>
+			{
+				for (int i = 0; i < 100; i++)
+				{
+					float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
+					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
+					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
+					_entityManager.AddEntity(KaEntity.CreateOBBEntity(_world, width, height, isStatic: false, rotation, worldPos));
+				}
+			};
+
+			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
+			//					viewLB, viewRT, PhysicsShapeType.Box_AABB);
+
+			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
+			//					viewLB, viewRT, PhysicsShapeType.Circle);
+
 			//// Create world
-			//for (int i = 0; i < dynamicCount + staticCount; i++)
-			//{
-			//	bool isStatic = i >= dynamicCount;
-			//	float width = RandomHelper.NextSingle(sizeMin, sizeMax);
-			//	float height = RandomHelper.NextSingle(sizeMin, sizeMax);
-			//	Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
-			//	KaEntity entity = KaEntity.CreateAABBEntity(_world, width, height, isStatic, randPos);
-			//	entity.Color = isStatic ? _staticObjectColor : entity.Color;
-			//	_entityManager.AddEntity(entity);
-			//}
+			//createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax,
+			//					viewLB, viewRT, PhysicsShapeType.Box_OBB);
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -264,18 +296,24 @@ namespace KaNet.Physics
 			_physicsCalcTimer.Restart();
 			//_world.Step(0.01f);
 			//_world.Step(deltaTime);
-			float interval = 0.01f;
-			int exitCount = 15;
+			float interval = 0.03f;
+			int iterCount = 0;
 			while (_deltaTimeStack > interval)
 			{
 				_deltaTimeStack -= interval;
 				_world.Step(interval);
-				if (--exitCount < 0)
+				if (++iterCount >= 15)
 					break;
 			}
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
+			_currentIterateCount = iterCount;
 
 			OnProcessUpdate?.Invoke();
+
+			if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+			{
+				entity.Body.LinearVelocity = Vector2.Zero;
+			}
 
 			//WarpScreen();
 			//RemoveObjectOutOfView();
@@ -338,11 +376,11 @@ namespace KaNet.Physics
 			// Process rotation
 			float rotateDirection = 0f;
 			if (_inputManager.IsPressed(GameKey.RotateLeft))
-				rotateDirection += -1;
-			if (_inputManager.IsPressed(GameKey.RotateRight))
 				rotateDirection += 1;
+			if (_inputManager.IsPressed(GameKey.RotateRight))
+				rotateDirection += -1;
 
-			if (controlBody != null || rotateDirection != 0)
+			if (controlBody != null && rotateDirection != 0)
 			{
 				controlBody?.Rotate(MathF.PI / 2f * rotateDirection * deltaTime);
 			}
@@ -386,15 +424,18 @@ namespace KaNet.Physics
 				_stepElapsedPerCount = (double)_elapsed * 1000 / Stopwatch.Frequency / _world.BodyCount;
 				_sampleTimer.Restart();
 				_currentFps = 1 / _deltaTime;
+				_iterateCount = _currentIterateCount;
+				_stepElapsedPerIter = _iterateCount == 0 ? 0 : (float)(_stepElapsed / _iterateCount);
 			}
 
 			_renderer.DrawTextGUI($"Body count : {_world.BodyCount}", new Vector2(10, 10), Color.White);
-			_renderer.DrawTextGUI($"Elapsed : {_stepElapsed:F3} ms", new Vector2(10, 30), Color.White);
-			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new Vector2(10, 50), Color.White);
+			_renderer.DrawTextGUI($"Elapsed / iterate: {_stepElapsed:F3} ms / {_iterateCount}", new Vector2(10, 30), Color.White);
+			_renderer.DrawTextGUI($"Elapsed per iterate : {_stepElapsedPerIter:F3} ms", new Vector2(10, 50), Color.White);
+			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new Vector2(10, 70), Color.White);
 
-			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 70), Color.White);
-			_renderer.DrawTextGUI($"DeltaTime : {_deltaTime:F4} ms", new Vector2(10, 90), Color.White);
-			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 110), Color.White);
+			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 110), Color.White);
+			_renderer.DrawTextGUI($"DeltaTime : {_deltaTime:F4} ms", new Vector2(10, 130), Color.White);
+			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 150), Color.White);
 		}
 
 		protected override void onMouseLeftClick(Vector2 worldPos)
@@ -459,6 +500,83 @@ namespace KaNet.Physics
 				RigidBody body = entity.Body;
 				Vector2 direction = Vector2.Normalize(worldPos - body.Position);
 				body.ForceVelocity = direction * 60.0f;
+			}
+		}
+
+		private void createRandomWorld(int dynamicObjectCount, int staticObjectCount,
+									   float sizeMin, float sizeMax,
+									   Vector2 viewLB, Vector2 viewRT)
+		{
+			for (int i = 0; i < dynamicObjectCount + staticObjectCount; i++)
+			{
+				KaEntity? entity = null;
+				bool isStatic = i >= dynamicObjectCount;
+				Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
+				float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float weith = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
+
+				switch (RandomHelper.NextInteger(0, 3))
+				{
+					case 0:
+						entity = KaEntity.CreateCircleEntity(_world, radius, isStatic, randPos);
+						break;
+
+					case 1:
+						entity = KaEntity.CreateAABBEntity(_world, weith, height, isStatic, randPos);
+						break;
+
+					case 2:
+						entity = KaEntity.CreateOBBEntity(_world, weith, height, isStatic,
+														  rotation, randPos);
+						break;
+				}
+
+				if (entity == null)
+					continue;
+
+				entity.Color = isStatic ? _staticObjectColor : entity.Color;
+				_entityManager.AddEntity(entity);
+			}
+		}
+
+		private void createRandomWorldBy(int dynamicObjectCount, int staticObjectCount,
+										 float sizeMin, float sizeMax,
+										 Vector2 viewLB, Vector2 viewRT,
+										 PhysicsShapeType shapeType)
+		{
+			for (int i = 0; i < dynamicObjectCount + staticObjectCount; i++)
+			{
+				KaEntity? entity = null;
+				bool isStatic = i >= dynamicObjectCount;
+				Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
+				float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float weith = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
+				float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
+
+				switch (shapeType)
+				{
+					case PhysicsShapeType.Circle:
+						entity = KaEntity.CreateCircleEntity(_world, radius, isStatic, randPos);
+						break;
+
+					case PhysicsShapeType.Box_AABB:
+						entity = KaEntity.CreateAABBEntity(_world, weith, height, isStatic, randPos);
+						break;
+
+					case PhysicsShapeType.Box_OBB:
+						entity = KaEntity.CreateOBBEntity(_world, weith, height, isStatic,
+														  rotation, randPos);
+						break;
+				}
+
+				if (entity == null)
+					continue;
+
+				entity.Color = isStatic ? _staticObjectColor : entity.Color;
+				_entityManager.AddEntity(entity);
 			}
 		}
 	}

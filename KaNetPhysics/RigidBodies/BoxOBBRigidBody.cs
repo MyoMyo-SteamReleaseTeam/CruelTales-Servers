@@ -15,6 +15,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>OBB의 바운더리 반지름입니다.</summary>
 		public readonly float BoundaryRadius;
 
+		/// <summary>OBB의 바운더리 반지름입니다.</summary>
+		public readonly float BoundaryDiameter;
+
 		/// <summary>정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _vertices;
 
@@ -38,6 +41,7 @@ namespace KaNet.Physics.RigidBodies
 			_vertices[3] = new Vector2(-hw, -hh);
 
 			BoundaryRadius = new Vector2(hw, hh).Length();
+			BoundaryDiameter = BoundaryDiameter * 2;
 
 			Physics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
 		}
@@ -46,7 +50,7 @@ namespace KaNet.Physics.RigidBodies
 		{
 			if (_isTransformDirty)
 			{
-				_boundingBox = new BoundingBox(Position, BoundaryRadius, BoundaryRadius);
+				_boundingBox = new BoundingBox(Position, BoundaryDiameter, BoundaryDiameter);
 			}
 
 			return _boundingBox;

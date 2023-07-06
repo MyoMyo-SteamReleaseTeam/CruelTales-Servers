@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define NO_OPTIMIZE
+
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using KaNet.Physics.RigidBodies;
@@ -168,14 +170,204 @@ namespace KaNet.Physics
 									  out normal, out depth);
 		}
 
+#if NO_OPTIMIZE
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsCollideOBBs(BoxOBBRigidBody bodyA, BoxOBBRigidBody bodyB,
 										 out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
-			depth = 0;
-			return false;
+			depth = float.MaxValue;
+
+			Vector2 centerA = bodyA.Position;
+			Vector2 centerB = bodyB.Position;
+
+			if (!IsIntersectCircles(centerA, bodyA.BoundaryRadius,
+									centerB, bodyB.BoundaryRadius))
+			{
+				return false;
+			}
+
+			Vector2[] aVertices = bodyA.GetTransformedVertices();
+			Vector2[] bVertices = bodyB.GetTransformedVertices();
+
+			for (int a = 0; a < 4; a++)
+			{
+				Vector2 aEdge1 = aVertices[a];
+				Vector2 aEdge2 = aVertices[(a + 1) % 4];
+				Vector2 aNormal = Vector2.Normalize(aEdge2 - aEdge1).RotateLeft();
+
+				float minA = float.MaxValue;
+				float minB = float.MaxValue;
+				float maxA = float.MinValue;
+				float maxB = float.MinValue;
+
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2 va = aVertices[i];
+					float projection = Vector2.Dot(va, aNormal);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2 vb = bVertices[i];
+					float projection = Vector2.Dot(vb, aNormal);
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+				{
+					return false;
+				}
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = aNormal;
+				}
+			}
+
+			for (int b = 0; b < 4; b++)
+			{
+				Vector2 bEdge1 = bVertices[b];
+				Vector2 bEdge2 = bVertices[(b + 1) % 4];
+				Vector2 bNormal = Vector2.Normalize(bEdge2 - bEdge1).RotateLeft();
+
+				float minB = float.MaxValue;
+				float minA = float.MaxValue;
+				float maxB = float.MinValue;
+				float maxA = float.MinValue;
+
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2 vb = bVertices[i];
+					float projection = Vector2.Dot(vb, bNormal);
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2 va = aVertices[i];
+					float projection = Vector2.Dot(va, bNormal);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+				{
+					return false;
+				}
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = bNormal;
+				}
+			}
+
+			Vector2 aTob = centerB - centerA;
+			if (Vector2.Dot(aTob, normal) < 0)
+			{
+				normal = -normal;
+			}
+
+			return true;
 		}
+#else
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsCollideOBBs(BoxOBBRigidBody bodyA, BoxOBBRigidBody bodyB,
+										 out Vector2 normal, out float depth)
+		{
+			normal = Vector2.Zero;
+			depth = float.MaxValue;
+
+			Vector2 centerA = bodyA.Position;
+			Vector2 centerB = bodyB.Position;
+
+			if (!IsIntersectCircles(centerA, bodyA.BoundaryRadius,
+									centerB, bodyB.BoundaryRadius))
+			{
+				return false;
+			}
+
+			Vector2[] aVertices = bodyA.GetTransformedVertices();
+			Vector2[] bVertices = bodyB.GetTransformedVertices();
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalA = Vector2.Normalize(aVertices[i + 1] - aVertices[i]).RotateLeft();
+				float maxA = Vector2.Dot(aVertices[i], normalA);
+				float minA = Vector2.Dot(aVertices[i + 2], normalA);
+
+				float maxB = float.MinValue;
+				float minB = float.MaxValue;
+
+				float projection;
+				Vector2 vb;
+
+				for (int b = 0; b < 4; b++)
+				{
+					vb = bVertices[b];
+					projection = Vector2.Dot(vb, normalA);
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalA;
+				}
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
+				float maxB = Vector2.Dot(bVertices[i], normalB);
+				float minB = Vector2.Dot(bVertices[i + 2], normalB);
+
+				float maxA = float.MinValue;
+				float minA = float.MaxValue;
+
+				float projection;
+				Vector2 va;
+
+				for (int a = 0; a < 4; a++)
+				{
+					va = aVertices[a];
+					projection = Vector2.Dot(va, normalB);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalB;
+				}
+			}
+
+			if (Vector2.Dot(centerB - centerA, normal) < 0)
+			{
+				normal = -normal;
+			}
+
+			return true;
+		}
+#endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsCollideCircleOBB(CircleRigidBody bodyA, BoxOBBRigidBody bodyB,
@@ -376,6 +568,43 @@ namespace KaNet.Physics
 
 			Vector2 pointToCircle = centerA - closestPoint;
 			return radiusA * radiusA > pointToCircle.LengthSquared();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsIntersectOBBs(Vector2 centerA, float boundaryRadiusA, Vector2[] aVertices, 
+										   Vector2 centerB, float boundaryRadiusB, Vector2[] bVertices)
+		{
+			if (!IsIntersectCircles(centerA, boundaryRadiusA,
+									centerB, boundaryRadiusB))
+			{
+				return false;
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalA = Vector2.Normalize(aVertices[i + 1] - aVertices[i]).RotateLeft();
+				float maxA = Vector2.Dot(aVertices[i], normalA);
+				float minA = Vector2.Dot(aVertices[i + 2], normalA);
+
+				float maxB = float.MinValue;
+				float minB = float.MaxValue;
+
+				float projection;
+				Vector2 vb;
+
+				for (int b = 0; b < 4; b++)
+				{
+					vb = bVertices[b];
+					projection = Vector2.Dot(vb, normalA);
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

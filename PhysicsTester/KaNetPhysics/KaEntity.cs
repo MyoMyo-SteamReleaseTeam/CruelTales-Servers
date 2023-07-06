@@ -117,7 +117,8 @@ namespace KaNet.Physics
 			renderer.DrawLine(position, position + new Vector2(-1, 1) * centerPivotRadius, Color.SkyBlue);
 			renderer.DrawLine(position, position + new Vector2(-1, -1) * centerPivotRadius, Color.SkyBlue);
 
-			//renderer.DrawText(Body.Angle.ToString("F3"), position, Color.Orange);
+			renderer.DrawText(Body.Angle.ToString("F3"), position - new Vector2(0, 1f), Color.Orange,
+							  isCenter: true);
 			renderer.DrawText(this.Id.ToString(), position, Color.LightGreen, Color.Black,
 							  isCenter: true, font: renderer.DefaultFont16);
 		}
