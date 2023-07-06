@@ -351,21 +351,21 @@ namespace PhysicsTester
 
 		public bool IsCulled(Vector2[] vertices)
 		{
-			float minX = 0;
-			float minY = 0;
-			float maxX = 0;
-			float maxY = 0;
+			float minX = float.MaxValue;
+			float minY = float.MaxValue;
+			float maxX = float.MinValue;
+			float maxY = float.MinValue;
 
 			foreach (Vector2 v in vertices)
 			{
-				MathF.Min(minX, v.X);
-				MathF.Min(minY, v.Y);
-				MathF.Max(maxX, v.X);
-				MathF.Max(maxY, v.Y);
+				minX = MathF.Min(minX, v.X);
+				minY = MathF.Min(minY, v.Y);
+				maxX = MathF.Max(maxX, v.X);
+				maxY = MathF.Max(maxY, v.Y);
 			}
 
 			BoundingBox objBound = new(new Vector2(minX, minY),
-										new Vector2(maxX, maxY));
+									   new Vector2(maxX, maxY));
 
 			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
 		}
