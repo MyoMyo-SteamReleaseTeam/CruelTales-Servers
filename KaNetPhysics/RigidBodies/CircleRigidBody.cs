@@ -28,25 +28,32 @@ namespace KaNet.Physics.RigidBodies
 
 		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)
 		{
+			bool result;
+
 			switch (otherBody.ShapeType)
 			{
 				case PhysicsShapeType.Box_AABB:
-					return Physics.IsCollideCircleAABB(this, (BoxAABBRigidBody)otherBody,
-														  out normal, out depth);
+					result = Physics.IsCollideCircleAABB(this, (BoxAABBRigidBody)otherBody,
+														 out normal, out depth);
+					break;
 
 				case PhysicsShapeType.Box_OBB:
-					return Physics.IsCollideCircleOBB(this, (BoxOBBRigidBody)otherBody,
-														  out normal, out depth);
+					result = Physics.IsCollideCircleOBB(this, (BoxOBBRigidBody)otherBody,
+														out normal, out depth);
+					break;
 
 
 				case PhysicsShapeType.Circle:
-					return Physics.IsCollideCircles(this, (CircleRigidBody)otherBody,
-													   out normal, out depth);
+					result = Physics.IsCollideCircles(this, (CircleRigidBody)otherBody,
+													  out normal, out depth);
+					break;
 
 				default:
 					throw new ArgumentOutOfRangeException
 						($"There is no such physics shape type as {otherBody.ShapeType}");
 			}
+
+			return result;
 		}
 	}
 }

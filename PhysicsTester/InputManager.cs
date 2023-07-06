@@ -90,16 +90,27 @@ namespace PhysicsTester
 		public InputManager()
 		{
 			// Moving Camera
-			addInput(GameKey.CameraMoveLeft, Keys.Left);
-			addInput(GameKey.CameraMoveRight, Keys.Right);
-			addInput(GameKey.CameraMoveUp, Keys.Up);
-			addInput(GameKey.CameraMoveDown, Keys.Down);
+			//addInput(GameKey.CameraMoveLeft, Keys.Left);
+			//addInput(GameKey.CameraMoveRight, Keys.Right);
+			//addInput(GameKey.CameraMoveUp, Keys.Up);
+			//addInput(GameKey.CameraMoveDown, Keys.Down);
+
+			addInput(GameKey.CameraMoveLeft, Keys.A);
+			addInput(GameKey.CameraMoveRight, Keys.D);
+			addInput(GameKey.CameraMoveUp, Keys.W);
+			addInput(GameKey.CameraMoveDown, Keys.S);
 
 			// Moving
-			addInput(GameKey.MoveLeft, Keys.A);
-			addInput(GameKey.MoveRight, Keys.D);
-			addInput(GameKey.MoveUp, Keys.W);
-			addInput(GameKey.MoveDown, Keys.S);
+			//addInput(GameKey.MoveLeft, Keys.A);
+			//addInput(GameKey.MoveRight, Keys.D);
+			//addInput(GameKey.MoveUp, Keys.W);
+			//addInput(GameKey.MoveDown, Keys.S);
+
+			addInput(GameKey.MoveLeft, Keys.Left);
+			addInput(GameKey.MoveRight, Keys.Right);
+			addInput(GameKey.MoveUp, Keys.Up);
+			addInput(GameKey.MoveDown, Keys.Down);
+
 			addInput(GameKey.RotateLeft, Keys.Q);
 			addInput(GameKey.RotateRight, Keys.E);
 
