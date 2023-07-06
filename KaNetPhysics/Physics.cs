@@ -44,6 +44,13 @@ namespace KaNet.Physics
 			Vector2 closestPoint = new Vector2(closestX, closestY);
 			Vector2 pointToCircle = centerA - closestPoint;
 
+			if (pointToCircle == Vector2.Zero)
+			{
+				normal = new Vector2(1, 0);
+				depth = bodyA.Radius;
+				return true;
+			}
+
 			depth = bodyA.Radius * bodyA.Radius - pointToCircle.LengthSquared();
 
 			if (depth > 0)
@@ -96,6 +103,13 @@ namespace KaNet.Physics
 			Vector2 centerA = bodyA.Position;
 			Vector2 centerB = bodyB.Position;
 
+			if (centerA == centerB)
+			{
+				normal = new Vector2(1, 0);
+				depth = bodyA.Radius;
+				return true;
+			}
+
 			float distance = Vector2.Distance(centerA, centerB);
 			float radii = bodyA.Radius + bodyB.Radius;
 
@@ -147,7 +161,7 @@ namespace KaNet.Physics
 
 			float atobX = boundA.Max.X - boundB.Min.X;
 
-			if (atobX < 0)
+			if (atobX <= 0)
 				return false;
 
 			if (atobX < depth)
@@ -158,7 +172,7 @@ namespace KaNet.Physics
 
 			float atobY = boundA.Max.Y - boundB.Min.Y;
 
-			if (atobY < 0)
+			if (atobY <= 0)
 				return false;
 
 			if (atobY < depth)
@@ -169,7 +183,7 @@ namespace KaNet.Physics
 
 			float btoaX = boundB.Max.X - boundA.Min.X;
 
-			if (btoaX < 0)
+			if (btoaX <= 0)
 				return false;
 
 			if (btoaX < depth)
@@ -180,7 +194,7 @@ namespace KaNet.Physics
 
 			float btoaY = boundB.Max.Y - boundA.Min.Y;
 
-			if (btoaY < 0)
+			if (btoaY <= 0)
 				return false;
 
 			if (btoaY < depth)
