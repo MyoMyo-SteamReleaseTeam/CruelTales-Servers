@@ -85,7 +85,7 @@ namespace PhysicsTester
 
 		private void MainCanvas_Paint(object sender, PaintEventArgs e)
 		{
-			e.Graphics.Clear(Color.FromArgb(20, 20, 20));
+			e.Graphics.Clear(Color.FromArgb(30, 30, 30));
 			_physicsRuntime.OnInvalidate(e.Graphics);
 			_physicsRuntime.OnDraw(e.Graphics);
 
