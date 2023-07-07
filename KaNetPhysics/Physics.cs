@@ -382,8 +382,35 @@ namespace KaNet.Physics
 											  out Vector2 normal, out float depth)
 		{
 			normal = Vector2.Zero;
-			depth = 0;
-			return false;
+			depth = float.MaxValue;
+
+			if (!IsIntersectAABBs(bodyA.GetBoundingBox(), bodyB.GetBoundingBox()))
+			{
+				return false;
+			}
+
+			Vector2 centerA = bodyA.Position;
+			Vector2[] verticesB = bodyB.GetTransformedVertices();
+			float radiusA = bodyA.Radius;
+			bool hasContacted = false;
+
+			for (int i = 0; i < 4; i++)
+			{
+				Vector2 b1 = verticesB[i];
+				Vector2 b2 = verticesB[(i + 1) % 4];
+
+				ComputePointSegmentDistance(centerA, b1, b2, out float d, out Vector2 cp);
+
+				if (d < radiusA && d < depth)
+				{
+					depth = d;
+					normal = Vector2.Normalize(centerA - cp);
+					hasContacted = true;
+				}
+			}
+
+			depth -= radiusA;
+			return hasContacted;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -719,6 +746,41 @@ namespace KaNet.Physics
 			}
 
 			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void IsIntersectCircleSegment(Vector2 p, Vector2 a, Vector2 b,
+													out float distance, out Vector2 nearestPoint)
+		{
+			// TODO
+			throw new NotImplementedException();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void ComputePointSegmentDistance(Vector2 p, Vector2 a, Vector2 b,
+													   out float distance, out Vector2 nearestPoint)
+		{
+			Vector2 ab = b - a;
+			Vector2 ap = p - a;
+
+			float projection = Vector2.Dot(ap, ab);
+			float abLengthSq = ab.LengthSquared();
+			float d = projection / abLengthSq;
+
+			if (d <= 0f)
+			{
+				nearestPoint = a;
+			}
+			else if (d >= 1f)
+			{
+				nearestPoint = b;
+			}
+			else
+			{
+				nearestPoint = a + ab * d;
+			}
+
+			distance = Vector2.Distance(p, nearestPoint);
 		}
 	}
 }

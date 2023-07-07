@@ -79,7 +79,7 @@ namespace KaNet.Physics
 			inputManager.GetInputData(GameKey.F3).OnPressed += () => setupForAABBsTest(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F4).OnPressed += () => setupForOBBsTest(viewLB, viewRT, viewHalfSize);
 
-			inputManager.GetInputData(GameKey.F4).ForceInvokePressed();
+			inputManager.GetInputData(GameKey.F2).ForceInvokePressed();
 
 			inputManager.GetInputData(GameKey.Num0).OnPressed += () => selectEntity(0);
 			inputManager.GetInputData(GameKey.Num1).OnPressed += () => selectEntity(1);
@@ -154,8 +154,8 @@ namespace KaNet.Physics
 		{
 			_entityManager.Clear();
 
-			int dynamicCount = 10;
-			int staticCount = 10;
+			int dynamicCount = 1;
+			int staticCount = 0;
 			float sizeMin = 1.0f;
 			float sizeMax = 2.0f;
 
@@ -178,16 +178,20 @@ namespace KaNet.Physics
 
 			OnPressRightMouseClick = (worldPos) =>
 			{
-				if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
-				{
-					RigidBody body = entity.Body;
-					Vector2 direction = Vector2.Normalize(worldPos - body.Position);
-					body.ForceVelocity =  direction * 60.0f;
-				}
+				float width = RandomHelper.NextSingle(sizeMin * 2, sizeMax * 2);
+				float height = RandomHelper.NextSingle(sizeMin * 2, sizeMax * 2);
+				float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
+				_entityManager.AddEntity(KaEntity.CreateOBBEntity(_world, width, height, isStatic: false, rotation, worldPos));
+				//if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+				//{
+				//	RigidBody body = entity.Body;
+				//	Vector2 direction = Vector2.Normalize(worldPos - body.Position);
+				//	body.ForceVelocity =  direction * 60.0f;
+				//}
 			};
 
 			// Create world
-			createRandomWorld(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT);
+			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT, PhysicsShapeType.Circle);
 		}
 
 		private void setupForAABBsTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
