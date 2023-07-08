@@ -1,9 +1,11 @@
 ﻿//#define NO_OPTIMIZE
 
 using System;
+using System.ComponentModel;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml;
 using KaNet.Physics.RigidBodies;
 
 namespace KaNet.Physics
@@ -61,62 +63,54 @@ namespace KaNet.Physics
 			depth = float.MaxValue;
 			normal = Vector2.Zero;
 
-			Vector2 aCircleCenter = bodyA.Position;
-			Vector2 bBoxCenter = bodyB.Position;
-			BoundingBox bBoundIn = bodyB.GetBoundingBox();
-			BoundingBox boundOut = new(bBoxCenter,
-									   bodyB.Width + bodyA.Diameter,
-									   bodyB.Height + bodyA.Diameter);
+			Vector2 centerA = bodyA.Position;
+			Vector2 centerB = bodyB.Position;
+			BoundingBox boundInB = bodyB.GetBoundingBox();
+			BoundingBox boundOutB = new(centerB,
+										bodyB.Width + bodyA.Diameter,
+										bodyB.Height + bodyA.Diameter);
 
-			if (!IsIntersectPointAABB(aCircleCenter, boundOut))
+			if (!IsIntersectPointAABB(centerA, boundOutB))
 				return false;
 
-			float closestCornerX = float.MaxValue;
-			float closestCornerY = float.MaxValue;
+			float closestVertexX = float.MaxValue;
+			float closestVertexY = float.MaxValue;
 
-			if (aCircleCenter.X <= bBoundIn.Min.X)
+			if (centerA.X <= boundInB.Min.X)
 			{
-				closestCornerX = bBoundIn.Min.X;
+				closestVertexX = boundInB.Min.X;
 			}
-			else if (aCircleCenter.X >= bBoundIn.Max.X)
+			else if (centerA.X >= boundInB.Max.X)
 			{
-				closestCornerX = bBoundIn.Max.X;
+				closestVertexX = boundInB.Max.X;
 			}
 			else
 			{
-				if (aCircleCenter.Y < bBoxCenter.Y)
+				if (centerA.Y < centerB.Y)
 				{
-					float d = aCircleCenter.Y - boundOut.Min.Y;
-					if (d < depth)
-					{
-						depth = d;
-						normal = new Vector2(0, 1);
-					}
+					depth = centerA.Y - boundOutB.Min.Y;
+					normal = new Vector2(0, 1);
 				}
 				else
 				{
-					float d = boundOut.Max.Y - aCircleCenter.Y;
-					if (d < depth)
-					{
-						depth = d;
-						normal = new Vector2(0, -1);
-					}
+					depth = boundOutB.Max.Y - centerA.Y;
+					normal = new Vector2(0, -1);
 				}
 			}
 
-			if (aCircleCenter.Y <= bBoundIn.Min.Y)
+			if (centerA.Y <= boundInB.Min.Y)
 			{
-				closestCornerY = bBoundIn.Min.Y;
+				closestVertexY = boundInB.Min.Y;
 			}
-			else if (aCircleCenter.Y >= bBoundIn.Max.Y)
+			else if (centerA.Y >= boundInB.Max.Y)
 			{
-				closestCornerY = bBoundIn.Max.Y;
+				closestVertexY = boundInB.Max.Y;
 			}
 			else
 			{
-				if (aCircleCenter.X < bBoxCenter.X)
+				if (centerA.X < centerB.X)
 				{
-					float d = aCircleCenter.X - boundOut.Min.X;
+					float d = centerA.X - boundOutB.Min.X;
 					if (d < depth)
 					{
 						depth = d;
@@ -125,7 +119,7 @@ namespace KaNet.Physics
 				}
 				else
 				{
-					float d = boundOut.Max.X - aCircleCenter.X;
+					float d = boundOutB.Max.X - centerA.X;
 					if (d < depth)
 					{
 						depth = d;
@@ -137,8 +131,8 @@ namespace KaNet.Physics
 			if (depth < float.MaxValue)
 				return true;
 
-			Vector2 closestCorner = new Vector2(closestCornerX, closestCornerY);
-			return IsIntersectPointCircle(closestCorner, aCircleCenter, bodyA.Radius,
+			Vector2 closestCorner = new Vector2(closestVertexX, closestVertexY);
+			return IsIntersectPointCircle(closestCorner, centerA, bodyA.Radius,
 										  out normal, out depth);
 		}
 
@@ -384,6 +378,222 @@ namespace KaNet.Physics
 			normal = Vector2.Zero;
 			depth = float.MaxValue;
 
+			Vector2 centerA = bodyA.Position;
+			float radiusA = bodyA.Radius;
+			Vector2 centerB = bodyB.Position;
+
+			if (!IsIntersectCircles(centerA, radiusA, centerB, bodyB.BoundaryRadius))
+				return false;
+
+			Vector2[] verticesB = bodyB.GetTransformedVertices();
+			float widthB = bodyB.Width;
+			float heightB = bodyB.Height;
+
+			float closestVertexRefX = float.MaxValue;
+			float closestVertexRefY = float.MaxValue;
+
+			Vector2 b0 = verticesB[0];
+			Vector2 b1 = verticesB[1];
+			Vector2 b3 = verticesB[3];
+
+			Vector2 normalRight = Vector2.Normalize(b1 - b0);
+			Vector2 normalUp = normalRight.RotateLeft();
+
+			float centerProjXA = Vector2.Dot(normalRight, centerA);
+			float centerProjXB = Vector2.Dot(normalRight, centerB);
+
+			float maxInXB = Vector2.Dot(normalRight, b1);
+			float minInXB = maxInXB - widthB;
+			float maxOutXB = maxInXB + radiusA;
+			float minOutXB = minInXB - radiusA;
+
+			float centerProjYA = Vector2.Dot(normalUp, centerA);
+			float centerProjYB = Vector2.Dot(normalUp, centerB);
+
+			float maxInYB = Vector2.Dot(normalUp, b1);
+			float minInYB = maxInYB - heightB;
+			float maxOutYB = maxInYB + radiusA;
+			float minOutYB = minInYB - radiusA;
+
+			if (centerProjXA <= minInXB)
+			{
+				closestVertexRefX = 0;
+			}
+			else if (centerProjXA >= maxInXB)
+			{
+				closestVertexRefX = widthB;
+			}
+			else
+			{
+				if (centerProjYA < centerProjYB)
+				{
+					depth = centerProjYA - minOutYB;
+					if (depth <= 0)
+						return false;
+					normal = normalUp;
+				}
+				else
+				{
+					depth = maxOutYB - centerProjYA;
+					if (depth <= 0)
+						return false;
+					normal = -normalUp;
+				}
+			}
+
+			if (centerProjYA <= minInYB)
+			{
+				closestVertexRefY = 0;
+			}
+			else if (centerProjYA >= maxInYB)
+			{
+				closestVertexRefY = heightB;
+			}
+			else
+			{
+				if (centerProjXA < centerProjXB)
+				{
+					float d = centerProjXA - minOutXB;
+					if (d <= 0) return false;
+					if (d < depth)
+					{
+						depth = d;
+						normal = normalRight;
+					}
+				}
+				else
+				{
+					float d = maxOutXB - centerProjXA;
+					if (d <= 0) return false;
+					if (d < depth)
+					{
+						depth = d;
+						normal = -normalRight;
+					}
+				}
+			}
+
+			if (depth < float.MaxValue)
+				return true;
+
+			Vector2 closestVertex = b3 + normalRight * closestVertexRefX + normalUp * closestVertexRefY;
+			return IsIntersectPointCircle(closestVertex, centerA, bodyA.Radius,
+										  out normal, out depth);
+		}
+
+		[Obsolete("꼭지점 부분이 문제")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Obsolete_IsCollideCircleOBB2(CircleRigidBody bodyA, BoxOBBRigidBody bodyB,
+											  out Vector2 normal, out float depth)
+		{
+			normal = Vector2.Zero;
+			depth = float.MaxValue;
+
+			Vector2 centerA = bodyA.Position;
+			float radiusA = bodyA.Radius;
+
+			if (!IsIntersectCircles(centerA, radiusA, bodyB.Position, bodyB.BoundaryRadius))
+			{
+				return false;
+			}
+
+			Vector2[] verticesB = bodyB.GetTransformedVertices();
+			float widthB = bodyB.Width;
+			float heightB = bodyB.Height;
+
+			Vector2 closestVector = Vector2.Zero;
+
+			Vector2 b0 = verticesB[0];
+			Vector2 b1 = verticesB[1];
+			Vector2 b2 = verticesB[2];
+			Vector2 b3 = verticesB[3];
+
+			{
+				Vector2 axis = Vector2.Normalize(b2 - b1);
+				Vector2 axisNormal = axis.RotateLeft();
+
+				float maxB = Vector2.Dot(axisNormal, b1);
+				float minB = maxB - widthB;
+
+				float projCenterA = Vector2.Dot(axisNormal, centerA);
+				float minA = projCenterA - radiusA;
+				float maxA = projCenterA + radiusA;
+
+				float d0 = maxB - minA;
+				if (d0 <= 0) return false;
+				depth = d0;
+				normal = axisNormal;
+				closestVector = b1;
+
+				float d1 = -(minB - maxA);
+				if (d1 <= 0 ) return false;
+				if (d1 < depth)
+				{
+					depth = d1;
+					normal = -axisNormal;
+					closestVector = b0;
+				}
+			}
+
+			{
+				Vector2 axis = Vector2.Normalize(b1 - b0);
+				Vector2 axisNormal = axis.RotateLeft();
+
+				float maxB = Vector2.Dot(axisNormal, b1);
+				float minB = maxB - heightB;
+
+				float projCenterA = Vector2.Dot(axisNormal, centerA);
+				float minA = projCenterA - radiusA;
+				float maxA = projCenterA + radiusA;
+
+				float d0 = maxB - minA;
+				if (d0 <= 0) return false;
+				if (d0 < depth)
+				{
+					depth = d0;
+					normal = axisNormal;
+				}
+
+				float d1 = -(minB - maxA);
+				if (d1 <= 0) return false;
+				if (d1 < depth)
+				{
+					depth = d1;
+					normal = -axisNormal;
+					if (closestVector == b0)
+					{
+						closestVector = b3;
+					}
+					else if (closestVector == b1)
+					{
+						closestVector = b2;
+					}
+				}
+			}
+
+			if (IsIntersectPointCircle(closestVector, centerA, bodyA.Radius,
+									   out Vector2 circleNormal, out float circleDepth))
+			{
+				if (circleDepth < depth)
+				{
+					depth = circleDepth;
+					normal = -circleNormal;
+				}
+			}
+
+			normal = -normal;
+
+			return true;
+		}
+
+		[Obsolete("원이 다각형 내부에 있는 경우 다각형 안에 갇힘")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Obsolete_IsCollideCircleOBB(CircleRigidBody bodyA, BoxOBBRigidBody bodyB,
+											  out Vector2 normal, out float depth)
+		{
+			normal = Vector2.Zero;
+			depth = float.MaxValue;
+
 			if (!IsIntersectAABBs(bodyA.GetBoundingBox(), bodyB.GetBoundingBox()))
 			{
 				return false;
@@ -537,11 +747,8 @@ namespace KaNet.Physics
 
 			float atobX = boundA.Max.X - boundB.Min.X;
 			if (atobX <= 0) return false;
-			if (atobX < depth)
-			{
-				normal = new Vector2(1, 0);
-				depth = atobX;
-			}
+			normal = new Vector2(1, 0);
+			depth = atobX;
 
 			float atobY = boundA.Max.Y - boundB.Min.Y;
 			if (atobY <= 0) return false;
@@ -570,6 +777,7 @@ namespace KaNet.Physics
 			return true;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsCollidePointAABB(in Vector2 point, in BoundingBox bound,
 											  out Vector2 normal, out float depth)
 		{
@@ -746,14 +954,6 @@ namespace KaNet.Physics
 			}
 
 			return true;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void IsIntersectCircleSegment(Vector2 p, Vector2 a, Vector2 b,
-													out float distance, out Vector2 nearestPoint)
-		{
-			// TODO
-			throw new NotImplementedException();
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -154,7 +154,7 @@ namespace KaNet.Physics
 		{
 			_entityManager.Clear();
 
-			int dynamicCount = 1;
+			int dynamicCount = 5;
 			int staticCount = 0;
 			float sizeMin = 1.0f;
 			float sizeMax = 2.0f;
@@ -301,19 +301,22 @@ namespace KaNet.Physics
 			processEntityInput(deltaTime);
 
 			_physicsCalcTimer.Restart();
-			//_world.Step(0.01f);
 			//_world.Step(deltaTime);
-			float interval = 0.01f;
-			int iterCount = 0;
-			while (_deltaTimeStack > interval)
-			{
-				_deltaTimeStack -= interval;
-				_world.Step(interval);
-				if (++iterCount >= 15)
-					break;
-			}
+			_world.Step(0.01f);
+			_currentIterateCount = 1;
+
+			//int iterCount = 0;
+			//float interval = 0.01f;
+			//while (_deltaTimeStack > interval)
+			//{
+			//	_deltaTimeStack -= interval;
+			//	_world.Step(interval);
+			//	if (++iterCount >= 15)
+			//		break;
+			//}
+			//_currentIterateCount = iterCount;
+
 			_elapsed = _physicsCalcTimer.ElapsedTicks;
-			_currentIterateCount = iterCount;
 
 			OnProcessUpdate?.Invoke();
 
