@@ -141,6 +141,91 @@ namespace KaNet.Physics
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsCollideOBBs(BoxOBBRigidBody bodyA, BoxOBBRigidBody bodyB,
+										 out Vector2 normal, out float depth)
+		{
+			normal = Vector2.Zero;
+			depth = float.MaxValue;
+
+			Vector2 centerA = bodyA.Position;
+			Vector2 centerB = bodyB.Position;
+
+			if (!IsIntersectCircles(centerA, bodyA.BoundaryRadius,
+									centerB, bodyB.BoundaryRadius))
+			{
+				return false;
+			}
+
+			Vector2[] aVertices = bodyA.GetTransformedVertices();
+			Vector2[] bVertices = bodyB.GetTransformedVertices();
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalA = Vector2.Normalize(aVertices[i + 1] - aVertices[i]).RotateLeft();
+				float minA = Vector2.Dot(aVertices[i + 2], normalA);
+				float maxA = Vector2.Dot(aVertices[i], normalA);
+
+				float minB = float.MaxValue;
+				float maxB = float.MinValue;
+
+				float projection;
+
+				for (int b = 0; b < 4; b++)
+				{
+					projection = Vector2.Dot(bVertices[b], normalA);
+					if (projection > maxB) { maxB = projection; }
+					if (projection < minB) { minB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalA;
+				}
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
+				float minB = Vector2.Dot(bVertices[i + 2], normalB);
+				float maxB = Vector2.Dot(bVertices[i], normalB);
+
+				float minA = float.MaxValue;
+				float maxA = float.MinValue;
+
+				float projection;
+
+				for (int a = 0; a < 4; a++)
+				{
+					projection = Vector2.Dot(aVertices[a], normalB);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+
+				float axisDepth = MathF.Min(maxA - minB, maxB - minA);
+				if (axisDepth < depth)
+				{
+					depth = axisDepth;
+					normal = normalB;
+				}
+			}
+
+			if (Vector2.Dot(centerB - centerA, normal) < 0)
+			{
+				normal = -normal;
+			}
+
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsCollideCircleOBB(CircleRigidBody bodyA, BoxOBBRigidBody bodyB,
 											  out Vector2 normal, out float depth)
 		{
