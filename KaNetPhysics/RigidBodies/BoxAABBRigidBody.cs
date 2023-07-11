@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
-	public class BoxAABBRigidBody : RigidBody
+	public class BoxAABBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>
 		public readonly float Width;
@@ -19,7 +19,7 @@ namespace KaNet.Physics.RigidBodies
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
 		public BoxAABBRigidBody(float width, float height, bool isStatic)
-			: base(PhysicsShapeType.Box_AABB, isStatic)
+			: base(KaPhysicsShapeType2D.Box_AABB, isStatic)
 		{
 			Width = width;
 			Height = height;
@@ -55,28 +55,28 @@ namespace KaNet.Physics.RigidBodies
 				return _transformedVertices;
 			_isTransformDirty = false;
 
-			Physics.ComputeTransform(_vertices, _transformedVertices, Position);
+			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position);
 			return _transformedVertices;
 		}
 
-		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)
+		public override bool IsCollideWith(KaRigidBody otherBody, out Vector2 normal, out float depth)
 		{
 			bool result;
 
 			switch (otherBody.ShapeType)
 			{
-				case PhysicsShapeType.Box_AABB:
-					result = Physics.IsCollideAABBs(this, (BoxAABBRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Box_AABB:
+					result = KaPhysics.IsCollideAABBs(this, (BoxAABBRigidBody)otherBody,
 													out normal, out depth);
 					break;
 
-				case PhysicsShapeType.Box_OBB:
-					result = Physics.IsCollideAABBOBB(this, (BoxOBBRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Box_OBB:
+					result = KaPhysics.IsCollideAABBOBB(this, (BoxOBBRigidBody)otherBody,
 													  out normal, out depth);
 					break;
 
-				case PhysicsShapeType.Circle:
-					result = Physics.IsCollideCircleAABB((CircleRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Circle:
+					result = KaPhysics.IsCollideCircleAABB((CircleRigidBody)otherBody,
 														 this, out normal, out depth);
 					normal = -normal;
 					break;

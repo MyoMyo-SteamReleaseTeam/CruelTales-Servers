@@ -8,18 +8,18 @@ namespace KaNet.Physics
 	internal class KaEntity
 	{
 		[AllowNull]
-		public PhysicsWorld World { get; private set; }
+		public KaPhysicsWorld World { get; private set; }
 		public int Id { get; private set; }
 
 		[AllowNull]
-		public readonly RigidBody Body;
+		public readonly KaRigidBody Body;
 		public Color Color { get; set; }
 		private static int[] _vertexIndices = new int[6] { 0, 1, 2, 0, 2, 3 };
 
 		private KaEntity() { }
 
 		/// <summary>원 RigidBody를 가진 Entity를 생성합니다.</summary>
-		private KaEntity(PhysicsWorld world, float radius, bool isStatic,
+		private KaEntity(KaPhysicsWorld world, float radius, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
 			World = world;
@@ -30,7 +30,7 @@ namespace KaNet.Physics
 		}
 
 		/// <summary>사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
-		private KaEntity(PhysicsWorld world, float width, float height, bool isStatic,
+		private KaEntity(KaPhysicsWorld world, float width, float height, bool isStatic,
 						Vector2 position = default, float rotation = 0)
 		{
 			World = world;
@@ -42,21 +42,21 @@ namespace KaNet.Physics
 		}
 
 		/// <summary>원 RigidBody를 가진 Entity를 생성합니다.</summary>
-		public static KaEntity CreateCircleEntity(PhysicsWorld world, float radius,
+		public static KaEntity CreateCircleEntity(KaPhysicsWorld world, float radius,
 												  bool isStatic, Vector2 position = default)
 		{
 			return new KaEntity(world, radius, isStatic, position);
 		}
 
 		/// <summary>축 정렬된 사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
-		public static KaEntity CreateAABBEntity(PhysicsWorld world, float width, float height,
+		public static KaEntity CreateAABBEntity(KaPhysicsWorld world, float width, float height,
 												bool isStatic, Vector2 position = default)
 		{
 			return new KaEntity(world, width, height, isStatic, position);
 		}
 
 		/// <summary>회전 가능한 사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
-		public static KaEntity CreateOBBEntity(PhysicsWorld world, float width, float height,
+		public static KaEntity CreateOBBEntity(KaPhysicsWorld world, float width, float height,
 											   bool isStatic, float rotation, Vector2 position = default)
 		{
 			return new KaEntity(world, width, height, isStatic, position, rotation);
@@ -73,10 +73,10 @@ namespace KaNet.Physics
 
 			switch (Body.ShapeType)
 			{
-				case PhysicsShapeType.None:
+				case KaPhysicsShapeType2D.None:
 					break;
 
-				case PhysicsShapeType.Box_AABB:
+				case KaPhysicsShapeType2D.Box_AABB:
 					{
 						BoxAABBRigidBody body = (BoxAABBRigidBody)Body;
 						renderer.DrawBoxFill(body.Position, body.Width, body.Height, Color);
@@ -84,7 +84,7 @@ namespace KaNet.Physics
 					}
 					break;
 
-				case PhysicsShapeType.Box_OBB:
+				case KaPhysicsShapeType2D.Box_OBB:
 					{
 						BoxOBBRigidBody body = (BoxOBBRigidBody)Body;
 						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, Color);
@@ -92,7 +92,7 @@ namespace KaNet.Physics
 					}
 					break;
 
-				case PhysicsShapeType.Circle:
+				case KaPhysicsShapeType2D.Circle:
 					{
 						CircleRigidBody body = (CircleRigidBody)Body;
 

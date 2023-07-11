@@ -6,36 +6,36 @@ using KaNet.Physics.RigidBodies;
 
 namespace KaNet.Physics
 {
-	public class PhysicsWorld
+	public class KaPhysicsWorld
 	{
-		private List<RigidBody> _rigidBodies = new();
+		private List<KaRigidBody> _rigidBodies = new();
 		public int BodyCount => _rigidBodies.Count;
 
-		public void AddRigidBody(RigidBody rigidBody)
+		public void AddRigidBody(KaRigidBody rigidBody)
 		{
 			_rigidBodies.Add(rigidBody);
 		}
 
-		public void RemoveRigidBody(RigidBody rigidBody)
+		public void RemoveRigidBody(KaRigidBody rigidBody)
 		{
 			_rigidBodies.Remove(rigidBody);
 		}
 
-		public RigidBody CreateCircle(float radius, bool isStatic)
+		public KaRigidBody CreateCircle(float radius, bool isStatic)
 		{
 			var rigid = new CircleRigidBody(radius, isStatic);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
 
-		public RigidBody CreateBoxAABB(float width, float height, bool isStatic)
+		public KaRigidBody CreateBoxAABB(float width, float height, bool isStatic)
 		{
 			var rigid = new BoxAABBRigidBody(width, height, isStatic);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
 
-		public RigidBody CreateBoxOBB(float width, float height, float angle, bool isStatic)
+		public KaRigidBody CreateBoxOBB(float width, float height, float angle, bool isStatic)
 		{
 			var rigid = new BoxOBBRigidBody(width, height, isStatic);
 			rigid.RotateTo(angle);
@@ -54,11 +54,11 @@ namespace KaNet.Physics
 
 			for (int a = 0; a < bodyCount - 1; a++)
 			{
-				RigidBody bodyA = _rigidBodies[a];
+				KaRigidBody bodyA = _rigidBodies[a];
 
 				for (int b = a + 1; b < bodyCount; b++)
 				{
-					RigidBody bodyB = _rigidBodies[b];
+					KaRigidBody bodyB = _rigidBodies[b];
 
 					if (!bodyA.IsCollideWith(bodyB, out Vector2 normal, out float depth))
 					{
@@ -70,7 +70,7 @@ namespace KaNet.Physics
 			}
 		}
 
-		private void solve(RigidBody bodyA, RigidBody bodyB, Vector2 normal, float depth)
+		private void solve(KaRigidBody bodyA, KaRigidBody bodyB, Vector2 normal, float depth)
 		{
 			if (!bodyA.IsStatic)
 			{
@@ -87,7 +87,7 @@ namespace KaNet.Physics
 			}
 		}
 
-		public bool TryGetBody(int i, [NotNullWhen(true)] out RigidBody? body)
+		public bool TryGetBody(int i, [NotNullWhen(true)] out KaRigidBody? body)
 		{
 			if (i < 0 || i >= BodyCount)
 			{

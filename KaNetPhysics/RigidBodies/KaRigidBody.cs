@@ -3,10 +3,10 @@
 namespace KaNet.Physics.RigidBodies
 {
 	/// <summary>물리 속성을 가진 강체입니다.</summary>
-	public abstract class RigidBody
+	public abstract class KaRigidBody
 	{
 		/// <summary>물리 형상 타입</summary>
-		public PhysicsShapeType ShapeType { get; private set; }
+		public KaPhysicsShapeType2D ShapeType { get; private set; }
 
 		/// <summary>위치</summary>
 		public Vector2 Position { get; private set; }
@@ -35,7 +35,7 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
 
-		public RigidBody(PhysicsShapeType shapeType, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType2D shapeType, bool isStatic)
 		{
 			ShapeType = shapeType;
 			IsStatic = isStatic;
@@ -51,7 +51,7 @@ namespace KaNet.Physics.RigidBodies
 				return;
 
 			Position += (LinearVelocity + ForceVelocity) * stepTime;
-			ForceVelocity = ForceVelocity.LengthSquared() > Physics.FLOAT_EPSILON ?
+			ForceVelocity = ForceVelocity.LengthSquared() > KaPhysics.FLOAT_EPSILON ?
 				Vector2.Lerp(ForceVelocity, Vector2.Zero, ForceFriction * stepTime) : Vector2.Zero;
 
 			_isTransformDirty = true;
@@ -93,6 +93,6 @@ namespace KaNet.Physics.RigidBodies
 		/// <param name="normal">충돌한 대상이 밀려나야 하는 방향 벡터입니다.</param>
 		/// <param name="depth">충돌한 대상과의 접촉 거리입니다.</param>
 		/// <returns>충돌 여부입니다.</returns>
-		public abstract bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth);
+		public abstract bool IsCollideWith(KaRigidBody otherBody, out Vector2 normal, out float depth);
 	}
 }

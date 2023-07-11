@@ -339,14 +339,14 @@ namespace PhysicsTester
 		public bool IsCulled(Vector2 worldPos, float width, float height)
 		{
 			BoundingBox objBound = new BoundingBox(worldPos, width, height);
-			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
+			return !KaPhysics.IsIntersectAABBs(_cameraViewBound, objBound);
 		}
 
 		public bool IsCulled(Vector2 worldPos, float radius)
 		{
 			float diameter = radius * 2;
 			BoundingBox objBound = new BoundingBox(worldPos, diameter, diameter);
-			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
+			return !KaPhysics.IsIntersectAABBs(_cameraViewBound, objBound);
 		}
 
 		public bool IsCulled(Vector2[] vertices)
@@ -367,7 +367,7 @@ namespace PhysicsTester
 			BoundingBox objBound = new(new Vector2(minX, minY),
 									   new Vector2(maxX, maxY));
 
-			return !Physics.IsIntersectAABBs(_cameraViewBound, objBound);
+			return !KaPhysics.IsIntersectAABBs(_cameraViewBound, objBound);
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace KaNet.Physics
 	 * 반환되는 Normal 벡터는 A가 충돌한 지점의 수직 벡터입니다.
 	 */
 
-	public static class Physics
+	public static class KaPhysics
 	{
 		public const float FLOAT_EPSILON = 0.001f;
 

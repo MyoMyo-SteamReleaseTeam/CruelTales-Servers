@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
-	public class BoxOBBRigidBody : RigidBody
+	public class BoxOBBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>
 		public readonly float Width;
@@ -25,7 +25,7 @@ namespace KaNet.Physics.RigidBodies
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
 		public BoxOBBRigidBody(float width, float height, bool isStatic)
-			: base(PhysicsShapeType.Box_OBB, isStatic)
+			: base(KaPhysicsShapeType2D.Box_OBB, isStatic)
 		{
 			Width = width;
 			Height = height;
@@ -43,7 +43,7 @@ namespace KaNet.Physics.RigidBodies
 			BoundaryRadius = new Vector2(hw, hh).Length();
 			BoundaryDiameter = BoundaryRadius * 2;
 
-			Physics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
+			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
 		}
 
 		public override BoundingBox GetBoundingBox()
@@ -62,29 +62,29 @@ namespace KaNet.Physics.RigidBodies
 			if (!_isTransformDirty)
 				return _transformedVertices;
 			_isTransformDirty = false;
-			Physics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
+			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
 			return _transformedVertices;
 		}
 
-		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)
+		public override bool IsCollideWith(KaRigidBody otherBody, out Vector2 normal, out float depth)
 		{
 			bool result;
 
 			switch (otherBody.ShapeType)
 			{
-				case PhysicsShapeType.Box_AABB:
-					result = Physics.IsCollideAABBOBB((BoxAABBRigidBody)otherBody, this,
+				case KaPhysicsShapeType2D.Box_AABB:
+					result = KaPhysics.IsCollideAABBOBB((BoxAABBRigidBody)otherBody, this,
 													  out normal, out depth);
 					normal = -normal;
 					break;
 
-				case PhysicsShapeType.Box_OBB:
-					result = Physics.IsCollideOBBs(this, (BoxOBBRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Box_OBB:
+					result = KaPhysics.IsCollideOBBs(this, (BoxOBBRigidBody)otherBody,
 												   out normal, out depth);
 					break;
 
-				case PhysicsShapeType.Circle:
-					result = Physics.IsCollideCircleOBB((CircleRigidBody)otherBody, this,
+				case KaPhysicsShapeType2D.Circle:
+					result = KaPhysics.IsCollideCircleOBB((CircleRigidBody)otherBody, this,
 														out normal, out depth);
 					normal = -normal;
 					break;

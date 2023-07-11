@@ -1,7 +1,7 @@
 ﻿namespace KaNet.Physics
 {
 	/// <summary>물리 형체 타입</summary>
-	public enum PhysicsShapeType
+	public enum KaPhysicsShapeType2D
 	{
 		None = 0,
 

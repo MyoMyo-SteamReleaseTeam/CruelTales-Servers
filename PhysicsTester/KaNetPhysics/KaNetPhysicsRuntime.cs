@@ -1,17 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using System.Windows.Forms;
 using KaNet.Physics.RigidBodies;
 using PhysicsTester;
 using PhysicsTester.KaNetPhysics;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ScrollBar;
 
 namespace KaNet.Physics
 {
 	public class KaNetPhysicsRuntime : PhysicsRuntime
 	{
 		// Physics
-		private PhysicsWorld _world = new();
+		private KaPhysicsWorld _world = new();
 
 		// Entity
 		private KaEntityManager _entityManager = new();
@@ -191,7 +189,7 @@ namespace KaNet.Physics
 			};
 
 			// Create world
-			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT, PhysicsShapeType.Circle);
+			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT, KaPhysicsShapeType2D.Circle);
 		}
 
 		private void setupForAABBsTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
@@ -278,14 +276,14 @@ namespace KaNet.Physics
 			};
 
 			createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
-								viewLB, viewRT, PhysicsShapeType.Box_AABB);
+								viewLB, viewRT, KaPhysicsShapeType2D.Box_AABB);
 
 			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
 			//					viewLB, viewRT, PhysicsShapeType.Circle);
 
 			// Create world
 			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax,
-								viewLB, viewRT, PhysicsShapeType.Box_OBB);
+								viewLB, viewRT, KaPhysicsShapeType2D.Box_OBB);
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -354,7 +352,7 @@ namespace KaNet.Physics
 			if (!_entityManager.TryGetEntity(_selectedEntity, out var entity))
 				return;
 
-			RigidBody controlBody = entity.Body;
+			KaRigidBody controlBody = entity.Body;
 
 			// Process movement direction
 			float forceMagnitude = 10f;
@@ -467,7 +465,7 @@ namespace KaNet.Physics
 		{
 			foreach (KaEntity entity in _entityManager.Entities)
 			{
-				RigidBody body = entity.Body;
+				KaRigidBody body = entity.Body;
 
 				if (body.IsStatic)
 					continue;
@@ -488,7 +486,7 @@ namespace KaNet.Physics
 
 			for (int i = 0; i < _world.BodyCount; i++)
 			{
-				if (!_world.TryGetBody(i, out RigidBody? body))
+				if (!_world.TryGetBody(i, out KaRigidBody? body))
 				{
 					continue;
 				}
@@ -507,7 +505,7 @@ namespace KaNet.Physics
 		{
 			if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
 			{
-				RigidBody body = entity.Body;
+				KaRigidBody body = entity.Body;
 				Vector2 direction = Vector2.Normalize(worldPos - body.Position);
 				body.ForceVelocity = direction * 60.0f;
 			}
@@ -554,7 +552,7 @@ namespace KaNet.Physics
 		private void createRandomWorldBy(int dynamicObjectCount, int staticObjectCount,
 										 float sizeMin, float sizeMax,
 										 Vector2 viewLB, Vector2 viewRT,
-										 PhysicsShapeType shapeType)
+										 KaPhysicsShapeType2D shapeType)
 		{
 			for (int i = 0; i < dynamicObjectCount + staticObjectCount; i++)
 			{
@@ -568,15 +566,15 @@ namespace KaNet.Physics
 
 				switch (shapeType)
 				{
-					case PhysicsShapeType.Circle:
+					case KaPhysicsShapeType2D.Circle:
 						entity = KaEntity.CreateCircleEntity(_world, radius, isStatic, randPos);
 						break;
 
-					case PhysicsShapeType.Box_AABB:
+					case KaPhysicsShapeType2D.Box_AABB:
 						entity = KaEntity.CreateAABBEntity(_world, weith, height, isStatic, randPos);
 						break;
 
-					case PhysicsShapeType.Box_OBB:
+					case KaPhysicsShapeType2D.Box_OBB:
 						entity = KaEntity.CreateOBBEntity(_world, weith, height, isStatic,
 														  rotation, randPos);
 						break;

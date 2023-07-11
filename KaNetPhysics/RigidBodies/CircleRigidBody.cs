@@ -3,14 +3,14 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
-	public class CircleRigidBody : RigidBody
+	public class CircleRigidBody : KaRigidBody
 	{
 		/// <summary>반지름</summary>
 		public readonly float Radius;
 		public readonly float Diameter;
 
 		public CircleRigidBody(float radius, bool isStatic)
-			: base(PhysicsShapeType.Circle, isStatic)
+			: base(KaPhysicsShapeType2D.Circle, isStatic)
 		{
 			Radius = radius;
 			Diameter = radius * 2;
@@ -27,25 +27,25 @@ namespace KaNet.Physics.RigidBodies
 			return _boundingBox;
 		}
 
-		public override bool IsCollideWith(RigidBody otherBody, out Vector2 normal, out float depth)
+		public override bool IsCollideWith(KaRigidBody otherBody, out Vector2 normal, out float depth)
 		{
 			bool result;
 
 			switch (otherBody.ShapeType)
 			{
-				case PhysicsShapeType.Box_AABB:
-					result = Physics.IsCollideCircleAABB(this, (BoxAABBRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Box_AABB:
+					result = KaPhysics.IsCollideCircleAABB(this, (BoxAABBRigidBody)otherBody,
 														 out normal, out depth);
 					break;
 
-				case PhysicsShapeType.Box_OBB:
-					result = Physics.IsCollideCircleOBB(this, (BoxOBBRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Box_OBB:
+					result = KaPhysics.IsCollideCircleOBB(this, (BoxOBBRigidBody)otherBody,
 														out normal, out depth);
 					break;
 
 
-				case PhysicsShapeType.Circle:
-					result = Physics.IsCollideCircles(this, (CircleRigidBody)otherBody,
+				case KaPhysicsShapeType2D.Circle:
+					result = KaPhysics.IsCollideCircles(this, (CircleRigidBody)otherBody,
 													  out normal, out depth);
 					break;
 
