@@ -12,13 +12,12 @@ namespace KaNet.Physics
 	public static class KaPhysics
 	{
 		public const float FLOAT_EPSILON = 0.001f;
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void ComputeTransform(in Vector2[] vertices, in Vector2[] transformed,
-											in Vector2 position, in float angle)
+											in Vector2 position, in float rotation)
 		{
-			float cos = MathF.Cos(angle);
-			float sin = MathF.Sin(angle);
+			float cos = MathF.Cos(rotation);
+			float sin = MathF.Sin(rotation);
 			Matrix3x2 r = new Matrix3x2(cos, sin, -sin, cos, 0, 0);
 			int length = vertices.Length;
 			for (int i = 0; i < length; i++)

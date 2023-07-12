@@ -73,10 +73,10 @@ namespace KaNet.Physics
 
 			switch (Body.ShapeType)
 			{
-				case KaPhysicsShapeType2D.None:
+				case KaPhysicsShapeType.None:
 					break;
 
-				case KaPhysicsShapeType2D.Box_AABB:
+				case KaPhysicsShapeType.Box_AABB:
 					{
 						BoxAABBRigidBody body = (BoxAABBRigidBody)Body;
 						renderer.DrawBoxFill(body.Position, body.Width, body.Height, Color);
@@ -84,7 +84,7 @@ namespace KaNet.Physics
 					}
 					break;
 
-				case KaPhysicsShapeType2D.Box_OBB:
+				case KaPhysicsShapeType.Box_OBB:
 					{
 						BoxOBBRigidBody body = (BoxOBBRigidBody)Body;
 						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, Color);
@@ -92,12 +92,12 @@ namespace KaNet.Physics
 					}
 					break;
 
-				case KaPhysicsShapeType2D.Circle:
+				case KaPhysicsShapeType.Circle:
 					{
 						CircleRigidBody body = (CircleRigidBody)Body;
 
-						float x = -MathF.Sin(body.Angle);
-						float y = MathF.Cos(body.Angle);
+						float x = -MathF.Sin(body.Rotation);
+						float y = MathF.Cos(body.Rotation);
 						Vector2 rotationLine = new Vector2(x, y) * body.Radius;
 
 						renderer.DrawCircleFill(position, body.Radius, Color);
@@ -117,7 +117,7 @@ namespace KaNet.Physics
 			renderer.DrawLine(position, position + new Vector2(-1, 1) * centerPivotRadius, Color.SkyBlue);
 			renderer.DrawLine(position, position + new Vector2(-1, -1) * centerPivotRadius, Color.SkyBlue);
 
-			renderer.DrawText(Body.Angle.ToString("F3"), position - new Vector2(0, 1f), Color.Orange,
+			renderer.DrawText(Body.Rotation.ToString("F3"), position - new Vector2(0, 1f), Color.Orange,
 							  isCenter: true);
 			renderer.DrawText(this.Id.ToString(), position, Color.LightGreen, Color.Black,
 							  isCenter: true, font: renderer.DefaultFont16);

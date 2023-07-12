@@ -24,8 +24,8 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>변환이 적용된 정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
-		public BoxOBBRigidBody(float width, float height, bool isStatic)
-			: base(KaPhysicsShapeType2D.Box_OBB, isStatic)
+		public BoxOBBRigidBody(float width, float height, float rotation, bool isStatic)
+			: base(KaPhysicsShapeType.Box_OBB, rotation, isStatic)
 		{
 			Width = width;
 			Height = height;
@@ -43,7 +43,7 @@ namespace KaNet.Physics.RigidBodies
 			BoundaryRadius = new Vector2(hw, hh).Length();
 			BoundaryDiameter = BoundaryRadius * 2;
 
-			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
+			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Rotation);
 		}
 
 		public override BoundingBox GetBoundingBox()
@@ -62,7 +62,7 @@ namespace KaNet.Physics.RigidBodies
 			if (!_isTransformDirty)
 				return _transformedVertices;
 			_isTransformDirty = false;
-			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Angle);
+			KaPhysics.ComputeTransform(_vertices, _transformedVertices, Position, Rotation);
 			return _transformedVertices;
 		}
 
@@ -72,18 +72,18 @@ namespace KaNet.Physics.RigidBodies
 
 			switch (otherBody.ShapeType)
 			{
-				case KaPhysicsShapeType2D.Box_AABB:
+				case KaPhysicsShapeType.Box_AABB:
 					result = KaPhysics.IsCollideAABBOBB((BoxAABBRigidBody)otherBody, this,
 													  out normal, out depth);
 					normal = -normal;
 					break;
 
-				case KaPhysicsShapeType2D.Box_OBB:
+				case KaPhysicsShapeType.Box_OBB:
 					result = KaPhysics.IsCollideOBBs(this, (BoxOBBRigidBody)otherBody,
 												   out normal, out depth);
 					break;
 
-				case KaPhysicsShapeType2D.Circle:
+				case KaPhysicsShapeType.Circle:
 					result = KaPhysics.IsCollideCircleOBB((CircleRigidBody)otherBody, this,
 														out normal, out depth);
 					normal = -normal;

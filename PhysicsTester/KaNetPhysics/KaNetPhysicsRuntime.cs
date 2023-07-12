@@ -189,7 +189,7 @@ namespace KaNet.Physics
 			};
 
 			// Create world
-			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT, KaPhysicsShapeType2D.Circle);
+			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax, viewLB, viewRT, KaPhysicsShapeType.Circle);
 		}
 
 		private void setupForAABBsTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
@@ -276,14 +276,14 @@ namespace KaNet.Physics
 			};
 
 			createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
-								viewLB, viewRT, KaPhysicsShapeType2D.Box_AABB);
+								viewLB, viewRT, KaPhysicsShapeType.Box_AABB);
 
 			//createRandomWorldBy(dynamicObjectCount: 1, 0, sizeMin, sizeMax,
 			//					viewLB, viewRT, PhysicsShapeType.Circle);
 
 			// Create world
 			createRandomWorldBy(dynamicCount, staticCount, sizeMin, sizeMax,
-								viewLB, viewRT, KaPhysicsShapeType2D.Box_OBB);
+								viewLB, viewRT, KaPhysicsShapeType.Box_OBB);
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -552,7 +552,7 @@ namespace KaNet.Physics
 		private void createRandomWorldBy(int dynamicObjectCount, int staticObjectCount,
 										 float sizeMin, float sizeMax,
 										 Vector2 viewLB, Vector2 viewRT,
-										 KaPhysicsShapeType2D shapeType)
+										 KaPhysicsShapeType shapeType)
 		{
 			for (int i = 0; i < dynamicObjectCount + staticObjectCount; i++)
 			{
@@ -566,15 +566,15 @@ namespace KaNet.Physics
 
 				switch (shapeType)
 				{
-					case KaPhysicsShapeType2D.Circle:
+					case KaPhysicsShapeType.Circle:
 						entity = KaEntity.CreateCircleEntity(_world, radius, isStatic, randPos);
 						break;
 
-					case KaPhysicsShapeType2D.Box_AABB:
+					case KaPhysicsShapeType.Box_AABB:
 						entity = KaEntity.CreateAABBEntity(_world, weith, height, isStatic, randPos);
 						break;
 
-					case KaPhysicsShapeType2D.Box_OBB:
+					case KaPhysicsShapeType.Box_OBB:
 						entity = KaEntity.CreateOBBEntity(_world, weith, height, isStatic,
 														  rotation, randPos);
 						break;

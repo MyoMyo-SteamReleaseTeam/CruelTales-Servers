@@ -1,23 +1,29 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
+using Sirenix.OdinInspector;
 
 namespace KaNet.Physics.RigidBodies
 {
 	/// <summary>물리 속성을 가진 강체입니다.</summary>
+	[Serializable]
 	public abstract class KaRigidBody
 	{
 		/// <summary>물리 형상 타입</summary>
-		public KaPhysicsShapeType2D ShapeType { get; private set; }
+		public KaPhysicsShapeType ShapeType { get; private set; }
 
 		/// <summary>위치</summary>
+		[ShowInInspector]
 		public Vector2 Position { get; private set; }
 
 		/// <summary>각도</summary>
-		public float Angle { get; private set; }
+		public float Rotation { get; private set; }
 
 		/// <summary>선속도</summary>
+		[ShowInInspector]
 		public Vector2 LinearVelocity { get; set; }
 
 		/// <summary>힘<summary>
+		[ShowInInspector]
 		public Vector2 ForceVelocity { get; set; }
 
 		/// <summary>힘 마찰력</summary>
@@ -35,9 +41,16 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
 
-		public KaRigidBody(KaPhysicsShapeType2D shapeType, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType shapeType, bool isStatic)
 		{
 			ShapeType = shapeType;
+			IsStatic = isStatic;
+		}
+
+		public KaRigidBody(KaPhysicsShapeType shapeType, float rotation, bool isStatic)
+		{
+			ShapeType = shapeType;
+			Rotation = rotation;
 			IsStatic = isStatic;
 		}
 
@@ -75,16 +88,16 @@ namespace KaNet.Physics.RigidBodies
 		}
 
 		/// <summary>해당 각도로 회전합니다.</summary>
-		public void RotateTo(float angle)
+		public void RotateTo(float rotation)
 		{
-			Angle = angle;
+			Rotation = rotation;
 			_isTransformDirty = true;
 		}
 
 		/// <summary>각도만큼 상대적으로 회전합니다.</summary>
-		public void Rotate(float angle)
+		public void Rotate(float rotation)
 		{
-			Angle += angle;
+			Rotation += rotation;
 			_isTransformDirty = true;
 		}
 

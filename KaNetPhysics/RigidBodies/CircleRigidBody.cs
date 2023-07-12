@@ -10,7 +10,7 @@ namespace KaNet.Physics.RigidBodies
 		public readonly float Diameter;
 
 		public CircleRigidBody(float radius, bool isStatic)
-			: base(KaPhysicsShapeType2D.Circle, isStatic)
+			: base(KaPhysicsShapeType.Circle, isStatic)
 		{
 			Radius = radius;
 			Diameter = radius * 2;
@@ -33,18 +33,18 @@ namespace KaNet.Physics.RigidBodies
 
 			switch (otherBody.ShapeType)
 			{
-				case KaPhysicsShapeType2D.Box_AABB:
+				case KaPhysicsShapeType.Box_AABB:
 					result = KaPhysics.IsCollideCircleAABB(this, (BoxAABBRigidBody)otherBody,
 														 out normal, out depth);
 					break;
 
-				case KaPhysicsShapeType2D.Box_OBB:
+				case KaPhysicsShapeType.Box_OBB:
 					result = KaPhysics.IsCollideCircleOBB(this, (BoxOBBRigidBody)otherBody,
 														out normal, out depth);
 					break;
 
 
-				case KaPhysicsShapeType2D.Circle:
+				case KaPhysicsShapeType.Circle:
 					result = KaPhysics.IsCollideCircles(this, (CircleRigidBody)otherBody,
 													  out normal, out depth);
 					break;

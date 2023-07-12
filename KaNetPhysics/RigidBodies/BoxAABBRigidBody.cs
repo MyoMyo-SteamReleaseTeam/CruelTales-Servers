@@ -19,7 +19,7 @@ namespace KaNet.Physics.RigidBodies
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
 		public BoxAABBRigidBody(float width, float height, bool isStatic)
-			: base(KaPhysicsShapeType2D.Box_AABB, isStatic)
+			: base(KaPhysicsShapeType.Box_AABB, isStatic)
 		{
 			Width = width;
 			Height = height;
@@ -65,17 +65,17 @@ namespace KaNet.Physics.RigidBodies
 
 			switch (otherBody.ShapeType)
 			{
-				case KaPhysicsShapeType2D.Box_AABB:
+				case KaPhysicsShapeType.Box_AABB:
 					result = KaPhysics.IsCollideAABBs(this, (BoxAABBRigidBody)otherBody,
 													out normal, out depth);
 					break;
 
-				case KaPhysicsShapeType2D.Box_OBB:
+				case KaPhysicsShapeType.Box_OBB:
 					result = KaPhysics.IsCollideAABBOBB(this, (BoxOBBRigidBody)otherBody,
 													  out normal, out depth);
 					break;
 
-				case KaPhysicsShapeType2D.Circle:
+				case KaPhysicsShapeType.Circle:
 					result = KaPhysics.IsCollideCircleAABB((CircleRigidBody)otherBody,
 														 this, out normal, out depth);
 					normal = -normal;

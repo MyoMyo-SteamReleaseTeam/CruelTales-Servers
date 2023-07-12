@@ -1,11 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
 using System.Numerics;
+using Sirenix.OdinInspector;
 
 namespace KaNet.Physics
 {
+	[Serializable]
 	public readonly struct BoundingBox
 	{
+		[ShowInInspector]
 		public readonly Vector2 Min;
+
+		[ShowInInspector]
 		public readonly Vector2 Max;
 
 		public BoundingBox(Vector2 min, Vector2 max)

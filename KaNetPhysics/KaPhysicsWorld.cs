@@ -35,10 +35,9 @@ namespace KaNet.Physics
 			return rigid;
 		}
 
-		public KaRigidBody CreateBoxOBB(float width, float height, float angle, bool isStatic)
+		public KaRigidBody CreateBoxOBB(float width, float height, float rotation, bool isStatic)
 		{
-			var rigid = new BoxOBBRigidBody(width, height, isStatic);
-			rigid.RotateTo(angle);
+			var rigid = new BoxOBBRigidBody(width, height, rotation, isStatic);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
