@@ -89,7 +89,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void f24(int a);
 		[SyncRpc]
-		private partial void f28(int a);
+		public partial void f28(int a);
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
 		private BitmaskByte _dirtyReliable_2 = new();
@@ -380,7 +380,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_3[6] = true;
 		}
 		private List<int> f24Callstack = new(4);
-		private partial void f28(int a)
+		public partial void f28(int a)
 		{
 			f28Callstack.Add(a);
 			_dirtyReliable_3[7] = true;

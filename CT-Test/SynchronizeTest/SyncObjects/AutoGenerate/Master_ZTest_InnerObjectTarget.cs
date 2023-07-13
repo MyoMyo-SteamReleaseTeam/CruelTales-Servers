@@ -52,7 +52,7 @@ namespace CTS.Instance.SyncObjects
 				return isDirty;
 			}
 		}
-		private int V0
+		public int V0
 		{
 			get => _v0;
 			set
@@ -68,7 +68,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0[1] = true;
 		}
 		private TargetCallstack<NetworkPlayer, NetStringShort> f1Callstack = new(8);
-		private int Uv1
+		public int Uv1
 		{
 			get => _uv1;
 			set

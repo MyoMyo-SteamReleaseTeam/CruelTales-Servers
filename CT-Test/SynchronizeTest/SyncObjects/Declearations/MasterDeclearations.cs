@@ -6,14 +6,24 @@ using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.SyncObjects
 {
-	public partial class ZTest_FuntionObject : IMasterSynchronizable
+	public partial class ZTest_InnerObject : IMasterSynchronizable
 	{
 
 	}
 
-	public partial class ZTest_InnerObject : IMasterSynchronizable
+	public partial class ZTest_FunctionDirection : MasterNetworkObject
 	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
+		public partial void Client_FromClientVoid(NetworkPlayer player)
+		{
+		}
+
+		public partial void Client_FromServerArg(NetworkPlayer player, int a, int b)
+		{
+		}
 	}
 
 	public partial class ZTest_SyncCollection : MasterNetworkObject
@@ -25,31 +35,45 @@ namespace CTS.Instance.SyncObjects
 		public SyncList<UserId> UserIdList => _userIdList;
 	}
 
-	public partial class ZTest_Value8 : MasterNetworkObject
-	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
-		public override VisibilityType Visibility => throw new NotImplementedException();
-		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
-
-		public void Call_uf5(NetworkPlayer player)
-		{
-			uf5(player);
-		}
-	}
-
-	public partial class ZTest_Value16 : MasterNetworkObject
+	public partial class ZTest_Value8Target : MasterNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
-	public partial class ZTest_Value32 : MasterNetworkObject
+	public partial class ZTest_Value8NonTarget : MasterNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+	}
 
-		public void CallF28(int value) => f28(value);
+	public partial class ZTest_Value16NonTarget : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+	}
+
+	public partial class ZTest_Value16Target : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+	}
+
+	public partial class ZTest_Value32Target : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+	}
+
+	public partial class ZTest_Value32NonTarget : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 }

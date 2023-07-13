@@ -68,8 +68,8 @@ namespace CTS.Instance.SyncObjects
 		private int _v21;
 		[SyncObject]
 		private SyncList<UserId> _v23 = new();
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void ft15(NetworkPlayer player);
+		[SyncRpc]
+		public partial void ft15();
 		[SyncRpc]
 		public partial void f22();
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -280,12 +280,12 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[3] = true;
 			}
 		}
-		public partial void ft15(NetworkPlayer player)
+		public partial void ft15()
 		{
-			ft15Callstack.Add(player);
+			ft15CallstackCount++;
 			_dirtyReliable_2[5] = true;
 		}
-		private TargetVoidCallstack<NetworkPlayer> ft15Callstack = new(8);
+		private byte ft15CallstackCount = 0;
 		public partial void f22()
 		{
 			f22CallstackCount++;
@@ -300,7 +300,7 @@ namespace CTS.Instance.SyncObjects
 			_v15.ClearDirtyReliable();
 			_dirtyReliable_2.Clear();
 			_v23.ClearDirtyReliable();
-			ft15Callstack.Clear();
+			ft15CallstackCount = 0;
 			f22CallstackCount = 0;
 		}
 		public override void ClearDirtyUnreliable()
@@ -317,7 +317,7 @@ namespace CTS.Instance.SyncObjects
 			masterDirty[1] = _dirtyReliable_1.AnyTrue();
 			_dirtyReliable_2[4] = _v23.IsDirtyReliable;
 			masterDirty[2] = _dirtyReliable_2.AnyTrue();
-			int masterDirty_pos = writer.OffsetSize(sizeof(byte));
+			masterDirty.Serialize(writer);
 			if (masterDirty[0])
 			{
 				_dirtyReliable_0.Serialize(writer);
@@ -392,8 +392,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (masterDirty[2])
 			{
-				BitmaskByte dirtyReliable_2 = _dirtyReliable_2;
-				int dirtyReliable_2_pos = writer.OffsetSize(sizeof(byte));
+				_dirtyReliable_2.Serialize(writer);
 				if (_dirtyReliable_2[0])
 				{
 					writer.Put(_v17);
@@ -416,37 +415,12 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_2[5])
 				{
-					int ft15Count = ft15Callstack.GetCallCount(player);
-					if (ft15Count > 0)
-					{
-						writer.Put((byte)ft15Count);
-					}
-					else
-					{
-						dirtyReliable_2[5] = false;
-					}
+					writer.Put((byte)ft15CallstackCount);
 				}
 				if (_dirtyReliable_2[6])
 				{
 					writer.Put((byte)f22CallstackCount);
 				}
-				if (dirtyReliable_2.AnyTrue())
-				{
-					writer.PutTo(dirtyReliable_2, dirtyReliable_2_pos);
-				}
-				else
-				{
-					writer.SetSize(dirtyReliable_2_pos);
-					masterDirty[2] = false;
-				}
-			}
-			if (masterDirty.AnyTrue())
-			{
-				writer.PutTo(masterDirty, masterDirty_pos);
-			}
-			else
-			{
-				writer.SetSize(masterDirty_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer)

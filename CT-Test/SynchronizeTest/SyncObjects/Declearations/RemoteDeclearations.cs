@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Security.Policy;
 using CT.Common.DataType;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
-//using CTC.Networks.Synchronizations;
+using CTS.Instance.Synchronizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	public enum NetworkObjectType
 	{
-		ZTest_Value8,
-		ZTest_Value16,
-		ZTest_Value32,
-		ZTest_Value32NoTarget,
 	}
 
 	public partial class ZTest_FuntionObject : IRemoteSynchronizable
@@ -86,7 +81,30 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 	public partial class ZTest_InnerObject : IRemoteSynchronizable
 	{
-		public partial void Server_Rename(NetStringShort newName)
+		public partial void f1(NetStringShort a)
+		{
+
+		}
+	}
+
+	public partial class ZTest_InnerObjectTarget : IRemoteSynchronizable
+	{
+		public partial void f1(NetStringShort a)
+		{
+
+		}
+	}
+
+	public partial class ZTest_FunctionDirection : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public partial void Server_FromServerVoid()
+		{
+
+		}
+
+		public partial void Server_FromServerArg(int a, int b)
 		{
 
 		}
@@ -97,128 +115,188 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override NetworkObjectType Type => throw new NotImplementedException();
 	}
 
-	public partial class ZTest_Value8 : RemoteNetworkObject
+
+	public partial class ZTest_Value8Target : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
-		public int TestInt = 0;
-		public byte TestByte = 0;
-		public double TestDouble = 0;
-		public int TestVoidCallCount = 0;
+		public NetString ft0v0;
+		public NetStringShort ft0v1;
+		public TestEnumType ft0v2;
+		public int ft0v3;
+		public int f1Count;
+		public int uf0a;
+		public byte uf0b;
+		public int uf1a;
+		public double uf1b;
+		public int uft2Count;
 
-		public partial void f3(int a)
+		public partial void ft0(NetString v0, NetStringShort v1, TestEnumType v2, int v3)
 		{
-			TestInt += a;
+			ft0v0 = v0;
+			ft0v1 = v1;
+			ft0v2 = v2;
+			ft0v3 += v3;
 		}
 
-		public partial void uf1(int a, byte b)
+		public partial void f1()
 		{
-			TestInt += a;
-			TestByte += b;
+			f1Count++;
 		}
 
-		public partial void uf3(int a, double b)
+		public partial void uf0(int a, byte b)
 		{
-			TestInt += a;
-			TestDouble += b;
+			uf0a += a;
+			uf0b += b;
 		}
 
-		private partial void uf5()
+		public partial void uf1(int a, double b)
 		{
-			TestVoidCallCount++;
+			uf1a += a;
+			uf1b += b;
+		}
+
+		public partial void uft2()
+		{
+			uft2Count++;
 		}
 	}
 
-	public partial class ZTest_Value16 : RemoteNetworkObject
+	public partial class ZTest_Value8NonTarget : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
-		public int v_f3 = 0;
-		public int v_uf1int = 0;
-		public int v_uf1sbyte = 0;
-		public int v_uf3int = 0;
-		public float v_uf3float = 0;
-		public int v_uf3enum = 0;
-		public int v_uf14int = 0;
-		public int v_uf9Count = 0;
+		public NetString f0v0;
+		public NetStringShort f0v1;
+		public TestEnumType f0v2;
+		public int f0v3;
+		public int f1Count;
+		public int uf0a;
+		public byte uf0b;
+		public int uf1a;
+		public double uf1b;
+		public int uf2Count;
 
-		public void ResetTestValue()
+		public partial void f0(NetString v0, NetStringShort v1, TestEnumType v2, int v3)
 		{
-			v_f3 = 0;
-			v_uf1int = 0;
-			v_uf1sbyte = 0;
-			v_uf3int = 0;
-			v_uf3float = 0;
-			v_uf3enum = 0;
-			v_uf14int = 0;
+			f0v0 = v0;
+			f0v1 = v1;
+			f0v2 = v2;
+			f0v3 += v3;
 		}
 
-		public partial void f3(int a) => v_f3 += a;
-		private partial void f9() {}
-		private partial void f14(int a, sbyte b) {}
-		public partial void uf1(int a, sbyte b)
+		public partial void f1()
 		{
-			v_uf1int += a;
-			v_uf1sbyte += b;
+			f1Count++;
 		}
-		public partial void uf3(int a, float b, TestEnumType c)
+
+		public partial void uf0(int a, byte b)
 		{
-			v_uf3int += a;
-			v_uf3float += b;
-			if (c == TestEnumType.B)
-				v_uf3enum++;
+			uf0a += a;
+			uf0b += b;
 		}
-		public partial void uf9() => v_uf9Count++;
-		public partial void uf14(int a) => v_uf14int += a;
+
+		public partial void uf1(int a, double b)
+		{
+			uf1a += a;
+			uf1b += b;
+		}
+
+		public partial void uf2()
+		{
+			uf2Count++;
+		}
 	}
 
-	public partial class ZTest_Value32 : RemoteNetworkObject
+	public partial class ZTest_Value16Target : RemoteNetworkObject
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
-		public int v_f3 = 0;
-		public int v_f14 = 0;
-		public int v_f22 = 0;
-		public int v_f28 = 0;
+		public int f0Count;
+		public int uft1Count;
+		public int uft2a;
+		public NetString uft3a;
+		public int uft3b;
 
-		public int v_uf3 = 0;
-		public int v_uf9 = 0;
-		public byte v_uf22byte = 0;
-		public int v_uf22int = 0;
-		public uint v_uf22uint = 0;
-		public int v_uf28 = 0;
+		public partial void f0()
+		{
+			f0Count++;
+		}
 
-		public void ResetTestValue()
+		public partial void uft1()
 		{
-			v_f3 = 0;
-			v_f14 = 0;
-			v_f22 = 0;
-			v_f28 = 0;
-			v_uf3 = 0;
-			v_uf9 = 0;
-			v_uf22byte = 0;
-			v_uf22int = 0;
-			v_uf22uint = 0;
-			v_uf28 = 0;
+			uft1Count++;
 		}
-		public partial void f3(int a) => v_f3 += a;
-		public partial void f14() => v_f14++;
-		public partial void f17(int a) { }
-		public partial void f22() => v_f22++;
-		public partial void f24(int a) { }
-		private partial void f28(int a) => v_f28 += a;
-		public partial void uf3(int a) => v_uf3 += a;
-		public partial void uf9() => v_uf9++;
-		public partial void uf12(int a) { }
-		public partial void uf14(int a, float b) { }
-		private partial void uf17(int a) { }
-		public partial void uf22(byte a, int b, uint c)
+
+		public partial void uft2(int a)
 		{
-			v_uf22byte += a;
-			v_uf22int += b;
-			v_uf22uint += c;
+			uft2a += a;
 		}
-		public partial void uf24() { }
-		public partial void uf28(int a) => v_uf28 += a;
+
+		public partial void uft3(NetString a, int b)
+		{
+			uft3a = a;
+			uft3b += b;
+		}
+	}
+
+	public partial class ZTest_Value16NonTarget : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public int f0Count;
+
+		public partial void f0()
+		{
+			f0Count++;
+		}
+	}
+
+	public partial class ZTest_Value32Target : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public int ft15Count;
+		public int f22Count;
+		public int f24a;
+		public int f28a;
+
+		public partial void ft15()
+		{
+			ft15Count++;
+		}
+
+		public partial void f22()
+		{
+			f22Count++;
+		}
+
+		public partial void f24(int a)
+		{
+			f24a += a;
+		}
+
+		public partial void f28(int a)
+		{
+			f28a += a;
+		}
+	}
+
+	public partial class ZTest_Value32NonTarget : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public int ft15Count;
+		public int f22Count;
+
+		public partial void ft15()
+		{
+			ft15Count++;
+		}
+
+		public partial void f22()
+		{
+			f22Count++;
+		}
 	}
 }

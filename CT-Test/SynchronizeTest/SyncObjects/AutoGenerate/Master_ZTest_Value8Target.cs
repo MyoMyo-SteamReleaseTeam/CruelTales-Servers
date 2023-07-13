@@ -47,15 +47,15 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv3;
 		[SyncRpc(SyncType.ReliableTarget)]
-		private partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3);
+		public partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3);
 		[SyncRpc]
-		private partial void f1();
+		public partial void f1();
 		[SyncRpc(SyncType.Unreliable)]
 		public partial void uf0(int a, byte b);
 		[SyncRpc(SyncType.Unreliable)]
 		public partial void uf1(int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		private partial void uft2(NetworkPlayer player);
+		public partial void uft2(NetworkPlayer player);
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable
@@ -119,13 +119,13 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[3] = true;
 			}
 		}
-		private partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3)
+		public partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3)
 		{
 			ft0Callstack.Add(player, (v0, v1, v2, v3));
 			_dirtyReliable_0[6] = true;
 		}
 		private TargetCallstack<NetworkPlayer, (NetString v0, NetStringShort v1, TestEnumType v2, int v3)> ft0Callstack = new(8);
-		private partial void f1()
+		public partial void f1()
 		{
 			f1CallstackCount++;
 			_dirtyReliable_0[7] = true;
@@ -183,7 +183,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyUnreliable_0[6] = true;
 		}
 		private List<(int a, double b)> uf1Callstack = new(4);
-		private partial void uft2(NetworkPlayer player)
+		public partial void uft2(NetworkPlayer player)
 		{
 			uft2Callstack.Add(player);
 			_dirtyUnreliable_0[7] = true;

@@ -42,9 +42,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public event Action<int>? OnV3Changed;
 		[SyncObject]
 		private SyncList<UserId> _v4 = new();
+		public SyncList<UserId> V4 => _v4;
 		public event Action<SyncList<UserId>>? OnV4Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
 		private ZTest_InnerObjectTarget _v5 = new();
+		public ZTest_InnerObjectTarget V5 => _v5;
 		public event Action<ZTest_InnerObjectTarget>? OnV5Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
@@ -63,15 +65,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public int Uv3 => _uv3;
 		public event Action<int>? OnUv3Changed;
 		[SyncRpc(SyncType.ReliableTarget)]
-		private partial void ft0(NetString v0, NetStringShort v1, TestEnumType v2, int v3);
+		public partial void ft0(NetString v0, NetStringShort v1, TestEnumType v2, int v3);
 		[SyncRpc]
-		private partial void f1();
+		public partial void f1();
 		[SyncRpc(SyncType.Unreliable)]
 		public partial void uf0(int a, byte b);
 		[SyncRpc(SyncType.Unreliable)]
 		public partial void uf1(int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
-		private partial void uft2();
+		public partial void uft2();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }

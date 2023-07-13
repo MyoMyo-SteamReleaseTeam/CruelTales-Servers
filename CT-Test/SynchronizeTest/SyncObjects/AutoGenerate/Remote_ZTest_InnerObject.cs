@@ -26,9 +26,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		[SyncVar]
 		private int _v0;
+		public int V0 => _v0;
 		public event Action<int>? OnV0Changed;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv1;
+		public int Uv1 => _uv1;
 		public event Action<int>? OnUv1Changed;
 		[SyncRpc]
 		public partial void f1(NetStringShort a);

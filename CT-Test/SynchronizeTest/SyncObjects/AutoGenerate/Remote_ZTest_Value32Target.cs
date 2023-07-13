@@ -54,6 +54,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public event Action<int>? OnV6Changed;
 		[SyncObject]
 		private SyncList<UserId> _v7 = new();
+		public SyncList<UserId> V7 => _v7;
 		public event Action<SyncList<UserId>>? OnV7Changed;
 		[SyncVar]
 		private int _v8;
@@ -91,9 +92,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public event Action<int>? OnV18Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
 		private ZTest_InnerObjectTarget _v19 = new();
+		public ZTest_InnerObjectTarget V19 => _v19;
 		public event Action<ZTest_InnerObjectTarget>? OnV19Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
 		private ZTest_InnerObject _v20 = new();
+		public ZTest_InnerObject V20 => _v20;
 		public event Action<ZTest_InnerObject>? OnV20Changed;
 		[SyncVar]
 		private int _v21;
@@ -101,6 +104,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public event Action<int>? OnV21Changed;
 		[SyncObject]
 		private SyncList<UserId> _v23 = new();
+		public SyncList<UserId> V23 => _v23;
 		public event Action<SyncList<UserId>>? OnV23Changed;
 		[SyncVar]
 		private int _v25;
@@ -130,7 +134,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc]
 		public partial void f24(int a);
 		[SyncRpc]
-		private partial void f28(int a);
+		public partial void f28(int a);
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
