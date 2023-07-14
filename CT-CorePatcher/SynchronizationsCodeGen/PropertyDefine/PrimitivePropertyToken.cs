@@ -31,7 +31,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName, _privateMemberName, string.Empty);
 		}
 
-		public override string Master_GetterSetter(string dirtyBitname, int memberIndex)
+		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
 		{
 			return string.Format(MemberFormat.GetterSetter, AccessModifier, _typeName, _publicMemberName,
 								 _privateMemberName, dirtyBitname, memberIndex);

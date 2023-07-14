@@ -35,7 +35,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _argGroup.GetParameterDeclaration());
 		}
 
-		public override string Master_GetterSetter(string dirtyBitname, int memberIndex)
+		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
 		{
 			if (_argGroup.Count == 0)
 			{

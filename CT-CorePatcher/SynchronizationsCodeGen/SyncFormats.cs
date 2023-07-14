@@ -655,6 +655,16 @@ private {1} {2}{3};";
 		/// <summary>
 		/// {0} Attribute<br/>
 		/// {1} Type name<br/>
+		/// {2} Property name<br/>
+		/// {3} Initialize<br/>
+		/// </summary>
+		public static string MasterReadonlyDeclaration =>
+@"[{0}]
+private readonly {1} {2}{3};";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Type name<br/>
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
@@ -679,6 +689,33 @@ private {1} {2}{4};
 {5} {1} {3} => {2};
 public event Action<{1}>? On{3}Changed;";
 
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Type name<br/>
+		/// {2} Private property name<br/>
+		/// {3} Public property name<br/>
+		/// {4} Initialize<br/>
+		/// {5} Access modifier
+		/// </summary>
+		public static string RemoteReadonlyDeclaration =>
+@"[{0}]
+{5} readonly {1} {2}{4};
+public event Action<{1}>? On{3}Changed;";
+
+		/// <summary>
+		/// {0} Attribute<br/>
+		/// {1} Type name<br/>
+		/// {2} Private property name<br/>
+		/// {3} Public property name<br/>
+		/// {4} Initialize<br/>
+		/// {5} Access modifier
+		/// </summary>
+		public static string RemoteReadonlyDeclarationAsPublic =>
+@"[{0}]
+private readonly {1} {2}{4};
+{5} {1} {3} => {2};
+public event Action<{1}>? On{3}Changed;";
+
 		public static string NewInitializer => " = new()";
 
 		/// <summary>
@@ -700,6 +737,14 @@ public event Action<{1}>? On{3}Changed;";
 		{4}[{5}] = true;
 	}}
 }}";
+
+		/// <summary>
+		/// {0} Access modifier<br/>
+		/// {1} Type name<br/>
+		/// {2} Public property name<br/>
+		/// {3} Private member name<br/>
+		/// </summary>
+		public static string ObjectGetter => @"{0} {1} {2} => {3};";
 
 		/// <summary>
 		/// {0} Private member name<br/>

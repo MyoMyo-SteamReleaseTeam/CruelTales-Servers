@@ -27,11 +27,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
+			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, _typeName,
 								 _privateMemberName, MemberFormat.NewInitializer);
 		}
 
-		public override string Master_GetterSetter(string dirtyBitname, int memberIndex) => string.Empty;
+		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
+		{
+			if (!IsPublic)
+				return string.Empty;
+
+			if (syncType.IsUnreliable() && _syncType == SyncType.ReliableOrUnreliable)
+				return string.Empty;
+
+			return string.Format(MemberFormat.ObjectGetter, AccessModifier, _typeName, _publicMemberName, _privateMemberName);
+		}
 
 		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
@@ -89,7 +98,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Remote_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
+			string format = IsPublic ? MemberFormat.RemoteReadonlyDeclarationAsPublic : MemberFormat.RemoteReadonlyDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
 								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier);
 		}

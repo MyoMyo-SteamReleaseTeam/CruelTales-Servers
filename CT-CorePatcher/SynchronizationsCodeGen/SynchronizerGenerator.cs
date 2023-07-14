@@ -1,11 +1,12 @@
-﻿using System;
+﻿#pragma warning disable CA1416 // Validate platform compatibility
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using CT.Common.DataType.Synchronizations;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
@@ -61,6 +62,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public void GenerateCode(string[] args)
 		{
+			// Parse options
 			StringArgumentArray masterTargetPathList = new();
 			StringArgumentArray remoteTargetPathList = new();
 			StringArgument masterPoolPath = new();
@@ -88,14 +90,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			List<GenOperation> operations = new();
 
-#pragma warning disable CA1416 // Validate platform compatibility
 			if (MainProcess.IsDebug)
 			{
 				masterTargetPathList.ArgumentArray = new string[] { "Test/" };
 				remoteTargetPathList.ArgumentArray = new string[] { "Test/" };
 				masterPoolPath.Argument = "Test/";
 			}
-#pragma warning restore CA1416 // Validate platform compatibility
 
 			// Create network object synchronize code
 			foreach (var syncObj in syncObjects)
@@ -116,40 +116,43 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			// Create network object enum types
-			var networkEnums = syncObjects
-				.Where(obj => obj.IsNetworkObject)
-				.Select(obj => obj.ObjectName).ToList();
-			var netTypeFileName = CommonFormat.NetworkObjectTypeTypeName + ".cs";
-
-			var masterEnumContent = CodeGenerator_Enumerate
-				.Generate(CommonFormat.NetworkObjectTypeTypeName,
-						  CommonFormat.MasterNamespace,
-						  hasNone: true, useTab: true,
-						  usingList: new List<string>(),
-						  networkEnums);
-			var masterEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, masterEnumContent);
-
-			var remoteEnumContent = CodeGenerator_Enumerate
-				.Generate(CommonFormat.NetworkObjectTypeTypeName,
-						  CommonFormat.RemoteNamespace,
-						  hasNone: true, useTab: true,
-						  usingList: new List<string>(),
-						  networkEnums);
-			var remoteEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, remoteEnumContent);
-
-			foreach (var targetPath in masterTargetPathList.ArgumentArray)
+			if (!MainProcess.IsDebug)
 			{
-				operations.Add(new GenOperation(targetPath, netTypeFileName, masterEumeCode));
-			}
+				var networkEnums = syncObjects
+					.Where(obj => obj.IsNetworkObject)
+					.Select(obj => obj.ObjectName).ToList();
+				var netTypeFileName = CommonFormat.NetworkObjectTypeTypeName + ".cs";
 
-			foreach (var targetPath in remoteTargetPathList.ArgumentArray)
-			{
-				operations.Add(new GenOperation(targetPath, netTypeFileName, remoteEumeCode));
-			}
+				var masterEnumContent = CodeGenerator_Enumerate
+					.Generate(CommonFormat.NetworkObjectTypeTypeName,
+							  CommonFormat.MasterNamespace,
+							  hasNone: true, useTab: true,
+							  usingList: new List<string>(),
+							  networkEnums);
+				var masterEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, masterEnumContent);
 
-			// Create server side network object pool setting code
-			var poolCode = ObjectPoolCodeGen.GenerateMasterNetworkObjectPoolCode(syncObjects);
-			operations.Add(new GenOperation(masterPoolPath.Argument, "NetworkObjectPoolManager", poolCode));
+				var remoteEnumContent = CodeGenerator_Enumerate
+					.Generate(CommonFormat.NetworkObjectTypeTypeName,
+							  CommonFormat.RemoteNamespace,
+							  hasNone: true, useTab: true,
+							  usingList: new List<string>(),
+							  networkEnums);
+				var remoteEumeCode = string.Format(CodeFormat.GeneratorMetadata, netTypeFileName, remoteEnumContent);
+
+				foreach (var targetPath in masterTargetPathList.ArgumentArray)
+				{
+					operations.Add(new GenOperation(targetPath, netTypeFileName, masterEumeCode));
+				}
+
+				foreach (var targetPath in remoteTargetPathList.ArgumentArray)
+				{
+					operations.Add(new GenOperation(targetPath, netTypeFileName, remoteEumeCode));
+				}
+
+				// Create server side network object pool setting code
+				var poolCode = ObjectPoolCodeGen.GenerateMasterNetworkObjectPoolCode(syncObjects);
+				operations.Add(new GenOperation(masterPoolPath.Argument, "NetworkObjectPoolManager", poolCode));
+			}
 
 			// Remove previous files
 			foreach (var targetPath in masterTargetPathList.ArgumentArray)
@@ -175,7 +178,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 			}
 
-#pragma warning disable CA1416 // Validate platform compatibility
 			if (MainProcess.IsDebug)
 			{
 				bool hasFocusWindow = false;
@@ -226,7 +228,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					}
 				}
 			}
-#pragma warning restore CA1416 // Validate platform compatibility
 		}
 
 		public List<SyncObjectInfo> parseAssemblys()
@@ -281,9 +282,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					isDebugObject = attSyncObj.IsDebugOnly;
 				}
 
-#pragma warning disable CA1416
-				if (isDebugObject && !MainProcess.IsDebug) continue;
-#pragma warning restore CA1416
+				if (MainProcess.IsDebug && !isDebugObject) continue;
 
 				List<MemberToken> masterMembers = new();
 				List<MemberToken> remoteMembers = new();
@@ -533,3 +532,5 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		}
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility
