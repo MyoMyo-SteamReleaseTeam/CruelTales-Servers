@@ -282,7 +282,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					isDebugObject = attSyncObj.IsDebugOnly;
 				}
 
-				if (MainProcess.IsDebug && !isDebugObject) continue;
+				if (MainProcess.IsDebug != isDebugObject) continue;
 
 				List<MemberToken> masterMembers = new();
 				List<MemberToken> remoteMembers = new();
