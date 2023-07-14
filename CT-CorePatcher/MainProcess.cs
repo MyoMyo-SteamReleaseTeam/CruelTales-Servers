@@ -44,47 +44,77 @@ namespace CT.CorePatcher
 			try
 			{
 				Console.SetWindowSize(100, 70);
-			}
-			catch
-			{
 
-			}
+				if (args.Length == 0)
+				{
+					IsDebug = true;
+				}
 
-			if (args.Length == 0)
-			{
-				IsDebug = true;
-			}
+				if (IsDebug)
+				{
+					//RunXmlPacketSystemPatch(args);
+					if (!RunSynchronizerGenerator(args))
+					{
+						pauseEndProcess();
+						return;
+					}
+				}
+				else
+				{
+					StringArgumentArray programs = new();
 
-			if (IsDebug)
+					OptionParser op = new OptionParser();
+					OptionParser.BindArgumentArray(op, PROGRAM_NAME, 2, programs);
+					if (!op.TryApplyArguments(args))
+					{
+						throw new ArgumentException("Argument parse error!");
+					}
+
+					if (programs.ArgumentArray.Contains(PROGRAM_SYNC))
+					{
+						if (!RunSynchronizerGenerator(args))
+						{
+							pauseEndProcess();
+							return;
+						}
+					}
+
+					if (programs.ArgumentArray.Contains(PROGRAM_XML))
+					{
+						if (!RunXmlPacketSystemPatch(args))
+						{
+							pauseEndProcess();
+							return;
+						}
+					}
+
+					if (programs.ArgumentArray.Contains(PROGRAM_FILEPATCH))
+					{
+						if (!RunFilePatch(args))
+						{
+							pauseEndProcess();
+							return;
+						}
+					}
+				}
+
+				Console.WriteLine("정상 종료되었습니다.");
+			}
+			catch (Exception e)
 			{
-				//RunXmlPacketSystemPatch(args);
-				RunSynchronizerGenerator(args);
+				PatcherConsole.PrintException(e);
+				pauseEndProcess();
 				return;
 			}
-
-			StringArgumentArray programs = new();
-
-			OptionParser op = new OptionParser();
-			OptionParser.BindArgumentArray(op, PROGRAM_NAME, 2, programs);
-			if (!op.TryApplyArguments(args))
-			{
-				Console.Read();
-				return;
-			}
-
-			if (programs.ArgumentArray.Contains(PROGRAM_SYNC))
-				RunSynchronizerGenerator(args);
-
-			if (programs.ArgumentArray.Contains(PROGRAM_XML))
-				RunXmlPacketSystemPatch(args);
-
-			if (programs.ArgumentArray.Contains(PROGRAM_FILEPATCH))
-				RunFilePatch(args);
-
-			Console.Read();
 		}
 
-		public static void RunSynchronizerGenerator(string[] args)
+		private static void pauseEndProcess()
+		{
+			Console.WriteLine("비정상 종료되었습니다.");
+			Console.ReadKey(true);
+		}
+
+		public static bool RunSynchronizerGenerator(string[] args)
 		{
 			string programName = nameof(RunSynchronizerGenerator);
 			PatcherConsole.PrintProgramInfo(programName);
@@ -93,11 +123,13 @@ namespace CT.CorePatcher
 			{
 				SynchronizerGenerator syncCodeGen = new();
 				syncCodeGen.GenerateCode(args);
+				return true;
 			}
 			catch (Exception e)
 			{
 				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
+				return false;
 			}
 			finally
 			{
@@ -105,7 +137,7 @@ namespace CT.CorePatcher
 			}
 		}
 
-		public static void RunXmlPacketSystemPatch(string[] args)
+		public static bool RunXmlPacketSystemPatch(string[] args)
 		{
 			string programName = nameof(RunXmlPacketSystemPatch);
 			PatcherConsole.PrintProgramInfo(programName);
@@ -116,13 +148,16 @@ namespace CT.CorePatcher
 				if (PacketGenerator.Run(args) == false)
 				{
 					PatcherConsole.PrintError($"{nameof(PacketGenerator)} error!");
-					return;
+					return false;
 				}
+
+				return true;
 			}
 			catch (Exception e)
 			{
 				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
+				return false;
 			}
 			finally
 			{
@@ -130,7 +165,7 @@ namespace CT.CorePatcher
 			}
 		}
 
-		public static void RunFilePatch(string[] args)
+		public static bool RunFilePatch(string[] args)
 		{
 			string programName = nameof(RunFilePatch);
 			PatcherConsole.PrintProgramInfo(programName);
@@ -144,7 +179,7 @@ namespace CT.CorePatcher
 				if (!filePatchOp.TryApplyArguments(args))
 				{
 					PatcherConsole.PrintError($"Copy count argument parse error!");
-					return;
+					return false;
 				}
 
 				if (!int.TryParse(patchCountArg.Argument, out int patchCount))
@@ -154,7 +189,7 @@ namespace CT.CorePatcher
 				if (patchCount < 0)
 				{
 					PatcherConsole.PrintWarm($"Zero copy count!");
-					return;
+					return false;
 				}
 
 				// File patch
@@ -172,7 +207,7 @@ namespace CT.CorePatcher
 				}
 				if (!op.TryApplyArguments(args))
 				{
-					return;
+					return false;
 				}
 
 				Console.WriteLine($"Patch count : {patchCount}");
@@ -190,14 +225,17 @@ namespace CT.CorePatcher
 						PatcherConsole.PrintError($"{nameof(FilePatcherRunner)} error!");
 						PatcherConsole.PrintError($"Project source : {source}");
 						PatcherConsole.PrintError($"Project target : {target}");
-						return;
+						return false;
 					}
 				}
+
+				return true;
 			}
 			catch (Exception e)
 			{
 				PatcherConsole.PrintException(e);
 				PatcherConsole.PrintProgramCompleted(programName, true);
+				return false;
 			}
 			finally
 			{

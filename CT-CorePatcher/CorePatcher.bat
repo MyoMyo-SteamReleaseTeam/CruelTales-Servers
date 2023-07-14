@@ -29,4 +29,4 @@ REM Run core patcher
  --sdispatcher "../CTS-GameplayServer/Packets/" ^
  --cdispatcher "../CTC-DummyClient/Packets/" "../../CruelTales-Client/CruelTales-Client/Assets/Scripts/Networks/Packets"
 
-pause
+REM pause

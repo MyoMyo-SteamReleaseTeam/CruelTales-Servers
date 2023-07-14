@@ -12,4 +12,4 @@ REM Run core patcher
  --syncRemotePath "../CTC-DummyClient/SyncObjects/" "../../CruelTales-Client/CruelTales-Client/Assets/Scripts/Networks/SyncObjects" ^
  --masterPoolPath "../CTS-GameplayServer/Gameplay/ObjectManagements/" ^
 
-pause
+REM pause

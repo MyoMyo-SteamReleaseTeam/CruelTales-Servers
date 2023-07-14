@@ -219,7 +219,7 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					Vector2SerializeExtension.IgnoreStatic(reader);
+					Vector2Extension.IgnoreStatic(reader);
 					reader.Ignore(1);
 				}
 			}
@@ -238,7 +238,7 @@ namespace CTS.Instance.SyncObjects
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(1);
-					Vector2SerializeExtension.IgnoreStatic(reader);
+					Vector2Extension.IgnoreStatic(reader);
 				}
 			}
 		}
@@ -250,7 +250,7 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					Vector2SerializeExtension.IgnoreStatic(reader);
+					Vector2Extension.IgnoreStatic(reader);
 					reader.Ignore(1);
 				}
 			}
@@ -269,7 +269,7 @@ namespace CTS.Instance.SyncObjects
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(1);
-					Vector2SerializeExtension.IgnoreStatic(reader);
+					Vector2Extension.IgnoreStatic(reader);
 				}
 			}
 		}
