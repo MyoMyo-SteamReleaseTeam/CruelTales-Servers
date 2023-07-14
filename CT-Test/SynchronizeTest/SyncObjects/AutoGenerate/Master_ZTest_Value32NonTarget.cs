@@ -41,7 +41,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v6;
 		[SyncObject]
-		private SyncList<UserId> _v7 = new();
+		private readonly SyncList<UserId> _v7 = new();
 		[SyncVar]
 		private int _v8;
 		[SyncVar]
@@ -55,7 +55,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v13;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v15 = new();
+		private readonly ZTest_InnerObject _v15 = new();
 		[SyncVar]
 		private int _v16;
 		[SyncVar]
@@ -67,7 +67,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v21;
 		[SyncObject]
-		private SyncList<UserId> _v23 = new();
+		private readonly SyncList<UserId> _v23 = new();
 		[SyncRpc]
 		public partial void ft15();
 		[SyncRpc]
@@ -170,6 +170,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[6] = true;
 			}
 		}
+		public SyncList<UserId> V7 => _v7;
 		private int V8
 		{
 			get => _v8;
@@ -230,6 +231,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_1[5] = true;
 			}
 		}
+		public ZTest_InnerObject V15 => _v15;
 		public int V16
 		{
 			get => _v16;
@@ -280,6 +282,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[3] = true;
 			}
 		}
+		public SyncList<UserId> V23 => _v23;
 		public partial void ft15()
 		{
 			ft15CallstackCount++;

@@ -27,9 +27,9 @@ namespace CTS.Instance.SyncObjects
 	public partial class ZTest_SyncCollection
 	{
 		[SyncObject]
-		private SyncList<UserId> _userIdList = new();
+		private readonly SyncList<UserId> _userIdList = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _syncObj = new();
+		private readonly ZTest_InnerObjectTarget _syncObj = new();
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable
@@ -53,6 +53,8 @@ namespace CTS.Instance.SyncObjects
 				return isDirty;
 			}
 		}
+		public SyncList<UserId> UserIdList => _userIdList;
+		public ZTest_InnerObjectTarget SyncObj => _syncObj;
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();

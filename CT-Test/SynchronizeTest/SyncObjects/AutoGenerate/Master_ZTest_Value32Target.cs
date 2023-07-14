@@ -41,7 +41,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v6;
 		[SyncObject]
-		private SyncList<UserId> _v7 = new();
+		private readonly SyncList<UserId> _v7 = new();
 		[SyncVar]
 		private int _v8;
 		[SyncVar]
@@ -63,13 +63,13 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v18;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _v19 = new();
+		private readonly ZTest_InnerObjectTarget _v19 = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v20 = new();
+		private readonly ZTest_InnerObject _v20 = new();
 		[SyncVar]
 		private int _v21;
 		[SyncObject]
-		private SyncList<UserId> _v23 = new();
+		private readonly SyncList<UserId> _v23 = new();
 		[SyncVar]
 		private int _v25;
 		[SyncVar]
@@ -192,6 +192,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[6] = true;
 			}
 		}
+		public SyncList<UserId> V7 => _v7;
 		private int V8
 		{
 			get => _v8;
@@ -292,6 +293,8 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[1] = true;
 			}
 		}
+		public ZTest_InnerObjectTarget V19 => _v19;
+		public ZTest_InnerObject V20 => _v20;
 		public int V21
 		{
 			get => _v21;
@@ -302,6 +305,7 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_2[4] = true;
 			}
 		}
+		public SyncList<UserId> V23 => _v23;
 		public int V25
 		{
 			get => _v25;

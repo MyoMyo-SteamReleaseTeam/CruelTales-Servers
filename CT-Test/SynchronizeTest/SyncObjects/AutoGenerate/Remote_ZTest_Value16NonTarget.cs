@@ -73,11 +73,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public NetStringShort V11 => _v11;
 		public event Action<NetStringShort>? OnV11Changed;
 		[SyncObject]
-		private SyncList<NetString> _v12 = new();
+		private readonly SyncList<NetString> _v12 = new();
 		public SyncList<NetString> V12 => _v12;
 		public event Action<SyncList<NetString>>? OnV12Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v14 = new();
+		private readonly ZTest_InnerObjectTarget _v13 = new();
+		public ZTest_InnerObjectTarget V13 => _v13;
+		public event Action<ZTest_InnerObjectTarget>? OnV13Changed;
+		[SyncObject(SyncType.ReliableOrUnreliable)]
+		private readonly ZTest_InnerObject _v14 = new();
 		public ZTest_InnerObject V14 => _v14;
 		public event Action<ZTest_InnerObject>? OnV14Changed;
 		[SyncVar(SyncType.Unreliable)]
@@ -174,10 +178,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[5])
 				{
+					if (!_v13.TryDeserializeSyncReliable(reader)) return false;
+					OnV13Changed?.Invoke(_v13);
+				}
+				if (dirtyReliable_1[6])
+				{
 					if (!_v14.TryDeserializeSyncReliable(reader)) return false;
 					OnV14Changed?.Invoke(_v14);
 				}
-				if (dirtyReliable_1[6])
+				if (dirtyReliable_1[7])
 				{
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
@@ -193,15 +202,20 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (dirtyUnreliable_0[0])
 			{
+				if (!_v13.TryDeserializeSyncUnreliable(reader)) return false;
+				OnV13Changed?.Invoke(_v13);
+			}
+			if (dirtyUnreliable_0[1])
+			{
 				if (!_v14.TryDeserializeSyncUnreliable(reader)) return false;
 				OnV14Changed?.Invoke(_v14);
 			}
-			if (dirtyUnreliable_0[1])
+			if (dirtyUnreliable_0[2])
 			{
 				if (!reader.TryReadByte(out _uv0)) return false;
 				OnUv0Changed?.Invoke(_uv0);
 			}
-			if (dirtyUnreliable_0[2])
+			if (dirtyUnreliable_0[3])
 			{
 				if (!reader.TryReadSByte(out _uv1)) return false;
 				OnUv1Changed?.Invoke(_uv1);
@@ -236,6 +250,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			OnV11Changed?.Invoke(_v11);
 			if (!_v12.TryDeserializeEveryProperty(reader)) return false;
 			OnV12Changed?.Invoke(_v12);
+			if (!_v13.TryDeserializeEveryProperty(reader)) return false;
+			OnV13Changed?.Invoke(_v13);
 			if (!_v14.TryDeserializeEveryProperty(reader)) return false;
 			OnV14Changed?.Invoke(_v14);
 			if (!reader.TryReadByte(out _uv0)) return false;
@@ -259,6 +275,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_v10 = new();
 			_v11 = new();
 			_v12.InitializeRemoteProperties();
+			_v13.InitializeRemoteProperties();
 			_v14.InitializeRemoteProperties();
 			_uv0 = 0;
 			_uv1 = 0;
@@ -326,9 +343,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[5])
 				{
-					_v14.IgnoreSyncReliable(reader);
+					_v13.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_1[6])
+				{
+					_v14.IgnoreSyncReliable(reader);
+				}
+				if (dirtyReliable_1[7])
 				{
 					reader.Ignore(1);
 				}
@@ -397,9 +418,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[5])
 				{
-					ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
+					ZTest_InnerObjectTarget.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_1[6])
+				{
+					ZTest_InnerObject.IgnoreSyncStaticReliable(reader);
+				}
+				if (dirtyReliable_1[7])
 				{
 					reader.Ignore(1);
 				}
@@ -410,13 +435,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (dirtyUnreliable_0[0])
 			{
-				_v14.IgnoreSyncUnreliable(reader);
+				_v13.IgnoreSyncUnreliable(reader);
 			}
 			if (dirtyUnreliable_0[1])
 			{
-				reader.Ignore(1);
+				_v14.IgnoreSyncUnreliable(reader);
 			}
 			if (dirtyUnreliable_0[2])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyUnreliable_0[3])
 			{
 				reader.Ignore(1);
 			}
@@ -426,13 +455,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
 			if (dirtyUnreliable_0[0])
 			{
-				ZTest_InnerObject.IgnoreSyncStaticUnreliable(reader);
+				ZTest_InnerObjectTarget.IgnoreSyncStaticUnreliable(reader);
 			}
 			if (dirtyUnreliable_0[1])
 			{
-				reader.Ignore(1);
+				ZTest_InnerObject.IgnoreSyncStaticUnreliable(reader);
 			}
 			if (dirtyUnreliable_0[2])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyUnreliable_0[3])
 			{
 				reader.Ignore(1);
 			}

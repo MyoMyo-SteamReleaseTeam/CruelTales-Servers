@@ -110,6 +110,7 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 
 			CTS.Instance.SyncObjects.ZTest_Value16NonTarget master = new();
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16NonTarget remote1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16NonTarget remote2 = new();
 
 			Assert.IsFalse(master.IsDirtyReliable);
 			master.V0 = 123;
@@ -124,236 +125,335 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			master.V9 = -123456789.123456789;
 			master.V10 = "NetString";
 			master.V11 = "NetStringShort";
-			//master.V12
-
+			master.V12.Add("string_0");
+			master.V12.Add("string_1");
+			master.V12.Add("string_2");
+			master.V12.Add("string_3");
+			master.V12.Add("string_4");
+			master.V12.Remove("string_2");
+			master.V12.RemoveAt(0);
+			master.V13.f1(p1, "YouAreP1");
+			master.V13.f1(p2, "YouAreP2");
+			master.V13.V0 = 13;
+			master.V13.Uv1 = 1313;
+			master.V14.f1("Both");
+			master.V14.V0 = 14;
+			master.V14.Uv1 = 1414;
+			master.Uv0 = 123;
+			master.Uv1 = -123;
 
 			Sync(buffer, p1, master, remote1);
+			Assert.AreEqual(master.V0, remote1.V0);
+			Assert.AreEqual(master.V1, remote1.V1);
+			Assert.AreEqual(master.V2, remote1.V2);
+			Assert.AreEqual(master.V3, remote1.V3);
+			Assert.AreEqual(master.V4, remote1.V4);
+			Assert.AreEqual(master.V5, remote1.V5);
+			Assert.AreEqual(master.V6, remote1.V6);
+			Assert.AreEqual(master.V7, remote1.V7);
+			Assert.AreEqual(master.V8, remote1.V8);
+			Assert.AreEqual(master.V9, remote1.V9);
+			Assert.IsTrue(master.V10 == remote1.V10);
+			Assert.IsTrue(master.V11 == remote1.V11);
+			Assert.AreEqual(3, remote1.V12.Count);
+			Assert.IsTrue("string_1" == remote1.V12[0]);
+			Assert.IsTrue("string_3" == remote1.V12[1]);
+			Assert.IsTrue("string_4" == remote1.V12[2]);
+			Assert.IsTrue("YouAreP1" == remote1.V13.f1a);
+			Assert.AreEqual(master.V13.V0, remote1.V13.V0);
+			Assert.AreEqual(master.V13.Uv1, remote1.V13.Uv1);
+			Assert.IsTrue("Both" == remote1.V14.f1a);
+			Assert.AreEqual(master.V14.V0, remote1.V14.V0);
+			Assert.AreEqual(master.V14.Uv1, remote1.V14.Uv1);
+			Assert.AreEqual(master.Uv0, remote1.Uv0);
+			Assert.AreEqual(master.Uv1, remote1.Uv1);
+
+			Sync(buffer, p2, master, remote2);
+			Assert.AreEqual(master.V0, remote2.V0);
+			Assert.AreEqual(master.V1, remote2.V1);
+			Assert.AreEqual(master.V2, remote2.V2);
+			Assert.AreEqual(master.V3, remote2.V3);
+			Assert.AreEqual(master.V4, remote2.V4);
+			Assert.AreEqual(master.V5, remote2.V5);
+			Assert.AreEqual(master.V6, remote2.V6);
+			Assert.AreEqual(master.V7, remote2.V7);
+			Assert.AreEqual(master.V8, remote2.V8);
+			Assert.AreEqual(master.V9, remote2.V9);
+			Assert.IsTrue(master.V10 == remote2.V10);
+			Assert.IsTrue(master.V11 == remote2.V11);
+			Assert.AreEqual(3, remote2.V12.Count);
+			Assert.IsTrue("string_1" == remote2.V12[0]);
+			Assert.IsTrue("string_3" == remote2.V12[1]);
+			Assert.IsTrue("string_4" == remote2.V12[2]);
+			Assert.IsTrue("YouAreP2" == remote2.V13.f1a);
+			Assert.AreEqual(master.V13.V0, remote2.V13.V0);
+			Assert.AreEqual(master.V13.Uv1, remote2.V13.Uv1);
+			Assert.IsTrue("Both" == remote2.V14.f1a);
+			Assert.AreEqual(master.V14.V0, remote2.V14.V0);
+			Assert.AreEqual(master.V14.Uv1, remote2.V14.Uv1);
+			Assert.AreEqual(master.Uv0, remote2.Uv0);
+			Assert.AreEqual(master.Uv1, remote2.Uv1);
 		}
-		//[TestMethod]
-		//public void TestValue8()
-		//{
-		//	ByteBuffer buffer = new ByteBuffer(1024 * 16);
 
-		//	NetworkPlayer p1 = new(new UserId(1));
-		//	NetworkPlayer p2 = new(new UserId(2));
+		[TestMethod]
+		public void TestValue16Target()
+		{
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
 
-		//	CTS.Instance.SyncObjects.ZTest_Value8 master = new();
-		//	CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value8 remote = new();
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
 
-		//	master.Call_uf5(p1);
-		//	Assert.IsTrue(master.IsDirtyUnreliable);
+			CTS.Instance.SyncObjects.ZTest_Value16Target master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16Target remote1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16Target remote2 = new();
 
-		//	master.SerializeSyncUnreliable(p2, buffer);
-		//	Assert.AreEqual(0, buffer.Size);
-		//	master.ClearDirtyUnreliable();
+			Assert.IsFalse(master.IsDirtyReliable);
+			master.V0 = 123;
+			master.V1 = -123;
+			master.V2 = 12345;
+			master.V3 = -12345;
+			master.V4 = 1234567890;
+			master.V5 = -1234567890;
+			master.V6 = 1234567890123456789;
+			master.V7 = -1234567890123456789;
+			master.V8 = -12345.6789f;
+			master.V9 = -123456789.123456789;
+			master.V10 = "NetString";
+			master.V11 = "NetStringShort";
+			master.V12.Add("string_0");
+			master.V12.Add("string_1");
+			master.V12.Add("string_2");
+			master.V12.Add("string_3");
+			master.V12.Add("string_4");
+			master.V12.Remove("string_2");
+			master.V12.RemoveAt(0);
+			master.V13.f1(p1, "YouAreP1");
+			master.V13.f1(p2, "YouAreP2");
+			master.V13.V0 = 13;
+			master.V13.Uv1 = 1313;
+			master.V14.f1("Both");
+			master.V14.V0 = 14;
+			master.V14.Uv1 = 1414;
+			master.Uv0 = 123;
+			master.Uv1 = -123;
+			master.uft1(p1);
+			master.uft1(p2);
+			master.uft1(p2);
+			master.uft2(p1, 10);
+			master.uft2(p1, 10);
+			master.uft2(p2, 10);
+			master.uft3(p1, "YouAreP1", 11);
+			master.uft3(p2, "YouAreP2", 22);
 
-		//	master.f3(10);
-		//	master.uf1(p1, 20, 30);
-		//	master.uf1(p2, 90, 100);
-		//	for (int i = 0; i < 13; i++)
-		//	{
-		//		master.Call_uf5(p1);
-		//	}
+			Sync(buffer, p1, master, remote1);
+			Assert.AreEqual(master.V0, remote1.V0);
+			Assert.AreEqual(master.V1, remote1.V1);
+			Assert.AreEqual(master.V2, remote1.V2);
+			Assert.AreEqual(master.V3, remote1.V3);
+			Assert.AreEqual(master.V4, remote1.V4);
+			Assert.AreEqual(master.V5, remote1.V5);
+			Assert.AreEqual(master.V6, remote1.V6);
+			Assert.AreEqual(master.V7, remote1.V7);
+			Assert.AreEqual(master.V8, remote1.V8);
+			Assert.AreEqual(master.V9, remote1.V9);
+			Assert.IsTrue(master.V10 == remote1.V10);
+			Assert.IsTrue(master.V11 == remote1.V11);
+			Assert.AreEqual(3, remote1.V12.Count);
+			Assert.IsTrue("string_1" == remote1.V12[0]);
+			Assert.IsTrue("string_3" == remote1.V12[1]);
+			Assert.IsTrue("string_4" == remote1.V12[2]);
+			Assert.IsTrue("YouAreP1" == remote1.V13.f1a);
+			Assert.AreEqual(master.V13.V0, remote1.V13.V0);
+			Assert.AreEqual(master.V13.Uv1, remote1.V13.Uv1);
+			Assert.IsTrue("Both" == remote1.V14.f1a);
+			Assert.AreEqual(master.V14.V0, remote1.V14.V0);
+			Assert.AreEqual(master.V14.Uv1, remote1.V14.Uv1);
+			Assert.AreEqual(master.Uv0, remote1.Uv0);
+			Assert.AreEqual(master.Uv1, remote1.Uv1);
+			Assert.AreEqual(1, remote1.uft1Count);
+			Assert.AreEqual(20, remote1.uft2a);
+			Assert.IsTrue("YouAreP1" == remote1.uft3a);
+			Assert.AreEqual(11, remote1.uft3b);
 
-		//	for (int i = 0; i < 5; i++)
-		//	{
-		//		master.Call_uf5(p2);
-		//	}
-		//	master.V0 = "가나다";
-		//	master.V2 = 99;
+			Sync(buffer, p2, master, remote2);
+			Assert.AreEqual(master.V0, remote2.V0);
+			Assert.AreEqual(master.V1, remote2.V1);
+			Assert.AreEqual(master.V2, remote2.V2);
+			Assert.AreEqual(master.V3, remote2.V3);
+			Assert.AreEqual(master.V4, remote2.V4);
+			Assert.AreEqual(master.V5, remote2.V5);
+			Assert.AreEqual(master.V6, remote2.V6);
+			Assert.AreEqual(master.V7, remote2.V7);
+			Assert.AreEqual(master.V8, remote2.V8);
+			Assert.AreEqual(master.V9, remote2.V9);
+			Assert.IsTrue(master.V10 == remote2.V10);
+			Assert.IsTrue(master.V11 == remote2.V11);
+			Assert.AreEqual(3, remote2.V12.Count);
+			Assert.IsTrue("string_1" == remote2.V12[0]);
+			Assert.IsTrue("string_3" == remote2.V12[1]);
+			Assert.IsTrue("string_4" == remote2.V12[2]);
+			Assert.IsTrue("YouAreP2" == remote2.V13.f1a);
+			Assert.AreEqual(master.V13.V0, remote2.V13.V0);
+			Assert.AreEqual(master.V13.Uv1, remote2.V13.Uv1);
+			Assert.IsTrue("Both" == remote2.V14.f1a);
+			Assert.AreEqual(master.V14.V0, remote2.V14.V0);
+			Assert.AreEqual(master.V14.Uv1, remote2.V14.Uv1);
+			Assert.AreEqual(master.Uv0, remote2.Uv0);
+			Assert.AreEqual(master.Uv1, remote2.Uv1);
+			Assert.AreEqual(2, remote2.uft1Count);
+			Assert.AreEqual(10, remote2.uft2a);
+			Assert.IsTrue("YouAreP2" == remote2.uft3a);
+			Assert.AreEqual(22, remote2.uft3b);
+		}
 
-		//	Sync(buffer, p1, master, remote);
+		[TestMethod]
+		public void TestValue32NonTarget()
+		{
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
 
-		//	Assert.AreEqual(30, remote.TestInt);
-		//	Assert.AreEqual(30, remote.TestByte);
-		//	Assert.AreEqual(13, remote.TestVoidCallCount);
-		//	Assert.AreEqual("가나다", remote.V0.Value);
-		//	Assert.AreEqual(99, remote.V2);
+			NetworkPlayer p1 = new(new UserId(1));
 
-		//	remote.TestInt = 0;
-		//	remote.TestByte = 0;
-		//	remote.TestVoidCallCount = 0;
+			CTS.Instance.SyncObjects.ZTest_Value32NonTarget master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value32NonTarget remote = new();
 
-		//	remote.InitializeRemoteProperties();
-		//	Sync(buffer, p2, master, remote);
+			Assert.IsFalse(master.IsDirtyReliable);
+			master.V0 = 123;
+			master.V1 = -123;
+			master.V2 = 12345;
+			master.V3 = -12345;
+			master.V4 = 1234567890;
+			master.V5 = -1234567890;
+			master.V7.Add(new UserId(0));
+			master.V7.Add(new UserId(1));
+			master.V7.Add(new UserId(2));
+			master.V7.Add(new UserId(3));
+			master.V7.Add(new UserId(4));
+			master.V7.Remove(new UserId(2));
+			master.V7.RemoveAt(0);
+			master.V15.f1("Both");
+			master.V15.V0 = 14;
+			master.V15.Uv1 = 1414;
+			master.f22();
+			master.f22();
+			master.f22();
 
-		//	Assert.AreEqual(100, remote.TestInt);
-		//	Assert.AreEqual(100, remote.TestByte);
-		//	Assert.AreEqual(5, remote.TestVoidCallCount);
-		//	Assert.AreEqual("가나다", remote.V0.Value);
-		//	Assert.AreEqual(99, remote.V2);
-		//}
+			Sync(buffer, p1, master, remote);
+			Assert.AreEqual(master.V0, remote.V0);
+			Assert.AreEqual(master.V1, remote.V1);
+			Assert.AreEqual(master.V2, remote.V2);
+			Assert.AreEqual(master.V3, remote.V3);
+			Assert.AreEqual(master.V4, remote.V4);
+			Assert.AreEqual(master.V5, remote.V5);
+			Assert.AreEqual(3, remote.V7.Count);
+			Assert.IsTrue(new UserId(1) == remote.V7[0]);
+			Assert.IsTrue(new UserId(3) == remote.V7[1]);
+			Assert.IsTrue(new UserId(4) == remote.V7[2]);
+			Assert.IsTrue("Both" == remote.V15.f1a);
+			Assert.AreEqual(master.V15.V0, remote.V15.V0);
+			Assert.AreEqual(master.V15.Uv1, remote.V15.Uv1);
+			Assert.AreEqual(3, remote.f22Count);
+		}
 
-		//[TestMethod]
-		//public void TestValue16()
-		//{
-		//	ByteBuffer buffer = new ByteBuffer(1024 * 16);
+		[TestMethod]
+		public void TestValue32Target()
+		{
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
 
-		//	NetworkPlayer p1 = new(new UserId(1));
-		//	NetworkPlayer p2 = new(new UserId(2));
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
 
-		//	CTS.Instance.SyncObjects.ZTest_Value16 master = new();
-		//	CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value16 remote = new();
+			CTS.Instance.SyncObjects.ZTest_Value32Target master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value32Target remote1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value32Target remote2 = new();
 
-		//	master.uf1(p1, 10, 10);
-		//	Assert.IsTrue(master.IsDirtyUnreliable);
-		//	master.SerializeSyncUnreliable(p2, buffer);
-		//	Assert.AreEqual(0, buffer.Size);
-		//	master.ClearDirtyUnreliable();
+			Assert.IsFalse(master.IsDirtyReliable);
+			master.V0 = 123;
+			master.V1 = -123;
+			master.V2 = 12345;
+			master.V3 = -12345;
+			master.V4 = 1234567890;
+			master.V5 = -1234567890;
+			master.V7.Add(new UserId(0));
+			master.V7.Add(new UserId(1));
+			master.V7.Add(new UserId(2));
+			master.V7.Add(new UserId(3));
+			master.V7.Add(new UserId(4));
+			master.V7.Remove(new UserId(2));
+			master.V7.RemoveAt(0);
+			master.ft15(p1);
+			master.ft15(p1);
+			master.ft15(p1);
+			master.ft15(p2);
+			master.V19.f1(p1, "YouAreP1");
+			master.V19.f1(p2, "YouAreP2");
+			master.V19.V0 = 13;
+			master.V19.Uv1 = 1313;
+			master.V20.f1("Both");
+			master.V20.V0 = 14;
+			master.V20.Uv1 = 1414;
+			master.V23.Add(new UserId(0));
+			master.V23.Add(new UserId(1));
+			master.V23.Add(new UserId(2));
+			master.V23.Add(new UserId(3));
+			master.V23.Add(new UserId(4));
+			master.V23.Remove(new UserId(2));
+			master.V23.RemoveAt(0);
+			master.f24(10);
+			master.f24(10);
+			master.f24(10);
+			master.f28(10);
+			master.f28(10);
 
-		//	for (int i = 0; i < 10; i++)
-		//	{
-		//		master.f3(10);
-		//		master.uf1(p1, 10, 10);
-		//		master.uf3(p1, 10, 20, TestEnumType.B);
-		//		master.uf9(p1);
-		//	}
-		//	for (int i = 0; i < 3; i++)
-		//	{
-		//		master.uf1(p2, 10, 10);
-		//		master.uf14(p2, 10);
-		//	}
+			Sync(buffer, p1, master, remote1);
+			Assert.AreEqual(master.V0, remote1.V0);
+			Assert.AreEqual(master.V1, remote1.V1);
+			Assert.AreEqual(master.V2, remote1.V2);
+			Assert.AreEqual(master.V3, remote1.V3);
+			Assert.AreEqual(master.V4, remote1.V4);
+			Assert.AreEqual(master.V5, remote1.V5);
+			Assert.AreEqual(3, remote1.V7.Count);
+			Assert.IsTrue(new UserId(1) == remote1.V7[0]);
+			Assert.IsTrue(new UserId(3) == remote1.V7[1]);
+			Assert.IsTrue(new UserId(4) == remote1.V7[2]);
+			Assert.AreEqual(3, remote1.ft15Count);
+			Assert.IsTrue("YouAreP1" == remote1.V19.f1a);
+			Assert.AreEqual(master.V19.V0, remote1.V19.V0);
+			Assert.AreEqual(master.V19.Uv1, remote1.V19.Uv1);
+			Assert.IsTrue("Both" == remote1.V20.f1a);
+			Assert.AreEqual(master.V20.V0, remote1.V20.V0);
+			Assert.AreEqual(master.V20.Uv1, remote1.V20.Uv1);
+			Assert.AreEqual(3, remote1.V23.Count);
+			Assert.IsTrue(new UserId(1) == remote1.V23[0]);
+			Assert.IsTrue(new UserId(3) == remote1.V23[1]);
+			Assert.IsTrue(new UserId(4) == remote1.V23[2]);
+			Assert.AreEqual(30, remote1.f24a);
+			Assert.AreEqual(20, remote1.f28a);
 
-		//	master.V0 = 99;
-
-		//	Sync(buffer, p1, master, remote);
-
-		//	Assert.AreEqual(100, remote.v_f3);
-		//	Assert.AreEqual(100, remote.v_uf3int);
-		//	Assert.AreEqual(100, remote.v_uf1int);
-		//	Assert.AreEqual(100, remote.v_uf1sbyte);
-		//	Assert.AreEqual(10, remote.v_uf9Count);
-
-		//	Assert.AreEqual(99, remote.V0);
-
-		//	remote.ResetTestValue();
-		//	remote.InitializeRemoteProperties();
-
-		//	Sync(buffer, p2, master, remote);
-
-		//	Assert.AreEqual(100, remote.v_f3);
-		//	Assert.AreEqual(30, remote.v_uf1int);
-		//	Assert.AreEqual(30, remote.v_uf1sbyte);
-		//	Assert.AreEqual(30, remote.v_uf14int);
-
-		//	Assert.AreEqual(99, remote.V0);
-		//}
-
-		//[TestMethod]
-		//public void TestValue32()
-		//{
-		//	ByteBuffer buffer = new ByteBuffer(1024 * 16);
-
-		//	NetworkPlayer p1 = new(new UserId(1));
-		//	NetworkPlayer p2 = new(new UserId(2));
-
-		//	CTS.Instance.SyncObjects.ZTest_Value32 master = new();
-		//	CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Value32 remote = new();
-
-		//	master.uf3(p1, 10);
-		//	Assert.IsTrue(master.IsDirtyUnreliable);
-		//	master.SerializeSyncUnreliable(p2, buffer);
-		//	Assert.AreEqual(0, buffer.Size);
-		//	master.ClearDirtyUnreliable();
-
-		//	for (int i = 0; i < 4; i++)
-		//	{
-		//		master.f3(10);
-		//		master.f14();
-		//		master.f22();
-		//		master.CallF28(10);
-		//	}
-
-		//	for (int i = 0; i < 3; i++)
-		//	{
-		//		master.uf3(p1, 10);
-		//		master.uf9(p1);
-		//	}
-
-		//	for (int i = 0; i < 2; i++)
-		//	{
-		//		master.uf9(p2);
-		//		master.uf22(p2, 10, 10, 10);
-		//		master.uf28(p2, 10);
-		//	}
-
-		//	master.V0 = 99;
-		//	master.V5 = 99;
-		//	master.Uv10 = 99;
-
-		//	Sync(buffer, p1, master, remote);
-
-		//	Assert.AreEqual(40, remote.v_f3);
-		//	Assert.AreEqual(4, remote.v_f14);
-		//	Assert.AreEqual(4, remote.v_f22);
-		//	Assert.AreEqual(40, remote.v_f28);
-
-		//	Assert.AreEqual(30, remote.v_uf3);
-		//	Assert.AreEqual(3, remote.v_uf9);
-
-		//	Assert.AreEqual(99, remote.V0);
-		//	Assert.AreEqual(99, remote.V5);
-		//	Assert.AreEqual(99, remote.Uv10);
-
-		//	remote.ResetTestValue();
-		//	remote.InitializeRemoteProperties();
-
-		//	Sync(buffer, p2, master, remote);
-
-		//	Assert.AreEqual(40, remote.v_f3);
-		//	Assert.AreEqual(4, remote.v_f14);
-		//	Assert.AreEqual(4, remote.v_f22);
-		//	Assert.AreEqual(40, remote.v_f28);
-
-		//	Assert.AreEqual(20, remote.v_uf22byte);
-		//	Assert.AreEqual(20, remote.v_uf22int);
-		//	Assert.AreEqual(20U, remote.v_uf22uint);
-		//	Assert.AreEqual(20, remote.v_uf28);
-		//	Assert.AreEqual(2, remote.v_uf9);
-
-		//	Assert.AreEqual(99, remote.V0);
-		//	Assert.AreEqual(99, remote.V5);
-		//	Assert.AreEqual(99, remote.Uv10);
-		//}
-
-		//[TestMethod]
-		//public void TestSyncCollection()
-		//{
-		//	int testCount = 10;
-
-		//	ByteBuffer buffer = new ByteBuffer(1024 * 16);
-		//	NetworkPlayer p1 = new(new UserId(1));
-
-		//	CTS.Instance.SyncObjects.ZTest_SyncCollection master = new();
-		//	CTC.Networks.SyncObjects.TestSyncObjects.ZTest_SyncCollection remote = new();
-
-		//	Assert.AreEqual(0, master.UserIdList.Count);
-		//	Assert.AreEqual(0, remote.UserIdList.Count);
-
-		//	for (int i = 0; i < testCount; i++)
-		//	{
-		//		Assert.AreEqual(i, master.UserIdList.Count);
-		//		master.UserIdList.Add(new UserId((ulong)(i * 10)));
-		//	}
-
-		//	Assert.AreEqual(testCount, master.UserIdList.Count);
-		//	Assert.AreEqual(0, remote.UserIdList.Count);
-
-		//	Assert.IsTrue(master.IsDirtyReliable);
-		//	master.SerializeSyncReliable(p1, buffer);
-
-		//	Sync(buffer, p1, master, remote);
-
-		//	Assert.AreEqual(testCount, master.UserIdList.Count);
-		//	Assert.AreEqual(testCount, remote.UserIdList.Count);
-
-		//	for (int i = 0; i < testCount; i++)
-		//	{
-		//		ulong value = (ulong)(i * 10);
-		//		Assert.AreEqual(value, master.UserIdList[i].Id);
-		//		Assert.AreEqual(value, remote.UserIdList[i].Id);
-		//	}
-		//}
+			Sync(buffer, p2, master, remote2);
+			Assert.AreEqual(master.V0, remote2.V0);
+			Assert.AreEqual(master.V1, remote2.V1);
+			Assert.AreEqual(master.V2, remote2.V2);
+			Assert.AreEqual(master.V3, remote2.V3);
+			Assert.AreEqual(master.V4, remote2.V4);
+			Assert.AreEqual(master.V5, remote2.V5);
+			Assert.AreEqual(3, remote2.V7.Count);
+			Assert.IsTrue(new UserId(1) == remote2.V7[0]);
+			Assert.IsTrue(new UserId(3) == remote2.V7[1]);
+			Assert.IsTrue(new UserId(4) == remote2.V7[2]);
+			Assert.AreEqual(1, remote2.ft15Count);
+			Assert.IsTrue("YouAreP2" == remote2.V19.f1a);
+			Assert.AreEqual(master.V19.V0, remote2.V19.V0);
+			Assert.AreEqual(master.V19.Uv1, remote2.V19.Uv1);
+			Assert.IsTrue("Both" == remote2.V20.f1a);
+			Assert.AreEqual(master.V20.V0, remote2.V20.V0);
+			Assert.AreEqual(master.V20.Uv1, remote2.V20.Uv1);
+			Assert.AreEqual(3, remote2.V23.Count);
+			Assert.IsTrue(new UserId(1) == remote2.V23[0]);
+			Assert.IsTrue(new UserId(3) == remote2.V23[1]);
+			Assert.IsTrue(new UserId(4) == remote2.V23[2]);
+			Assert.AreEqual(30, remote2.f24a);
+			Assert.AreEqual(20, remote2.f28a);
+		}
 
 		public void Sync(ByteBuffer buffer,
 						 NetworkPlayer player,

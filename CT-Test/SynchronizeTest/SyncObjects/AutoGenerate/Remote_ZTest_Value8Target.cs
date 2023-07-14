@@ -41,11 +41,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public int V3 => _v3;
 		public event Action<int>? OnV3Changed;
 		[SyncObject]
-		private SyncList<UserId> _v4 = new();
+		private readonly SyncList<UserId> _v4 = new();
 		public SyncList<UserId> V4 => _v4;
 		public event Action<SyncList<UserId>>? OnV4Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _v5 = new();
+		private readonly ZTest_InnerObjectTarget _v5 = new();
 		public ZTest_InnerObjectTarget V5 => _v5;
 		public event Action<ZTest_InnerObjectTarget>? OnV5Changed;
 		[SyncVar(SyncType.Unreliable)]

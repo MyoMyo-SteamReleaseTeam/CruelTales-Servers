@@ -51,11 +51,11 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _v11 = new();
 		[SyncObject]
-		private SyncList<NetString> _v12 = new();
+		private readonly SyncList<NetString> _v12 = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _v13 = new();
+		private readonly ZTest_InnerObjectTarget _v13 = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v14 = new();
+		private readonly ZTest_InnerObject _v14 = new();
 		[SyncVar(SyncType.Unreliable)]
 		private byte _uv0;
 		[SyncVar(SyncType.Unreliable)]
@@ -215,6 +215,9 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_1[3] = true;
 			}
 		}
+		public SyncList<NetString> V12 => _v12;
+		public ZTest_InnerObjectTarget V13 => _v13;
+		public ZTest_InnerObject V14 => _v14;
 		public partial void f0()
 		{
 			f0CallstackCount++;

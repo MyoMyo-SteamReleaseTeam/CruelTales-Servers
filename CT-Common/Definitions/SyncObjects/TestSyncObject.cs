@@ -135,6 +135,8 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar] public NetStringShort v11;
 		[SyncObject] public SyncList<NetString> v12 = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
+		public ZTest_InnerObjectTarget v13 = new();
+		[SyncObject(SyncType.ReliableOrUnreliable)]
 		public ZTest_InnerObject v14 = new();
 
 		[SyncVar(SyncType.Unreliable)] public byte uv0;

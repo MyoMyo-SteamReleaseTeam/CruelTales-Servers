@@ -31,8 +31,6 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => throw new NotImplementedException();
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
-
-		public SyncList<UserId> UserIdList => _userIdList;
 	}
 
 	public partial class ZTest_Value8Target : MasterNetworkObject

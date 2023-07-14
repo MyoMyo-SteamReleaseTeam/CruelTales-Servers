@@ -53,7 +53,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public int V6 => _v6;
 		public event Action<int>? OnV6Changed;
 		[SyncObject]
-		private SyncList<UserId> _v7 = new();
+		private readonly SyncList<UserId> _v7 = new();
 		public SyncList<UserId> V7 => _v7;
 		public event Action<SyncList<UserId>>? OnV7Changed;
 		[SyncVar]
@@ -75,7 +75,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private int _v13;
 		public event Action<int>? OnV13Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v15 = new();
+		private readonly ZTest_InnerObject _v15 = new();
 		public ZTest_InnerObject V15 => _v15;
 		public event Action<ZTest_InnerObject>? OnV15Changed;
 		[SyncVar]
@@ -99,7 +99,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public int V21 => _v21;
 		public event Action<int>? OnV21Changed;
 		[SyncObject]
-		private SyncList<UserId> _v23 = new();
+		private readonly SyncList<UserId> _v23 = new();
 		public SyncList<UserId> V23 => _v23;
 		public event Action<SyncList<UserId>>? OnV23Changed;
 		[SyncRpc]

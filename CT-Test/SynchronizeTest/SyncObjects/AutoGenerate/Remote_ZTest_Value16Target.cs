@@ -73,15 +73,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public NetStringShort V11 => _v11;
 		public event Action<NetStringShort>? OnV11Changed;
 		[SyncObject]
-		private SyncList<NetString> _v12 = new();
+		private readonly SyncList<NetString> _v12 = new();
 		public SyncList<NetString> V12 => _v12;
 		public event Action<SyncList<NetString>>? OnV12Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _v13 = new();
+		private readonly ZTest_InnerObjectTarget _v13 = new();
 		public ZTest_InnerObjectTarget V13 => _v13;
 		public event Action<ZTest_InnerObjectTarget>? OnV13Changed;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObject _v14 = new();
+		private readonly ZTest_InnerObject _v14 = new();
 		public ZTest_InnerObject V14 => _v14;
 		public event Action<ZTest_InnerObject>? OnV14Changed;
 		[SyncVar(SyncType.Unreliable)]

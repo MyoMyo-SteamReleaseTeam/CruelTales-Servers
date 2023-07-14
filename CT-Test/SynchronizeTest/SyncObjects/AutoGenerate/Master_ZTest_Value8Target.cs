@@ -35,9 +35,9 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v3;
 		[SyncObject]
-		private SyncList<UserId> _v4 = new();
+		private readonly SyncList<UserId> _v4 = new();
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _v5 = new();
+		private readonly ZTest_InnerObjectTarget _v5 = new();
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
 		[SyncVar(SyncType.Unreliable)]
@@ -119,6 +119,8 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[3] = true;
 			}
 		}
+		public SyncList<UserId> V4 => _v4;
+		public ZTest_InnerObjectTarget V5 => _v5;
 		public partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3)
 		{
 			ft0Callstack.Add(player, (v0, v1, v2, v3));

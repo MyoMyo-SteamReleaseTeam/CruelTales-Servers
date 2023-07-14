@@ -81,17 +81,21 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 	public partial class ZTest_InnerObject : IRemoteSynchronizable
 	{
+		public NetStringShort f1a;
+
 		public partial void f1(NetStringShort a)
 		{
-
+			f1a = a;
 		}
 	}
 
 	public partial class ZTest_InnerObjectTarget : IRemoteSynchronizable
 	{
+		public NetStringShort f1a;
+
 		public partial void f1(NetStringShort a)
 		{
-
+			f1a = a;
 		}
 	}
 

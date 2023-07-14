@@ -25,11 +25,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class ZTest_SyncCollection
 	{
 		[SyncObject]
-		private SyncList<UserId> _userIdList = new();
+		private readonly SyncList<UserId> _userIdList = new();
 		public SyncList<UserId> UserIdList => _userIdList;
 		public event Action<SyncList<UserId>>? OnUserIdListChanged;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private ZTest_InnerObjectTarget _syncObj = new();
+		private readonly ZTest_InnerObjectTarget _syncObj = new();
 		public ZTest_InnerObjectTarget SyncObj => _syncObj;
 		public event Action<ZTest_InnerObjectTarget>? OnSyncObjChanged;
 		public override bool IsDirtyReliable => false;
