@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using CT.Common.Synchronizations;
-using CT.CorePatcher.Exceptions;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -16,7 +15,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public  bool IsNetworkObject { get; private set; } = false;
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
-		public bool _isDebugObject = false;
+		public bool IsDebugObject { get; private set; } = false;
+		public InheritType InheritType { get; private set; } = InheritType.None;
 
 		[AllowNull] private SerializeDirectionGroup _masterSerializeGroup;
 		[AllowNull] private DeserializeDirectionGroup _masterDeserializeGroup;
@@ -45,7 +45,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_objectName = objectName;
 			IsNetworkObject = isNetworkObject;
 			Capacity = capacity;
-			_isDebugObject = isDebugObject;
+			this.IsDebugObject = isDebugObject;
 			MultiplyByMaxUser = multiplyByMaxUser;
 			_modifier = IsNetworkObject ? "override " : string.Empty;
 
@@ -120,7 +120,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Gen_RemoteCode()
 		{
-			string usingStatements = _isDebugObject ? 
+			string usingStatements = IsDebugObject ? 
 				CommonFormat.DebugRemoteUsingStatements : 
 				CommonFormat.RemoteUsingStatements;
 
@@ -139,7 +139,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private string getNetworkTypeDefinition()
 		{
-			if (_isDebugObject)
+			if (IsDebugObject)
 				return string.Empty;
 
 			if (!IsNetworkObject)

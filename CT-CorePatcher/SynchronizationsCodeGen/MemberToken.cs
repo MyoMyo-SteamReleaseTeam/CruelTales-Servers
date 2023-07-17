@@ -7,5 +7,6 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		public BaseMemberToken Member;
 		public SyncType SyncType;
+		public InheritType InheritType;
 	}
 }

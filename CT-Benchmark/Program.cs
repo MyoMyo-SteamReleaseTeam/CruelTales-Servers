@@ -11,10 +11,12 @@ namespace CT.Benchmark
 			//ActionGC.Test();
 			//BufferPoolDataRaceTest.Test();
 			//BenchmarkRunner.Run<StringBufferBenchmark>();
-			BenchmarkRunner.Run<BranchBenchmark>();
+			//BenchmarkRunner.Run<BranchBenchmark>();
 
 			//StringBufferBenchmark sb = new();
 			//sb.SBToByteArrayByIter();
+			InheritReflectionTest.Test();
+
 		}
 	}
 }

@@ -54,6 +54,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public const string MASTER_POOL_PATH = "masterPoolPath";
 
 		private static Dictionary<string, SyncObjectInfo> _syncObjectByName = new();
+		private static Dictionary<Type, InheritType> _typeByInheritType = new();
 
 		public static bool TryGetSyncObjectByTypeName(string typeName, out SyncObjectInfo? syncObjectInfo)
 		{
@@ -260,6 +261,27 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private List<SyncObjectInfo> parseTypeToSyncObjectInfo(IEnumerable<Type> types, bool isNetworkObject)
 		{
+			HashSet<Type> baseTypes = new();
+
+			foreach (var t in types)
+			{
+				Type? baseType = t.BaseType;
+				if (baseType == null || baseType == typeof(object))
+					continue;
+				baseTypes.Add(baseType);
+				_typeByInheritType.Add(t, InheritType.Child);
+			}
+
+			foreach (var t in types)
+			{
+				var inheritType = baseTypes.Contains(t) ? InheritType.Parent : InheritType.None;
+
+				if (!_typeByInheritType.ContainsKey(t))
+				{
+					_typeByInheritType.Add(t, inheritType);
+				}
+			}
+
 			List<SyncObjectInfo> syncObjects = new();
 
 			foreach (var t in types)

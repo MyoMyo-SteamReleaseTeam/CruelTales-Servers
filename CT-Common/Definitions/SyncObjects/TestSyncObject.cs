@@ -32,13 +32,26 @@ namespace CT.Common.Definitions.SyncObjects
 	public partial class ZTest_Child : ZTest_Parent
 	{
 		[SyncVar]
-		public int C1;
+		public int C3;
 
 		[SyncRpc(dir: SyncDirection.FromMaster)]
-		public void SC1() { }
+		public void SC3() { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void CC1() { }
+		public void CC3() { }
+	}
+
+	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
+	public partial class ZTest_ChildChild : ZTest_Parent
+	{
+		[SyncVar]
+		public int CC4;
+
+		[SyncRpc(dir: SyncDirection.FromMaster)]
+		public void SCC4() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void CCC4() { }
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
