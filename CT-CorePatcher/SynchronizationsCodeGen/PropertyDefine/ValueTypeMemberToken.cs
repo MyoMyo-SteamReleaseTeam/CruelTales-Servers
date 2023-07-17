@@ -9,8 +9,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override bool ShouldRollBackMask => false;
 		public bool IsNativeStruct { get; private set; }
 
-		public ValueTypeMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
-			: base(syncType, typeName, memberName, isPublic)
+		public ValueTypeMemberToken(SyncType syncType, InheritType inheritType,
+									string typeName, string memberName, bool isPublic)
+			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
 			_syncType = syncType;
 			_typeName = typeName;
@@ -28,7 +29,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
-								 _privateMemberName, MemberFormat.NewInitializer);
+								 _privateMemberName, MemberFormat.NewInitializer, _privateAccessModifier);
 		}
 
 		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
@@ -56,7 +57,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
-								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier);
+								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier, _privateAccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)

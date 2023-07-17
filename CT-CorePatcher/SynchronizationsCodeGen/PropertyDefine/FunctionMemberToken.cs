@@ -11,8 +11,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		private string _functionName;
 		private SyncArgumentGroup _argGroup;
 
-		public FunctionMemberToken(SyncType syncType, string functionName, bool isPublic, List<BaseArgument> args)
-			: base(syncType, string.Empty, functionName, isPublic)
+		public FunctionMemberToken(SyncType syncType, InheritType inheritType,
+								   string functionName, bool isPublic, List<BaseArgument> args)
+			: base(syncType, inheritType, string.Empty, functionName, isPublic)
 		{
 			_syncType = syncType;
 			_functionName = functionName;
@@ -26,10 +27,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_Declaration(SyncDirection direction)
 		{
+			if (direction == SyncDirection.FromMaster)
+			{
+			}
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
 			return string.Format(FuncMemberFormat.Declaration,
 								 attribute, AccessModifier, _functionName,
-								 _argGroup.GetParameterDeclaration());
+								 _argGroup.GetParameterDeclaration(), string.Empty);
 		}
 
 		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
@@ -37,7 +41,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			if (_argGroup.Count == 0)
 			{
 				return string.Format(FuncMemberFormat.CallWithStackVoid, AccessModifier,
-									 _functionName, dirtyBitname, memberIndex);
+									 _functionName, dirtyBitname, memberIndex,
+									 _privateAccessModifier);
 			}
 
 			return string.Format(FuncMemberFormat.CallWithStack,
@@ -46,7 +51,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _argGroup.GetParameterDeclaration(),
 								 _argGroup.GetTupleEnqueueValue(),
 								 _argGroup.GetTupleDeclaration(),
-								 dirtyBitname, memberIndex);
+								 dirtyBitname, memberIndex,
+								 _privateAccessModifier);
 		}
 
 		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
@@ -91,7 +97,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			}
 
 			return string.Format(format, attribute, AccessModifier, _functionName,
-								 _argGroup.GetParameterDeclaration());
+								 _argGroup.GetParameterDeclaration(), _inheritKeyword);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)

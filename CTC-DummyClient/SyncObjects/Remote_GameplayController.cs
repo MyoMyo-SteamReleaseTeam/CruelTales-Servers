@@ -42,19 +42,39 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _currentPlayerCount;
 		public int CurrentPlayerCount => _currentPlayerCount;
-		public event Action<int>? OnCurrentPlayerCountChanged;
+		private Action<int>? _onCurrentPlayerCountChanged;
+		public event Action<int> OnCurrentPlayerCountChanged
+		{
+			add => _onCurrentPlayerCountChanged += value;
+			remove => _onCurrentPlayerCountChanged -= value;
+		}
 		[SyncVar]
 		private NetStringShort _roomName = new();
 		public NetStringShort RoomName => _roomName;
-		public event Action<NetStringShort>? OnRoomNameChanged;
+		private Action<NetStringShort>? _onRoomNameChanged;
+		public event Action<NetStringShort> OnRoomNameChanged
+		{
+			add => _onRoomNameChanged += value;
+			remove => _onRoomNameChanged -= value;
+		}
 		[SyncVar]
 		private NetStringShort _roomDiscription = new();
 		public NetStringShort RoomDiscription => _roomDiscription;
-		public event Action<NetStringShort>? OnRoomDiscriptionChanged;
+		private Action<NetStringShort>? _onRoomDiscriptionChanged;
+		public event Action<NetStringShort> OnRoomDiscriptionChanged
+		{
+			add => _onRoomDiscriptionChanged += value;
+			remove => _onRoomDiscriptionChanged -= value;
+		}
 		[SyncVar]
 		private int _password;
 		public int Password => _password;
-		public event Action<int>? OnPasswordChanged;
+		private Action<int>? _onPasswordChanged;
+		public event Action<int> OnPasswordChanged
+		{
+			add => _onPasswordChanged += value;
+			remove => _onPasswordChanged -= value;
+		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(GameMapType mapType);
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -178,22 +198,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[0])
 			{
 				if (!reader.TryReadInt32(out _currentPlayerCount)) return false;
-				OnCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
+				_onCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
 			}
 			if (dirtyReliable_0[1])
 			{
 				if (!_roomName.TryDeserialize(reader)) return false;
-				OnRoomNameChanged?.Invoke(_roomName);
+				_onRoomNameChanged?.Invoke(_roomName);
 			}
 			if (dirtyReliable_0[2])
 			{
 				if (!_roomDiscription.TryDeserialize(reader)) return false;
-				OnRoomDiscriptionChanged?.Invoke(_roomDiscription);
+				_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
 			}
 			if (dirtyReliable_0[3])
 			{
 				if (!reader.TryReadInt32(out _password)) return false;
-				OnPasswordChanged?.Invoke(_password);
+				_onPasswordChanged?.Invoke(_password);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -221,13 +241,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out _currentPlayerCount)) return false;
-			OnCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
+			_onCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
 			if (!_roomName.TryDeserialize(reader)) return false;
-			OnRoomNameChanged?.Invoke(_roomName);
+			_onRoomNameChanged?.Invoke(_roomName);
 			if (!_roomDiscription.TryDeserialize(reader)) return false;
-			OnRoomDiscriptionChanged?.Invoke(_roomDiscription);
+			_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
 			if (!reader.TryReadInt32(out _password)) return false;
-			OnPasswordChanged?.Invoke(_password);
+			_onPasswordChanged?.Invoke(_password);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

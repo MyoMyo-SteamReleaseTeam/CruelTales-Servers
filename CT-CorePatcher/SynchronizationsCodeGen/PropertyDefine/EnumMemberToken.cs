@@ -10,9 +10,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		private string _enumSizeTypeName;
 		private string _clrEnumSizeTypeName;
 
-		public EnumMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic,
+		public EnumMemberToken(SyncType syncType, InheritType inheritType,
+							   string typeName, string memberName, bool isPublic,
 							   string enumSizeTypeName, string clrEnumSizeTypeName)
-			: base(syncType, typeName, memberName, isPublic)
+			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
 			_enumSizeTypeName = enumSizeTypeName;
 			_clrEnumSizeTypeName = clrEnumSizeTypeName;
@@ -27,7 +28,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
-								 _privateMemberName, MemberFormat.NewInitializer);
+								 _privateMemberName, MemberFormat.NewInitializer, _privateAccessModifier);
 		}
 
 		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
@@ -54,7 +55,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
-								 _publicMemberName, string.Empty, AccessModifier);
+								 _publicMemberName, string.Empty, AccessModifier, _privateAccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)

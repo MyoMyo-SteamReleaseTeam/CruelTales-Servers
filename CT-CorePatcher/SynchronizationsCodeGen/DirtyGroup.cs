@@ -86,7 +86,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 			int index = 0;
 			foreach (var m in _members)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
 				sb.AppendLine(m.Master_GetterSetter(_syncType, GetName(), index++));
+			}
 			return sb.ToString();
 		}
 

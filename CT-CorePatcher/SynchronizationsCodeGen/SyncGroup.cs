@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
@@ -55,12 +56,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 		}
 
-		public string Master_BitmaskDeclarations()
+		public string Master_BitmaskDeclarations(InheritType inheritType)
 		{
+			if (inheritType == InheritType.Child)
+				return string.Empty;
+
+			string accessModifier = inheritType switch
+			{
+				InheritType.Parent => "protected",
+				InheritType.None => "private",
+				_ => throw new ArgumentException($"There is no such inheritType to declar bitmask. {inheritType}")
+			};
+
 			StringBuilder sb = new();
 
 			foreach (var g in _dirtyGroups)
-				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeclaration, g.GetName()));
+				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeclaration, g.GetName(), accessModifier));
 			return sb.ToString();
 		}
 
@@ -360,18 +371,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return headers.ToString();
 		}
 
-		public string Remote_IgnoreSync(bool isStatic)
+		public string Remote_IgnoreSync(InheritType inheritType, bool isStatic)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			string delcaration = isStatic ?
-				SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic :
-				SyncGroupFormat.IgnoreSyncFunctionDeclaration;
-
 			if (isStatic)
-				sb.Append(string.Format(delcaration, _syncType));
+			{
+				if (inheritType == InheritType.Child)
+				{
+					sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclarationStaticNew, _syncType));
+				}
+				else
+				{
+					sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclarationStatic, _syncType));
+				}
+			}
 			else
-				sb.Append(string.Format(delcaration, _modifier, _syncType));
+			{
+				sb.Append(string.Format(SyncGroupFormat.IgnoreSyncFunctionDeclaration,
+										_modifier, _syncType));
+			}
 
 			if (_dirtyGroups.Count == 0)
 			{

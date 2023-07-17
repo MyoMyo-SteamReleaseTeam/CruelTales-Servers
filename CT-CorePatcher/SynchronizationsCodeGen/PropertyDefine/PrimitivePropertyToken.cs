@@ -9,8 +9,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override bool ShouldRollBackMask => false;
 		private string _clrTypeName;
 
-		public PrimitivePropertyToken(SyncType syncType, string typeName, string memberName, string clrTypeName, bool isPublic)
-			: base(syncType, typeName, memberName, isPublic)
+		public PrimitivePropertyToken(SyncType syncType, InheritType inheritType,
+									  string typeName, string memberName, string clrTypeName, bool isPublic)
+			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
 			_syncType = syncType;
 			_typeName = typeName;
@@ -28,7 +29,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
-			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName, _privateMemberName, string.Empty);
+			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName, _privateMemberName,
+								 string.Empty, _privateAccessModifier);
 		}
 
 		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
@@ -57,7 +59,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName, 
-								 _publicMemberName, string.Empty, AccessModifier);
+								 _publicMemberName, string.Empty, AccessModifier, _privateAccessModifier);
 		}
 
 		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)

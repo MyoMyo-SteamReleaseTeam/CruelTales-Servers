@@ -83,10 +83,12 @@ namespace CT.CorePatcher
 		public static void PrintException(Exception e)
 		{
 			PrintSeparator();
+			ConsoleHelper.SetColor(ConsoleColor.White, ConsoleColor.Red);
 			Console.WriteLine($"# {e.GetType().Name} #");
 			Console.WriteLine($"");
 			Console.WriteLine($"{e.Message}");
 			Console.WriteLine($"{e.StackTrace}");
+			Console.ResetColor();
 			PrintSeparator();
 		}
 

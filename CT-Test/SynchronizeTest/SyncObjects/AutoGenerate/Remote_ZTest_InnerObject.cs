@@ -27,11 +27,21 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private int _v0;
 		public int V0 => _v0;
-		public event Action<int>? OnV0Changed;
+		private Action<int>? _onV0Changed;
+		public event Action<int> OnV0Changed
+		{
+			add => _onV0Changed += value;
+			remove => _onV0Changed -= value;
+		}
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv1;
 		public int Uv1 => _uv1;
-		public event Action<int>? OnUv1Changed;
+		private Action<int>? _onUv1Changed;
+		public event Action<int> OnUv1Changed
+		{
+			add => _onUv1Changed += value;
+			remove => _onUv1Changed -= value;
+		}
 		[SyncRpc]
 		public partial void f1(NetStringShort a);
 		public bool IsDirtyReliable => false;
@@ -48,7 +58,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[0])
 			{
 				if (!reader.TryReadInt32(out _v0)) return false;
-				OnV0Changed?.Invoke(_v0);
+				_onV0Changed?.Invoke(_v0);
 			}
 			if (dirtyReliable_0[1])
 			{
@@ -68,16 +78,16 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyUnreliable_0[0])
 			{
 				if (!reader.TryReadInt32(out _uv1)) return false;
-				OnUv1Changed?.Invoke(_uv1);
+				_onUv1Changed?.Invoke(_uv1);
 			}
 			return true;
 		}
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out _v0)) return false;
-			OnV0Changed?.Invoke(_v0);
+			_onV0Changed?.Invoke(_v0);
 			if (!reader.TryReadInt32(out _uv1)) return false;
-			OnUv1Changed?.Invoke(_uv1);
+			_onUv1Changed?.Invoke(_uv1);
 			return true;
 		}
 		public void InitializeRemoteProperties()

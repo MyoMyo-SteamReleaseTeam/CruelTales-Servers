@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
@@ -53,8 +54,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public const string SYNC_REMOTE_PATH = "syncRemotePath";
 		public const string MASTER_POOL_PATH = "masterPoolPath";
 
+		private static BindingFlags _parseFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
 		private static Dictionary<string, SyncObjectInfo> _syncObjectByName = new();
 		private static Dictionary<Type, InheritType> _typeByInheritType = new();
+		private static Dictionary<Type, HashSet<(string TypeName, string PropertyName)>> _propertySetByType = new();
+		private static Dictionary<Type, HashSet<string>> _functionSetByType = new();
 
 		public static bool TryGetSyncObjectByTypeName(string typeName, out SyncObjectInfo? syncObjectInfo)
 		{
@@ -261,10 +266,31 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private List<SyncObjectInfo> parseTypeToSyncObjectInfo(IEnumerable<Type> types, bool isNetworkObject)
 		{
+			// Parse inheritance tree
 			HashSet<Type> baseTypes = new();
 
 			foreach (var t in types)
 			{
+				// Parse properties and functions
+				var propertySet = new HashSet<(string TypeName, string PropertyName)>();
+				var functionSet = new HashSet<string>();
+
+				FieldInfo[] fieldInfos = t.GetFields(_parseFlags);
+				foreach (var f in fieldInfos)
+				{
+					propertySet.Add((f.FieldType.Name, f.Name));
+				}
+
+				MethodInfo[] methods = t.GetMethods(_parseFlags);
+				foreach (var m in methods)
+				{
+					functionSet.Add(m.Name);
+				}
+
+				_propertySetByType.Add(t, propertySet);
+				_functionSetByType.Add(t, functionSet);
+
+				// Add if it's child
 				Type? baseType = t.BaseType;
 				if (baseType == null || baseType == typeof(object))
 					continue;
@@ -284,6 +310,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			List<SyncObjectInfo> syncObjects = new();
 
+			// Parse synchronize objects
 			foreach (var t in types)
 			{
 				var attNetObj = t.GetCustomAttribute<SyncNetworkObjectDefinitionAttribute>();
@@ -321,7 +348,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					remoteMembers.AddRange(remoteFuncMembers);
 				}
 
-				SyncObjectInfo objectInfo = new(t.Name, masterMembers, remoteMembers,
+				InheritType inheritType = _typeByInheritType[t];
+				SyncObjectInfo objectInfo = new(t.Name, inheritType, masterMembers, remoteMembers,
 												isNetworkObject, capacity, multiplyByMaxUser, isDebugObject);
 				objectInfo.HasReliable = masterMembers.Any((m) => m.SyncType.IsReliable());
 				objectInfo.HasUnreliable = masterMembers.Any((m) => m.SyncType.IsUnreliable());
@@ -340,7 +368,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			remoteMembers = new();
 
 			// Parse functions
-			foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+			MethodInfo[] methods = type.GetMethods(_parseFlags);
+			InheritType inheritType = _typeByInheritType[type];
+			Type? baseType = type.BaseType;
+			foreach (var method in methods)
 			{
 				foreach (var att in method.GetCustomAttributes())
 				{
@@ -350,6 +381,29 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					if (att is not SyncRpcAttribute syncAtt)
 						continue;
 
+					// Check it's inherited
+					InheritType memberInheritType = InheritType.None;
+					if (inheritType == InheritType.Child)
+					{
+						if (baseType != null && _functionSetByType[baseType].Contains(method.Name))
+						{
+							memberInheritType = InheritType.Child;
+						}
+					}
+					else if (inheritType == InheritType.Parent)
+					{
+						memberInheritType = InheritType.Parent;
+					}
+
+					if (inheritType != InheritType.None)
+					{
+						if (method.IsPrivate && !method.IsFamily)
+						{
+							throw new ArgumentException($"If {method.Name} can be inherited you must set to protected! Type : {type.Name}");
+						}
+					}
+
+					// Parse member function
 					syncType = syncAtt.SyncType;
 					direction = syncAtt.SyncDirection;
 
@@ -359,8 +413,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 						throw new WrongSyncSetting(type, method.Name, $"You can not set target type from remote side!");
 					}
 
-					MemberToken member = parseSyncFunction(method, syncType);
+					MemberToken member = parseSyncFunction(method, syncType, memberInheritType);
+					member.InheritType = memberInheritType;
 
+					// Add to list
 					if (direction == SyncDirection.FromMaster)
 					{
 						masterMembers.Add(member);
@@ -376,7 +432,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			return masterMembers.Count != 0 || remoteMembers.Count != 0;
 		}
-
+		
 		public static bool TryParseProperty(Type type,
 											out List<MemberToken> masterMembers,
 											out List<MemberToken> remoteMembers)
@@ -385,7 +441,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			remoteMembers = new();
 
 			// Parse properties
-			FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+			FieldInfo[] fieldInfos = type.GetFields(_parseFlags);
+			InheritType inheritType = _typeByInheritType[type];
+			Type? baseType = type.BaseType;
 			foreach (var field in fieldInfos)
 			{
 				foreach (var att in field.GetCustomAttributes())
@@ -394,6 +452,33 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					SyncDirection direction;
 					MemberToken member;
 
+					// Check it's inherited
+					InheritType memberInheritType = InheritType.None;
+					if (inheritType == InheritType.Child)
+					{
+						if (baseType != null && _propertySetByType[baseType].Contains((field.FieldType.Name, field.Name)))
+						{
+							memberInheritType = InheritType.Child;
+						}
+						else
+						{
+							memberInheritType = InheritType.Parent;
+						}
+					}
+					else if (inheritType == InheritType.Parent)
+					{
+						memberInheritType = InheritType.Parent;
+					}
+
+					if (inheritType != InheritType.None)
+					{
+						if (field.IsPrivate && !field.IsFamily)
+						{
+							throw new ArgumentException($"If {field.Name} can be inherited you must set to protected! Type : {type.Name}");
+						}
+					}
+
+					// Parse member property
 					if (att is SyncVarAttribute syncVarAtt)
 					{
 						syncType = syncVarAtt.SyncType;
@@ -403,7 +488,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							throw new WrongSyncSetting(type, field.Name,
 													   $"You can not set cold data from remote side!");
 						}
-						member = parseValueField(field, syncType);
+						member = parseValueField(field, syncType, memberInheritType);
 					}
 					else if (att is SyncObjectAttribute syncObjAtt)
 					{
@@ -414,13 +499,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							throw new WrongSyncSetting(type, field.Name,
 													   $"You can not set cold/hot data at sync object!");
 						}
-						member = parseSyncObjectField(field, syncType);
+						member = parseSyncObjectField(field, syncType, memberInheritType);
 					}
 					else
 					{
 						continue;
 					}
 
+					member.InheritType = memberInheritType;
+
+					// Add to list
 					if (direction == SyncDirection.FromMaster)
 					{
 						masterMembers.Add(member);
@@ -437,7 +525,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return masterMembers.Count != 0 || remoteMembers.Count != 0;
 		}
 
-		private static MemberToken parseValueField(FieldInfo fieldInfo, SyncType syncType)
+		private static MemberToken parseValueField(FieldInfo fieldInfo, SyncType syncType, InheritType inheritType)
 		{
 			bool isPublic = fieldInfo.IsPublic;
 			string typeName = fieldInfo.FieldType.Name;
@@ -451,7 +539,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				var sizeTypeName = ProjectReference.Instance.GetEnumSizeTypeName(typeName);
 				if (ReflectionHelper.TryGetCLRTypeByPrimitive(sizeTypeName, out string clrEnumSizeType))
 				{
-					var memberToken = new EnumMemberToken(syncType, typeName, memberName, isPublic,
+					var memberToken = new EnumMemberToken(syncType, inheritType, typeName, memberName, isPublic,
 														  sizeTypeName, clrEnumSizeType);
 					member.Member = memberToken;
 				}
@@ -460,13 +548,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (ReflectionHelper.TryGetTypeByCLRType(typeName, out string nonClrType))
 				{
-					member.Member = new PrimitivePropertyToken(syncType, nonClrType, memberName,
+					member.Member = new PrimitivePropertyToken(syncType, inheritType, nonClrType, memberName,
 															   typeName, isPublic);
 				}
 			}
 			else if (fieldInfo.FieldType.IsValueType)
 			{
-				member.Member = new ValueTypeMemberToken(syncType, typeName, memberName, isPublic);
+				member.Member = new ValueTypeMemberToken(syncType, inheritType, typeName, memberName, isPublic);
 			}
 			else
 			{
@@ -476,7 +564,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return member;
 		}
 
-		private static MemberToken parseSyncObjectField(FieldInfo fieldInfo, SyncType syncType)
+		private static MemberToken parseSyncObjectField(FieldInfo fieldInfo, SyncType syncType, InheritType inheritType)
 		{
 			bool isPublic = fieldInfo.IsPublic;
 			string typeName = fieldInfo.FieldType.Name;
@@ -492,11 +580,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				isCollection = true;
 			}
 
-			member.Member = new SyncObjectMemberToken(syncType, typeName, memberName, isPublic, isCollection);
+			member.Member = new SyncObjectMemberToken(syncType, inheritType, typeName, memberName, isPublic, isCollection);
 			return member;
 		}
 
-		private static MemberToken parseSyncFunction(MethodInfo methodInfo, SyncType syncType)
+		private static MemberToken parseSyncFunction(MethodInfo methodInfo, SyncType syncType, InheritType inheritType)
 		{
 			bool isPublic = methodInfo.IsPublic;
 			string functionName = methodInfo.Name;
@@ -544,11 +632,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (syncType == SyncType.Reliable || syncType == SyncType.Unreliable)
 			{
-				member.Member = new FunctionMemberToken(syncType, functionName, isPublic, arguments);
+				member.Member = new FunctionMemberToken(syncType, inheritType, functionName, isPublic, arguments);
 			}
 			else if (syncType == SyncType.ReliableTarget || syncType == SyncType.UnreliableTarget)
 			{
-				member.Member = new TargetFunctionMemberToken(syncType, functionName, isPublic, arguments);
+				member.Member = new TargetFunctionMemberToken(syncType, inheritType, functionName, isPublic, arguments);
 			}
 			return member;
 		}

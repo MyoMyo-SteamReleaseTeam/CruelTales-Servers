@@ -10,6 +10,45 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 	}
 
+	public partial class ZTest_Parent : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public virtual partial void Server_P1()
+		{
+		}
+
+		protected virtual partial void Server_p2(int a, int b)
+		{
+		}
+	}
+
+	public partial class ZTest_Child : ZTest_Parent
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public partial void Server_C3()
+		{
+		}
+
+		private partial void Server_c4()
+		{
+		}
+	}
+
+	public partial class ZTest_ChildChild : ZTest_Child
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+
+		public partial void Server_CC5()
+		{
+		}
+
+		private partial void Server_cc6()
+		{
+		}
+	}
+
 	public partial class ZTest_FuntionObject : IRemoteSynchronizable
 	{
 		public partial void Server_VoidArg()

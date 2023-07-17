@@ -36,35 +36,75 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private UserId _userId = new();
 		public UserId UserId => _userId;
-		public event Action<UserId>? OnUserIdChanged;
+		private Action<UserId>? _onUserIdChanged;
+		public event Action<UserId> OnUserIdChanged
+		{
+			add => _onUserIdChanged += value;
+			remove => _onUserIdChanged -= value;
+		}
 		[SyncVar]
 		private NetStringShort _username = new();
 		public NetStringShort Username => _username;
-		public event Action<NetStringShort>? OnUsernameChanged;
+		private Action<NetStringShort>? _onUsernameChanged;
+		public event Action<NetStringShort> OnUsernameChanged
+		{
+			add => _onUsernameChanged += value;
+			remove => _onUsernameChanged -= value;
+		}
 		[SyncVar]
 		private int _costume;
 		public int Costume => _costume;
-		public event Action<int>? OnCostumeChanged;
+		private Action<int>? _onCostumeChanged;
+		public event Action<int> OnCostumeChanged
+		{
+			add => _onCostumeChanged += value;
+			remove => _onCostumeChanged -= value;
+		}
 		[SyncVar]
 		private bool _isFreezed;
 		public bool IsFreezed => _isFreezed;
-		public event Action<bool>? OnIsFreezedChanged;
+		private Action<bool>? _onIsFreezedChanged;
+		public event Action<bool> OnIsFreezedChanged
+		{
+			add => _onIsFreezedChanged += value;
+			remove => _onIsFreezedChanged -= value;
+		}
 		[SyncVar(SyncType.ColdData)]
 		private DokzaAnimation _currentAnimation;
 		public DokzaAnimation CurrentAnimation => _currentAnimation;
-		public event Action<DokzaAnimation>? OnCurrentAnimationChanged;
+		private Action<DokzaAnimation>? _onCurrentAnimationChanged;
+		public event Action<DokzaAnimation> OnCurrentAnimationChanged
+		{
+			add => _onCurrentAnimationChanged += value;
+			remove => _onCurrentAnimationChanged -= value;
+		}
 		[SyncVar(SyncType.ColdData)]
 		private float _animationTime;
 		public float AnimationTime => _animationTime;
-		public event Action<float>? OnAnimationTimeChanged;
+		private Action<float>? _onAnimationTimeChanged;
+		public event Action<float> OnAnimationTimeChanged
+		{
+			add => _onAnimationTimeChanged += value;
+			remove => _onAnimationTimeChanged -= value;
+		}
 		[SyncVar(SyncType.ColdData)]
 		private bool _isRight;
 		public bool IsRight => _isRight;
-		public event Action<bool>? OnIsRightChanged;
+		private Action<bool>? _onIsRightChanged;
+		public event Action<bool> OnIsRightChanged
+		{
+			add => _onIsRightChanged += value;
+			remove => _onIsRightChanged -= value;
+		}
 		[SyncVar(SyncType.ColdData)]
 		private bool _isUp;
 		public bool IsUp => _isUp;
-		public event Action<bool>? OnIsUpChanged;
+		private Action<bool>? _onIsUpChanged;
+		public event Action<bool> OnIsUpChanged
+		{
+			add => _onIsUpChanged += value;
+			remove => _onIsUpChanged -= value;
+		}
 		[SyncRpc]
 		public partial void Server_OnAnimationChanged(DokzaAnimation animation, bool isRight, bool isUp);
 		private BitmaskByte _dirtyUnreliable_0 = new();
@@ -150,22 +190,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[0])
 			{
 				if (!_userId.TryDeserialize(reader)) return false;
-				OnUserIdChanged?.Invoke(_userId);
+				_onUserIdChanged?.Invoke(_userId);
 			}
 			if (dirtyReliable_0[1])
 			{
 				if (!_username.TryDeserialize(reader)) return false;
-				OnUsernameChanged?.Invoke(_username);
+				_onUsernameChanged?.Invoke(_username);
 			}
 			if (dirtyReliable_0[2])
 			{
 				if (!reader.TryReadInt32(out _costume)) return false;
-				OnCostumeChanged?.Invoke(_costume);
+				_onCostumeChanged?.Invoke(_costume);
 			}
 			if (dirtyReliable_0[3])
 			{
 				if (!reader.TryReadBoolean(out _isFreezed)) return false;
-				OnIsFreezedChanged?.Invoke(_isFreezed);
+				_onIsFreezedChanged?.Invoke(_isFreezed);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -185,22 +225,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!_userId.TryDeserialize(reader)) return false;
-			OnUserIdChanged?.Invoke(_userId);
+			_onUserIdChanged?.Invoke(_userId);
 			if (!_username.TryDeserialize(reader)) return false;
-			OnUsernameChanged?.Invoke(_username);
+			_onUsernameChanged?.Invoke(_username);
 			if (!reader.TryReadInt32(out _costume)) return false;
-			OnCostumeChanged?.Invoke(_costume);
+			_onCostumeChanged?.Invoke(_costume);
 			if (!reader.TryReadBoolean(out _isFreezed)) return false;
-			OnIsFreezedChanged?.Invoke(_isFreezed);
+			_onIsFreezedChanged?.Invoke(_isFreezed);
 			if (!reader.TryReadInt32(out var _currentAnimationValue)) return false;
 			_currentAnimation = (DokzaAnimation)_currentAnimationValue;
-			OnCurrentAnimationChanged?.Invoke(_currentAnimation);
+			_onCurrentAnimationChanged?.Invoke(_currentAnimation);
 			if (!reader.TryReadSingle(out _animationTime)) return false;
-			OnAnimationTimeChanged?.Invoke(_animationTime);
+			_onAnimationTimeChanged?.Invoke(_animationTime);
 			if (!reader.TryReadBoolean(out _isRight)) return false;
-			OnIsRightChanged?.Invoke(_isRight);
+			_onIsRightChanged?.Invoke(_isRight);
 			if (!reader.TryReadBoolean(out _isUp)) return false;
-			OnIsUpChanged?.Invoke(_isUp);
+			_onIsUpChanged?.Invoke(_isUp);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

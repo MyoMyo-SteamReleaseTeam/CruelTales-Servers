@@ -10,48 +10,84 @@ namespace CT.Common.Definitions.SyncObjects
 	public partial class ZTest_Parent
 	{
 		[SyncVar]
-		public int P1;
+		public int Field_Server_P1;
 
 		[SyncVar]
-		public float P2;
+		protected float field_Server_P2;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		public int Field_Client_P1;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		protected float field_Client_P2;
 
 		[SyncRpc(dir: SyncDirection.FromMaster)]
-		public void SP1() { }
+		public void Server_P1() { }
 
-		[SyncRpc(dir: SyncDirection.FromMaster)]
-		public void SP2(int a, int b) { }
-
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void CP1() { }
+		[SyncRpc(SyncType.ReliableTarget, SyncDirection.FromMaster)]
+		protected void Server_p2(int a, int b) { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void CP2(int a, int b) { }
+		public void Client_P1() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		protected void Client_p2(int a, int b) { }
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_Child : ZTest_Parent
 	{
 		[SyncVar]
-		public int C3;
+		public int Field_Server_C3;
+
+		[SyncVar]
+		protected int field_Server_C4;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		public int Field_Client_C3;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		protected int field_Client_C4;
 
 		[SyncRpc(dir: SyncDirection.FromMaster)]
-		public void SC3() { }
+		public void Server_C3() { }
+
+		[SyncRpc(SyncType.ReliableTarget, SyncDirection.FromMaster)]
+		protected void Server_c4() { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void CC3() { }
+		public void Client_C3() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		protected void Client_c4() { }
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
 	public partial class ZTest_ChildChild : ZTest_Parent
 	{
 		[SyncVar]
-		public int CC4;
+		public int Field_Server_CC5;
+
+		[SyncVar]
+		protected int field_Server_CC6;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		public int Field_Client_CC5;
+
+		[SyncVar(dir: SyncDirection.FromRemote)]
+		protected int field_Client_CC6;
 
 		[SyncRpc(dir: SyncDirection.FromMaster)]
-		public void SCC4() { }
+		public void Server_CC5() { }
+
+		[SyncRpc(SyncType.ReliableTarget, SyncDirection.FromMaster)]
+		protected void Server_cc6() { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void CCC4() { }
+		public void Client_CC5() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		protected void Client_cc6() { }
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
@@ -69,7 +105,7 @@ namespace CT.Common.Definitions.SyncObjects
 	{
 		[SyncRpc(dir: SyncDirection.FromMaster)]
 		public void Server_FromServerVoid() { }
-		
+
 		[SyncRpc(dir: SyncDirection.FromMaster)]
 		public void Server_FromServerArg(int a, int b) { }
 

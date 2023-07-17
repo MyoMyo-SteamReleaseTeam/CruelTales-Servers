@@ -10,14 +10,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		private string _modifier;
 		private SyncDirection _direction;
+		private InheritType _inheritType;
 
 		private SerializeSyncGroup _reliableGruop;
 		private SerializeSyncGroup _unreliableGruop;
 		private EntireSerializeSyncGroup _entireGroup;
 
-		public SerializeDirectionGroup(List<MemberToken> serializeMembers, SyncDirection syncDirection, string modifier)
+		public SerializeDirectionGroup(List<MemberToken> serializeMembers,
+									   SyncDirection syncDirection,
+									   InheritType inheritType,
+									   string modifier)
 		{
 			_direction = syncDirection;
+			_inheritType = inheritType;
 			_modifier = modifier;
 
 			List<BaseMemberToken> sReliableMembers = serializeMembers
@@ -45,8 +50,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string Gen_SynchronizerProperties()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(_reliableGruop.Master_BitmaskDeclarations());
-			sb.AppendLine(_unreliableGruop.Master_BitmaskDeclarations());
+			sb.AppendLine(_reliableGruop.Master_BitmaskDeclarations(_inheritType));
+			sb.AppendLine(_unreliableGruop.Master_BitmaskDeclarations(_inheritType));
 
 			sb.AppendLine(_reliableGruop.Master_DirtyProperty());
 			sb.AppendLine(_unreliableGruop.Master_DirtyProperty());
@@ -75,14 +80,19 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		private string _modifier;
 		private SyncDirection _direction;
+		private InheritType _inheritType;
 
 		private DeserializeSyncGroup _reliableGruop;
 		private DeserializeSyncGroup _unreliableGruop;
 		private EntireDeserializeSyncGroup _entireGroup;
 
-		public DeserializeDirectionGroup(List<MemberToken> deserializeMembers, SyncDirection direction, string modifier)
+		public DeserializeDirectionGroup(List<MemberToken> deserializeMembers, 
+										 SyncDirection direction, 
+										 InheritType inheritType,
+										 string modifier)
 		{
 			_direction = direction;
+			_inheritType = inheritType;
 			_modifier = modifier;
 
 			List<BaseMemberToken> dReliableMembers = deserializeMembers
@@ -116,11 +126,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll());
 			sb.AppendLine(_entireGroup.Remote_InitilaizeProperties());
 
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(isStatic: false));
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(isStatic: true));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(_inheritType, isStatic: false));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(_inheritType, isStatic: true));
 
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(isStatic: false));
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(isStatic: true));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(_inheritType, isStatic: false));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(_inheritType, isStatic: true));
 			return sb.ToString();
 		}
 	}

@@ -296,6 +296,11 @@ public partial class {0} : {1}
 		/// </summary>
 		public static string IgnoreSyncFunctionDeclarationStatic => @"public static void IgnoreSyncStatic{0}(IPacketReader reader)";
 
+		/// <summary>
+		/// {0} SyncType<br/>
+		/// </summary>
+		public static string IgnoreSyncFunctionDeclarationStaticNew => @"public new static void IgnoreSyncStatic{0}(IPacketReader reader)";
+
 		public static string EntireFunctionSuffix => "EveryProperty";
 
 		/// <summary>
@@ -319,8 +324,9 @@ public partial class {0} : {1}
 
 		/// <summary>
 		/// {0} Dirty bit name<br/>
+		/// {1} Private access modifier<br/>
 		/// </summary>
-		public static string DirtyBitDeclaration => @"private BitmaskByte {0} = new();";
+		public static string DirtyBitDeclaration => @"{1} BitmaskByte {0} = new();";
 
 		/// <summary>
 		/// {0} Modifire<br/>
@@ -395,39 +401,43 @@ else
 		/// {1} Access modifier<br/>
 		/// {2} Function name<br/>
 		/// {3} Parameter declaration <br/>
+		/// {4} Inherit keyword <br/>
 		/// </summary>
 		public static string Declaration =>
 @"[{0}]
-{1} partial void {2}({3});";
+{1}{4} partial void {2}({3});";
 
 		/// <summary>
 		/// {0} Attribute<br/>
 		/// {1} Access modifier<br/>
 		/// {2} Function name<br/>
+		/// {3} Inherit keyword <br/>
 		/// </summary>
 		public static string TargetDeclarationVoid =>
 @"[{0}]
-{1} partial void {2}(NetworkPlayer player);";
+{1}{3} partial void {2}(NetworkPlayer player);";
 
 		/// <summary>
 		/// {0} Attribute<br/>
 		/// {1} Access modifier<br/>
 		/// {2} Function name<br/>
 		/// {3} Parameter declaration <br/>
+		/// {4} Inherit keyword <br/>
 		/// </summary>
 		public static string TargetDeclaration =>
 @"[{0}]
-{1} partial void {2}(NetworkPlayer player, {3});";
+{1}{4} partial void {2}(NetworkPlayer player, {3});";
 
 		/// <summary>
 		/// {0} Attribute<br/>
 		/// {1} Access modifier<br/>
 		/// {2} Function name<br/>
 		/// {3} Parameter declaration <br/>
+		/// {4} Inherit keyword <br/>
 		/// </summary>
 		public static string DeclarationFromRemote =>
 @"[{0}]
-{1} partial void {2}(NetworkPlayer player, {3});";
+{1}{4} partial void {2}(NetworkPlayer player, {3});";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -437,6 +447,7 @@ else
 		/// {4} Callstack tuple declaration<br/>
 		/// {5} Dirty bits name<br/>
 		/// {6} Dirty index<br/>
+		/// {7} Private access modifier<br/>
 		/// </summary>
 		public static string CallWithStack =>
 @"{0} partial void {1}({2})
@@ -444,13 +455,14 @@ else
 	{1}Callstack.Add({3});
 	{5}[{6}] = true;
 }}
-private List<{4}> {1}Callstack = new(4);";
+{7} List<{4}> {1}Callstack = new(4);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
 		/// {1} Function name<br/>
 		/// {2} Dirty bits name<br/>
 		/// {3} Member index<br/>
+		/// {4} Private access modifier<br/>
 		/// </summary>
 		public static string CallWithStackVoid =>
 @"{0} partial void {1}()
@@ -458,7 +470,7 @@ private List<{4}> {1}Callstack = new(4);";
 	{1}CallstackCount++;
 	{2}[{3}] = true;
 }}
-private byte {1}CallstackCount = 0;";
+{4} byte {1}CallstackCount = 0;";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -468,6 +480,7 @@ private byte {1}CallstackCount = 0;";
 		/// {4} Callstack tuple declaration<br/>
 		/// {5} Dirty bits name<br/>
 		/// {6} Dirty index<br/>
+		/// {7} Private access modifier<br/>
 		/// </summary>
 		public static string TargetCallWithStack =>
 @"{0} partial void {1}(NetworkPlayer player, {2})
@@ -475,13 +488,14 @@ private byte {1}CallstackCount = 0;";
 	{1}Callstack.Add(player, {3});
 	{5}[{6}] = true;
 }}
-private TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
+{7} TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
 		/// {1} Function name<br/>
 		/// {2} Dirty bits name<br/>
 		/// {3} Member index<br/>
+		/// {4} Private access modifier<br/>
 		/// </summary>
 		public static string TargetCallWithStackVoid =>
 @"{0} partial void {1}(NetworkPlayer player)
@@ -489,7 +503,7 @@ private TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
 	{1}Callstack.Add(player);
 	{2}[{3}] = true;
 }}
-private TargetVoidCallstack<NetworkPlayer> {1}Callstack = new(8);";
+{4} TargetVoidCallstack<NetworkPlayer> {1}Callstack = new(8);";
 
 		/// <summary>
 		/// {0} Function name<br/>
@@ -647,20 +661,22 @@ if (!{1}.TryDeserialize(reader)) return false;";
 		/// {1} Type name<br/>
 		/// {2} Property name<br/>
 		/// {3} Initialize<br/>
+		/// {4} Private access modifier<br/>
 		/// </summary>
 		public static string MasterDeclaration =>
 @"[{0}]
-private {1} {2}{3};";
+{4} {1} {2}{3};";
 
 		/// <summary>
 		/// {0} Attribute<br/>
 		/// {1} Type name<br/>
 		/// {2} Property name<br/>
 		/// {3} Initialize<br/>
+		/// {4} Private access modifier<br/>
 		/// </summary>
 		public static string MasterReadonlyDeclaration =>
 @"[{0}]
-private readonly {1} {2}{3};";
+{4} readonly {1} {2}{3};";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -668,12 +684,18 @@ private readonly {1} {2}{3};";
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
-		/// {5} Access modifier
+		/// {5} Access modifier<br/>
+		/// {6} Private access modifier<br/>
 		/// </summary>
 		public static string RemoteDeclaration =>
 @"[{0}]
-{5} {1} {2}{4};
-public event Action<{1}>? On{3}Changed;";
+{6} {1} {2}{4};
+{6} Action<{1}>? _on{3}Changed;
+public event Action<{1}> On{3}Changed
+{{
+	add => _on{3}Changed += value;
+	remove => _on{3}Changed -= value;
+}}";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -681,13 +703,19 @@ public event Action<{1}>? On{3}Changed;";
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
-		/// {5} Access modifier
+		/// {5} Access modifier<br/>
+		/// {6} Private access modifier<br/>
 		/// </summary>
 		public static string RemoteDeclarationAsPublic=>
 @"[{0}]
-private {1} {2}{4};
-{5} {1} {3} => {2};
-public event Action<{1}>? On{3}Changed;";
+{6} {1} {2}{4};
+public {1} {3} => {2};
+{6} Action<{1}>? _on{3}Changed;
+public event Action<{1}> On{3}Changed
+{{
+	add => _on{3}Changed += value;
+	remove => _on{3}Changed -= value;
+}}";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -695,12 +723,18 @@ public event Action<{1}>? On{3}Changed;";
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
-		/// {5} Access modifier
+		/// {5} Access modifier<br/>
+		/// {6} Private access modifier<br/>
 		/// </summary>
 		public static string RemoteReadonlyDeclaration =>
 @"[{0}]
-{5} readonly {1} {2}{4};
-public event Action<{1}>? On{3}Changed;";
+{6} readonly {1} {2}{4};
+{6} Action<{1}>? _on{3}Changed;
+public event Action<{1}> On{3}Changed
+{{
+	add => _on{3}Changed += value;
+	remove => _on{3}Changed -= value;
+}}";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -708,13 +742,19 @@ public event Action<{1}>? On{3}Changed;";
 		/// {2} Private property name<br/>
 		/// {3} Public property name<br/>
 		/// {4} Initialize<br/>
-		/// {5} Access modifier
+		/// {5} Access modifier<br/>
+		/// {6} Private access modifier<br/>
 		/// </summary>
 		public static string RemoteReadonlyDeclarationAsPublic =>
 @"[{0}]
-private readonly {1} {2}{4};
-{5} {1} {3} => {2};
-public event Action<{1}>? On{3}Changed;";
+{6} readonly {1} {2}{4};
+public {1} {3} => {2};
+{6} Action<{1}>? _on{3}Changed;
+public event Action<{1}> On{3}Changed
+{{
+	add => _on{3}Changed += value;
+	remove => _on{3}Changed -= value;
+}}";
 
 		public static string NewInitializer => " = new()";
 
@@ -843,7 +883,7 @@ if (writer.Size == curSize)
 		/// {0} Public property name<br/>
 		/// {1} Private property name<br/>
 		/// </summary>
-		public static string CallbackEvent => @"On{0}Changed?.Invoke({1});";
+		public static string CallbackEvent => @"_on{0}Changed?.Invoke({1});";
 
 		/// <summary>
 		/// {0} Private member name<br/>

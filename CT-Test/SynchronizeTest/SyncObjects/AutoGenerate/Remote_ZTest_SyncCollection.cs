@@ -27,11 +27,21 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncObject]
 		private readonly SyncList<UserId> _userIdList = new();
 		public SyncList<UserId> UserIdList => _userIdList;
-		public event Action<SyncList<UserId>>? OnUserIdListChanged;
+		private Action<SyncList<UserId>>? _onUserIdListChanged;
+		public event Action<SyncList<UserId>> OnUserIdListChanged
+		{
+			add => _onUserIdListChanged += value;
+			remove => _onUserIdListChanged -= value;
+		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
 		private readonly ZTest_InnerObjectTarget _syncObj = new();
 		public ZTest_InnerObjectTarget SyncObj => _syncObj;
-		public event Action<ZTest_InnerObjectTarget>? OnSyncObjChanged;
+		private Action<ZTest_InnerObjectTarget>? _onSyncObjChanged;
+		public event Action<ZTest_InnerObjectTarget> OnSyncObjChanged
+		{
+			add => _onSyncObjChanged += value;
+			remove => _onSyncObjChanged -= value;
+		}
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }
@@ -46,12 +56,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[0])
 			{
 				if (!_userIdList.TryDeserializeSyncReliable(reader)) return false;
-				OnUserIdListChanged?.Invoke(_userIdList);
+				_onUserIdListChanged?.Invoke(_userIdList);
 			}
 			if (dirtyReliable_0[1])
 			{
 				if (!_syncObj.TryDeserializeSyncReliable(reader)) return false;
-				OnSyncObjChanged?.Invoke(_syncObj);
+				_onSyncObjChanged?.Invoke(_syncObj);
 			}
 			return true;
 		}
@@ -61,16 +71,16 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyUnreliable_0[0])
 			{
 				if (!_syncObj.TryDeserializeSyncUnreliable(reader)) return false;
-				OnSyncObjChanged?.Invoke(_syncObj);
+				_onSyncObjChanged?.Invoke(_syncObj);
 			}
 			return true;
 		}
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!_userIdList.TryDeserializeEveryProperty(reader)) return false;
-			OnUserIdListChanged?.Invoke(_userIdList);
+			_onUserIdListChanged?.Invoke(_userIdList);
 			if (!_syncObj.TryDeserializeEveryProperty(reader)) return false;
-			OnSyncObjChanged?.Invoke(_syncObj);
+			_onSyncObjChanged?.Invoke(_syncObj);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

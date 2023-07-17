@@ -30,19 +30,39 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncVar]
 		private float _r;
 		public float R => _r;
-		public event Action<float>? OnRChanged;
+		private Action<float>? _onRChanged;
+		public event Action<float> OnRChanged
+		{
+			add => _onRChanged += value;
+			remove => _onRChanged -= value;
+		}
 		[SyncVar]
 		private float _g;
 		public float G => _g;
-		public event Action<float>? OnGChanged;
+		private Action<float>? _onGChanged;
+		public event Action<float> OnGChanged
+		{
+			add => _onGChanged += value;
+			remove => _onGChanged -= value;
+		}
 		[SyncVar]
 		private float _b;
 		public float B => _b;
-		public event Action<float>? OnBChanged;
+		private Action<float>? _onBChanged;
+		public event Action<float> OnBChanged
+		{
+			add => _onBChanged += value;
+			remove => _onBChanged -= value;
+		}
 		[SyncVar(SyncType.ColdData)]
 		private float _animationTime;
 		public float AnimationTime => _animationTime;
-		public event Action<float>? OnAnimationTimeChanged;
+		private Action<float>? _onAnimationTimeChanged;
+		public event Action<float> OnAnimationTimeChanged
+		{
+			add => _onAnimationTimeChanged += value;
+			remove => _onAnimationTimeChanged -= value;
+		}
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
 		public override bool IsDirtyReliable => false;
@@ -59,17 +79,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[0])
 			{
 				if (!reader.TryReadSingle(out _r)) return false;
-				OnRChanged?.Invoke(_r);
+				_onRChanged?.Invoke(_r);
 			}
 			if (dirtyReliable_0[1])
 			{
 				if (!reader.TryReadSingle(out _g)) return false;
-				OnGChanged?.Invoke(_g);
+				_onGChanged?.Invoke(_g);
 			}
 			if (dirtyReliable_0[2])
 			{
 				if (!reader.TryReadSingle(out _b)) return false;
-				OnBChanged?.Invoke(_b);
+				_onBChanged?.Invoke(_b);
 			}
 			if (dirtyReliable_0[3])
 			{
@@ -86,13 +106,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadSingle(out _r)) return false;
-			OnRChanged?.Invoke(_r);
+			_onRChanged?.Invoke(_r);
 			if (!reader.TryReadSingle(out _g)) return false;
-			OnGChanged?.Invoke(_g);
+			_onGChanged?.Invoke(_g);
 			if (!reader.TryReadSingle(out _b)) return false;
-			OnBChanged?.Invoke(_b);
+			_onBChanged?.Invoke(_b);
 			if (!reader.TryReadSingle(out _animationTime)) return false;
-			OnAnimationTimeChanged?.Invoke(_animationTime);
+			_onAnimationTimeChanged?.Invoke(_animationTime);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

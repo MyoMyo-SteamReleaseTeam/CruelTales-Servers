@@ -6,9 +6,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	public abstract class BaseMemberToken
 	{
 		public string AccessModifier { get; protected set; } = string.Empty;
+		protected string _privateAccessModifier = string.Empty;
+		protected string _inheritKeyword = string.Empty;
 		public abstract bool ShouldRollBackMask { get; }
 		public bool IsPublic { get; }
 		protected SyncType _syncType;
+		public InheritType InheritType { get; private set; }
 		protected string _typeName;
 		protected string _privateMemberName;
 		protected string _publicMemberName;
@@ -16,10 +19,30 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public string PrivateMemberName => _privateMemberName;
 		public string PublicMemberName => _publicMemberName;
 
-		public BaseMemberToken(SyncType syncType, string typeName, string memberName, bool isPublic)
+		public BaseMemberToken(SyncType syncType, InheritType inheritType, string typeName, string memberName, bool isPublic)
 		{
 			IsPublic = isPublic;
-			AccessModifier = isPublic ? "public" : "private";
+			InheritType = inheritType;
+
+			if (InheritType == InheritType.None)
+			{
+				_privateAccessModifier = "private";
+				AccessModifier = IsPublic ? "public" : "private";
+			}
+			else
+			{
+				_privateAccessModifier = "protected";
+				AccessModifier = IsPublic ? "public" : "protected";
+				if (InheritType == InheritType.Child)
+				{
+					_inheritKeyword = " override";
+				}
+				else if (InheritType == InheritType.Parent)
+				{
+					_inheritKeyword = " virtual";
+				}
+			}
+
 			_syncType = syncType;
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);

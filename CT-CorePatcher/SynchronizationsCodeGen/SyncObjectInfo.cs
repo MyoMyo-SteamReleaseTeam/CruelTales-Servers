@@ -16,7 +16,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
 		public bool IsDebugObject { get; private set; } = false;
-		public InheritType InheritType { get; private set; } = InheritType.None;
+		private InheritType _inheritType = InheritType.None;
 
 		[AllowNull] private SerializeDirectionGroup _masterSerializeGroup;
 		[AllowNull] private DeserializeDirectionGroup _masterDeserializeGroup;
@@ -35,6 +35,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public bool HasTarget { get; set; }
 
 		public SyncObjectInfo(string objectName,
+							  InheritType inheritType,
 							  List<MemberToken> masterSideMembers,
 							  List<MemberToken> remoteSideMembers,
 							  bool isNetworkObject,
@@ -43,6 +44,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							  bool isDebugObject)
 		{
 			_objectName = objectName;
+			_inheritType = inheritType;
 			IsNetworkObject = isNetworkObject;
 			Capacity = capacity;
 			this.IsDebugObject = isDebugObject;
@@ -62,12 +64,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public void InitializeSyncGroup()
 		{
 			// Add forward direction
-			_masterSerializeGroup = new(_masterSideMembers, SyncDirection.FromMaster, _modifier);
-			_masterDeserializeGroup = new(_remoteSideMembers, SyncDirection.FromMaster, _modifier);
+			_masterSerializeGroup = new(_masterSideMembers, SyncDirection.FromMaster, _inheritType, _modifier);
+			_masterDeserializeGroup = new(_remoteSideMembers, SyncDirection.FromMaster, _inheritType, _modifier);
 
 			// Add reverse direction
-			_remoteSerializeGroup = new(_remoteSideMembers, SyncDirection.FromRemote, _modifier);
-			_remoteDeserializeGroup = new(_masterSideMembers, SyncDirection.FromRemote, _modifier);
+			_remoteSerializeGroup = new(_remoteSideMembers, SyncDirection.FromRemote, _inheritType, _modifier);
+			_remoteDeserializeGroup = new(_masterSideMembers, SyncDirection.FromRemote, _inheritType, _modifier);
 		}
 
 		public void CheckValidation()
@@ -162,9 +164,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			sb.AppendLine(getNetworkTypeDefinition());
 
 			foreach (var m in forwardMember)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
 				sb.AppendLine(m.Member.Master_Declaration(direction));
+			}
 			foreach (var m in backwardMember)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
 				sb.AppendLine(m.Member.Remote_Declaration(direction.Reverse()));
+			}
 
 			sb.AppendLine(forward.Gen_SynchronizerProperties());
 			sb.AppendLine(forward.Gen_SerializeSyncFuntions());
