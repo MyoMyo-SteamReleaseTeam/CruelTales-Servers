@@ -88,7 +88,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			foreach (var m in _members)
 			{
 				if (m.InheritType == InheritType.Child)
+				{
+					index++;
 					continue;
+				}
 				sb.AppendLine(m.Master_GetterSetter(_syncType, GetName(), index++));
 			}
 			return sb.ToString();
