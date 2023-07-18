@@ -14,39 +14,89 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
+		public int Server_P1_Count;
+		public int Server_P2_a;
+		public int Server_P2_b;
+
+		public float Field_Server_P2_Public => _field_Server_P2;
+		public float Field_Client_P2_Public
+		{
+			get => Field_Client_P2;
+			set => Field_Client_P2 = value;
+		}
+
 		public virtual partial void Server_P1()
 		{
+			Server_P1_Count++;
 		}
 
 		protected virtual partial void Server_p2(int a, int b)
 		{
+			Server_P2_a += a;
+			Server_P2_b += b;
 		}
+
+		public void Client_P2_Public(int a, int b) => this.Client_p2(a, b);
 	}
 
 	public partial class ZTest_Child : ZTest_Parent
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
-		public partial void Server_C3()
+		public int Server_C3_Count;
+		public int Server_C4_Count;
+
+		public int Field_Server_C4_Public => _field_Server_C4;
+		public int Field_Client_C4_Public
 		{
+			get => Field_Client_C4;
+			set => Field_Client_C4 = value;
 		}
 
-		private partial void Server_c4()
+		public virtual partial void Server_C3()
 		{
+			Server_C3_Count++;
 		}
+
+		protected virtual partial void Server_c4()
+		{
+			Server_C4_Count++;
+		}
+
+		protected override void Server_p2(int a, int b)
+		{
+			Server_P2_a += a * 2;
+			Server_P2_b += b * 2;
+		}
+
+		public void Client_C4_Public() => this.Client_c4();
 	}
 
 	public partial class ZTest_ChildChild : ZTest_Child
 	{
 		public override NetworkObjectType Type => throw new NotImplementedException();
 
-		public partial void Server_CC5()
+		public int Server_CC5_Count;
+		public int Server_CC6_Count;
+		
+		public int Field_Server_CC6_Public => _field_Server_CC6;
+		public int Field_Client_CC6_Public
 		{
+			get => Field_Client_CC6;
+			set => Field_Client_CC6 = value;
 		}
 
-		private partial void Server_cc6()
+		public virtual partial void Server_CC5()
 		{
+			Server_CC5_Count++;
 		}
+
+		protected virtual partial void Server_cc6()
+		{
+			Server_CC6_Count++;
+		}
+
+		public void Client_CC6_Public() => this.Client_cc6();
 	}
 
 	public partial class ZTest_FuntionObject : IRemoteSynchronizable

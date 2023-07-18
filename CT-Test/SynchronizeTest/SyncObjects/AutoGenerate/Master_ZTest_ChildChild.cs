@@ -33,7 +33,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void Server_CC5();
 		[SyncRpc(SyncType.ReliableTarget)]
-		private partial void Server_cc6(NetworkPlayer player);
+		protected partial void Server_cc6(NetworkPlayer player);
 		[SyncVar(dir: SyncDirection.FromRemote)]
 		protected int _field_Client_CC5;
 		public int Field_Client_CC5 => _field_Client_CC5;
@@ -54,7 +54,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_CC5(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		private partial void Client_cc6(NetworkPlayer player);
+		protected partial void Client_cc6(NetworkPlayer player);
 		public override bool IsDirtyReliable
 		{
 			get
@@ -72,7 +72,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_field_Server_CC5 == value) return;
 				_field_Server_CC5 = value;
-				_dirtyReliable_0[0] = true;
+				_dirtyReliable_0[4] = true;
 			}
 		}
 		protected int Field_Server_CC6
@@ -82,28 +82,28 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_field_Server_CC6 == value) return;
 				_field_Server_CC6 = value;
-				_dirtyReliable_0[1] = true;
+				_dirtyReliable_0[5] = true;
 			}
 		}
 		public partial void Server_CC5()
 		{
 			Server_CC5CallstackCount++;
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[6] = true;
 		}
-		private byte Server_CC5CallstackCount = 0;
-		private partial void Server_cc6(NetworkPlayer player)
+		protected byte Server_CC5CallstackCount = 0;
+		protected partial void Server_cc6(NetworkPlayer player)
 		{
 			Server_cc6Callstack.Add(player);
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[7] = true;
 		}
-		private TargetVoidCallstack<NetworkPlayer> Server_cc6Callstack = new(8);
+		protected TargetVoidCallstack<NetworkPlayer> Server_cc6Callstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			Server_CC5CallstackCount = 0;
-			Server_cc6Callstack.Clear();
 			Server_P1CallstackCount = 0;
 			Server_p2Callstack.Clear();
+			Server_CC5CallstackCount = 0;
+			Server_cc6Callstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -112,41 +112,17 @@ namespace CTS.Instance.SyncObjects
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				writer.Put(_field_Server_CC5);
+				writer.Put(_field_Server_P1);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				writer.Put(_field_Server_CC6);
+				writer.Put(_field_Server_P2);
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_field_Server_P1);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				writer.Put(_field_Server_P2);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				writer.Put((byte)Server_CC5CallstackCount);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				int Server_cc6Count = Server_cc6Callstack.GetCallCount(player);
-				if (Server_cc6Count > 0)
-				{
-					writer.Put((byte)Server_cc6Count);
-				}
-				else
-				{
-					dirtyReliable_0[5] = false;
-				}
-			}
-			if (_dirtyReliable_0[6])
-			{
 				writer.Put((byte)Server_P1CallstackCount);
 			}
-			if (_dirtyReliable_0[7])
+			if (_dirtyReliable_0[3])
 			{
 				int Server_p2Count = Server_p2Callstack.GetCallCount(player);
 				if (Server_p2Count > 0)
@@ -159,6 +135,30 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.a);
 						writer.Put(arg.b);
 					}
+				}
+				else
+				{
+					dirtyReliable_0[3] = false;
+				}
+			}
+			if (_dirtyReliable_0[4])
+			{
+				writer.Put(_field_Server_CC5);
+			}
+			if (_dirtyReliable_0[5])
+			{
+				writer.Put(_field_Server_CC6);
+			}
+			if (_dirtyReliable_0[6])
+			{
+				writer.Put((byte)Server_CC5CallstackCount);
+			}
+			if (_dirtyReliable_0[7])
+			{
+				int Server_cc6Count = Server_cc6Callstack.GetCallCount(player);
+				if (Server_cc6Count > 0)
+				{
+					writer.Put((byte)Server_cc6Count);
 				}
 				else
 				{
@@ -177,58 +177,32 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
-			writer.Put(_field_Server_CC5);
-			writer.Put(_field_Server_CC6);
 			writer.Put(_field_Server_P1);
 			writer.Put(_field_Server_P2);
+			writer.Put(_field_Server_CC5);
+			writer.Put(_field_Server_CC6);
 		}
 		public override void InitializeMasterProperties()
 		{
-			_field_Server_CC5 = 0;
-			_field_Server_CC6 = 0;
 			_field_Server_P1 = 0;
 			_field_Server_P2 = 0;
+			_field_Server_CC5 = 0;
+			_field_Server_CC6 = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				if (!reader.TryReadInt32(out _field_Client_CC5)) return false;
-				_onField_Client_CC5Changed?.Invoke(_field_Client_CC5);
-			}
-			if (dirtyReliable_0[1])
-			{
-				if (!reader.TryReadInt32(out _field_Client_CC6)) return false;
-				_onField_Client_CC6Changed?.Invoke(_field_Client_CC6);
-			}
-			if (dirtyReliable_0[2])
-			{
 				if (!reader.TryReadInt32(out _field_Client_P1)) return false;
 				_onField_Client_P1Changed?.Invoke(_field_Client_P1);
 			}
-			if (dirtyReliable_0[3])
+			if (dirtyReliable_0[1])
 			{
 				if (!reader.TryReadSingle(out _field_Client_P2)) return false;
 				_onField_Client_P2Changed?.Invoke(_field_Client_P2);
 			}
-			if (dirtyReliable_0[4])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					Client_CC5(player);
-				}
-			}
-			if (dirtyReliable_0[5])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					Client_cc6(player);
-				}
-			}
-			if (dirtyReliable_0[6])
+			if (dirtyReliable_0[2])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -236,7 +210,7 @@ namespace CTS.Instance.SyncObjects
 					Client_P1(player);
 				}
 			}
-			if (dirtyReliable_0[7])
+			if (dirtyReliable_0[3])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -246,15 +220,41 @@ namespace CTS.Instance.SyncObjects
 					Client_p2(player, a, b);
 				}
 			}
+			if (dirtyReliable_0[4])
+			{
+				if (!reader.TryReadInt32(out _field_Client_CC5)) return false;
+				_onField_Client_CC5Changed?.Invoke(_field_Client_CC5);
+			}
+			if (dirtyReliable_0[5])
+			{
+				if (!reader.TryReadInt32(out _field_Client_CC6)) return false;
+				_onField_Client_CC6Changed?.Invoke(_field_Client_CC6);
+			}
+			if (dirtyReliable_0[6])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					Client_CC5(player);
+				}
+			}
+			if (dirtyReliable_0[7])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					Client_cc6(player);
+				}
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override void InitializeRemoteProperties()
 		{
-			_field_Client_CC5 = 0;
-			_field_Client_CC6 = 0;
 			_field_Client_P1 = 0;
 			_field_Client_P2 = 0;
+			_field_Client_CC5 = 0;
+			_field_Client_CC6 = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -269,25 +269,9 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(4);
+				reader.Ignore(1);
 			}
 			if (dirtyReliable_0[3])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[4])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[5])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[6])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[7])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -295,6 +279,22 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(4);
 					reader.Ignore(4);
 				}
+			}
+			if (dirtyReliable_0[4])
+			{
+				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[5])
+			{
+				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[6])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[7])
+			{
+				reader.Ignore(1);
 			}
 		}
 		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -310,25 +310,9 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(4);
+				reader.Ignore(1);
 			}
 			if (dirtyReliable_0[3])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[4])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[5])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[6])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[7])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -336,6 +320,22 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(4);
 					reader.Ignore(4);
 				}
+			}
+			if (dirtyReliable_0[4])
+			{
+				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[5])
+			{
+				reader.Ignore(4);
+			}
+			if (dirtyReliable_0[6])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[7])
+			{
+				reader.Ignore(1);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

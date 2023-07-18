@@ -455,11 +455,193 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			Assert.AreEqual(20, remote2.f28a);
 		}
 
+		[TestMethod]
+		public void TestInheritParent()
+		{
+			// Child in Parent
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
+
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
+
+			CTS.Instance.SyncObjects.ZTest_Parent master = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote2 = new();
+
+			master.Server_P1();
+			master.Server_P1();
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p2, 20, 40);
+			master.Field_Server_P1 = 12345;
+			master.Field_Server_P2_Public = 12345.12345f;
+
+			remote1.Field_Client_P1 = 98765;
+			remote1.Field_Client_P2_Public = 98765;
+			remote1.Client_P1();
+			remote1.Client_P1();
+			remote1.Client_P2_Public(10, 20);
+			remote1.Client_P2_Public(10, 20);
+
+			remote2.Field_Client_P1 = 87654;
+			remote2.Field_Client_P2_Public = 87654;
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P2_Public(20, 40);
+			remote2.Client_P2_Public(20, 40);
+
+			Sync(buffer, p1, master, remote1);
+
+			Assert.AreEqual(master.Field_Server_P1, remote1.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote1.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote1.Server_P1_Count);
+			Assert.AreEqual(20, remote1.Server_P2_a);
+			Assert.AreEqual(40, remote1.Server_P2_b);
+
+			Assert.AreEqual(remote1.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote1.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(2, master.Client_P1_CountTable[p1]);
+			Assert.AreEqual(20, master.Client_P2_Table[p1].a);
+			Assert.AreEqual(40, master.Client_P2_Table[p1].b);
+
+			Sync(buffer, p2, master, remote2);
+
+			Assert.AreEqual(master.Field_Server_P1, remote2.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote2.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote2.Server_P1_Count);
+			Assert.AreEqual(20, remote2.Server_P2_a);
+			Assert.AreEqual(40, remote2.Server_P2_b);
+
+			Assert.AreEqual(remote2.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote2.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(3, master.Client_P1_CountTable[p2]);
+			Assert.AreEqual(40, master.Client_P2_Table[p2].a);
+			Assert.AreEqual(80, master.Client_P2_Table[p2].b);
+		}
+
+		[TestMethod]
+		public void TestInheritChild()
+		{
+			// Child in Parent
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
+
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
+
+			CTS.Instance.SyncObjects.ZTest_Child masterChild = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild2 = new();
+
+			CTS.Instance.SyncObjects.ZTest_Parent master = masterChild;
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote1 = remoteChild1;
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote2 = remoteChild2;
+
+			master.Server_P1();
+			master.Server_P1();
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p2, 20, 40);
+			master.Field_Server_P1 = 111;
+			master.Field_Server_P2_Public = 222.222f;
+			masterChild.Server_C3();
+			masterChild.Server_C3();
+			masterChild.Server_C3();
+			masterChild.Server_C4_Public(p1);
+			masterChild.Server_C4_Public(p2);
+			masterChild.Server_C4_Public(p2);
+			masterChild.Field_Server_C3 = 333;
+			masterChild.Field_Server_C4_Public = 444;
+
+			remote1.Field_Client_P1 = 11111;
+			remote1.Field_Client_P2_Public = 22222;
+			remote1.Client_P1();
+			remote1.Client_P1();
+			remote1.Client_P2_Public(10, 20);
+			remote1.Client_P2_Public(10, 20);
+			for (int i = 0; i < 7 ; i++)
+				remoteChild1.Client_C3();
+			for (int i = 0; i < 8 ; i++)
+				remoteChild1.Client_C4_Public();
+			remoteChild1.Field_Client_C3 = 33333;
+			remoteChild1.Field_Client_C4_Public = 44444;
+
+			remote2.Field_Client_P1 = 10111;
+			remote2.Field_Client_P2_Public = 20222;
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P2_Public(20, 40);
+			remote2.Client_P2_Public(20, 40);
+			for (int i = 0; i < 14; i++)
+				remoteChild2.Client_C3();
+			for (int i = 0; i < 16; i++)
+				remoteChild2.Client_C4_Public();
+			remoteChild2.Field_Client_C3 = 30333;
+			remoteChild2.Field_Client_C4_Public = 40444;
+
+			// Master <--> Remote 1
+			Sync(buffer, p1, masterChild, remoteChild1);
+
+			// Check parent
+			Assert.AreEqual(master.Field_Server_P1, remote1.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote1.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote1.Server_P1_Count);
+			Assert.AreEqual(40, remote1.Server_P2_a);
+			Assert.AreEqual(80, remote1.Server_P2_b);
+
+			Assert.AreEqual(remote1.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote1.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(2, master.Client_P1_CountTable[p1]);
+			Assert.AreEqual(20, master.Client_P2_Table[p1].a);
+			Assert.AreEqual(40, master.Client_P2_Table[p1].b);
+
+			// Check child
+			Assert.AreEqual(masterChild.Field_Server_C3, remoteChild1.Field_Server_C3);
+			Assert.AreEqual(masterChild.Field_Server_C4_Public, remoteChild1.Field_Server_C4_Public);
+			Assert.AreEqual(3, remoteChild1.Server_C3_Count);
+			Assert.AreEqual(1, remoteChild1.Server_C4_Count);
+
+			Assert.AreEqual(remoteChild1.Field_Client_C3, masterChild.Field_Client_C3);
+			Assert.AreEqual(remoteChild1.Field_Client_C4_Public, masterChild.Field_Client_C4_Public);
+			Assert.AreEqual(7, masterChild.Client_C3_CountTable[p1]);
+			Assert.AreEqual(8, masterChild.Client_C4_CountTable[p1]);
+
+			// Master <--> Remote 2
+			Sync(buffer, p2, masterChild, remoteChild2);
+
+			// Check parent
+			Assert.AreEqual(master.Field_Server_P1, remote2.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote2.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote2.Server_P1_Count);
+			Assert.AreEqual(40, remote2.Server_P2_a);
+			Assert.AreEqual(80, remote2.Server_P2_b);
+
+			Assert.AreEqual(remote2.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote2.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(3, master.Client_P1_CountTable[p2]);
+			Assert.AreEqual(40, master.Client_P2_Table[p2].a);
+			Assert.AreEqual(80, master.Client_P2_Table[p2].b);
+
+			// Check child
+			Assert.AreEqual(masterChild.Field_Server_C3, remoteChild2.Field_Server_C3);
+			Assert.AreEqual(masterChild.Field_Server_C4_Public, remoteChild2.Field_Server_C4_Public);
+			Assert.AreEqual(3, remoteChild2.Server_C3_Count);
+			Assert.AreEqual(2, remoteChild2.Server_C4_Count);
+
+			Assert.AreEqual(remoteChild2.Field_Client_C3, masterChild.Field_Client_C3);
+			Assert.AreEqual(remoteChild2.Field_Client_C4_Public, masterChild.Field_Client_C4_Public);
+			Assert.AreEqual(14, masterChild.Client_C3_CountTable[p2]);
+			Assert.AreEqual(16, masterChild.Client_C4_CountTable[p2]);
+
+		}
+
 		public void Sync(ByteBuffer buffer,
 						 NetworkPlayer player,
 						 MasterNetworkObject master,
 						 CTC.Networks.SyncObjects.TestSyncObjects.RemoteNetworkObject remote)
 		{
+			// Master -> Remote
 			buffer.Reset();
 			master.SerializeSyncReliable(player, buffer);
 			remote.TryDeserializeSyncReliable(buffer);
@@ -467,6 +649,15 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			buffer.Reset();
 			master.SerializeSyncUnreliable(player, buffer);
 			remote.TryDeserializeSyncUnreliable(buffer);
+
+			// Remote -> Master
+			buffer.Reset();
+			remote.SerializeSyncReliable(buffer);
+			master.TryDeserializeSyncReliable(player, buffer);
+
+			buffer.Reset();
+			remote.SerializeSyncUnreliable(buffer);
+			master.TryDeserializeSyncUnreliable(player, buffer);
 		}
 
 		public void Clear(MasterNetworkObject master)
