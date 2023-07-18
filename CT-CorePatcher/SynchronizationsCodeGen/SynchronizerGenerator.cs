@@ -336,6 +336,43 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				List<MemberToken> masterMembers = new();
 				List<MemberToken> remoteMembers = new();
 
+				/*
+				 * # Synchronize property order
+				 * 
+				 * - Parent properties
+				 * - Parent functions
+				 * - Child properties
+				 * - Child functions
+				 */
+
+				TryParsePropertyByOrder(t, out var masterPropMembers, out var remotePropMembers);
+				TryParseFunctionsByOrder(t, out var masterFuncMambers, out var remoteFuncMembers);
+
+				int propMinCount = Math.Min(masterPropMembers.Count, remotePropMembers.Count);
+				int funcMinCount = Math.Min(masterFuncMambers.Count, remoteFuncMembers.Count);
+				int minCount = Math.Min(propMinCount, funcMinCount);
+
+				int propMaxCount = Math.Max(masterPropMembers.Count, remotePropMembers.Count);
+				int funcMaxCount = Math.Max(masterFuncMambers.Count, remoteFuncMembers.Count);
+				int maxCount = Math.Max(propMaxCount, funcMaxCount);
+
+				if (minCount != maxCount)
+				{
+					throw new ArgumentException($"SyncObject parse error! Faild to parse type inherit tree! " +
+						$"Type: {t.Name}");
+				}
+
+				for (int i = 0; i < maxCount; i++)
+				{
+					masterMembers.AddRange(masterPropMembers[i]);
+					masterMembers.AddRange(masterFuncMambers[i]);
+					remoteMembers.AddRange(remotePropMembers[i]);
+					remoteMembers.AddRange(remoteFuncMembers[i]);
+				}
+
+				/*
+				 * 상속 받은 프로퍼티의 순서를 고려할 수 없음
+				 * 
 				if (TryParseProperty(t, out var masterPropMembers, out var remotePropMembers))
 				{
 					masterMembers.AddRange(masterPropMembers);
@@ -347,6 +384,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					masterMembers.AddRange(masterFuncMambers);
 					remoteMembers.AddRange(remoteFuncMembers);
 				}
+				*/
 
 				InheritType inheritType = _typeByInheritType[t];
 				SyncObjectInfo objectInfo = new(t.Name, inheritType, masterMembers, remoteMembers,
@@ -360,6 +398,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return syncObjects;
 		}
 
+		[Obsolete($"상속 받은 객체에 대응할 수 없습니다. {nameof(TryParseFunctionsByOrder)}를 사용하세요.")]
 		public static bool TryParseFunctions(Type type,
 											 out List<MemberToken> masterMembers,
 											 out List<MemberToken> remoteMembers)
@@ -432,7 +471,109 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			return masterMembers.Count != 0 || remoteMembers.Count != 0;
 		}
-		
+
+		public static bool TryParseFunctionsByOrder(
+			Type type,
+			out List<List<MemberToken>> masterMemberByOrder,
+			out List<List<MemberToken>> remoteMemberByOrder)
+		{
+			bool hasProperty = false;
+
+			masterMemberByOrder = new();
+			remoteMemberByOrder = new();
+
+			Stack<Type> inheritStack = new();
+			Type? targetType = type;
+			while (targetType != null && targetType != typeof(object))
+			{
+				inheritStack.Push(targetType);
+				targetType = targetType.BaseType;
+			}
+
+			if (inheritStack.Count == 0)
+			{
+				throw new ArgumentException($"Type inherit parse error! {type.Name}");
+			}
+
+			InheritType inheritType = _typeByInheritType[type];
+
+			while (inheritStack.Count > 0)
+			{
+				// Parse functions
+				Type curType = inheritStack.Pop();
+				MethodInfo[] methods = curType.GetMethods(_parseFlags);
+				Type? baseType = curType.BaseType;
+
+				List<MemberToken> masterMembers = new();
+				List<MemberToken> remoteMembers = new();
+
+				foreach (var method in methods)
+				{
+					foreach (var att in method.GetCustomAttributes())
+					{
+						SyncType syncType;
+						SyncDirection direction;
+
+						if (att is not SyncRpcAttribute syncAtt)
+							continue;
+
+						// Check it's inherited
+						if (baseType != null &&
+							baseType != typeof(object) &&
+							_functionSetByType[baseType].Contains(method.Name))
+						{
+							break;
+						}
+
+						InheritType memberInheritType = InheritType.None;
+						if (inheritType != InheritType.None)
+						{
+							memberInheritType = (inheritStack.Count == 0) ?
+								InheritType.Parent : InheritType.Child;
+
+							if (method.IsPrivate && !method.IsFamily)
+							{
+								throw new ArgumentException($"If {method.Name} can be inherited you must set to protected! Type : {type.Name}");
+							}
+						}
+
+						// Parse member function
+						syncType = syncAtt.SyncType;
+						direction = syncAtt.SyncDirection;
+
+						if (direction == SyncDirection.FromRemote &&
+							(syncType == SyncType.ReliableTarget || syncType == SyncType.UnreliableTarget))
+						{
+							throw new WrongSyncSetting(type, method.Name, $"You can not set target type from remote side!");
+						}
+
+						MemberToken member = parseSyncFunction(method, syncType, memberInheritType);
+						member.InheritType = memberInheritType;
+
+						// Add to list
+						if (direction == SyncDirection.FromMaster)
+						{
+							masterMembers.Add(member);
+						}
+						else if (direction == SyncDirection.FromRemote)
+						{
+							remoteMembers.Add(member);
+						}
+
+						hasProperty = true;
+
+						break;
+					}
+				}
+
+				masterMemberByOrder.Add(masterMembers);
+				remoteMemberByOrder.Add(remoteMembers);
+			}
+
+			return hasProperty;
+		}
+
+		[Obsolete($"상속 받은 객체에 대응할 수 없습니다. {nameof(TryParsePropertyByOrder)}를 사용하세요.")]
 		public static bool TryParseProperty(Type type,
 											out List<MemberToken> masterMembers,
 											out List<MemberToken> remoteMembers)
@@ -523,6 +664,129 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			return masterMembers.Count != 0 || remoteMembers.Count != 0;
+		}
+
+		public static bool TryParsePropertyByOrder(
+			Type type,
+			out List<List<MemberToken>> masterMemberByOrder,
+			out List<List<MemberToken>> remoteMemberByOrder)
+		{
+			bool hasProperty = false;
+
+			masterMemberByOrder = new();
+			remoteMemberByOrder = new();
+
+			Stack<Type> inheritStack = new();
+			Type? targetType = type;
+			while (targetType != null && targetType != typeof(object))
+			{
+				inheritStack.Push(targetType);
+				targetType = targetType.BaseType;
+			}
+
+			if (inheritStack.Count == 0)
+			{
+				throw new ArgumentException($"Type inherit parse error! {type.Name}");
+			}
+
+			InheritType inheritType = _typeByInheritType[type];
+
+			while (inheritStack.Count > 0)
+			{
+				// Parse properties
+				Type curType = inheritStack.Pop();
+				FieldInfo[] fieldInfos = curType.GetFields(_parseFlags);
+				Type? baseType = curType.BaseType;
+
+				List<MemberToken> masterMembers = new();
+				List<MemberToken> remoteMembers = new();
+
+				foreach (var field in fieldInfos)
+				{
+					foreach (var att in field.GetCustomAttributes())
+					{
+						SyncType syncType;
+						SyncDirection direction;
+						MemberToken member;
+
+						SyncVarAttribute? syncVarAtt = att as SyncVarAttribute;
+						SyncObjectAttribute? syncObjAtt = att as SyncObjectAttribute;
+
+						if (syncVarAtt == null && syncObjAtt == null)
+							continue;
+
+						// Check it's inherited
+						var propertyToken = (field.FieldType.Name, field.Name);
+						if (baseType != null &&
+							baseType != typeof(object) &&
+							_propertySetByType[baseType].Contains(propertyToken))
+						{
+							break;
+						}
+
+						InheritType memberInheritType = InheritType.None;
+						if (inheritType != InheritType.None)
+						{
+							memberInheritType = (inheritStack.Count == 0)?
+								InheritType.Parent : InheritType.Child;
+
+							if (field.IsPrivate && !field.IsFamily)
+							{
+								throw new ArgumentException($"If {field.Name} can be inherited you must set to protected! Type : {type.Name}");
+							}
+						}
+
+						// Parse member property
+						if (syncVarAtt != null)
+						{
+							syncType = syncVarAtt.SyncType;
+							direction = syncVarAtt.SyncDirection;
+							if (direction == SyncDirection.FromRemote && syncType == SyncType.ColdData)
+							{
+								throw new WrongSyncSetting(type, field.Name,
+														   $"You can not set cold data from remote side!");
+							}
+							member = parseValueField(field, syncType, memberInheritType);
+						}
+						else if (syncObjAtt != null)
+						{
+							syncType = syncObjAtt.SyncType;
+							direction = syncObjAtt.SyncDirection;
+							if (syncType == SyncType.ColdData)
+							{
+								throw new WrongSyncSetting(type, field.Name,
+														   $"You can not set cold/hot data at sync object!");
+							}
+							member = parseSyncObjectField(field, syncType, memberInheritType);
+						}
+						else
+						{
+							continue;
+						}
+
+						member.InheritType = memberInheritType;
+
+						// Add to list
+						if (direction == SyncDirection.FromMaster)
+						{
+							masterMembers.Add(member);
+						}
+						else if (direction == SyncDirection.FromRemote)
+						{
+							remoteMembers.Add(member);
+						}
+
+						hasProperty = true;
+
+						break;
+					}
+				}
+
+				masterMemberByOrder.Add(masterMembers);
+				remoteMemberByOrder.Add(remoteMembers);
+			}
+
+			return hasProperty;
 		}
 
 		private static MemberToken parseValueField(FieldInfo fieldInfo, SyncType syncType, InheritType inheritType)
