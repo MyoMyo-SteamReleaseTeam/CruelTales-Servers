@@ -1,202 +1,389 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 public static class VectorSwizzleExtension
 {
 	#region Vector2 to Vector2
-	public static Vector2 _XX(this Vector2 v) => new Vector2(v.X, v.X);
-	public static Vector2 _YX(this Vector2 v) => new Vector2(v.Y, v.X);
-	public static Vector2 _0X(this Vector2 v) => new Vector2(0, v.X);
-	public static Vector2 _1X(this Vector2 v) => new Vector2(1, v.X);
-	public static Vector2 _XY(this Vector2 v) => new Vector2(v.X, v.Y);
-	public static Vector2 _YY(this Vector2 v) => new Vector2(v.Y, v.Y);
-	public static Vector2 _0Y(this Vector2 v) => new Vector2(0, v.Y);
-	public static Vector2 _1Y(this Vector2 v) => new Vector2(1, v.Y);
-	public static Vector2 _X0(this Vector2 v) => new Vector2(v.X, 0);
-	public static Vector2 _Y0(this Vector2 v) => new Vector2(v.Y, 0);
-	public static Vector2 _X1(this Vector2 v) => new Vector2(v.X, 1);
-	public static Vector2 _Y1(this Vector2 v) => new Vector2(v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _xx(this Vector2 v) => new Vector2(v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _yx(this Vector2 v) => new Vector2(v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _0x(this Vector2 v) => new Vector2(0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _1x(this Vector2 v) => new Vector2(1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _xy(this Vector2 v) => new Vector2(v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _yy(this Vector2 v) => new Vector2(v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _0y(this Vector2 v) => new Vector2(0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _1y(this Vector2 v) => new Vector2(1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _x0(this Vector2 v) => new Vector2(v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _y0(this Vector2 v) => new Vector2(v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _x1(this Vector2 v) => new Vector2(v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _y1(this Vector2 v) => new Vector2(v.Y, 1);
 	#endregion
 
 	#region Vector2 to Vector3
-	public static Vector3 _XXX(this Vector2 v) => new Vector3(v.X, v.X, v.X);
-	public static Vector3 _XXY(this Vector2 v) => new Vector3(v.X, v.X, v.Y);
-	public static Vector3 _XX0(this Vector2 v) => new Vector3(v.X, v.X, 0);
-	public static Vector3 _XX1(this Vector2 v) => new Vector3(v.X, v.X, 1);
-	public static Vector3 _YXX(this Vector2 v) => new Vector3(v.Y, v.X, v.X);
-	public static Vector3 _YXY(this Vector2 v) => new Vector3(v.Y, v.X, v.Y);
-	public static Vector3 _YX0(this Vector2 v) => new Vector3(v.Y, v.X, 0);
-	public static Vector3 _YX1(this Vector2 v) => new Vector3(v.Y, v.X, 1);
-	public static Vector3 _0XX(this Vector2 v) => new Vector3(0, v.X, v.X);
-	public static Vector3 _0XY(this Vector2 v) => new Vector3(0, v.X, v.Y);
-	public static Vector3 _0X0(this Vector2 v) => new Vector3(0, v.X, 0);
-	public static Vector3 _0X1(this Vector2 v) => new Vector3(0, v.X, 1);
-	public static Vector3 _1XX(this Vector2 v) => new Vector3(1, v.X, v.X);
-	public static Vector3 _1XY(this Vector2 v) => new Vector3(1, v.X, v.Y);
-	public static Vector3 _1X0(this Vector2 v) => new Vector3(1, v.X, 0);
-	public static Vector3 _1X1(this Vector2 v) => new Vector3(1, v.X, 1);
-	public static Vector3 _XYX(this Vector2 v) => new Vector3(v.X, v.Y, v.X);
-	public static Vector3 _XYY(this Vector2 v) => new Vector3(v.X, v.Y, v.Y);
-	public static Vector3 _XY0(this Vector2 v) => new Vector3(v.X, v.Y, 0);
-	public static Vector3 _XY1(this Vector2 v) => new Vector3(v.X, v.Y, 1);
-	public static Vector3 _YYX(this Vector2 v) => new Vector3(v.Y, v.Y, v.X);
-	public static Vector3 _YYY(this Vector2 v) => new Vector3(v.Y, v.Y, v.Y);
-	public static Vector3 _YY0(this Vector2 v) => new Vector3(v.Y, v.Y, 0);
-	public static Vector3 _YY1(this Vector2 v) => new Vector3(v.Y, v.Y, 1);
-	public static Vector3 _0YX(this Vector2 v) => new Vector3(0, v.Y, v.X);
-	public static Vector3 _0YY(this Vector2 v) => new Vector3(0, v.Y, v.Y);
-	public static Vector3 _0Y0(this Vector2 v) => new Vector3(0, v.Y, 0);
-	public static Vector3 _0Y1(this Vector2 v) => new Vector3(0, v.Y, 1);
-	public static Vector3 _1YX(this Vector2 v) => new Vector3(1, v.Y, v.X);
-	public static Vector3 _1YY(this Vector2 v) => new Vector3(1, v.Y, v.Y);
-	public static Vector3 _1Y0(this Vector2 v) => new Vector3(1, v.Y, 0);
-	public static Vector3 _1Y1(this Vector2 v) => new Vector3(1, v.Y, 1);
-	public static Vector3 _X0X(this Vector2 v) => new Vector3(v.X, 0, v.X);
-	public static Vector3 _X0Y(this Vector2 v) => new Vector3(v.X, 0, v.Y);
-	public static Vector3 _X00(this Vector2 v) => new Vector3(v.X, 0, 0);
-	public static Vector3 _X01(this Vector2 v) => new Vector3(v.X, 0, 1);
-	public static Vector3 _Y0X(this Vector2 v) => new Vector3(v.Y, 0, v.X);
-	public static Vector3 _Y0Y(this Vector2 v) => new Vector3(v.Y, 0, v.Y);
-	public static Vector3 _Y00(this Vector2 v) => new Vector3(v.Y, 0, 0);
-	public static Vector3 _Y01(this Vector2 v) => new Vector3(v.Y, 0, 1);
-	public static Vector3 _X1X(this Vector2 v) => new Vector3(v.X, 1, v.X);
-	public static Vector3 _X1Y(this Vector2 v) => new Vector3(v.X, 1, v.Y);
-	public static Vector3 _X10(this Vector2 v) => new Vector3(v.X, 1, 0);
-	public static Vector3 _X11(this Vector2 v) => new Vector3(v.X, 1, 1);
-	public static Vector3 _Y1X(this Vector2 v) => new Vector3(v.Y, 1, v.X);
-	public static Vector3 _Y1Y(this Vector2 v) => new Vector3(v.Y, 1, v.Y);
-	public static Vector3 _Y10(this Vector2 v) => new Vector3(v.Y, 1, 0);
-	public static Vector3 _Y11(this Vector2 v) => new Vector3(v.Y, 1, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xxx(this Vector2 v) => new Vector3(v.X, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xxy(this Vector2 v) => new Vector3(v.X, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xx0(this Vector2 v) => new Vector3(v.X, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xx1(this Vector2 v) => new Vector3(v.X, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yxx(this Vector2 v) => new Vector3(v.Y, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yxy(this Vector2 v) => new Vector3(v.Y, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yx0(this Vector2 v) => new Vector3(v.Y, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yx1(this Vector2 v) => new Vector3(v.Y, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0xx(this Vector2 v) => new Vector3(0, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0xy(this Vector2 v) => new Vector3(0, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0x0(this Vector2 v) => new Vector3(0, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0x1(this Vector2 v) => new Vector3(0, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1xx(this Vector2 v) => new Vector3(1, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1xy(this Vector2 v) => new Vector3(1, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1x0(this Vector2 v) => new Vector3(1, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1x1(this Vector2 v) => new Vector3(1, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xyx(this Vector2 v) => new Vector3(v.X, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xyy(this Vector2 v) => new Vector3(v.X, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xy0(this Vector2 v) => new Vector3(v.X, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xy1(this Vector2 v) => new Vector3(v.X, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yyx(this Vector2 v) => new Vector3(v.Y, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yyy(this Vector2 v) => new Vector3(v.Y, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yy0(this Vector2 v) => new Vector3(v.Y, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yy1(this Vector2 v) => new Vector3(v.Y, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0yx(this Vector2 v) => new Vector3(0, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0yy(this Vector2 v) => new Vector3(0, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0y0(this Vector2 v) => new Vector3(0, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0y1(this Vector2 v) => new Vector3(0, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1yx(this Vector2 v) => new Vector3(1, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1yy(this Vector2 v) => new Vector3(1, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1y0(this Vector2 v) => new Vector3(1, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1y1(this Vector2 v) => new Vector3(1, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x0x(this Vector2 v) => new Vector3(v.X, 0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x0y(this Vector2 v) => new Vector3(v.X, 0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x00(this Vector2 v) => new Vector3(v.X, 0, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x01(this Vector2 v) => new Vector3(v.X, 0, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y0x(this Vector2 v) => new Vector3(v.Y, 0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y0y(this Vector2 v) => new Vector3(v.Y, 0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y00(this Vector2 v) => new Vector3(v.Y, 0, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y01(this Vector2 v) => new Vector3(v.Y, 0, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x1x(this Vector2 v) => new Vector3(v.X, 1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x1y(this Vector2 v) => new Vector3(v.X, 1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x10(this Vector2 v) => new Vector3(v.X, 1, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x11(this Vector2 v) => new Vector3(v.X, 1, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y1x(this Vector2 v) => new Vector3(v.Y, 1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y1y(this Vector2 v) => new Vector3(v.Y, 1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y10(this Vector2 v) => new Vector3(v.Y, 1, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y11(this Vector2 v) => new Vector3(v.Y, 1, 1);
 	#endregion
 
 	#region Vector3 to Vector2
-	public static Vector2 _XX(this Vector3 v) => new Vector2(v.X, v.X);
-	public static Vector2 _YX(this Vector3 v) => new Vector2(v.Y, v.X);
-	public static Vector2 _ZX(this Vector3 v) => new Vector2(v.Z, v.X);
-	public static Vector2 _0X(this Vector3 v) => new Vector2(0, v.X);
-	public static Vector2 _1X(this Vector3 v) => new Vector2(1, v.X);
-	public static Vector2 _XY(this Vector3 v) => new Vector2(v.X, v.Y);
-	public static Vector2 _YY(this Vector3 v) => new Vector2(v.Y, v.Y);
-	public static Vector2 _ZY(this Vector3 v) => new Vector2(v.Z, v.Y);
-	public static Vector2 _0Y(this Vector3 v) => new Vector2(0, v.Y);
-	public static Vector2 _1Y(this Vector3 v) => new Vector2(1, v.Y);
-	public static Vector2 _XZ(this Vector3 v) => new Vector2(v.X, v.Z);
-	public static Vector2 _YZ(this Vector3 v) => new Vector2(v.Y, v.Z);
-	public static Vector2 _ZZ(this Vector3 v) => new Vector2(v.Z, v.Z);
-	public static Vector2 _0Z(this Vector3 v) => new Vector2(0, v.Z);
-	public static Vector2 _1Z(this Vector3 v) => new Vector2(1, v.Z);
-	public static Vector2 _X0(this Vector3 v) => new Vector2(v.X, 0);
-	public static Vector2 _Y0(this Vector3 v) => new Vector2(v.Y, 0);
-	public static Vector2 _Z0(this Vector3 v) => new Vector2(v.Z, 0);
-	public static Vector2 _X1(this Vector3 v) => new Vector2(v.X, 1);
-	public static Vector2 _Y1(this Vector3 v) => new Vector2(v.Y, 1);
-	public static Vector2 _Z1(this Vector3 v) => new Vector2(v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _xx(this Vector3 v) => new Vector2(v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _yx(this Vector3 v) => new Vector2(v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _zx(this Vector3 v) => new Vector2(v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _0x(this Vector3 v) => new Vector2(0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _1x(this Vector3 v) => new Vector2(1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _xy(this Vector3 v) => new Vector2(v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _yy(this Vector3 v) => new Vector2(v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _zy(this Vector3 v) => new Vector2(v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _0y(this Vector3 v) => new Vector2(0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _1y(this Vector3 v) => new Vector2(1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _xz(this Vector3 v) => new Vector2(v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _yz(this Vector3 v) => new Vector2(v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _zz(this Vector3 v) => new Vector2(v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _0z(this Vector3 v) => new Vector2(0, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _1z(this Vector3 v) => new Vector2(1, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _x0(this Vector3 v) => new Vector2(v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _y0(this Vector3 v) => new Vector2(v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _z0(this Vector3 v) => new Vector2(v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _x1(this Vector3 v) => new Vector2(v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _y1(this Vector3 v) => new Vector2(v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 _z1(this Vector3 v) => new Vector2(v.Z, 1);
 	#endregion
 
 	#region Vector3 to Vector3
-	public static Vector3 _XXX(this Vector3 v) => new Vector3(v.X, v.X, v.X);
-	public static Vector3 _XXY(this Vector3 v) => new Vector3(v.X, v.X, v.Y);
-	public static Vector3 _XXZ(this Vector3 v) => new Vector3(v.X, v.X, v.Z);
-	public static Vector3 _XX0(this Vector3 v) => new Vector3(v.X, v.X, 0);
-	public static Vector3 _XX1(this Vector3 v) => new Vector3(v.X, v.X, 1);
-	public static Vector3 _YXX(this Vector3 v) => new Vector3(v.Y, v.X, v.X);
-	public static Vector3 _YXY(this Vector3 v) => new Vector3(v.Y, v.X, v.Y);
-	public static Vector3 _YXZ(this Vector3 v) => new Vector3(v.Y, v.X, v.Z);
-	public static Vector3 _YX0(this Vector3 v) => new Vector3(v.Y, v.X, 0);
-	public static Vector3 _YX1(this Vector3 v) => new Vector3(v.Y, v.X, 1);
-	public static Vector3 _ZXX(this Vector3 v) => new Vector3(v.Z, v.X, v.X);
-	public static Vector3 _ZXY(this Vector3 v) => new Vector3(v.Z, v.X, v.Y);
-	public static Vector3 _ZXZ(this Vector3 v) => new Vector3(v.Z, v.X, v.Z);
-	public static Vector3 _ZX0(this Vector3 v) => new Vector3(v.Z, v.X, 0);
-	public static Vector3 _ZX1(this Vector3 v) => new Vector3(v.Z, v.X, 1);
-	public static Vector3 _0XX(this Vector3 v) => new Vector3(0, v.X, v.X);
-	public static Vector3 _0XY(this Vector3 v) => new Vector3(0, v.X, v.Y);
-	public static Vector3 _0XZ(this Vector3 v) => new Vector3(0, v.X, v.Z);
-	public static Vector3 _0X0(this Vector3 v) => new Vector3(0, v.X, 0);
-	public static Vector3 _0X1(this Vector3 v) => new Vector3(0, v.X, 1);
-	public static Vector3 _1XX(this Vector3 v) => new Vector3(1, v.X, v.X);
-	public static Vector3 _1XY(this Vector3 v) => new Vector3(1, v.X, v.Y);
-	public static Vector3 _1XZ(this Vector3 v) => new Vector3(1, v.X, v.Z);
-	public static Vector3 _1X0(this Vector3 v) => new Vector3(1, v.X, 0);
-	public static Vector3 _1X1(this Vector3 v) => new Vector3(1, v.X, 1);
-	public static Vector3 _XYX(this Vector3 v) => new Vector3(v.X, v.Y, v.X);
-	public static Vector3 _XYY(this Vector3 v) => new Vector3(v.X, v.Y, v.Y);
-	public static Vector3 _XYZ(this Vector3 v) => new Vector3(v.X, v.Y, v.Z);
-	public static Vector3 _XY0(this Vector3 v) => new Vector3(v.X, v.Y, 0);
-	public static Vector3 _XY1(this Vector3 v) => new Vector3(v.X, v.Y, 1);
-	public static Vector3 _YYX(this Vector3 v) => new Vector3(v.Y, v.Y, v.X);
-	public static Vector3 _YYY(this Vector3 v) => new Vector3(v.Y, v.Y, v.Y);
-	public static Vector3 _YYZ(this Vector3 v) => new Vector3(v.Y, v.Y, v.Z);
-	public static Vector3 _YY0(this Vector3 v) => new Vector3(v.Y, v.Y, 0);
-	public static Vector3 _YY1(this Vector3 v) => new Vector3(v.Y, v.Y, 1);
-	public static Vector3 _ZYX(this Vector3 v) => new Vector3(v.Z, v.Y, v.X);
-	public static Vector3 _ZYY(this Vector3 v) => new Vector3(v.Z, v.Y, v.Y);
-	public static Vector3 _ZYZ(this Vector3 v) => new Vector3(v.Z, v.Y, v.Z);
-	public static Vector3 _ZY0(this Vector3 v) => new Vector3(v.Z, v.Y, 0);
-	public static Vector3 _ZY1(this Vector3 v) => new Vector3(v.Z, v.Y, 1);
-	public static Vector3 _0YX(this Vector3 v) => new Vector3(0, v.Y, v.X);
-	public static Vector3 _0YY(this Vector3 v) => new Vector3(0, v.Y, v.Y);
-	public static Vector3 _0YZ(this Vector3 v) => new Vector3(0, v.Y, v.Z);
-	public static Vector3 _0Y0(this Vector3 v) => new Vector3(0, v.Y, 0);
-	public static Vector3 _0Y1(this Vector3 v) => new Vector3(0, v.Y, 1);
-	public static Vector3 _1YX(this Vector3 v) => new Vector3(1, v.Y, v.X);
-	public static Vector3 _1YY(this Vector3 v) => new Vector3(1, v.Y, v.Y);
-	public static Vector3 _1YZ(this Vector3 v) => new Vector3(1, v.Y, v.Z);
-	public static Vector3 _1Y0(this Vector3 v) => new Vector3(1, v.Y, 0);
-	public static Vector3 _1Y1(this Vector3 v) => new Vector3(1, v.Y, 1);
-	public static Vector3 _XZX(this Vector3 v) => new Vector3(v.X, v.Z, v.X);
-	public static Vector3 _XZY(this Vector3 v) => new Vector3(v.X, v.Z, v.Y);
-	public static Vector3 _XZZ(this Vector3 v) => new Vector3(v.X, v.Z, v.Z);
-	public static Vector3 _XZ0(this Vector3 v) => new Vector3(v.X, v.Z, 0);
-	public static Vector3 _XZ1(this Vector3 v) => new Vector3(v.X, v.Z, 1);
-	public static Vector3 _YZX(this Vector3 v) => new Vector3(v.Y, v.Z, v.X);
-	public static Vector3 _YZY(this Vector3 v) => new Vector3(v.Y, v.Z, v.Y);
-	public static Vector3 _YZZ(this Vector3 v) => new Vector3(v.Y, v.Z, v.Z);
-	public static Vector3 _YZ0(this Vector3 v) => new Vector3(v.Y, v.Z, 0);
-	public static Vector3 _YZ1(this Vector3 v) => new Vector3(v.Y, v.Z, 1);
-	public static Vector3 _ZZX(this Vector3 v) => new Vector3(v.Z, v.Z, v.X);
-	public static Vector3 _ZZY(this Vector3 v) => new Vector3(v.Z, v.Z, v.Y);
-	public static Vector3 _ZZZ(this Vector3 v) => new Vector3(v.Z, v.Z, v.Z);
-	public static Vector3 _ZZ0(this Vector3 v) => new Vector3(v.Z, v.Z, 0);
-	public static Vector3 _ZZ1(this Vector3 v) => new Vector3(v.Z, v.Z, 1);
-	public static Vector3 _0ZX(this Vector3 v) => new Vector3(0, v.Z, v.X);
-	public static Vector3 _0ZY(this Vector3 v) => new Vector3(0, v.Z, v.Y);
-	public static Vector3 _0ZZ(this Vector3 v) => new Vector3(0, v.Z, v.Z);
-	public static Vector3 _0Z0(this Vector3 v) => new Vector3(0, v.Z, 0);
-	public static Vector3 _0Z1(this Vector3 v) => new Vector3(0, v.Z, 1);
-	public static Vector3 _1ZX(this Vector3 v) => new Vector3(1, v.Z, v.X);
-	public static Vector3 _1ZY(this Vector3 v) => new Vector3(1, v.Z, v.Y);
-	public static Vector3 _1ZZ(this Vector3 v) => new Vector3(1, v.Z, v.Z);
-	public static Vector3 _1Z0(this Vector3 v) => new Vector3(1, v.Z, 0);
-	public static Vector3 _1Z1(this Vector3 v) => new Vector3(1, v.Z, 1);
-	public static Vector3 _X0X(this Vector3 v) => new Vector3(v.X, 0, v.X);
-	public static Vector3 _X0Y(this Vector3 v) => new Vector3(v.X, 0, v.Y);
-	public static Vector3 _X0Z(this Vector3 v) => new Vector3(v.X, 0, v.Z);
-	public static Vector3 _X00(this Vector3 v) => new Vector3(v.X, 0, 0);
-	public static Vector3 _X01(this Vector3 v) => new Vector3(v.X, 0, 1);
-	public static Vector3 _Y0X(this Vector3 v) => new Vector3(v.Y, 0, v.X);
-	public static Vector3 _Y0Y(this Vector3 v) => new Vector3(v.Y, 0, v.Y);
-	public static Vector3 _Y0Z(this Vector3 v) => new Vector3(v.Y, 0, v.Z);
-	public static Vector3 _Y00(this Vector3 v) => new Vector3(v.Y, 0, 0);
-	public static Vector3 _Y01(this Vector3 v) => new Vector3(v.Y, 0, 1);
-	public static Vector3 _Z0X(this Vector3 v) => new Vector3(v.Z, 0, v.X);
-	public static Vector3 _Z0Y(this Vector3 v) => new Vector3(v.Z, 0, v.Y);
-	public static Vector3 _Z0Z(this Vector3 v) => new Vector3(v.Z, 0, v.Z);
-	public static Vector3 _Z00(this Vector3 v) => new Vector3(v.Z, 0, 0);
-	public static Vector3 _Z01(this Vector3 v) => new Vector3(v.Z, 0, 1);
-	public static Vector3 _X1X(this Vector3 v) => new Vector3(v.X, 1, v.X);
-	public static Vector3 _X1Y(this Vector3 v) => new Vector3(v.X, 1, v.Y);
-	public static Vector3 _X1Z(this Vector3 v) => new Vector3(v.X, 1, v.Z);
-	public static Vector3 _X10(this Vector3 v) => new Vector3(v.X, 1, 0);
-	public static Vector3 _X11(this Vector3 v) => new Vector3(v.X, 1, 1);
-	public static Vector3 _Y1X(this Vector3 v) => new Vector3(v.Y, 1, v.X);
-	public static Vector3 _Y1Y(this Vector3 v) => new Vector3(v.Y, 1, v.Y);
-	public static Vector3 _Y1Z(this Vector3 v) => new Vector3(v.Y, 1, v.Z);
-	public static Vector3 _Y10(this Vector3 v) => new Vector3(v.Y, 1, 0);
-	public static Vector3 _Y11(this Vector3 v) => new Vector3(v.Y, 1, 1);
-	public static Vector3 _Z1X(this Vector3 v) => new Vector3(v.Z, 1, v.X);
-	public static Vector3 _Z1Y(this Vector3 v) => new Vector3(v.Z, 1, v.Y);
-	public static Vector3 _Z1Z(this Vector3 v) => new Vector3(v.Z, 1, v.Z);
-	public static Vector3 _Z10(this Vector3 v) => new Vector3(v.Z, 1, 0);
-	public static Vector3 _Z11(this Vector3 v) => new Vector3(v.Z, 1, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xxx(this Vector3 v) => new Vector3(v.X, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xxy(this Vector3 v) => new Vector3(v.X, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xxz(this Vector3 v) => new Vector3(v.X, v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xx0(this Vector3 v) => new Vector3(v.X, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xx1(this Vector3 v) => new Vector3(v.X, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yxx(this Vector3 v) => new Vector3(v.Y, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yxy(this Vector3 v) => new Vector3(v.Y, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yxz(this Vector3 v) => new Vector3(v.Y, v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yx0(this Vector3 v) => new Vector3(v.Y, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yx1(this Vector3 v) => new Vector3(v.Y, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zxx(this Vector3 v) => new Vector3(v.Z, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zxy(this Vector3 v) => new Vector3(v.Z, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zxz(this Vector3 v) => new Vector3(v.Z, v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zx0(this Vector3 v) => new Vector3(v.Z, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zx1(this Vector3 v) => new Vector3(v.Z, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0xx(this Vector3 v) => new Vector3(0, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0xy(this Vector3 v) => new Vector3(0, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0xz(this Vector3 v) => new Vector3(0, v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0x0(this Vector3 v) => new Vector3(0, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0x1(this Vector3 v) => new Vector3(0, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1xx(this Vector3 v) => new Vector3(1, v.X, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1xy(this Vector3 v) => new Vector3(1, v.X, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1xz(this Vector3 v) => new Vector3(1, v.X, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1x0(this Vector3 v) => new Vector3(1, v.X, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1x1(this Vector3 v) => new Vector3(1, v.X, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xyx(this Vector3 v) => new Vector3(v.X, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xyy(this Vector3 v) => new Vector3(v.X, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xyz(this Vector3 v) => new Vector3(v.X, v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xy0(this Vector3 v) => new Vector3(v.X, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xy1(this Vector3 v) => new Vector3(v.X, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yyx(this Vector3 v) => new Vector3(v.Y, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yyy(this Vector3 v) => new Vector3(v.Y, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yyz(this Vector3 v) => new Vector3(v.Y, v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yy0(this Vector3 v) => new Vector3(v.Y, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yy1(this Vector3 v) => new Vector3(v.Y, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zyx(this Vector3 v) => new Vector3(v.Z, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zyy(this Vector3 v) => new Vector3(v.Z, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zyz(this Vector3 v) => new Vector3(v.Z, v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zy0(this Vector3 v) => new Vector3(v.Z, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zy1(this Vector3 v) => new Vector3(v.Z, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0yx(this Vector3 v) => new Vector3(0, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0yy(this Vector3 v) => new Vector3(0, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0yz(this Vector3 v) => new Vector3(0, v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0y0(this Vector3 v) => new Vector3(0, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0y1(this Vector3 v) => new Vector3(0, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1yx(this Vector3 v) => new Vector3(1, v.Y, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1yy(this Vector3 v) => new Vector3(1, v.Y, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1yz(this Vector3 v) => new Vector3(1, v.Y, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1y0(this Vector3 v) => new Vector3(1, v.Y, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1y1(this Vector3 v) => new Vector3(1, v.Y, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xzx(this Vector3 v) => new Vector3(v.X, v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xzy(this Vector3 v) => new Vector3(v.X, v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xzz(this Vector3 v) => new Vector3(v.X, v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xz0(this Vector3 v) => new Vector3(v.X, v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _xz1(this Vector3 v) => new Vector3(v.X, v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yzx(this Vector3 v) => new Vector3(v.Y, v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yzy(this Vector3 v) => new Vector3(v.Y, v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yzz(this Vector3 v) => new Vector3(v.Y, v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yz0(this Vector3 v) => new Vector3(v.Y, v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _yz1(this Vector3 v) => new Vector3(v.Y, v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zzx(this Vector3 v) => new Vector3(v.Z, v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zzy(this Vector3 v) => new Vector3(v.Z, v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zzz(this Vector3 v) => new Vector3(v.Z, v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zz0(this Vector3 v) => new Vector3(v.Z, v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _zz1(this Vector3 v) => new Vector3(v.Z, v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0zx(this Vector3 v) => new Vector3(0, v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0zy(this Vector3 v) => new Vector3(0, v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0zz(this Vector3 v) => new Vector3(0, v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0z0(this Vector3 v) => new Vector3(0, v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _0z1(this Vector3 v) => new Vector3(0, v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1zx(this Vector3 v) => new Vector3(1, v.Z, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1zy(this Vector3 v) => new Vector3(1, v.Z, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1zz(this Vector3 v) => new Vector3(1, v.Z, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1z0(this Vector3 v) => new Vector3(1, v.Z, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _1z1(this Vector3 v) => new Vector3(1, v.Z, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x0x(this Vector3 v) => new Vector3(v.X, 0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x0y(this Vector3 v) => new Vector3(v.X, 0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x0z(this Vector3 v) => new Vector3(v.X, 0, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x00(this Vector3 v) => new Vector3(v.X, 0, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x01(this Vector3 v) => new Vector3(v.X, 0, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y0x(this Vector3 v) => new Vector3(v.Y, 0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y0y(this Vector3 v) => new Vector3(v.Y, 0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y0z(this Vector3 v) => new Vector3(v.Y, 0, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y00(this Vector3 v) => new Vector3(v.Y, 0, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y01(this Vector3 v) => new Vector3(v.Y, 0, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z0x(this Vector3 v) => new Vector3(v.Z, 0, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z0y(this Vector3 v) => new Vector3(v.Z, 0, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z0z(this Vector3 v) => new Vector3(v.Z, 0, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z00(this Vector3 v) => new Vector3(v.Z, 0, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z01(this Vector3 v) => new Vector3(v.Z, 0, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x1x(this Vector3 v) => new Vector3(v.X, 1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x1y(this Vector3 v) => new Vector3(v.X, 1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x1z(this Vector3 v) => new Vector3(v.X, 1, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x10(this Vector3 v) => new Vector3(v.X, 1, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _x11(this Vector3 v) => new Vector3(v.X, 1, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y1x(this Vector3 v) => new Vector3(v.Y, 1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y1y(this Vector3 v) => new Vector3(v.Y, 1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y1z(this Vector3 v) => new Vector3(v.Y, 1, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y10(this Vector3 v) => new Vector3(v.Y, 1, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _y11(this Vector3 v) => new Vector3(v.Y, 1, 1);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z1x(this Vector3 v) => new Vector3(v.Z, 1, v.X);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z1y(this Vector3 v) => new Vector3(v.Z, 1, v.Y);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z1z(this Vector3 v) => new Vector3(v.Z, 1, v.Z);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z10(this Vector3 v) => new Vector3(v.Z, 1, 0);
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector3 _z11(this Vector3 v) => new Vector3(v.Z, 1, 1);
 	#endregion
 }
