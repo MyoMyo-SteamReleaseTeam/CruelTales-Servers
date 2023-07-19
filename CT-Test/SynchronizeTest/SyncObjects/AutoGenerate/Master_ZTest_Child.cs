@@ -30,6 +30,10 @@ namespace CTS.Instance.SyncObjects
 		protected int _field_Server_C3;
 		[SyncVar]
 		protected int _field_Server_C4;
+		[SyncVar]
+		protected int _space_2;
+		[SyncVar]
+		protected int _space_3;
 		[SyncRpc]
 		public partial void Server_C3();
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -55,12 +59,14 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_C3(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		protected partial void Client_c4(NetworkPlayer player);
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public override bool IsDirtyReliable
 		{
 			get
 			{
 				bool isDirty = false;
 				isDirty |= _dirtyReliable_0.AnyTrue();
+				isDirty |= _dirtyReliable_1.AnyTrue();
 				return isDirty;
 			}
 		}
@@ -72,7 +78,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_field_Server_C3 == value) return;
 				_field_Server_C3 = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_0[5] = true;
 			}
 		}
 		protected int Field_Server_C4
@@ -82,19 +88,39 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_field_Server_C4 == value) return;
 				_field_Server_C4 = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_0[6] = true;
+			}
+		}
+		public int Space_2
+		{
+			get => _space_2;
+			set
+			{
+				if (_space_2 == value) return;
+				_space_2 = value;
+				_dirtyReliable_0[7] = true;
+			}
+		}
+		public int Space_3
+		{
+			get => _space_3;
+			set
+			{
+				if (_space_3 == value) return;
+				_space_3 = value;
+				_dirtyReliable_1[0] = true;
 			}
 		}
 		public partial void Server_C3()
 		{
 			Server_C3CallstackCount++;
-			_dirtyReliable_0[6] = true;
+			_dirtyReliable_1[1] = true;
 		}
 		protected byte Server_C3CallstackCount = 0;
 		protected partial void Server_c4(NetworkPlayer player)
 		{
 			Server_c4Callstack.Add(player);
-			_dirtyReliable_0[7] = true;
+			_dirtyReliable_1[2] = true;
 		}
 		protected TargetVoidCallstack<NetworkPlayer> Server_c4Callstack = new(8);
 		public override void ClearDirtyReliable()
@@ -102,76 +128,96 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Clear();
 			Server_P1CallstackCount = 0;
 			Server_p2Callstack.Clear();
+			_dirtyReliable_1.Clear();
 			Server_C3CallstackCount = 0;
 			Server_c4Callstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			int originSize = writer.Size;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				writer.Put(_field_Server_P1);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				writer.Put(_field_Server_P2);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				writer.Put((byte)Server_P1CallstackCount);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				int Server_p2Count = Server_p2Callstack.GetCallCount(player);
-				if (Server_p2Count > 0)
+				if (_dirtyReliable_0[0])
 				{
-					var Server_p2callList = Server_p2Callstack.GetCallList(player);
-					writer.Put((byte)Server_p2Count);
-					for (int i = 0; i < Server_p2Count; i++)
+					writer.Put(_field_Server_P1);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					writer.Put(_field_Server_P2);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					writer.Put(_space_1);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					writer.Put((byte)Server_P1CallstackCount);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					int Server_p2Count = Server_p2Callstack.GetCallCount(player);
+					if (Server_p2Count > 0)
 					{
-						var arg = Server_p2callList[i];
-						writer.Put(arg.a);
-						writer.Put(arg.b);
+						var Server_p2callList = Server_p2Callstack.GetCallList(player);
+						writer.Put((byte)Server_p2Count);
+						for (int i = 0; i < Server_p2Count; i++)
+						{
+							var arg = Server_p2callList[i];
+							writer.Put(arg.a);
+							writer.Put(arg.b);
+						}
+					}
+					else
+					{
+						dirtyReliable_0[4] = false;
 					}
 				}
-				else
+				if (_dirtyReliable_0[5])
 				{
-					dirtyReliable_0[3] = false;
+					writer.Put(_field_Server_C3);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					writer.Put(_field_Server_C4);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					writer.Put(_space_2);
 				}
 			}
-			if (_dirtyReliable_0[4])
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			BitmaskByte dirtyReliable_1 = _dirtyReliable_1;
+			int dirtyReliable_1_pos = writer.OffsetSize(sizeof(byte));
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				writer.Put(_field_Server_C3);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				writer.Put(_field_Server_C4);
-			}
-			if (_dirtyReliable_0[6])
-			{
-				writer.Put((byte)Server_C3CallstackCount);
-			}
-			if (_dirtyReliable_0[7])
-			{
-				int Server_c4Count = Server_c4Callstack.GetCallCount(player);
-				if (Server_c4Count > 0)
+				if (_dirtyReliable_1[0])
 				{
-					writer.Put((byte)Server_c4Count);
+					writer.Put(_space_3);
 				}
-				else
+				if (_dirtyReliable_1[1])
 				{
-					dirtyReliable_0[7] = false;
+					writer.Put((byte)Server_C3CallstackCount);
+				}
+				if (_dirtyReliable_1[2])
+				{
+					int Server_c4Count = Server_c4Callstack.GetCallCount(player);
+					if (Server_c4Count > 0)
+					{
+						writer.Put((byte)Server_c4Count);
+					}
+					else
+					{
+						dirtyReliable_1[2] = false;
+					}
 				}
 			}
-			if (dirtyReliable_0.AnyTrue())
+			writer.PutTo(dirtyReliable_1, dirtyReliable_1_pos);
+			if (writer.Size == originSize + 2)
 			{
-				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			}
-			else
-			{
-				writer.SetSize(dirtyReliable_0_pos);
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -179,15 +225,21 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put(_field_Server_P1);
 			writer.Put(_field_Server_P2);
+			writer.Put(_space_1);
 			writer.Put(_field_Server_C3);
 			writer.Put(_field_Server_C4);
+			writer.Put(_space_2);
+			writer.Put(_space_3);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_field_Server_P1 = 0;
 			_field_Server_P2 = 0;
+			_space_1 = 0;
 			_field_Server_C3 = 0;
 			_field_Server_C4 = 0;
+			_space_2 = 0;
+			_space_3 = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

@@ -49,6 +49,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onField_Server_P2Changed += value;
 			remove => _onField_Server_P2Changed -= value;
 		}
+		[SyncVar]
+		protected int _space_1;
+		public int Space_1 => _space_1;
+		protected Action<int>? _onSpace_1Changed;
+		public event Action<int> OnSpace_1Changed
+		{
+			add => _onSpace_1Changed += value;
+			remove => _onSpace_1Changed -= value;
+		}
 		[SyncRpc]
 		public virtual partial void Server_P1();
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -156,13 +165,18 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
+				if (!reader.TryReadInt32(out _space_1)) return false;
+				_onSpace_1Changed?.Invoke(_space_1);
+			}
+			if (dirtyReliable_0[3])
+			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					Server_P1();
 				}
 			}
-			if (dirtyReliable_0[3])
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -181,12 +195,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onField_Server_P1Changed?.Invoke(_field_Server_P1);
 			if (!reader.TryReadSingle(out _field_Server_P2)) return false;
 			_onField_Server_P2Changed?.Invoke(_field_Server_P2);
+			if (!reader.TryReadInt32(out _space_1)) return false;
+			_onSpace_1Changed?.Invoke(_space_1);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
 		{
 			_field_Server_P1 = 0;
 			_field_Server_P2 = 0;
+			_space_1 = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -201,9 +218,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(1);
+				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -226,9 +247,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(1);
+				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)

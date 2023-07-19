@@ -30,6 +30,8 @@ namespace CTS.Instance.SyncObjects
 		protected int _field_Server_P1;
 		[SyncVar]
 		protected float _field_Server_P2;
+		[SyncVar]
+		protected int _space_1;
 		[SyncRpc]
 		public partial void Server_P1();
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -86,16 +88,26 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[1] = true;
 			}
 		}
+		public int Space_1
+		{
+			get => _space_1;
+			set
+			{
+				if (_space_1 == value) return;
+				_space_1 = value;
+				_dirtyReliable_0[2] = true;
+			}
+		}
 		public partial void Server_P1()
 		{
 			Server_P1CallstackCount++;
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[3] = true;
 		}
 		protected byte Server_P1CallstackCount = 0;
 		protected partial void Server_p2(NetworkPlayer player, int a, int b)
 		{
 			Server_p2Callstack.Add(player, (a, b));
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[4] = true;
 		}
 		protected TargetCallstack<NetworkPlayer, (int a, int b)> Server_p2Callstack = new(8);
 		public override void ClearDirtyReliable()
@@ -119,9 +131,13 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put((byte)Server_P1CallstackCount);
+				writer.Put(_space_1);
 			}
 			if (_dirtyReliable_0[3])
+			{
+				writer.Put((byte)Server_P1CallstackCount);
+			}
+			if (_dirtyReliable_0[4])
 			{
 				int Server_p2Count = Server_p2Callstack.GetCallCount(player);
 				if (Server_p2Count > 0)
@@ -137,7 +153,7 @@ namespace CTS.Instance.SyncObjects
 				}
 				else
 				{
-					dirtyReliable_0[3] = false;
+					dirtyReliable_0[4] = false;
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())
@@ -154,11 +170,13 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put(_field_Server_P1);
 			writer.Put(_field_Server_P2);
+			writer.Put(_space_1);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_field_Server_P1 = 0;
 			_field_Server_P2 = 0;
+			_space_1 = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
