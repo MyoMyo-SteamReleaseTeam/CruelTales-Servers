@@ -58,12 +58,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Master_BitmaskDeclarations(InheritType inheritType)
 		{
-			if (inheritType == InheritType.Child)
-				return string.Empty;
-
 			string accessModifier = inheritType switch
 			{
 				InheritType.Parent => "protected",
+				InheritType.Child => "protected",
 				InheritType.None => "private",
 				_ => throw new ArgumentException($"There is no such inheritType to declar bitmask. {inheritType}")
 			};
@@ -71,7 +69,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 
 			foreach (var g in _dirtyGroups)
+			{
+				if (g.HasChildMember)
+					continue;
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeclaration, g.GetName(), accessModifier));
+			}
 			return sb.ToString();
 		}
 

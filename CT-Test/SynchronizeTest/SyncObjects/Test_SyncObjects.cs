@@ -530,10 +530,10 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			NetworkPlayer p2 = new(new UserId(2));
 
 			CTS.Instance.SyncObjects.ZTest_Child masterChild = new();
+			CTS.Instance.SyncObjects.ZTest_Parent master = masterChild;
+
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild1 = new();
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild2 = new();
-
-			CTS.Instance.SyncObjects.ZTest_Parent master = masterChild;
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote1 = remoteChild1;
 			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote2 = remoteChild2;
 
@@ -633,7 +633,166 @@ namespace CT.Test.SynchronizeTest.SyncObjects
 			Assert.AreEqual(remoteChild2.Field_Client_C4_Public, masterChild.Field_Client_C4_Public);
 			Assert.AreEqual(14, masterChild.Client_C3_CountTable[p2]);
 			Assert.AreEqual(16, masterChild.Client_C4_CountTable[p2]);
+		}
 
+		[TestMethod]
+		public void TestInheritChildChild()
+		{
+			// Child in Parent
+			ByteBuffer buffer = new ByteBuffer(1024 * 16);
+
+			NetworkPlayer p1 = new(new UserId(1));
+			NetworkPlayer p2 = new(new UserId(2));
+
+			CTS.Instance.SyncObjects.ZTest_ChildChild masterChildChild = new();
+			CTS.Instance.SyncObjects.ZTest_Child masterChild = masterChildChild;
+			CTS.Instance.SyncObjects.ZTest_Parent master = masterChild;
+
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_ChildChild remoteChildChild1 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_ChildChild remoteChildChild2 = new();
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild1 = remoteChildChild1;
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Child remoteChild2 = remoteChildChild2;
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote1 = remoteChild1;
+			CTC.Networks.SyncObjects.TestSyncObjects.ZTest_Parent remote2 = remoteChild2;
+
+			master.Server_P1();
+			master.Server_P1();
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p1, 10, 20);
+			master.Server_P2_Public(p2, 20, 40);
+			master.Field_Server_P1 = 111;
+			master.Field_Server_P2_Public = 222.222f;
+			masterChild.Server_C3();
+			masterChild.Server_C3();
+			masterChild.Server_C3();
+			masterChild.Server_C4_Public(p1);
+			masterChild.Server_C4_Public(p2);
+			masterChild.Server_C4_Public(p2);
+			masterChild.Field_Server_C3 = 333;
+			masterChild.Field_Server_C4_Public = 444;
+			for (int i = 0; i < 5; i++)
+				masterChildChild.Server_CC5();
+			for (int i = 0; i < 6; i++)
+				masterChildChild.Server_CC6_Public(p1);
+			for (int i = 0; i < 7; i++)
+				masterChildChild.Server_CC6_Public(p2);
+			masterChildChild.Field_Server_CC5 = 55;
+			masterChildChild.Field_Server_CC6_Public = 66;
+
+			remote1.Field_Client_P1 = 11111;
+			remote1.Field_Client_P2_Public = 22222;
+			remote1.Client_P1();
+			remote1.Client_P1();
+			remote1.Client_P2_Public(10, 20);
+			remote1.Client_P2_Public(10, 20);
+			for (int i = 0; i < 7; i++)
+				remoteChild1.Client_C3();
+			for (int i = 0; i < 8; i++)
+				remoteChild1.Client_C4_Public();
+			remoteChild1.Field_Client_C3 = 33333;
+			remoteChild1.Field_Client_C4_Public = 44444;
+			for (int i = 0; i < 9; i++)
+				remoteChildChild1.Client_CC5();
+			for (int i = 0; i < 10; i++)
+				remoteChildChild1.Client_CC6_Public();
+			remoteChildChild1.Field_Client_CC5 = 50;
+			remoteChildChild1.Field_Client_CC6_Public = 60;
+
+			remote2.Field_Client_P1 = 10111;
+			remote2.Field_Client_P2_Public = 20222;
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P1();
+			remote2.Client_P2_Public(20, 40);
+			remote2.Client_P2_Public(20, 40);
+			for (int i = 0; i < 14; i++)
+				remoteChild2.Client_C3();
+			for (int i = 0; i < 16; i++)
+				remoteChild2.Client_C4_Public();
+			remoteChild2.Field_Client_C3 = 30333;
+			remoteChild2.Field_Client_C4_Public = 40444;
+			for (int i = 0; i < 18; i++)
+				remoteChildChild2.Client_CC5();
+			for (int i = 0; i < 20; i++)
+				remoteChildChild2.Client_CC6_Public();
+			remoteChildChild2.Field_Client_CC5 = 500;
+			remoteChildChild2.Field_Client_CC6_Public = 600;
+
+			// Master <--> Remote 1
+			Sync(buffer, p1, masterChildChild, remoteChildChild1);
+
+			// Check parent
+			Assert.AreEqual(master.Field_Server_P1, remote1.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote1.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote1.Server_P1_Count);
+			Assert.AreEqual(40, remote1.Server_P2_a);
+			Assert.AreEqual(80, remote1.Server_P2_b);
+
+			Assert.AreEqual(remote1.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote1.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(2, master.Client_P1_CountTable[p1]);
+			Assert.AreEqual(20, master.Client_P2_Table[p1].a);
+			Assert.AreEqual(40, master.Client_P2_Table[p1].b);
+
+			// Check child
+			Assert.AreEqual(masterChild.Field_Server_C3, remoteChild1.Field_Server_C3);
+			Assert.AreEqual(masterChild.Field_Server_C4_Public, remoteChild1.Field_Server_C4_Public);
+			Assert.AreEqual(3, remoteChild1.Server_C3_Count);
+			Assert.AreEqual(1, remoteChild1.Server_C4_Count);
+
+			Assert.AreEqual(remoteChild1.Field_Client_C3, masterChild.Field_Client_C3);
+			Assert.AreEqual(remoteChild1.Field_Client_C4_Public, masterChild.Field_Client_C4_Public);
+			Assert.AreEqual(7, masterChild.Client_C3_CountTable[p1]);
+			Assert.AreEqual(8, masterChild.Client_C4_CountTable[p1]);
+
+			// Check child child
+			Assert.AreEqual(masterChildChild.Field_Server_CC5, remoteChildChild1.Field_Server_CC5);
+			Assert.AreEqual(masterChildChild.Field_Server_CC6_Public, remoteChildChild1.Field_Server_CC6_Public);
+			Assert.AreEqual(5, remoteChildChild1.Server_CC5_Count);
+			Assert.AreEqual(6, remoteChildChild1.Server_CC6_Count);
+
+			Assert.AreEqual(remoteChildChild1.Field_Client_CC5, masterChildChild.Field_Client_CC5);
+			Assert.AreEqual(remoteChildChild1.Field_Client_CC6_Public, masterChildChild.Field_Client_CC6_Public);
+			Assert.AreEqual(9, masterChildChild.Client_CC5_CountTable[p1]);
+			Assert.AreEqual(10, masterChildChild.Client_CC6_CountTable[p1]);
+
+			// Master <--> Remote 2
+			Sync(buffer, p2, masterChildChild, remoteChildChild2);
+
+			// Check parent
+			Assert.AreEqual(master.Field_Server_P1, remote2.Field_Server_P1);
+			Assert.AreEqual(master.Field_Server_P2_Public, remote2.Field_Server_P2_Public);
+			Assert.AreEqual(2, remote2.Server_P1_Count);
+			Assert.AreEqual(40, remote2.Server_P2_a);
+			Assert.AreEqual(80, remote2.Server_P2_b);
+
+			Assert.AreEqual(remote2.Field_Client_P1, master.Field_Client_P1);
+			Assert.AreEqual(remote2.Field_Client_P2_Public, master.Field_Client_P2_Public);
+			Assert.AreEqual(3, master.Client_P1_CountTable[p2]);
+			Assert.AreEqual(40, master.Client_P2_Table[p2].a);
+			Assert.AreEqual(80, master.Client_P2_Table[p2].b);
+
+			// Check child
+			Assert.AreEqual(masterChild.Field_Server_C3, remoteChild2.Field_Server_C3);
+			Assert.AreEqual(masterChild.Field_Server_C4_Public, remoteChild2.Field_Server_C4_Public);
+			Assert.AreEqual(3, remoteChild2.Server_C3_Count);
+			Assert.AreEqual(2, remoteChild2.Server_C4_Count);
+
+			Assert.AreEqual(remoteChild2.Field_Client_C3, masterChild.Field_Client_C3);
+			Assert.AreEqual(remoteChild2.Field_Client_C4_Public, masterChild.Field_Client_C4_Public);
+			Assert.AreEqual(14, masterChild.Client_C3_CountTable[p2]);
+			Assert.AreEqual(16, masterChild.Client_C4_CountTable[p2]);
+
+			// Check child child
+			Assert.AreEqual(masterChildChild.Field_Server_CC5, remoteChildChild2.Field_Server_CC5);
+			Assert.AreEqual(masterChildChild.Field_Server_CC6_Public, remoteChildChild2.Field_Server_CC6_Public);
+			Assert.AreEqual(5, remoteChildChild2.Server_CC5_Count);
+			Assert.AreEqual(7, remoteChildChild2.Server_CC6_Count);
+
+			Assert.AreEqual(remoteChildChild2.Field_Client_CC5, masterChildChild.Field_Client_CC5);
+			Assert.AreEqual(remoteChildChild2.Field_Client_CC6_Public, masterChildChild.Field_Client_CC6_Public);
+			Assert.AreEqual(18, masterChildChild.Client_CC5_CountTable[p2]);
+			Assert.AreEqual(20, masterChildChild.Client_CC6_CountTable[p2]);
 		}
 
 		public void Sync(ByteBuffer buffer,

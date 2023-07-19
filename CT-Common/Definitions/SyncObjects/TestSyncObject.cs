@@ -65,7 +65,7 @@ namespace CT.Common.Definitions.SyncObjects
 	}
 
 	[SyncNetworkObjectDefinition(IsDebugOnly = true)]
-	public partial class ZTest_ChildChild : ZTest_Parent
+	public partial class ZTest_ChildChild : ZTest_Child
 	{
 		[SyncVar]
 		public int Field_Server_CC5;

@@ -11,15 +11,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private List<BaseMemberToken> _members = new();
 		private SyncType _syncType;
 		private int _dirtyIndex;
-		private bool _hasTargetMember = false;
-		public bool HasTargetMember => _hasTargetMember;
+		public bool HasTargetMember { get; private set; }
+		/// <summary>자식 멤버가 있다면 더티 비트는 부모 클래스에서 선언되어 있음</summary>
+		public bool HasChildMember { get; private set; }
 
 		public DirtyGroup(List<BaseMemberToken> members, SyncType syncType, int dirtyIndex)
 		{
 			_members = members;
 			_syncType = syncType;
 			_dirtyIndex = dirtyIndex;
-			_hasTargetMember |= members.Any((m) =>
+			HasTargetMember = members.Any((m) =>
 			{
 				if (m is TargetFunctionMemberToken)
 					return true;
@@ -39,6 +40,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 				return false;
 			});
+
+			HasChildMember = members.Any((m) => m.InheritType == InheritType.Child);
 		}
 
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";

@@ -53,12 +53,14 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public virtual partial void Server_CC5();
 		[SyncRpc(SyncType.ReliableTarget)]
 		protected virtual partial void Server_cc6();
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public override bool IsDirtyReliable
 		{
 			get
 			{
 				bool isDirty = false;
 				isDirty |= _dirtyReliable_0.AnyTrue();
+				isDirty |= _dirtyReliable_1.AnyTrue();
 				return isDirty;
 			}
 		}
@@ -70,7 +72,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				if (_field_Client_CC5 == value) return;
 				_field_Client_CC5 = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_1[0] = true;
 			}
 		}
 		protected int Field_Client_CC6
@@ -80,19 +82,19 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				if (_field_Client_CC6 == value) return;
 				_field_Client_CC6 = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_1[1] = true;
 			}
 		}
 		public partial void Client_CC5()
 		{
 			Client_CC5CallstackCount++;
-			_dirtyReliable_0[6] = true;
+			_dirtyReliable_1[2] = true;
 		}
 		protected byte Client_CC5CallstackCount = 0;
 		protected partial void Client_cc6()
 		{
 			Client_cc6CallstackCount++;
-			_dirtyReliable_0[7] = true;
+			_dirtyReliable_1[3] = true;
 		}
 		protected byte Client_cc6CallstackCount = 0;
 		public override void ClearDirtyReliable()
@@ -100,6 +102,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_dirtyReliable_0.Clear();
 			Client_P1CallstackCount = 0;
 			Client_p2Callstack.Clear();
+			Client_C3CallstackCount = 0;
+			Client_c4CallstackCount = 0;
+			_dirtyReliable_1.Clear();
 			Client_CC5CallstackCount = 0;
 			Client_cc6CallstackCount = 0;
 		}
@@ -107,44 +112,67 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void SerializeSyncReliable(IPacketWriter writer)
 		{
 			_dirtyReliable_0.Serialize(writer);
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				writer.Put(_field_Client_P1);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				writer.Put(_field_Client_P2);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				writer.Put((byte)Client_P1CallstackCount);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				byte count = (byte)Client_p2Callstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Client_p2Callstack[i];
-					writer.Put(arg.a);
-					writer.Put(arg.b);
+					writer.Put(_field_Client_P1);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					writer.Put(_field_Client_P2);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					writer.Put((byte)Client_P1CallstackCount);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					byte count = (byte)Client_p2Callstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Client_p2Callstack[i];
+						writer.Put(arg.a);
+						writer.Put(arg.b);
+					}
+				}
+				if (_dirtyReliable_0[4])
+				{
+					writer.Put(_field_Client_C3);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					writer.Put(_field_Client_C4);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					writer.Put((byte)Client_C3CallstackCount);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					writer.Put((byte)Client_c4CallstackCount);
 				}
 			}
-			if (_dirtyReliable_0[4])
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				writer.Put(_field_Client_CC5);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				writer.Put(_field_Client_CC6);
-			}
-			if (_dirtyReliable_0[6])
-			{
-				writer.Put((byte)Client_CC5CallstackCount);
-			}
-			if (_dirtyReliable_0[7])
-			{
-				writer.Put((byte)Client_cc6CallstackCount);
+				if (_dirtyReliable_1[0])
+				{
+					writer.Put(_field_Client_CC5);
+				}
+				if (_dirtyReliable_1[1])
+				{
+					writer.Put(_field_Client_CC6);
+				}
+				if (_dirtyReliable_1[2])
+				{
+					writer.Put((byte)Client_CC5CallstackCount);
+				}
+				if (_dirtyReliable_1[3])
+				{
+					writer.Put((byte)Client_cc6CallstackCount);
+				}
 			}
 		}
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
@@ -152,6 +180,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			writer.Put(_field_Client_P1);
 			writer.Put(_field_Client_P2);
+			writer.Put(_field_Client_C3);
+			writer.Put(_field_Client_C4);
 			writer.Put(_field_Client_CC5);
 			writer.Put(_field_Client_CC6);
 		}
@@ -159,64 +189,99 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			_field_Client_P1 = 0;
 			_field_Client_P2 = 0;
+			_field_Client_C3 = 0;
+			_field_Client_C4 = 0;
 			_field_Client_CC5 = 0;
 			_field_Client_CC6 = 0;
 		}
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
+			if (dirtyReliable_0.AnyTrue())
 			{
-				if (!reader.TryReadInt32(out _field_Server_P1)) return false;
-				_onField_Server_P1Changed?.Invoke(_field_Server_P1);
-			}
-			if (dirtyReliable_0[1])
-			{
-				if (!reader.TryReadSingle(out _field_Server_P2)) return false;
-				_onField_Server_P2Changed?.Invoke(_field_Server_P2);
-			}
-			if (dirtyReliable_0[2])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_0[0])
 				{
-					Server_P1();
+					if (!reader.TryReadInt32(out _field_Server_P1)) return false;
+					_onField_Server_P1Changed?.Invoke(_field_Server_P1);
+				}
+				if (dirtyReliable_0[1])
+				{
+					if (!reader.TryReadSingle(out _field_Server_P2)) return false;
+					_onField_Server_P2Changed?.Invoke(_field_Server_P2);
+				}
+				if (dirtyReliable_0[2])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						Server_P1();
+					}
+				}
+				if (dirtyReliable_0[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						if (!reader.TryReadInt32(out int a)) return false;
+						if (!reader.TryReadInt32(out int b)) return false;
+						Server_p2(a, b);
+					}
+				}
+				if (dirtyReliable_0[4])
+				{
+					if (!reader.TryReadInt32(out _field_Server_C3)) return false;
+					_onField_Server_C3Changed?.Invoke(_field_Server_C3);
+				}
+				if (dirtyReliable_0[5])
+				{
+					if (!reader.TryReadInt32(out _field_Server_C4)) return false;
+					_onField_Server_C4Changed?.Invoke(_field_Server_C4);
+				}
+				if (dirtyReliable_0[6])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						Server_C3();
+					}
+				}
+				if (dirtyReliable_0[7])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						Server_c4();
+					}
 				}
 			}
-			if (dirtyReliable_0[3])
+			BitmaskByte dirtyReliable_1 = reader.ReadBitmaskByte();
+			if (dirtyReliable_1.AnyTrue())
 			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_1[0])
 				{
-					if (!reader.TryReadInt32(out int a)) return false;
-					if (!reader.TryReadInt32(out int b)) return false;
-					Server_p2(a, b);
+					if (!reader.TryReadInt32(out _field_Server_CC5)) return false;
+					_onField_Server_CC5Changed?.Invoke(_field_Server_CC5);
 				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				if (!reader.TryReadInt32(out _field_Server_CC5)) return false;
-				_onField_Server_CC5Changed?.Invoke(_field_Server_CC5);
-			}
-			if (dirtyReliable_0[5])
-			{
-				if (!reader.TryReadInt32(out _field_Server_CC6)) return false;
-				_onField_Server_CC6Changed?.Invoke(_field_Server_CC6);
-			}
-			if (dirtyReliable_0[6])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_1[1])
 				{
-					Server_CC5();
+					if (!reader.TryReadInt32(out _field_Server_CC6)) return false;
+					_onField_Server_CC6Changed?.Invoke(_field_Server_CC6);
 				}
-			}
-			if (dirtyReliable_0[7])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_1[2])
 				{
-					Server_cc6();
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						Server_CC5();
+					}
+				}
+				if (dirtyReliable_1[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						Server_cc6();
+					}
 				}
 			}
 			return true;
@@ -228,6 +293,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onField_Server_P1Changed?.Invoke(_field_Server_P1);
 			if (!reader.TryReadSingle(out _field_Server_P2)) return false;
 			_onField_Server_P2Changed?.Invoke(_field_Server_P2);
+			if (!reader.TryReadInt32(out _field_Server_C3)) return false;
+			_onField_Server_C3Changed?.Invoke(_field_Server_C3);
+			if (!reader.TryReadInt32(out _field_Server_C4)) return false;
+			_onField_Server_C4Changed?.Invoke(_field_Server_C4);
 			if (!reader.TryReadInt32(out _field_Server_CC5)) return false;
 			_onField_Server_CC5Changed?.Invoke(_field_Server_CC5);
 			if (!reader.TryReadInt32(out _field_Server_CC6)) return false;
@@ -238,89 +307,137 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			_field_Server_P1 = 0;
 			_field_Server_P2 = 0;
+			_field_Server_C3 = 0;
+			_field_Server_C4 = 0;
 			_field_Server_CC5 = 0;
 			_field_Server_CC6 = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
+			if (dirtyReliable_0.AnyTrue())
 			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[1])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[2])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[3])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_0[0])
 				{
 					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[1])
+				{
 					reader.Ignore(4);
 				}
+				if (dirtyReliable_0[2])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_0[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+						reader.Ignore(4);
+					}
+				}
+				if (dirtyReliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[6])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_0[7])
+				{
+					reader.Ignore(1);
+				}
 			}
-			if (dirtyReliable_0[4])
+			BitmaskByte dirtyReliable_1 = reader.ReadBitmaskByte();
+			if (dirtyReliable_1.AnyTrue())
 			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[5])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[6])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[7])
-			{
-				reader.Ignore(1);
+				if (dirtyReliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_1[2])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_1[3])
+				{
+					reader.Ignore(1);
+				}
 			}
 		}
 		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
+			if (dirtyReliable_0.AnyTrue())
 			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[1])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[2])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[3])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
+				if (dirtyReliable_0[0])
 				{
 					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[1])
+				{
 					reader.Ignore(4);
 				}
+				if (dirtyReliable_0[2])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_0[3])
+				{
+					byte count = reader.ReadByte();
+					for (int i = 0; i < count; i++)
+					{
+						reader.Ignore(4);
+						reader.Ignore(4);
+					}
+				}
+				if (dirtyReliable_0[4])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[5])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_0[6])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_0[7])
+				{
+					reader.Ignore(1);
+				}
 			}
-			if (dirtyReliable_0[4])
+			BitmaskByte dirtyReliable_1 = reader.ReadBitmaskByte();
+			if (dirtyReliable_1.AnyTrue())
 			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[5])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[6])
-			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[7])
-			{
-				reader.Ignore(1);
+				if (dirtyReliable_1[0])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_1[1])
+				{
+					reader.Ignore(4);
+				}
+				if (dirtyReliable_1[2])
+				{
+					reader.Ignore(1);
+				}
+				if (dirtyReliable_1[3])
+				{
+					reader.Ignore(1);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
