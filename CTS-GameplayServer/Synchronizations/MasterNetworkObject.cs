@@ -6,6 +6,7 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.SyncObjects;
+using KaNet.Physics.RigidBodies;
 
 namespace CTS.Instance.Synchronizations
 {
@@ -28,6 +29,9 @@ namespace CTS.Instance.Synchronizations
 
 		/// <summary>네트워크 객체의 Transform입니다.</summary>
 		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
+
+		/// <summary>물리 RigidBody입니다.</summary>
+		public KaRigidBody RigidBody { get; protected set; }
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }

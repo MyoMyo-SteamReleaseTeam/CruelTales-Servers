@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />
+    <ProjectReference Include="..\KaNetPhysics\KaNetPhysics.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,9 +15,6 @@ namespace KaNet.Physics.RigidBodies
 		[ShowInInspector]
 		public Vector2 Position { get; private set; }
 
-		/// <summary>각도</summary>
-		public float Rotation { get; private set; }
-
 		/// <summary>선속도</summary>
 		[ShowInInspector]
 		public Vector2 LinearVelocity { get; set; }
@@ -25,6 +22,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>힘<summary>
 		[ShowInInspector]
 		public Vector2 ForceVelocity { get; set; }
+
+		/// <summary>각도</summary>
+		public float Rotation { get; private set; }
 
 		/// <summary>힘 마찰력</summary>
 		public float ForceFriction { get; set; } = 3.0f;
