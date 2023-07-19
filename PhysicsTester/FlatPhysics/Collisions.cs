@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using KaNet.Physics;
 
 namespace FlatPhysics
 {
@@ -93,9 +94,9 @@ namespace FlatPhysics
 
 					PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
-					if (KaMath.NearlyEqual(distSq, minDistSq))
+					if (KaPhysics.NearlyEqual(distSq, minDistSq))
 					{
-						if (!KaMath.NearlyEqual(cp, contact1))
+						if (KaPhysics.NearlyNotEqual(cp, contact1))
 						{
 							contact2 = cp;
 							contactCount = 2;
@@ -121,9 +122,9 @@ namespace FlatPhysics
 
 					PointSegmentDistance(p, va, vb, out float distSq, out Vector2 cp);
 
-					if (KaMath.NearlyEqual(distSq, minDistSq))
+					if (KaPhysics.NearlyEqual(distSq, minDistSq))
 					{
-						if (!KaMath.NearlyEqual(cp, contact1))
+						if (KaPhysics.NearlyNotEqual(cp, contact1))
 						{
 							contact2 = cp;
 							contactCount = 2;

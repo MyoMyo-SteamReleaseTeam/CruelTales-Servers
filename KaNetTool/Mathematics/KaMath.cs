@@ -67,19 +67,4 @@ public static class KaMath
 	{
 		return a.X * b.Y - a.Y * b.X;
 	}
-
-	public static readonly float FloatElapsed = 0.001f;
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool NearlyEqual(float a, float b)
-	{
-		return MathF.Abs(a - b) < FloatElapsed;
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static bool NearlyEqual(Vector2 a, Vector2 b)
-	{
-		//return Vector2.DistanceSquared(a, b) < PhysicsFloatElapsed * PhysicsFloatElapsed;
-		return NearlyEqual(a.X, b.X) && NearlyEqual(a.Y, b.Y);
-	}
 }

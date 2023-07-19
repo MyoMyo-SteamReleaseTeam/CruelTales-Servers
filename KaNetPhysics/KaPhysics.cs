@@ -11,7 +11,33 @@ namespace KaNet.Physics
 
 	public static class KaPhysics
 	{
+		public const float MIN_COLLIDER_SIZE = 0.2f;
 		public const float FLOAT_EPSILON = 0.001f;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool NearlyEqual(float a, float b)
+		{
+			return MathF.Abs(a - b) < FLOAT_EPSILON;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool NearlyEqual(Vector2 a, Vector2 b)
+		{
+			return NearlyEqual(a.X, b.X) && NearlyEqual(a.Y, b.Y);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool NearlyNotEqual(float a, float b)
+		{
+			return MathF.Abs(a - b) >= FLOAT_EPSILON;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool NearlyNotEqual(Vector2 a, Vector2 b)
+		{
+			return NearlyNotEqual(a.X, b.X) || NearlyNotEqual(a.Y, b.Y);
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void ComputeTransform(in Vector2[] vertices, in Vector2[] transformed,
 											in Vector2 position, in float rotation)

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using KaNet.Physics;
 using PhysicsTester;
 
 namespace FlatPhysics
@@ -375,7 +376,7 @@ namespace FlatPhysics
 
 				Vector2 tangent = relativeVelocity - Vector2.Dot(relativeVelocity, normal) * normal;
 
-				if (KaMath.NearlyEqual(tangent, Vector2.Zero))
+				if (KaPhysics.NearlyEqual(tangent, Vector2.Zero))
 				{
 					continue;
 				}
