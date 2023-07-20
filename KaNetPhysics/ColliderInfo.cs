@@ -41,7 +41,7 @@ namespace KaNet.Physics
 			IsStatic = isStatic;
 		}
 
-		public KaRigidBody OnCreatedByTester()
+		public KaRigidBody CreateRigidBody()
 		{
 			KaRigidBody rigidBody;
 

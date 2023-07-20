@@ -1,0 +1,628 @@
+{
+  "MapType": 110,
+  "Theme": 101,
+  "SpawnPosition": [
+    {
+      "X": -9.85,
+      "Y": 6.52
+    },
+    {
+      "X": -8.35,
+      "Y": 4.82
+    },
+    {
+      "X": -6.35,
+      "Y": 4.32
+    },
+    {
+      "X": -4.35,
+      "Y": 4.82
+    },
+    {
+      "X": -2.85,
+      "Y": 6.52
+    },
+    {
+      "X": -7.55,
+      "Y": 6.82
+    },
+    {
+      "X": -5.14999962,
+      "Y": 6.82
+    },
+    {
+      "X": -6.35,
+      "Y": 5.62
+    }
+  ],
+  "ColliderInfoList": [
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -25.97495,
+        "Y": 19.1309338
+      },
+      "Rotation": 0.0,
+      "Radius": 9.113555,
+      "Width": 18.22711,
+      "Height": 19.4865017,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -8.826645,
+        "Y": 21.3746662
+      },
+      "Rotation": 0.0,
+      "Radius": 8.03475,
+      "Width": 16.0695,
+      "Height": 14.9990377,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -9.27,
+        "Y": 17.24
+      },
+      "Rotation": 0.0,
+      "Radius": 2.69073939,
+      "Width": 5.381479,
+      "Height": 8.38811,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 4.57652855,
+        "Y": 11.9128571
+      },
+      "Rotation": 0.0,
+      "Radius": 5.36842346,
+      "Width": 10.7368469,
+      "Height": 33.922657,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -26.1679249,
+        "Y": -7.76
+      },
+      "Rotation": 0.0,
+      "Radius": 8.920578,
+      "Width": 17.841156,
+      "Height": 13.1594505,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 15.8972254,
+        "Y": 15.35861
+      },
+      "Rotation": 0.0,
+      "Radius": 5.952274,
+      "Width": 11.9045477,
+      "Height": 5.44732571,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -34.6240349,
+        "Y": 2.78694
+      },
+      "Rotation": 0.0,
+      "Radius": 0.464469731,
+      "Width": 0.928939462,
+      "Height": 13.2014856,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 37.9517555,
+        "Y": 3.13427162
+      },
+      "Rotation": 0.0,
+      "Radius": 0.64370954,
+      "Width": 1.28741908,
+      "Height": 19.0013523,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 37.69,
+        "Y": -20.82071
+      },
+      "Rotation": 0.0,
+      "Radius": 0.64370954,
+      "Width": 1.28741908,
+      "Height": 29.8021564,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -0.24,
+        "Y": -29.9427032
+      },
+      "Rotation": 0.0,
+      "Radius": 40.5189819,
+      "Width": 81.0379639,
+      "Height": 1.50805438,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 13.52,
+        "Y": -3.74
+      },
+      "Rotation": 0.0,
+      "Radius": 8.305951,
+      "Width": 16.6119022,
+      "Height": 7.519946,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 0.09083605,
+        "Y": -7.10704565
+      },
+      "Rotation": 331.796722,
+      "Radius": 7.03286457,
+      "Width": 14.0657291,
+      "Height": 3.88153934,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": -16.9621315,
+        "Y": -15.9550991
+      },
+      "Rotation": 331.796722,
+      "Radius": 8.869164,
+      "Width": 17.7383289,
+      "Height": 4.355507,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": -14.0578289,
+        "Y": -26.3977146
+      },
+      "Rotation": 331.796722,
+      "Radius": 8.886002,
+      "Width": 17.7720032,
+      "Height": 18.2940178,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": -8.88,
+        "Y": -11.69
+      },
+      "Rotation": 311.945129,
+      "Radius": 0.507082641,
+      "Width": 1.01416528,
+      "Height": 4.39400625,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": -6.25,
+        "Y": -10.2
+      },
+      "Rotation": 311.945129,
+      "Radius": 0.7351684,
+      "Width": 1.47033679,
+      "Height": 4.1720314,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -27.22,
+        "Y": 2.59
+      },
+      "Rotation": 0.0,
+      "Radius": 3.907587,
+      "Width": 7.815174,
+      "Height": 4.10621452,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 2.805,
+        "Y": -11.49
+      },
+      "Rotation": 0.0,
+      "Radius": 1.6423434,
+      "Width": 3.2846868,
+      "Height": 2.52590346,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 13.78,
+        "Y": -12.0471926
+      },
+      "Rotation": 0.0,
+      "Radius": 6.8815074,
+      "Width": 13.7630148,
+      "Height": 9.094437,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 18.83,
+        "Y": -19.67
+      },
+      "Rotation": 0.0,
+      "Radius": 4.366458,
+      "Width": 8.732916,
+      "Height": 6.57577658,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 18.79,
+        "Y": -20.96
+      },
+      "Rotation": 0.0,
+      "Radius": 2.95440173,
+      "Width": 5.90880346,
+      "Height": 6.73113537,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 27.93,
+        "Y": -19.56
+      },
+      "Rotation": 0.0,
+      "Radius": 0.191704229,
+      "Width": 0.383408457,
+      "Height": 4.61235428,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 31.32,
+        "Y": -19.56
+      },
+      "Rotation": 0.0,
+      "Radius": 0.191704229,
+      "Width": 0.383408457,
+      "Height": 4.61235428,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 33.8384666,
+        "Y": -18.968977
+      },
+      "Rotation": 0.0,
+      "Radius": 2.32676458,
+      "Width": 4.653529,
+      "Height": 3.43030834,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 25.3572788,
+        "Y": -18.3701744
+      },
+      "Rotation": 8.399741,
+      "Radius": 2.6206696,
+      "Width": 5.241339,
+      "Height": 3.0287025,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 11.4,
+        "Y": -21.55
+      },
+      "Rotation": 326.531952,
+      "Radius": 0.191704229,
+      "Width": 0.383408457,
+      "Height": 4.664799,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 6.62849951,
+        "Y": -22.3873768
+      },
+      "Rotation": 307.879517,
+      "Radius": 1.41233671,
+      "Width": 2.82467341,
+      "Height": 0.334091216,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 13.467021,
+        "Y": -19.22819
+      },
+      "Rotation": 326.531952,
+      "Radius": 2.813004,
+      "Width": 5.626008,
+      "Height": 3.07093024,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 17.06,
+        "Y": 12.35
+      },
+      "Rotation": 0.0,
+      "Radius": 2.90049815,
+      "Width": 5.8009963,
+      "Height": 0.825943649,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 30.57,
+        "Y": 12.36
+      },
+      "Rotation": 0.0,
+      "Radius": 2.58360934,
+      "Width": 5.16721869,
+      "Height": 0.825943649,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 34.33,
+        "Y": 5.31
+      },
+      "Rotation": 0.0,
+      "Radius": 2.4906168,
+      "Width": 4.9812336,
+      "Height": 0.230991662,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 14.28,
+        "Y": 6.47
+      },
+      "Rotation": 0.0,
+      "Radius": 0.75067544,
+      "Width": 1.50135088,
+      "Height": 0.825943649,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 18.1,
+        "Y": 2.25
+      },
+      "Rotation": 0.0,
+      "Radius": 0.694113255,
+      "Width": 1.38822651,
+      "Height": 0.825943649,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -6.07,
+        "Y": -4.05
+      },
+      "Rotation": 0.0,
+      "Radius": 0.452659518,
+      "Width": 0.905319035,
+      "Height": 0.4436784,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 33.9020233,
+        "Y": -13.515625
+      },
+      "Rotation": 0.0,
+      "Radius": 1.39192092,
+      "Width": 2.78384185,
+      "Height": 3.93060255,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 29.726263,
+        "Y": -11.8716116
+      },
+      "Rotation": 0.0,
+      "Radius": 1.39192092,
+      "Width": 2.78384185,
+      "Height": 1.738584,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -10.625,
+        "Y": 3.522
+      },
+      "Rotation": 0.0,
+      "Radius": 0.3283728,
+      "Width": 0.6567456,
+      "Height": 0.4436784,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 5.33560133,
+        "Y": -24.91303
+      },
+      "Rotation": 286.336853,
+      "Radius": 1.62093878,
+      "Width": 3.24187756,
+      "Height": 0.334091216,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 4.797503,
+        "Y": -27.84157
+      },
+      "Rotation": 273.595459,
+      "Radius": 1.41233671,
+      "Width": 2.82467341,
+      "Height": 0.334091216,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 24.4000549,
+        "Y": 23.47823
+      },
+      "Rotation": 0.0,
+      "Radius": 14.4551039,
+      "Width": 28.9102077,
+      "Height": 10.7919121,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 32.41,
+        "Y": 15.35861
+      },
+      "Rotation": 0.0,
+      "Radius": 6.185466,
+      "Width": 12.3709316,
+      "Height": 5.44732571,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 31.41,
+        "Y": -3.74
+      },
+      "Rotation": 0.0,
+      "Radius": 7.44727945,
+      "Width": 14.8945589,
+      "Height": 7.519946,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 8.81,
+        "Y": -23.01
+      },
+      "Rotation": 326.531952,
+      "Radius": 0.191704229,
+      "Width": 0.383408457,
+      "Height": 4.664799,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -0.24,
+        "Y": -27.4
+      },
+      "Rotation": 0.0,
+      "Radius": 5.11229658,
+      "Width": 10.2245932,
+      "Height": 6.73113537,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 24.4000549,
+        "Y": 23.47823
+      },
+      "Rotation": 0.0,
+      "Radius": 14.4551039,
+      "Width": 28.9102077,
+      "Height": 10.7919121,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 32.41,
+        "Y": 15.35861
+      },
+      "Rotation": 0.0,
+      "Radius": 6.185466,
+      "Width": 12.3709316,
+      "Height": 5.44732571,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": 31.41,
+        "Y": -3.74
+      },
+      "Rotation": 0.0,
+      "Radius": 7.44727945,
+      "Width": 14.8945589,
+      "Height": 7.519946,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 2,
+      "Position": {
+        "X": 8.81,
+        "Y": -23.01
+      },
+      "Rotation": 326.531952,
+      "Radius": 0.191704229,
+      "Width": 0.383408457,
+      "Height": 4.664799,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "Position": {
+        "X": -0.24,
+        "Y": -27.4
+      },
+      "Rotation": 0.0,
+      "Radius": 5.11229658,
+      "Width": 10.2245932,
+      "Height": 6.73113537,
+      "IsStatic": true
+    }
+  ]
+}
