@@ -41,25 +41,28 @@ namespace KaNet.Physics
 			IsStatic = isStatic;
 		}
 
-		public KaRigidBody CreateRigidBody()
+		public KaRigidBody CreateRigidBody(bool checkValidation = false)
 		{
 			KaRigidBody rigidBody;
 
 #if DEBUG
-			if (Width < KaPhysics.MIN_COLLIDER_SIZE)
-				throw new ArgumentException($"Too small width : {Width}");
+			if (checkValidation)
+			{
+				if (Width < KaPhysics.MIN_COLLIDER_SIZE)
+					throw new ArgumentException($"Too small width : {Width}");
 
-			if (Height < KaPhysics.MIN_COLLIDER_SIZE)
-				throw new ArgumentException($"Too small height : {Height}");
+				if (Height < KaPhysics.MIN_COLLIDER_SIZE)
+					throw new ArgumentException($"Too small height : {Height}");
 
-			if (Radius * 2 < KaPhysics.MIN_COLLIDER_SIZE)
-				throw new ArgumentException($"Too small diameter : {Radius * 2}");
+				if (Radius * 2 < KaPhysics.MIN_COLLIDER_SIZE)
+					throw new ArgumentException($"Too small diameter : {Radius * 2}");
+			}
 #endif
 
 			if (PhysicsShapeType == KaPhysicsShapeType.Box_AABB)
 			{
 #if DEBUG
-				if (KaPhysics.NearlyNotEqual(Rotation, 0))
+				if (checkValidation && KaPhysics.NearlyNotEqual(Rotation, 0))
 				{
 					throw new ArgumentException($"This collider is AABB but current rotation is {Rotation}!");
 				}
@@ -69,9 +72,15 @@ namespace KaNet.Physics
 			else if (PhysicsShapeType == KaPhysicsShapeType.Box_OBB)
 			{
 #if DEBUG
-				if (KaPhysics.NearlyNotEqual(Rotation, 0))
+				if (checkValidation)
 				{
-					throw new ArgumentException($"This collider is AABB but current rotation is {Rotation}!");
+					if (KaPhysics.NearlyEqual(Rotation, 0) ||
+						KaPhysics.NearlyEqual(Rotation, 90) ||
+						KaPhysics.NearlyEqual(Rotation, 180) ||
+						KaPhysics.NearlyEqual(Rotation, 270))
+					{
+						throw new ArgumentException($"This collider is OBB but current rotation is {Rotation}! It's should be assigned OBB!");
+					}
 				}
 #endif
 				rigidBody = new BoxOBBRigidBody(Width, Height, Rotation, IsStatic);
