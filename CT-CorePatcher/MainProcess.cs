@@ -44,6 +44,14 @@ namespace CT.CorePatcher
 			try
 			{
 				Console.SetWindowSize(100, 70);
+			}
+			catch
+			{
+				PatcherConsole.PrintError("Set Window Size Failed!");
+			}
+			
+			try
+			{
 
 				if (args.Length == 0)
 				{
