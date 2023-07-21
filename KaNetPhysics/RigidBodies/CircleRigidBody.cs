@@ -3,6 +3,7 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
+	/// <summary>원형 강체입니다.</summary>
 	public class CircleRigidBody : KaRigidBody
 	{
 		/// <summary>반지름</summary>

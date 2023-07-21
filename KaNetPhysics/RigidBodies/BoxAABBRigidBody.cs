@@ -4,6 +4,7 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
+	/// <summary>좌표계에 수직하거나 평행한 상자 강체입니다.</summary>
 	public class BoxAABBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>

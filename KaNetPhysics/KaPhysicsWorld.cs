@@ -8,7 +8,7 @@ namespace KaNet.Physics
 {
 	public class KaPhysicsWorld
 	{
-		private List<KaRigidBody> _rigidBodies = new();
+		private List<KaRigidBody> _rigidBodies = new(128);
 		public int BodyCount => _rigidBodies.Count;
 
 		public void AddRigidBody(KaRigidBody rigidBody)
@@ -75,14 +75,14 @@ namespace KaNet.Physics
 			{
 				float depthAmount = bodyB.IsStatic ? depth : depth * 0.5f;
 				bodyA.Move(-normal, depthAmount);
-				bodyA.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
+				bodyA.Impulse(Vector2.Reflect(bodyA.ForceVelocity, normal));
 			}
 
 			if (!bodyB.IsStatic)
 			{
 				float depthAmount = bodyA.IsStatic ? depth : depth * 0.5f;
 				bodyB.Move(normal, depthAmount);
-				bodyA.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
+				bodyB.Impulse(Vector2.Reflect(bodyA.ForceVelocity, normal));
 			}
 		}
 

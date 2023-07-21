@@ -22,7 +22,7 @@ namespace KaNet.Physics.RigidBodies
 
 		/// <summary>힘<summary>
 		[ShowInInspector]
-		public Vector2 ForceVelocity { get; set; }
+		public Vector2 ForceVelocity { get; private set; }
 
 		/// <summary>각도</summary>
 		[field: UnityEngine.SerializeField]
@@ -89,6 +89,18 @@ namespace KaNet.Physics.RigidBodies
 			Position += direction * distance;
 			_isTransformDirty = true;
 			_isBoundingBoxDirty = true;
+		}
+
+		/// <summary>순간적인 힘을 가합니다.</summary>
+		public void Impulse(Vector2 direction, float power)
+		{
+			ForceVelocity = direction * power;
+		}
+
+		/// <summary>순간적인 힘을 가합니다.</summary>
+		public void Impulse(Vector2 impluseVelocity)
+		{
+			ForceVelocity = impluseVelocity;
 		}
 
 		/// <summary>해당 각도로 회전합니다.</summary>

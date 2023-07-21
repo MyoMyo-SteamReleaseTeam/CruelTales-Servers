@@ -4,6 +4,7 @@ using System.Numerics;
 
 namespace KaNet.Physics.RigidBodies
 {
+	/// <summary>회전 가능한 상자 강체 입니다.</summary>
 	public class BoxOBBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>
