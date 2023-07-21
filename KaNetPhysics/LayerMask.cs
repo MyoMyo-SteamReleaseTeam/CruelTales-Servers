@@ -51,8 +51,15 @@ namespace KaNet.Physics
 		private static List<PhysicsLayerMask> _layerMaskEnums = new();
 		private static Dictionary<PhysicsLayerMask, PhysicsLayerMask> _flagsByLayerMask = new();
 
+		private static bool _isInitialized = false;
+
 		public static void Initialize()
 		{
+			if (_isInitialized)
+				return;
+
+			_isInitialized = true;
+
 			// Initialize layer mask
 			Span<PhysicsLayerMask> layerMaskFlagArray = stackalloc PhysicsLayerMask[MASK_COUNT];
 
