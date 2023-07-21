@@ -42,8 +42,14 @@ namespace KaNet.Physics
 		public static void ComputeTransform(in Vector2[] vertices, in Vector2[] transformed,
 											in Vector2 position, in float rotation)
 		{
-			float cos = MathF.Cos(rotation);
-			float sin = MathF.Sin(rotation);
+			// Right-handed coordinate system
+			//float cos = MathF.Cos(rotation);
+			//float sin = MathF.Sin(rotation);
+
+			// Left-handed coordinate system
+			float cos = MathF.Cos(-rotation);
+			float sin = MathF.Sin(-rotation);
+
 			Matrix3x2 r = new Matrix3x2(cos, sin, -sin, cos, 0, 0);
 			int length = vertices.Length;
 			for (int i = 0; i < length; i++)
