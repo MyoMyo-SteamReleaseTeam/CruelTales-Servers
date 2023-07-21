@@ -19,47 +19,52 @@ namespace KaNet.Physics
 		private KaEntity() { }
 
 		/// <summary>원 RigidBody를 가진 Entity를 생성합니다.</summary>
-		private KaEntity(KaPhysicsWorld world, float radius, bool isStatic,
-						Vector2 position = default, float rotation = 0)
+		private KaEntity(KaPhysicsWorld world, float radius,
+						 bool isStatic, PhysicsLayerMask layerMask,
+						 Vector2 position = default, float rotation = 0)
 		{
 			World = world;
 
-			Body = World.CreateCircle(radius, isStatic);
+			Body = World.CreateCircle(radius, isStatic, layerMask);
 			Body.MoveTo(position);
 			Color = WinformRandomHelper.RandomColor();
 		}
 
 		/// <summary>사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
-		private KaEntity(KaPhysicsWorld world, float width, float height, bool isStatic,
-						Vector2 position = default, float rotation = 0)
+		private KaEntity(KaPhysicsWorld world, float width, float height,
+						 bool isStatic, PhysicsLayerMask layerMask,
+						 Vector2 position = default, float rotation = 0)
 		{
 			World = world;
 			Body = rotation == 0 ?
-				World.CreateBoxAABB(width, height, isStatic) :
-				World.CreateBoxOBB(width, height, rotation, isStatic);
+				World.CreateBoxAABB(width, height, isStatic, layerMask) :
+				World.CreateBoxOBB(width, height, rotation, isStatic, layerMask);
 			Body.MoveTo(position);
 			Color = WinformRandomHelper.RandomColor();
 		}
 
 		/// <summary>원 RigidBody를 가진 Entity를 생성합니다.</summary>
 		public static KaEntity CreateCircleEntity(KaPhysicsWorld world, float radius,
-												  bool isStatic, Vector2 position = default)
+												  bool isStatic, PhysicsLayerMask layerMask,
+												  Vector2 position = default)
 		{
-			return new KaEntity(world, radius, isStatic, position);
+			return new KaEntity(world, radius, isStatic, layerMask, position);
 		}
 
 		/// <summary>축 정렬된 사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
 		public static KaEntity CreateAABBEntity(KaPhysicsWorld world, float width, float height,
-												bool isStatic, Vector2 position = default)
+												bool isStatic, PhysicsLayerMask layerMask,
+												Vector2 position = default)
 		{
-			return new KaEntity(world, width, height, isStatic, position);
+			return new KaEntity(world, width, height, isStatic, layerMask, position);
 		}
 
 		/// <summary>회전 가능한 사각형 RigidBody를 가진 Entity를 생성합니다.</summary>
 		public static KaEntity CreateOBBEntity(KaPhysicsWorld world, float width, float height,
-											   bool isStatic, float rotation, Vector2 position = default)
+											   float rotation, bool isStatic, 
+											   PhysicsLayerMask layerMask, Vector2 position = default)
 		{
-			return new KaEntity(world, width, height, isStatic, position, rotation);
+			return new KaEntity(world, width, height, isStatic, layerMask, position, rotation);
 		}
 
 		public void SetID(int id)

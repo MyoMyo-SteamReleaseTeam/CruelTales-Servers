@@ -10,8 +10,9 @@ namespace KaNet.Physics.RigidBodies
 		public readonly float Radius;
 		public readonly float Diameter;
 
-		public CircleRigidBody(float radius, bool isStatic)
-			: base(KaPhysicsShapeType.Circle, isStatic)
+		public CircleRigidBody(float radius, bool isStatic,
+							   PhysicsLayerMask layerMask)
+			: base(KaPhysicsShapeType.Circle, layerMask, isStatic)
 		{
 			Radius = radius;
 			Diameter = radius * 2;

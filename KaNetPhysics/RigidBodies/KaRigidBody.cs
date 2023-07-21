@@ -12,6 +12,10 @@ namespace KaNet.Physics.RigidBodies
 		[field: UnityEngine.SerializeField]
 		public KaPhysicsShapeType ShapeType { get; private set; }
 
+		/// <summary>레이어 마스크</summary>
+		[field: UnityEngine.SerializeField]
+		public LayerMask LayerMask { get; private set; }
+
 		/// <summary>위치</summary>
 		[ShowInInspector]
 		public Vector2 Position { get; private set; }
@@ -45,17 +49,19 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
 
-		public KaRigidBody(KaPhysicsShapeType shapeType, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType shapeType, PhysicsLayerMask layerMask, bool isStatic)
 		{
 			ShapeType = shapeType;
 			IsStatic = isStatic;
+			LayerMask = LayerMaskHelper.GetLayerMask(layerMask);
 		}
 
-		public KaRigidBody(KaPhysicsShapeType shapeType, float rotation, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType shapeType, PhysicsLayerMask layerMask, float rotation, bool isStatic)
 		{
 			ShapeType = shapeType;
 			Rotation = rotation;
 			IsStatic = isStatic;
+			LayerMask = LayerMaskHelper.GetLayerMask(layerMask);
 		}
 
 		/// <summary>AABB 볼륨을 반환합니다.</summary>

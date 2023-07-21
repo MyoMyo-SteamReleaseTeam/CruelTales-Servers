@@ -1,10 +1,9 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
-using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using KaNet.Physics.RigidBodies;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -13,6 +12,10 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
+		public PlayerCharacter() : base()
+		{
+			KaRigidBody rigid;
+		}
 
 		public float Speed = 5.0f;
 

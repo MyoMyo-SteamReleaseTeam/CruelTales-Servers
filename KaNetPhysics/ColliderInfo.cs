@@ -8,6 +8,7 @@ namespace KaNet.Physics
 	public struct ColliderInfo
 	{
 		public KaPhysicsShapeType PhysicsShapeType;
+		public PhysicsLayerMask LayerMask;
 		public Vector2 Position;
 		public float Rotation;
 		public float Radius;
@@ -29,10 +30,12 @@ namespace KaNet.Physics
 //#endif
 
 		public ColliderInfo(KaPhysicsShapeType physicsShapeType,
+							PhysicsLayerMask layerMask,
 							Vector2 position, float rotation, float radius,
 							float width, float height, bool isStatic)
 		{
 			PhysicsShapeType = physicsShapeType;
+			LayerMask = layerMask;
 			Position = position;
 			Rotation = rotation;
 			Radius = radius;
@@ -67,7 +70,7 @@ namespace KaNet.Physics
 					throw new ArgumentException($"This collider is AABB but current rotation is {Rotation}!");
 				}
 #endif
-				rigidBody = new BoxAABBRigidBody(Width, Height, IsStatic);
+				rigidBody = new BoxAABBRigidBody(Width, Height, IsStatic, LayerMask);
 			}
 			else if (PhysicsShapeType == KaPhysicsShapeType.Box_OBB)
 			{
@@ -83,11 +86,11 @@ namespace KaNet.Physics
 					}
 				}
 #endif
-				rigidBody = new BoxOBBRigidBody(Width, Height, Rotation, IsStatic);
+				rigidBody = new BoxOBBRigidBody(Width, Height, Rotation, IsStatic, LayerMask);
 			}
 			else if (PhysicsShapeType == KaPhysicsShapeType.Circle)
 			{
-				rigidBody = new CircleRigidBody(Radius, IsStatic);
+				rigidBody = new CircleRigidBody(Radius, IsStatic, LayerMask);
 			}
 			else
 			{

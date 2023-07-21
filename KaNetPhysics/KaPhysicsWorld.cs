@@ -21,23 +21,25 @@ namespace KaNet.Physics
 			_rigidBodies.Remove(rigidBody);
 		}
 
-		public KaRigidBody CreateCircle(float radius, bool isStatic)
+		public KaRigidBody CreateCircle(float radius, bool isStatic, PhysicsLayerMask layerMask)
 		{
-			var rigid = new CircleRigidBody(radius, isStatic);
+			var rigid = new CircleRigidBody(radius, isStatic, layerMask);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
 
-		public KaRigidBody CreateBoxAABB(float width, float height, bool isStatic)
+		public KaRigidBody CreateBoxAABB(float width, float height,
+										 bool isStatic, PhysicsLayerMask layerMask)
 		{
-			var rigid = new BoxAABBRigidBody(width, height, isStatic);
+			var rigid = new BoxAABBRigidBody(width, height, isStatic, layerMask);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
 
-		public KaRigidBody CreateBoxOBB(float width, float height, float rotation, bool isStatic)
+		public KaRigidBody CreateBoxOBB(float width, float height, float rotation,
+										bool isStatic, PhysicsLayerMask layerMask)
 		{
-			var rigid = new BoxOBBRigidBody(width, height, rotation, isStatic);
+			var rigid = new BoxOBBRigidBody(width, height, rotation, isStatic, layerMask);
 			this.AddRigidBody(rigid);
 			return rigid;
 		}
@@ -58,6 +60,11 @@ namespace KaNet.Physics
 				for (int b = a + 1; b < bodyCount; b++)
 				{
 					KaRigidBody bodyB = _rigidBodies[b];
+
+					if ((bodyA.LayerMask.Mask & bodyB.LayerMask.Flags) != bodyA.LayerMask.Mask)
+					{
+						continue;
+					}
 
 					if (!bodyA.IsCollideWith(bodyB, out Vector2 normal, out float depth))
 					{

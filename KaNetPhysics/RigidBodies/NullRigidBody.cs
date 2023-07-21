@@ -5,7 +5,8 @@ namespace KaNet.Physics.RigidBodies
 	/// <summary>형체가 없는 강체입니다. 연산되지 않습니다.</summary>
 	public class NullRigidBody : KaRigidBody
 	{
-		public NullRigidBody() : base(KaPhysicsShapeType.None, true)
+		public NullRigidBody() :
+			base(KaPhysicsShapeType.None, PhysicsLayerMask.None, isStatic: true)
 		{
 		}
 

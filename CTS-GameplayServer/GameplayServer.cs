@@ -7,6 +7,7 @@ using CT.Common.Tools.Data;
 #endif
 using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
+using KaNet.Physics;
 using log4net;
 
 namespace CTS.Instance
@@ -65,6 +66,9 @@ namespace CTS.Instance
 			_log.Info($"Frame per ms\t: {_serverOption.FramePerMs}");
 			_log.Info($"Alarm Tick ms\t: {_serverOption.AlarmTickMs}");
 			_log.Info($"Max Game Count\t: {_serverOption.GameCount}");
+
+			// Initialize
+			LayerMaskHelper.Initialize();
 
 			// Start server
 			_serverTimer = new TickTimer();

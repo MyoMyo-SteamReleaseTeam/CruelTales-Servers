@@ -31,7 +31,7 @@ namespace CTS.Instance.Synchronizations
 		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
 
 		/// <summary>물리 RigidBody입니다.</summary>
-		public KaRigidBody RigidBody { get; protected set; }
+		public KaRigidBody? RigidBody { get; protected set; }
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
@@ -48,8 +48,6 @@ namespace CTS.Instance.Synchronizations
 
 		/// <summary>위치가 고정된 네트워크 객체인지 여부입니다.</summary>
 		public bool IsStatic { get; }
-
-		public MasterNetworkObject() {}
 
 		public Vector2Int CurrentCellPos { get; private set; }
 
@@ -90,18 +88,19 @@ namespace CTS.Instance.Synchronizations
 		public virtual void OnUpdate(float deltaTime) { }
 
 		/// <summary>객체를 초기화합니다.</summary>
-		public void Create(WorldManager manager,
+		public void Create(WorldManager worldManager,
 						   WorldVisibilityManager worldPartitioner,
 						   GameplayManager gameManager,
 						   NetworkIdentity id,
-						   Vector3 position)
+						   Vector3 position,
+						   float rotation)
 		{
 			// Initialize
 			Identity = id;
 			IsAlive = true;
 
 			// Bind reference
-			WorldManager = manager;
+			WorldManager = worldManager;
 			GameplayManager = gameManager;
 
 			VisibilityAuthority = InitialVisibilityAuthority;

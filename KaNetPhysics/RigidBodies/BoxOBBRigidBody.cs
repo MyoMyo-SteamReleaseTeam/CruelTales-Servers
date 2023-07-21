@@ -25,8 +25,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>변환이 적용된 정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
-		public BoxOBBRigidBody(float width, float height, float rotation, bool isStatic)
-			: base(KaPhysicsShapeType.Box_OBB, rotation, isStatic)
+		public BoxOBBRigidBody(float width, float height, float rotation,
+							   bool isStatic, PhysicsLayerMask layerMask)
+			: base(KaPhysicsShapeType.Box_OBB, layerMask, rotation, isStatic)
 		{
 			Width = width;
 			Height = height;

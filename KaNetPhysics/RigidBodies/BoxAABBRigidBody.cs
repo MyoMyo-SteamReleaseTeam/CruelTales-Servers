@@ -19,8 +19,9 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>변환이 적용된 정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _transformedVertices;
 
-		public BoxAABBRigidBody(float width, float height, bool isStatic)
-			: base(KaPhysicsShapeType.Box_AABB, isStatic)
+		public BoxAABBRigidBody(float width, float height,
+								bool isStatic, PhysicsLayerMask layerMask)
+			: base(KaPhysicsShapeType.Box_AABB, layerMask, isStatic)
 		{
 			Width = width;
 			Height = height;

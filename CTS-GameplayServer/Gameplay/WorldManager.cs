@@ -11,6 +11,7 @@ using CT.Networks;
 using CT.Packets;
 using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.Synchronizations;
+using KaNet.Physics;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -35,6 +36,9 @@ namespace CTS.Instance.Gameplay
 		// Visibility
 		private WorldVisibilityManager _visibilityManager;
 
+		// Physics World
+		private KaPhysicsWorld _physicsWorld;
+
 		public WorldManager(GameplayInstance gameplayInstance,
 							GameplayManager gameplayManager,
 							InstanceInitializeOption option)
@@ -50,6 +54,9 @@ namespace CTS.Instance.Gameplay
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
+
+			// Physics world
+			_physicsWorld = new KaPhysicsWorld();
 		}
 
 		public void UpdateNetworkObjects(float deltaTime)
@@ -141,7 +148,13 @@ namespace CTS.Instance.Gameplay
 			var netObj = _objectPoolManager.Create<T>();
 			netObj.InitializeMasterProperties();
 			netObj.InitializeRemoteProperties();
-			netObj.Create(this, _visibilityManager, _gameplayManager, getNetworkIdentityCounter(), position);
+			netObj.Create(worldManager: this,
+						  _visibilityManager,
+						  _gameplayManager, 
+						  getNetworkIdentityCounter(),
+						  position, 
+						  rotation: 0);
+
 			_networkObjectById.Add(netObj.Identity, netObj);
 			netObj.OnCreated();
 			return netObj;

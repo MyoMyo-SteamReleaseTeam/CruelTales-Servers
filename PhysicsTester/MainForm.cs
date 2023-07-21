@@ -22,6 +22,7 @@ namespace PhysicsTester
 			InitializeComponent();
 
 			// Initialize
+			LayerMaskHelper.Initialize();
 			_inputManager = new InputManager();
 
 			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
