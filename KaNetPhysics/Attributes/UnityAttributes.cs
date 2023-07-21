@@ -7,4 +7,12 @@ namespace Sirenix.OdinInspector
 	{
 	}
 }
+
+namespace UnityEngine
+{
+	public class SerializeFieldAttribute : Attribute
+	{
+
+	}
+}
 #endif

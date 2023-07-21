@@ -9,6 +9,7 @@ namespace KaNet.Physics.RigidBodies
 	public abstract class KaRigidBody
 	{
 		/// <summary>물리 형상 타입</summary>
+		[field: UnityEngine.SerializeField]
 		public KaPhysicsShapeType ShapeType { get; private set; }
 
 		/// <summary>위치</summary>
@@ -24,12 +25,15 @@ namespace KaNet.Physics.RigidBodies
 		public Vector2 ForceVelocity { get; set; }
 
 		/// <summary>각도</summary>
+		[field: UnityEngine.SerializeField]
 		public float Rotation { get; private set; }
 
 		/// <summary>힘 마찰력</summary>
+		[field: UnityEngine.SerializeField]
 		public float ForceFriction { get; set; } = 3.0f;
 
 		/// <summary>정적 객체 여부</summary>
+		[field: UnityEngine.SerializeField]
 		public readonly bool IsStatic;
 
 		/// <summary>변환이 필요한지 여부입니다.</summary>
