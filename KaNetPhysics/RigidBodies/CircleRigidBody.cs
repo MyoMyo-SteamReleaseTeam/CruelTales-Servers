@@ -7,15 +7,20 @@ namespace KaNet.Physics.RigidBodies
 	public class CircleRigidBody : KaRigidBody
 	{
 		/// <summary>반지름</summary>
-		public readonly float Radius;
-		public readonly float Diameter;
+		public float Radius { get; private set; }
+		public float Diameter { get; private set; }
 
 		public CircleRigidBody(float radius, bool isStatic,
 							   PhysicsLayerMask layerMask)
 			: base(KaPhysicsShapeType.Circle, layerMask, isStatic)
 		{
 			Radius = radius;
-			Diameter = radius * 2;
+			CalcurateProperties();
+		}
+
+		public override void CalcurateProperties()
+		{
+			Diameter = Radius * 2;
 		}
 
 		public override BoundingBox GetBoundingBox()

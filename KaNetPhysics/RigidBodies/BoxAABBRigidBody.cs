@@ -8,10 +8,10 @@ namespace KaNet.Physics.RigidBodies
 	public class BoxAABBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>
-		public readonly float Width;
+		public float Width { get; private set; }
 
 		/// <summary>높이</summary>
-		public readonly float Height;
+		public float Height { get; private set; }
 
 		/// <summary>정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _vertices;
@@ -27,17 +27,19 @@ namespace KaNet.Physics.RigidBodies
 			Height = height;
 
 			_vertices = new Vector2[4];
+			_transformedVertices = new Vector2[4];
 
+			CalcurateProperties();
+		}
+
+		public override void CalcurateProperties()
+		{
 			float hw = Width * 0.5f;
 			float hh = Height * 0.5f;
 			_vertices[0] = new Vector2(-hw, hh);
 			_vertices[1] = new Vector2(hw, hh);
 			_vertices[2] = new Vector2(hw, -hh);
 			_vertices[3] = new Vector2(-hw, -hh);
-
-			_transformedVertices = new Vector2[4];
-
-			_boundingBox = new BoundingBox(Position, Width, Height);
 		}
 
 		public override BoundingBox GetBoundingBox()

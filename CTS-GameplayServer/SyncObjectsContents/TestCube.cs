@@ -33,8 +33,8 @@ namespace CTS.Instance.SyncObjects
 			_animationTime += deltaTime;
 
 			float x = MathF.Cos(_radiusFactor);
-			float z = MathF.Sin(_radiusFactor);
-			Transform.SetPosition(Transform.Position + new Vector3(x, 0, z));
+			float y = MathF.Sin(_radiusFactor);
+			RigidBody.MoveTo(RigidBody.Position + new Vector2(x, y));
 			_radiusFactor += 0.128f * 1f;
 			//Console.WriteLine(Identity.ToString() + Transform.ToString());
 

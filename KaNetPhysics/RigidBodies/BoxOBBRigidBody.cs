@@ -8,16 +8,16 @@ namespace KaNet.Physics.RigidBodies
 	public class BoxOBBRigidBody : KaRigidBody
 	{
 		/// <summary>너비</summary>
-		public readonly float Width;
+		public float Width { get; private set; }
 
 		/// <summary>높이</summary>
-		public readonly float Height;
+		public float Height { get; private set; }
 
 		/// <summary>OBB의 바운더리 반지름입니다.</summary>
-		public readonly float BoundaryRadius;
+		public float BoundaryRadius { get; private set; }
 
 		/// <summary>OBB의 바운더리 반지름입니다.</summary>
-		public readonly float BoundaryDiameter;
+		public float BoundaryDiameter { get; private set; }
 
 		/// <summary>정점 배열</summary>
 		[AllowNull] public readonly Vector2[] _vertices;
@@ -35,6 +35,11 @@ namespace KaNet.Physics.RigidBodies
 			_vertices = new Vector2[4];
 			_transformedVertices = new Vector2[4];
 
+			CalcurateProperties();
+		}
+
+		public override void CalcurateProperties()
+		{
 			float hw = Width * 0.5f;
 			float hh = Height * 0.5f;
 			_vertices[0] = new Vector2(-hw, hh);

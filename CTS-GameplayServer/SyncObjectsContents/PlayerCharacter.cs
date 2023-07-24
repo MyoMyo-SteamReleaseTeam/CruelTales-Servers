@@ -12,11 +12,6 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public PlayerCharacter() : base()
-		{
-			KaRigidBody rigid;
-		}
-
 		public float Speed = 5.0f;
 
 		public NetworkPlayer? NetworkPlayer { get; private set; }
@@ -26,7 +21,7 @@ namespace CTS.Instance.SyncObjects
 			this.UserId = player.UserId;
 			this.Username = player.Username;
 			NetworkPlayer = player;
-			NetworkPlayer.BindViewTarget(this.Transform);
+			NetworkPlayer.BindViewTarget(RigidBody);
 		}
 
 		public override void OnDestroyed()
@@ -40,12 +35,13 @@ namespace CTS.Instance.SyncObjects
 			if (_userId != player.UserId)
 				return;
 
-			Vector3 velocity = Vector3.Zero;
+			Vector2 velocity = Vector2.Zero;
 			if (direction.X != 0 && direction.Y != 0)
 			{
-				velocity = Vector3.Normalize(new Vector3(direction.X, 0, direction.Y)) * Speed;
+				velocity = Vector2.Normalize(new Vector2(direction.X, direction.Y)) * Speed;
 			}
-			Transform.Move(Transform.Position, velocity);
+			RigidBody.MoveTo(RigidBody.Position);
+			RigidBody.ChangeVelocity(velocity);
 		}
 
 		public partial void Client_InputInteraction(NetworkPlayer player,

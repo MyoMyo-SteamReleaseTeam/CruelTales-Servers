@@ -10,6 +10,10 @@ namespace KaNet.Physics.RigidBodies
 		{
 		}
 
+		public override void CalcurateProperties()
+		{
+		}
+
 		public override BoundingBox GetBoundingBox()
 		{
 			return new BoundingBox(Vector2.Zero, 0, 0);

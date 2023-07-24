@@ -4,6 +4,7 @@ using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
+using CTS.Instance.Data.Entities;
 using CTS.Instance.Gameplay;
 using CTS.Instance.SyncObjects;
 using KaNet.Physics.RigidBodies;
@@ -24,14 +25,18 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; } = new NetworkIdentity();
 
+		/// <summary>객체를 소유한 유저의 ID입니다.</summary>
 		public UserId Owner { get; protected set; } = new UserId(0);
+
+		/// <summary>유저의 소속입니다.</summary>
 		public Faction Faction { get; protected set; } = Faction.System;
 
 		/// <summary>네트워크 객체의 Transform입니다.</summary>
-		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
+		//public NetworkTransform Transform { get; private set; } = new NetworkTransform();
 
 		/// <summary>물리 RigidBody입니다.</summary>
-		public KaRigidBody? RigidBody { get; protected set; }
+		public readonly NetRigidBody RigidBody;
+		private readonly KaRigidBody _rigidBody;
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
@@ -51,6 +56,12 @@ namespace CTS.Instance.Synchronizations
 
 		public Vector2Int CurrentCellPos { get; private set; }
 
+		public MasterNetworkObject()
+		{
+			_rigidBody = EntityRigidBodyDB.CreateRigidBodyBy(Type);
+			RigidBody = new NetRigidBody(_rigidBody);
+		}
+
 		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
 		public void UpdatePhysics(float deltaTime)
 		{
@@ -67,7 +78,7 @@ namespace CTS.Instance.Synchronizations
 			if (Visibility == VisibilityType.View)
 			{
 				Vector2Int previousPos = CurrentCellPos;
-				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_rigidBody.Position);
 				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
 		}
@@ -75,7 +86,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
 		private void fixedUpdate(float deltaTime)
 		{
-			Transform.Update(deltaTime);
+			_rigidBody.Step(deltaTime);
 		}
 
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
@@ -105,14 +116,16 @@ namespace CTS.Instance.Synchronizations
 
 			VisibilityAuthority = InitialVisibilityAuthority;
 
-			// Set position
-			Transform.Initialize(position);
+			// Initialize physics
+			RigidBody.Reset();
+			RigidBody.MoveTo(position._xz());
+			RigidBody.RotateTo(rotation);
 
 			// Add to trace visibility
 			_worldVisibilityManager = worldPartitioner;
 			if (Visibility == VisibilityType.View)
 			{
-				CurrentCellPos = WorldVisibilityManager.GetWorldCell(Transform.Position);
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(RigidBody.Position);
 			}
 			_worldVisibilityManager.OnCreated(this);
 		}

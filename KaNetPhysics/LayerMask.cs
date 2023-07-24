@@ -17,15 +17,15 @@ namespace KaNet.Physics
 	}
 
 	[Flags]
-	public enum PhysicsLayerMask : ushort
+	public enum PhysicsLayerMask : uint
 	{
 		None = 0,
 
-		Environment		= 1,		// 1
-		Invisible		= 1 << 1,	// 2 
-		Player			= 1 << 2,	// 3 
-		Item			= 1 << 3,	// 4
-		LayerMask_5		= 1 << 4,	// 5
+		System			= 1,        // 1
+		Environment		= 1 << 1,   // 2 
+		Invisible		= 1 << 2,   // 3 
+		Player			= 1 << 3,   // 4
+		Item			= 1 << 4,	// 5
 		LayerMask_6		= 1 << 5,	// 6
 		LayerMask_7		= 1 << 6,	// 7
 	}
@@ -39,11 +39,11 @@ namespace KaNet.Physics
 			new List<byte>() /* None			/ 0 */ { 1, 1, 1, 1, 1, 1, 1, 1 },
 
 												//////   7  6  5  4  3  2  1
-			new List<byte>() /* Environment		/ 1 */ { 0, 0, 0, 1, 1, 0, 0 },
-			new List<byte>() /* Invisible		/ 2 */ { 0, 0, 0, 1, 1, 0 },
-			new List<byte>() /* Player			/ 3 */ { 0, 0, 0, 0, 0 },
-			new List<byte>() /* Item			/ 4 */ { 0, 0, 0, 1 },
-			new List<byte>() /* LayerMask_5		/ 5 */ { 0, 0, 0 },
+			new List<byte>() /* System			/ 1 */ { 0, 0, 0, 0, 0, 0, 0 },
+			new List<byte>() /* Environment		/ 2 */ { 0, 0, 1, 1, 0, 0 },
+			new List<byte>() /* Invisible		/ 3 */ { 0, 0, 1, 1, 0 },
+			new List<byte>() /* Player			/ 4 */ { 0, 0, 0, 0 },
+			new List<byte>() /* Item			/ 5 */ { 0, 0, 1 },
 			new List<byte>() /* LayerMask_6		/ 6 */ { 0, 0 },
 			new List<byte>() /* LayerMask_7		/ 7 */ { 0 },
 		};

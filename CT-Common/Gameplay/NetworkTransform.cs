@@ -18,6 +18,7 @@ namespace CT.Common.Gameplay
 	//	public bool IsTeleported;
 	//}
 
+	[Obsolete("RigidBody를 사용하십시오")]
 	[StructLayout(LayoutKind.Sequential)]
 	public class NetworkTransform
 	{

@@ -509,7 +509,7 @@ namespace KaNet.Physics
 			{
 				KaRigidBody body = entity.Body;
 				Vector2 direction = Vector2.Normalize(worldPos - body.Position);
-				body.Impulse(direction, 60.0f);
+				body.ForceVelocity = direction * 60.0f;
 			}
 		}
 

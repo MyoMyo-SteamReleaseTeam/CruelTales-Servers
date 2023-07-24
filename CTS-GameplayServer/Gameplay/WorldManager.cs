@@ -114,7 +114,7 @@ namespace CTS.Instance.Gameplay
 			{
 				netObj.ClearDirtyReliable();
 				netObj.ClearDirtyUnreliable();
-				netObj.Transform.ClearDirty();
+				netObj.RigidBody.ClearDirty();
 			}
 		}
 
@@ -332,14 +332,14 @@ namespace CTS.Instance.Gameplay
 			{
 				writer.Put(spawnObj.Type);
 				writer.Put(spawnObj.Identity);
-				spawnObj.Transform.SerializeSpawnData(writer);
+				spawnObj.RigidBody.SerializeInitialSyncData(writer);
 				spawnObj.SerializeEveryProperty(writer);
 
 				// TODO : remove
 				// DEBUG
 				if (packetType == PacketType.SC_Sync_MasterSpawn)
 				{
-					Console.WriteLine($"{spawnObj.Identity}:{spawnObj.Transform} SPAWN");
+					Console.WriteLine($"{spawnObj.Identity}:{spawnObj.RigidBody.Position} SPAWN");
 				}
 			}
 		}
@@ -459,12 +459,12 @@ namespace CTS.Instance.Gameplay
 			int syncCount = 0;
 			foreach (var syncObj in netObjs.Values)
 			{
-				NetworkTransform transform = syncObj.Transform;
-				if (transform.IsDirty)
+				NetRigidBody rigidBody = syncObj.RigidBody;
+				if (rigidBody.IsDirty)
 				{
-					syncCount++;
 					writer.Put(syncObj.Identity);
-					transform.Serialize(writer);
+					rigidBody.SerializeEventSyncData(writer);
+					syncCount++;
 				}
 			}
 

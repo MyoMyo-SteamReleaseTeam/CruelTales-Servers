@@ -26,9 +26,9 @@ namespace CTS.Instance.Gameplay
 		public bool IsHost { get; set; } = false;
 
 		// Gameplay
-		public NetworkTransform? TargetTransform { get; private set; }
-		public NetworkTransform ViewTransform { get; private set; }
-		public bool HasViewTarget => TargetTransform != null;
+		public NetRigidBody? TargetRigidBody { get; private set; }
+		public Vector2 ViewPosition { get; private set; }
+		public bool HasViewTarget => TargetRigidBody != null;
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
 		public Faction Faction { get; private set; }
@@ -50,7 +50,6 @@ namespace CTS.Instance.Gameplay
 							 WorldManager worldManager,
 							 InstanceInitializeOption option)
 		{
-			ViewTransform = new NetworkTransform();
 			GameManager = gameManager;
 			WorldManager = worldManager;
 			HalfViewInSize = option.HalfViewInSize;
@@ -86,24 +85,22 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-			Vector3 targetPosition = TargetTransform == null ?
-				Vector3.Zero : TargetTransform.Position;
+			Vector2 targetPosition = TargetRigidBody == null ?
+				Vector2.Zero : TargetRigidBody.Position;
 
-			ViewTransform.Position = Vector3.Lerp(ViewTransform.Position,
-												  targetPosition,
-												  CameraSpeed * deltaTime);
-			ViewTransform.Velocity = TargetTransform == null ?
-				Vector3.Zero : TargetTransform.Velocity;
+			ViewPosition = Vector2.Lerp(ViewPosition,
+										targetPosition,
+										CameraSpeed * deltaTime);
 		}
 
-		public void BindViewTarget(NetworkTransform target)
+		public void BindViewTarget(NetRigidBody target)
 		{
-			TargetTransform = target;
+			TargetRigidBody = target;
 		}
 
 		public void ReleaseViewTarget()
 		{
-			TargetTransform = null;
+			TargetRigidBody = null;
 		}
 
 		public override string ToString() => Username;
