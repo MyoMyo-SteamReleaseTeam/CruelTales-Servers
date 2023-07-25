@@ -49,14 +49,18 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
 
-		public KaRigidBody(KaPhysicsShapeType shapeType, PhysicsLayerMask layerMask, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType shapeType,
+						   PhysicsLayerMask layerMask,
+						   bool isStatic)
 		{
 			ShapeType = shapeType;
 			IsStatic = isStatic;
 			LayerMask = LayerMaskHelper.GetLayerMask(layerMask);
 		}
 
-		public KaRigidBody(KaPhysicsShapeType shapeType, PhysicsLayerMask layerMask, float rotation, bool isStatic)
+		public KaRigidBody(KaPhysicsShapeType shapeType,
+						   PhysicsLayerMask layerMask, 
+						   float rotation, bool isStatic)
 		{
 			ShapeType = shapeType;
 			Rotation = rotation;
