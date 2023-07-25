@@ -95,31 +95,34 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체가 갱신되었을 때 호출됩니다.</summary>
 		public virtual void OnUpdate(float deltaTime) { }
 
-		/// <summary>객체를 초기화합니다.</summary>
-		public void Create(WorldManager worldManager,
-						   WorldVisibilityManager worldPartitioner,
-						   GameplayManager gameManager,
-						   NetworkIdentity id,
-						   Vector3 position,
-						   float rotation)
+		/// <summary>생성된 객체를 초기화합니다.</summary>
+		public void Initialize(WorldManager worldManager,
+							   WorldVisibilityManager worldPartitioner,
+							   GameplayManager gameManager,
+							   NetworkIdentity id,
+							   Vector2 position,
+							   float rotation)
 		{
-			// Initialize
-			Identity = id;
-			IsAlive = true;
-
 			// Bind reference
 			WorldManager = worldManager;
 			GameplayManager = gameManager;
+			_worldVisibilityManager = worldPartitioner;
+
+			// Initialize
+			Identity = id;
+			IsAlive = true;
 
 			VisibilityAuthority = InitialVisibilityAuthority;
 
 			// Initialize physics
 			RigidBody.Reset();
-			RigidBody.MoveTo(position._xz());
+			RigidBody.MoveTo(position);
 			RigidBody.RotateTo(rotation);
+		}
 
+		public void InitializeAfterFrame()
+		{
 			// Add to trace visibility
-			_worldVisibilityManager = worldPartitioner;
 			if (Visibility == VisibilityType.View)
 			{
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(RigidBody.Position);
@@ -131,7 +134,7 @@ namespace CTS.Instance.Synchronizations
 		public void Destroy()
 		{
 			IsAlive = false;
-			WorldManager.AddDestroyStack(this);
+			WorldManager.AddDestroyEqueue(this);
 
 			if (Visibility == VisibilityType.View)
 			{

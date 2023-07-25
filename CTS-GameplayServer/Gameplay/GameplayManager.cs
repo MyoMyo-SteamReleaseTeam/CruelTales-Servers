@@ -80,7 +80,7 @@ namespace CTS.Instance.Gameplay
 			WorldManager.ClearDirtys();
 
 			// Remove objects
-			WorldManager.UpdateRemoveObjects();
+			WorldManager.UpdateObjectLifeCycle();
 		}
 
 		public void StartGame()

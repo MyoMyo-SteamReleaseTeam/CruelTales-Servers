@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Numerics;
 using CT.Common.DataType;
 
 namespace CT.Common.Serialization
@@ -18,7 +17,6 @@ namespace CT.Common.Serialization
 		{
 		}
 
-		//[Obsolete("Need to pool")]
 		public ByteBuffer(int count)
 		{
 			byte[] bytes = new byte[count];
@@ -716,7 +714,7 @@ namespace CT.Common.Serialization
 		}
 
 #if UNITY_2021
-		public bool TryReadVector2(out UnityEngine.Vector2 value)
+		public bool TryReadUnityVector2(out UnityEngine.Vector2 value)
 		{
 			if (TryReadSingle(out float x) && TryReadSingle(out float y))
 			{
@@ -729,11 +727,11 @@ namespace CT.Common.Serialization
 		}
 #endif
 
-		public bool TryReadVector2(out Vector2 value)
+		public bool TryReadVector2(out System.Numerics.Vector2 value)
 		{
 			if (TryReadSingle(out float x) && TryReadSingle(out float y))
 			{
-				value = new Vector2(x, y);
+				value = new System.Numerics.Vector2(x, y);
 				return true;
 			}
 
@@ -742,7 +740,7 @@ namespace CT.Common.Serialization
 		}
 
 #if UNITY_2021
-		public bool TryReadVector3(out UnityEngine.Vector3 value)
+		public bool TryReadUnityVector3(out UnityEngine.Vector3 value)
 		{
 			if (TryReadSingle(out float x) &&
 				TryReadSingle(out float y) && 
@@ -757,13 +755,13 @@ namespace CT.Common.Serialization
 		}
 #endif
 
-		public bool TryReadVector3(out Vector3 value)
+		public bool TryReadVector3(out System.Numerics.Vector3 value)
 		{
 			if (TryReadSingle(out float x) &&
 				TryReadSingle(out float y) && 
 				TryReadSingle(out float z))
 			{
-				value = new Vector3(x, y, z);
+				value = new System.Numerics.Vector3(x, y, z);
 				return true;
 			}
 

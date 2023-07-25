@@ -23,7 +23,7 @@ namespace CTS.Instance.Gameplay
 		public int GlobalDespawnObjectCapacity = 16;
 
 		// World Manager
-		public int DestroyObjectStackCapacity = 16;
+		public int WorldMaximumObjectCount = 128;
 
 		// Half view boundary
 		public Vector2 HalfViewInSize = new Vector2(32, 18) / 2;

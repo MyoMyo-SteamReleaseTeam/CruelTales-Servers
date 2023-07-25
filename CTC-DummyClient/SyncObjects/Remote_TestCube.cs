@@ -18,9 +18,6 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using CTC.Networks.Synchronizations;
-#if UNITY_2021
-using UnityEngine;
-#endif
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {

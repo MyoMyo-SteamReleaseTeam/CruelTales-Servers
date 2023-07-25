@@ -106,10 +106,7 @@ using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using CTC.Networks.Synchronizations;
-#if UNITY_2021
-using UnityEngine;
-#endif";
+using CTC.Networks.Synchronizations;";
 
 		public static string DebugRemoteUsingStatements =>
 @"using System;
@@ -119,10 +116,7 @@ using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;
-#if UNITY_2021
-using UnityEngine;
-#endif";
+using CT.Common.Tools.Collections;";
 
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";

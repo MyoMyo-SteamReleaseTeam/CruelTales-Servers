@@ -33,6 +33,7 @@ namespace CT.Common.DataType
 		ClientError_FailedToReceivePacket,
 		ClientError_WrongConnectionFlow,
 		ClientError_NullReference,
+		ClientError_WrongClientData,
 
 		// Server error
 		ServerError_CannotHandlePacket,

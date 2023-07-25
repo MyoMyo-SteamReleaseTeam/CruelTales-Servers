@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
@@ -63,7 +62,6 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-
 			// Update minigame controller
 			MiniGameController?.Update();
 		}

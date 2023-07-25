@@ -163,8 +163,7 @@ namespace CTS.Instance.Gameplay
 			{
 				NetworkPlayer player = kv.Key;
 				PlayerVisibleTable viewTable = kv.Value;
-				Vector2 viewPos3D = player.ViewPosition;
-				Vector2 viewPos = new Vector2(viewPos3D.X, viewPos3D.Y);
+				Vector2 viewPos = player.ViewPosition;
 
 				Vector2 inBoundary = player.HalfViewInSize;
 				Vector2 inboundLB = viewPos - inBoundary;

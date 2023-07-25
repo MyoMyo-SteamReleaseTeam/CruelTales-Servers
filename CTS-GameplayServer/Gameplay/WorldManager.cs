@@ -29,8 +29,12 @@ namespace CTS.Instance.Gameplay
 		// Network Object Management
 		private BidirectionalMap<NetworkIdentity, MasterNetworkObject> _networkObjectById = new();
 		private NetworkObjectPoolManager _objectPoolManager;
+
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
-		private Stack<MasterNetworkObject> _destroyObjectStack;
+		private Queue<MasterNetworkObject> _destroyObjectStack;
+
+		private Queue<MasterNetworkObject> _createObjectEueue;
+
 		private NetworkIdentity _idCounter;
 
 		// Visibility
@@ -38,6 +42,9 @@ namespace CTS.Instance.Gameplay
 
 		// Physics World
 		private KaPhysicsWorld _physicsWorld;
+
+		// Getter
+		public int Count => _networkObjectById.Count;
 
 		public WorldManager(GameplayInstance gameplayInstance,
 							GameplayManager gameplayManager,
@@ -50,7 +57,8 @@ namespace CTS.Instance.Gameplay
 
 			// Network Object Management
 			_objectPoolManager = new();
-			_destroyObjectStack = new(option.DestroyObjectStackCapacity);
+			_destroyObjectStack = new(option.WorldMaximumObjectCount);
+			_createObjectEueue = new(option.WorldMaximumObjectCount);
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
@@ -94,12 +102,19 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void UpdateRemoveObjects()
+		public void UpdateObjectLifeCycle()
 		{
+			while (_createObjectEueue.Count > 0)
+			{
+				var createdObj = _createObjectEueue.Dequeue();
+				createdObj.InitializeAfterFrame();
+				_networkObjectById.Add(createdObj.Identity, createdObj);
+			}
+
 			// Remove objects
 			while (_destroyObjectStack.Count > 0)
 			{
-				destroyObject(_destroyObjectStack.Pop());
+				destroyObject(_destroyObjectStack.Dequeue());
 			}
 		}
 
@@ -143,20 +158,20 @@ namespace CTS.Instance.Gameplay
 
 		#region Life Cycle
 
-		public T CreateObject<T>(Vector3 position = default) where T : MasterNetworkObject, new()
+		public T CreateObject<T>(Vector2 position = default) where T : MasterNetworkObject, new()
 		{
 			var netObj = _objectPoolManager.Create<T>();
 			netObj.InitializeMasterProperties();
 			netObj.InitializeRemoteProperties();
-			netObj.Create(worldManager: this,
-						  _visibilityManager,
-						  _gameplayManager, 
-						  getNetworkIdentityCounter(),
-						  position, 
-						  rotation: 0);
-
-			_networkObjectById.Add(netObj.Identity, netObj);
+			netObj.Initialize(worldManager: this,
+							  _visibilityManager,
+							  _gameplayManager, 
+							  getNetworkIdentityCounter(),
+							  position, 
+							  rotation: 0);
 			netObj.OnCreated();
+			_createObjectEueue.Enqueue(netObj);
+
 			return netObj;
 
 			NetworkIdentity getNetworkIdentityCounter()
@@ -175,9 +190,9 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void AddDestroyStack(MasterNetworkObject networkObject)
+		public void AddDestroyEqueue(MasterNetworkObject networkObject)
 		{
-			_destroyObjectStack.Push(networkObject);
+			_destroyObjectStack.Enqueue(networkObject);
 		}
 
 		public void Clear()
@@ -226,25 +241,25 @@ namespace CTS.Instance.Gameplay
 			// Serialize first spawn data
 			if (visibleTable.SpawnObjects.Count != 0)
 			{
-				SerializeSpawnData(_reliableBuffer,
-								   visibleTable.SpawnObjects,
-								   PacketType.SC_Sync_MasterSpawn);
+				SerializeCreationData(_reliableBuffer,
+									  visibleTable.SpawnObjects,
+									  PacketType.SC_Sync_MasterSpawn);
 			}
 
 			// Serialize first global spawn data
 			if (visibleTable.GlobalSpawnObjects.Count != 0)
 			{
-				SerializeSpawnData(_reliableBuffer,
-								   visibleTable.GlobalSpawnObjects,
-								   PacketType.SC_Sync_MasterSpawn);
+				SerializeCreationData(_reliableBuffer,
+									  visibleTable.GlobalSpawnObjects,
+									  PacketType.SC_Sync_MasterSpawn);
 			}
 
 			// Serialize enter data
 			if (visibleTable.EnterObjects.Count != 0)
 			{
-				SerializeSpawnData(_reliableBuffer,
-								   visibleTable.EnterObjects,
-								   PacketType.SC_Sync_MasterEnter);
+				SerializeCreationData(_reliableBuffer,
+									  visibleTable.EnterObjects,
+									  PacketType.SC_Sync_MasterEnter);
 			}
 
 			// Serialize reliable and unreliable trace object data
@@ -287,25 +302,25 @@ namespace CTS.Instance.Gameplay
 			// Serialize leave data
 			if (visibleTable.LeaveObjects.Count != 0)
 			{
-				SerializeDespawnData(_reliableBuffer,
-									 visibleTable.LeaveObjects,
-									 PacketType.SC_Sync_MasterLeave);
+				SerializeDestructionData(_reliableBuffer,
+										 visibleTable.LeaveObjects,
+										 PacketType.SC_Sync_MasterLeave);
 			}
 
 			// Serialize Desapwn data
 			if (visibleTable.DespawnObjects.Count != 0)
 			{
-				SerializeDespawnData(_reliableBuffer,
-									 visibleTable.DespawnObjects,
-									 PacketType.SC_Sync_MasterDespawn);
+				SerializeDestructionData(_reliableBuffer,
+										 visibleTable.DespawnObjects,
+										 PacketType.SC_Sync_MasterDespawn);
 			}
 
 			// Serialize Global Desapwn data
 			if (visibleTable.GlobalDespawnObjects.Count != 0)
 			{
-				SerializeDespawnData(_reliableBuffer,
-									 visibleTable.GlobalDespawnObjects,
-									 PacketType.SC_Sync_MasterDespawn);
+				SerializeDestructionData(_reliableBuffer,
+										 visibleTable.GlobalDespawnObjects,
+										 PacketType.SC_Sync_MasterDespawn);
 			}
 
 			// Send unreliable data
@@ -321,9 +336,9 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public static void SerializeSpawnData(IPacketWriter writer,
-											  Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
-											  PacketType packetType)
+		public static void SerializeCreationData(IPacketWriter writer,
+												 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
+												 PacketType packetType)
 		{
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
@@ -344,9 +359,9 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public static void SerializeDespawnData(IPacketWriter writer,
-												Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
-												PacketType packetType)
+		public static void SerializeDestructionData(IPacketWriter writer,
+													Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
+													PacketType packetType)
 		{
 			writer.Put(packetType);
 			writer.Put((byte)netObjs.Count);
@@ -449,8 +464,8 @@ namespace CTS.Instance.Gameplay
 		}
 
 		public static void SerializePhysicsEventData(IPacketWriter writer,
-												 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
-												 PacketType packetType)
+													 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
+													 PacketType packetType)
 		{
 			int originSize = writer.Size;
 			writer.OffsetSize(OFFSET_SIZE);

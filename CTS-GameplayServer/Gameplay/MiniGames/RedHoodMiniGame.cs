@@ -7,16 +7,16 @@ namespace CTS.Instance.Gameplay.MiniGames
 {
 	public class MiniGameData
 	{
-		public List<Vector3> SpawnPositions = new()
+		public List<Vector2> SpawnPositions = new()
 		{
-			new Vector3(-9.85f, 0.00f, 6.52f),
-			new Vector3(-8.35f, 0.00f, 4.82f),
-			new Vector3(-6.35f, 0.00f, 4.32f),
-			new Vector3(-4.35f, 0.00f, 4.82f),
-			new Vector3(-2.85f, 0.00f, 6.52f),
-			new Vector3(-7.55f, 0.00f, 6.82f),
-			new Vector3(-5.15f, 0.00f, 6.82f),
-			new Vector3(-6.35f, 0.00f, 5.62f),
+			new Vector2(-9.85f, 6.52f),
+			new Vector2(-8.35f, 4.82f),
+			new Vector2(-6.35f, 4.32f),
+			new Vector2(-4.35f, 4.82f),
+			new Vector2(-2.85f, 6.52f),
+			new Vector2(-7.55f, 6.82f),
+			new Vector2(-5.15f, 6.82f),
+			new Vector2(-6.35f, 5.62f),
 		};
 	}
 
@@ -41,9 +41,20 @@ namespace CTS.Instance.Gameplay.MiniGames
 			_miniGameData = new MiniGameData();
 		}
 
+		private List<TestCube> _testCubeList = new();
+
 		public void Update()
 		{
 			CheckGameOverCondition();
+
+			if (_testCubeList.Count < 40)
+			{
+				Vector2 lb = new Vector2(-30, -30);
+				Vector2 rt = new Vector2(30, 30);
+				var createPos = RandomHelper.NextVectorBetween(lb, rt);
+				var testCube = _worldManager.CreateObject<TestCube>(createPos);
+				_testCubeList.Add(testCube);
+			}
 		}
 
 		public void OnGameStart()
@@ -53,7 +64,7 @@ namespace CTS.Instance.Gameplay.MiniGames
 			int spawnPosCount = spawnPositions.Count;
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
 			{
-				Vector3 spawnPos = spawnPositions[_spawnIndex];
+				Vector2 spawnPos = spawnPositions[_spawnIndex];
 				createPlayerBy(player, spawnPos);
 				_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
 			}
@@ -71,7 +82,7 @@ namespace CTS.Instance.Gameplay.MiniGames
 		{
 			var spawnPositions = _miniGameData.SpawnPositions;
 			int spawnPosCount = spawnPositions.Count;
-			Vector3 spawnPos = spawnPositions[_spawnIndex];
+			Vector2 spawnPos = spawnPositions[_spawnIndex];
 			createPlayerBy(player, spawnPos);
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
 		}
@@ -87,7 +98,7 @@ namespace CTS.Instance.Gameplay.MiniGames
 			CheckGameOverCondition();
 		}
 
-		private void createPlayerBy(NetworkPlayer player, Vector3 spawnPos)
+		private void createPlayerBy(NetworkPlayer player, Vector2 spawnPos)
 		{
 			var playerCharacter = _worldManager.CreateObject<PlayerCharacter>(spawnPos);
 			playerCharacter.BindNetworkPlayer(player);

@@ -24,15 +24,21 @@ namespace CT.Common.Gameplay
 		{
 			writer.Put(_rigidBody.Position);
 			writer.Put(_rigidBody.LinearVelocity);
-			writer.Put(_rigidBody.ForceFriction);
+			writer.Put(_rigidBody.ForceVelocity);
 		}
 #endif
 
-		public void DeserializeInitialSyncData(IPacketReader reader)
+		public bool TryDeserializeInitialSyncData(IPacketReader reader)
 		{
-			_rigidBody.MoveTo(reader.ReadVector2());
-			_rigidBody.LinearVelocity = reader.ReadVector2();
-			_rigidBody.ForceVelocity = reader.ReadVector2();
+			if (!reader.TryReadVector2(out var position)) return false;
+			if (!reader.TryReadVector2(out var linearVelocity)) return false;
+			if (!reader.TryReadVector2(out var forceVelocity)) return false;
+
+			_rigidBody.MoveTo(position);
+			_rigidBody.LinearVelocity = linearVelocity;
+			_rigidBody.ForceVelocity = forceVelocity;
+
+			return true;
 		}
 
 #if CT_SERVER
@@ -50,6 +56,11 @@ namespace CT.Common.Gameplay
 
 			SynchronizeByEvent(rigidBodyEvent);
 			return true;
+		}
+
+		public static void IgnoreSyncData(IPacketReader reader)
+		{
+			PhysicsEvent.IgnoreStatic(reader);
 		}
 
 		public void Reset()

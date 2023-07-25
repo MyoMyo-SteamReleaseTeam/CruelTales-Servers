@@ -49,6 +49,11 @@ namespace CT.Common.Gameplay
 
 		public void Ignore(IPacketReader reader)
 		{
+			IgnoreStatic(reader);
+		}
+
+		public static void IgnoreStatic(IPacketReader reader)
+		{
 			var eventFlags = (PhysicsEventFlag)reader.ReadByte();
 
 			if (eventFlags.HasFlag(PhysicsEventFlag.Position))
