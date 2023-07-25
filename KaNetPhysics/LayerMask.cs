@@ -89,6 +89,9 @@ namespace KaNet.Physics
 
 		public static LayerMask GetLayerMask(PhysicsLayerMask layerMask)
 		{
+#if DEBUG
+			Initialize();
+#endif
 			return new LayerMask(layerMask, _flagsByLayerMask[layerMask]);
 		}
 	}

@@ -9,6 +9,7 @@
 #pragma warning disable CS0649
 
 using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
@@ -33,11 +34,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc]
 		public partial void Server_PrimitiveArg_3(float v0, int v1, double v2);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_1(NetVec2 v0);
+		public partial void Server_ValueTypeArg_1(Vector2 v0);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_2(NetVec2 v0, NetString v1);
+		public partial void Server_ValueTypeArg_2(Vector2 v0, NetString v1);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2);
+		public partial void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2);
 		[SyncRpc]
 		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1);
 		[SyncRpc]
@@ -47,9 +48,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncRpc]
 		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1);
+		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2);
+		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2);
 		public bool IsDirtyReliable => false;
 		public bool IsDirtyUnreliable => false;
 		public void ClearDirtyReliable() { }
@@ -106,8 +107,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2 v0 = new();
-						if (!v0.TryDeserialize(reader)) return false;
+						if (!reader.TryReadVector2(out var v0)) return false;
 						Server_ValueTypeArg_1(v0);
 					}
 				}
@@ -116,8 +116,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2 v0 = new();
-						if (!v0.TryDeserialize(reader)) return false;
+						if (!reader.TryReadVector2(out var v0)) return false;
 						NetString v1 = new();
 						if (!v1.TryDeserialize(reader)) return false;
 						Server_ValueTypeArg_2(v0, v1);
@@ -130,8 +129,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					{
 						UserId v0 = new();
 						if (!v0.TryDeserialize(reader)) return false;
-						NetVec2 v1 = new();
-						if (!v1.TryDeserialize(reader)) return false;
+						if (!reader.TryReadVector2(out var v1)) return false;
 						NetString v2 = new();
 						if (!v2.TryDeserialize(reader)) return false;
 						Server_ValueTypeArg_3(v0, v1, v2);
@@ -195,8 +193,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2 v0 = new();
-						if (!v0.TryDeserialize(reader)) return false;
+						if (!reader.TryReadVector2(out var v0)) return false;
 						if (!reader.TryReadInt32(out var v1Value)) return false;
 						TestEnumType v1 = (TestEnumType)v1Value;
 						Server_CompositeArg_2_2(v0, v1);
@@ -207,8 +204,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2 v0 = new();
-						if (!v0.TryDeserialize(reader)) return false;
+						if (!reader.TryReadVector2(out var v0)) return false;
 						if (!reader.TryReadInt32(out var v1Value)) return false;
 						TestEnumType v1 = (TestEnumType)v1Value;
 						if (!reader.TryReadSingle(out float v2)) return false;
@@ -262,7 +258,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 					}
 				}
 				if (dirtyReliable_0[5])
@@ -270,7 +266,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						NetString.IgnoreStatic(reader);
 					}
 				}
@@ -280,7 +276,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						UserId.IgnoreStatic(reader);
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						NetString.IgnoreStatic(reader);
 					}
 				}
@@ -330,7 +326,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						reader.Ignore(4);
 					}
 				}
@@ -339,7 +335,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						reader.Ignore(4);
 						reader.Ignore(4);
 					}
@@ -387,7 +383,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 					}
 				}
 				if (dirtyReliable_0[5])
@@ -395,7 +391,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						NetString.IgnoreStatic(reader);
 					}
 				}
@@ -405,7 +401,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						UserId.IgnoreStatic(reader);
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						NetString.IgnoreStatic(reader);
 					}
 				}
@@ -455,7 +451,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						reader.Ignore(4);
 					}
 				}
@@ -464,7 +460,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					byte count = reader.ReadByte();
 					for (int i = 0; i < count; i++)
 					{
-						NetVec2.IgnoreStatic(reader);
+						Vector2SerializeExtension.IgnoreStatic(reader);
 						reader.Ignore(4);
 						reader.Ignore(4);
 					}

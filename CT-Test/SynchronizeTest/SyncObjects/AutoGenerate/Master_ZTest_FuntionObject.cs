@@ -35,11 +35,11 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void Server_PrimitiveArg_3(float v0, int v1, double v2);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_1(NetVec2 v0);
+		public partial void Server_ValueTypeArg_1(Vector2 v0);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_2(NetVec2 v0, NetString v1);
+		public partial void Server_ValueTypeArg_2(Vector2 v0, NetString v1);
 		[SyncRpc]
-		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2);
+		public partial void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2);
 		[SyncRpc]
 		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1);
 		[SyncRpc]
@@ -49,9 +49,9 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1);
+		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1);
 		[SyncRpc]
-		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2);
+		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2);
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
 		public bool IsDirtyReliable
@@ -89,24 +89,24 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0[3] = true;
 		}
 		private List<(float v0, int v1, double v2)> Server_PrimitiveArg_3Callstack = new(4);
-		public partial void Server_ValueTypeArg_1(NetVec2 v0)
+		public partial void Server_ValueTypeArg_1(Vector2 v0)
 		{
 			Server_ValueTypeArg_1Callstack.Add(v0);
 			_dirtyReliable_0[4] = true;
 		}
-		private List<NetVec2> Server_ValueTypeArg_1Callstack = new(4);
-		public partial void Server_ValueTypeArg_2(NetVec2 v0, NetString v1)
+		private List<Vector2> Server_ValueTypeArg_1Callstack = new(4);
+		public partial void Server_ValueTypeArg_2(Vector2 v0, NetString v1)
 		{
 			Server_ValueTypeArg_2Callstack.Add((v0, v1));
 			_dirtyReliable_0[5] = true;
 		}
-		private List<(NetVec2 v0, NetString v1)> Server_ValueTypeArg_2Callstack = new(4);
-		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2)
+		private List<(Vector2 v0, NetString v1)> Server_ValueTypeArg_2Callstack = new(4);
+		public partial void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2)
 		{
 			Server_ValueTypeArg_3Callstack.Add((v0, v1, v2));
 			_dirtyReliable_0[6] = true;
 		}
-		private List<(UserId v0, NetVec2 v1, NetString v2)> Server_ValueTypeArg_3Callstack = new(4);
+		private List<(UserId v0, Vector2 v1, NetString v2)> Server_ValueTypeArg_3Callstack = new(4);
 		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1)
 		{
 			Server_EnumTypeArg_1Callstack.Add((v0, v1));
@@ -131,18 +131,18 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_1[2] = true;
 		}
 		private List<(int v0, TestEnumType v1)> Server_CompositeArg_2_1Callstack = new(4);
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1)
+		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1)
 		{
 			Server_CompositeArg_2_2Callstack.Add((v0, v1));
 			_dirtyReliable_1[3] = true;
 		}
-		private List<(NetVec2 v0, TestEnumType v1)> Server_CompositeArg_2_2Callstack = new(4);
-		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2)
+		private List<(Vector2 v0, TestEnumType v1)> Server_CompositeArg_2_2Callstack = new(4);
+		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2)
 		{
 			Server_CompositeArg_3Callstack.Add((v0, v1, v2));
 			_dirtyReliable_1[4] = true;
 		}
-		private List<(NetVec2 v0, TestEnumType v1, float v2)> Server_CompositeArg_3Callstack = new(4);
+		private List<(Vector2 v0, TestEnumType v1, float v2)> Server_CompositeArg_3Callstack = new(4);
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -221,7 +221,7 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = Server_ValueTypeArg_2Callstack[i];
-						arg.v0.Serialize(writer);
+						writer.Put(arg.v0);
 						arg.v1.Serialize(writer);
 					}
 				}
@@ -233,7 +233,7 @@ namespace CTS.Instance.SyncObjects
 					{
 						var arg = Server_ValueTypeArg_3Callstack[i];
 						arg.v0.Serialize(writer);
-						arg.v1.Serialize(writer);
+						writer.Put(arg.v1);
 						arg.v2.Serialize(writer);
 					}
 				}
@@ -293,7 +293,7 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = Server_CompositeArg_2_2Callstack[i];
-						arg.v0.Serialize(writer);
+						writer.Put(arg.v0);
 						writer.Put((int)arg.v1);
 					}
 				}
@@ -304,7 +304,7 @@ namespace CTS.Instance.SyncObjects
 					for (int i = 0; i < count; i++)
 					{
 						var arg = Server_CompositeArg_3Callstack[i];
-						arg.v0.Serialize(writer);
+						writer.Put(arg.v0);
 						writer.Put((int)arg.v1);
 						writer.Put(arg.v2);
 					}

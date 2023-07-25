@@ -259,9 +259,9 @@ namespace CTS.Instance.Gameplay
 				_mtuBuffer.ResetWriter();
 
 				// Serialize movement data
-				SerializeMovementData(_mtuBuffer,
-									  visibleTable.TraceObjects,
-									  PacketType.SC_Sync_MasterMovement);
+				SerializePhysicsEventData(_mtuBuffer,
+										  visibleTable.TraceObjects,
+										  PacketType.SC_Sync_MasterPhysics);
 
 				// Unreliable data
 				SerializeUnreliableData(player, _mtuBuffer,
@@ -448,7 +448,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public static void SerializeMovementData(IPacketWriter writer,
+		public static void SerializePhysicsEventData(IPacketWriter writer,
 												 Dictionary<NetworkIdentity, MasterNetworkObject> netObjs,
 												 PacketType packetType)
 		{

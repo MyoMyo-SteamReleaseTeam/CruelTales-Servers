@@ -1,5 +1,6 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
+using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
@@ -169,15 +170,15 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncRpc] public void Server_PrimitiveArg_1(float v0) { }
 		[SyncRpc] public void Server_PrimitiveArg_2(float v0, int v1) { }
 		[SyncRpc] public void Server_PrimitiveArg_3(float v0, int v1, double v2) { }
-		[SyncRpc] public void Server_ValueTypeArg_1(NetVec2 v0) { }
-		[SyncRpc] public void Server_ValueTypeArg_2(NetVec2 v0, NetString v1) { }
-		[SyncRpc] public void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2) { }
+		[SyncRpc] public void Server_ValueTypeArg_1(Vector2 v0) { }
+		[SyncRpc] public void Server_ValueTypeArg_2(Vector2 v0, NetString v1) { }
+		[SyncRpc] public void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2) { }
 		[SyncRpc] public void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1) { }
 		[SyncRpc] public void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1) { }
 		[SyncRpc] public void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2) { }
 		[SyncRpc] public void Server_CompositeArg_2_1(int v0, TestEnumType v1) { }
-		[SyncRpc] public void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1) { }
-		[SyncRpc] public void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2) { }
+		[SyncRpc] public void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1) { }
+		[SyncRpc] public void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2) { }
 	}
 
 	#endregion

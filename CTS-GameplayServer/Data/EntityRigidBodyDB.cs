@@ -4,7 +4,7 @@ using CTS.Instance.SyncObjects;
 using KaNet.Physics;
 using KaNet.Physics.RigidBodies;
 
-namespace CTS.Instance.Data.Entities
+namespace CTS.Instance.Data
 {
 	public static class EntityRigidBodyDB
 	{

@@ -9,9 +9,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
 	public abstract class RemoteNetworkObject : IRemoteSynchronizable
 	{
-		/// <summary>네트워크 객체의 Transform입니다.</summary>
-		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
-
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; }
 

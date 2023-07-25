@@ -98,6 +98,7 @@ using CTS.Instance.SyncObjects;";
 
 		public static string RemoteUsingStatements =>
 @"using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
 using CT.Common.DataType;
@@ -112,6 +113,7 @@ using UnityEngine;
 
 		public static string DebugRemoteUsingStatements =>
 @"using System;
+using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;

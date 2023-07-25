@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
@@ -121,17 +122,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 		}
 
-		public partial void Server_ValueTypeArg_1(NetVec2 v0)
+		public partial void Server_ValueTypeArg_1(Vector2 v0)
 		{
 
 		}
 
-		public partial void Server_ValueTypeArg_2(NetVec2 v0, NetString v1)
+		public partial void Server_ValueTypeArg_2(Vector2 v0, NetString v1)
 		{
 
 		}
 
-		public partial void Server_ValueTypeArg_3(UserId v0, NetVec2 v1, NetString v2)
+		public partial void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2)
 		{
 
 		}
@@ -156,12 +157,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 		}
 
-		public partial void Server_CompositeArg_2_2(NetVec2 v0, TestEnumType v1)
+		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1)
 		{
 
 		}
 
-		public partial void Server_CompositeArg_3(NetVec2 v0, TestEnumType v1, float v2)
+		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2)
 		{
 
 		}

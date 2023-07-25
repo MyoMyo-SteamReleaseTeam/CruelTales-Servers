@@ -4,7 +4,7 @@ using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
-using CTS.Instance.Data.Entities;
+using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.SyncObjects;
 using KaNet.Physics.RigidBodies;
@@ -31,12 +31,9 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>유저의 소속입니다.</summary>
 		public Faction Faction { get; protected set; } = Faction.System;
 
-		/// <summary>네트워크 객체의 Transform입니다.</summary>
-		//public NetworkTransform Transform { get; private set; } = new NetworkTransform();
-
 		/// <summary>물리 RigidBody입니다.</summary>
 		public readonly NetRigidBody RigidBody;
-		private readonly KaRigidBody _rigidBody;
+		private readonly KaRigidBody _physicsRigidBody;
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
@@ -58,8 +55,8 @@ namespace CTS.Instance.Synchronizations
 
 		public MasterNetworkObject()
 		{
-			_rigidBody = EntityRigidBodyDB.CreateRigidBodyBy(Type);
-			RigidBody = new NetRigidBody(_rigidBody);
+			_physicsRigidBody = EntityRigidBodyDB.CreateRigidBodyBy(Type);
+			RigidBody = new NetRigidBody(_physicsRigidBody);
 		}
 
 		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
@@ -78,7 +75,7 @@ namespace CTS.Instance.Synchronizations
 			if (Visibility == VisibilityType.View)
 			{
 				Vector2Int previousPos = CurrentCellPos;
-				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_rigidBody.Position);
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
 				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
 		}
@@ -86,7 +83,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
 		private void fixedUpdate(float deltaTime)
 		{
-			_rigidBody.Step(deltaTime);
+			_physicsRigidBody.Step(deltaTime);
 		}
 
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>

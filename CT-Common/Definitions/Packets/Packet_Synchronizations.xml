@@ -13,7 +13,7 @@
 	<!-- Declare Packets -->
 	<client name="Sync_RemoteReliable" custom="true"/>
 	<client name="Sync_RemoteUnreliable" custom="true"/>
-	<server name="Sync_MasterMovement" custom="true"/>
+	<server name="Sync_MasterPhysics" custom="true"/>
 	<server name="Sync_MasterSpawn" custom="true"/>
 	<server name="Sync_MasterDespawn" custom="true"/>
 	<server name="Sync_MasterEnter" custom="true"/>

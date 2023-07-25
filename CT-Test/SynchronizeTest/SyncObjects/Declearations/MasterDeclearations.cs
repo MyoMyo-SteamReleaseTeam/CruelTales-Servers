@@ -24,7 +24,7 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_Parent : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
@@ -63,7 +63,7 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_Child : ZTest_Parent
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
@@ -93,7 +93,7 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_ChildChild : ZTest_Child
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
@@ -128,7 +128,7 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_FunctionDirection : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 
@@ -143,49 +143,49 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_SyncCollection : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value8Target : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value8NonTarget : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value16NonTarget : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value16Target : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value32Target : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
 
 	public partial class ZTest_Value32NonTarget : MasterNetworkObject
 	{
-		public override NetworkObjectType Type => throw new NotImplementedException();
+		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}

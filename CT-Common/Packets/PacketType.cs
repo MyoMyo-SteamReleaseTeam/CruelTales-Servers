@@ -15,7 +15,7 @@ namespace CT.Packets
 		CS_Req_ReadyToSync,
 		CS_Sync_RemoteReliable,
 		CS_Sync_RemoteUnreliable,
-		SC_Sync_MasterMovement,
+		SC_Sync_MasterPhysics,
 		SC_Sync_MasterSpawn,
 		SC_Sync_MasterDespawn,
 		SC_Sync_MasterEnter,
