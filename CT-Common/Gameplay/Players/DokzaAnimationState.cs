@@ -1,4 +1,4 @@
-﻿namespace CT.Common.Gameplay.PlayerCharacter
+﻿namespace CT.Common.Gameplay.Players
 {
 	public enum DokzaAnimationState : byte
 	{

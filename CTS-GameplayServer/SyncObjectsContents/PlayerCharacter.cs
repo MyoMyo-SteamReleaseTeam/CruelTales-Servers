@@ -1,13 +1,13 @@
 ﻿using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.PlayerCharacterStates;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
-using KaNet.Physics.RigidBodies;
 
 namespace CTS.Instance.SyncObjects
 {
-	public partial class PlayerCharacter : MasterNetworkObject
+	public partial class PlayerCharacter : MasterNetworkObject, IPlayerBehaviour
 	{
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
@@ -15,6 +15,16 @@ namespace CTS.Instance.SyncObjects
 		public float Speed = 5.0f;
 
 		public NetworkPlayer? NetworkPlayer { get; private set; }
+
+		// States
+		private PlayerCharacterModel PlayerModel;
+		private PlayerCharacterStateMachine StateMachine;
+
+		public PlayerCharacter() : base()
+		{
+			PlayerModel = new(this);
+			StateMachine = new(PlayerModel);
+		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)
 		{
@@ -35,16 +45,17 @@ namespace CTS.Instance.SyncObjects
 			if (_userId != player.UserId)
 				return;
 
+			InputInfo info;
 			if (direction == Vector2.Zero)
 			{
-				RigidBody.ChangeVelocity(Vector2.Zero);
+				info = new InputInfo(InputEvent.Movement);
 			}
 			else
 			{
-				float speed = isWalk ? Speed * 0.5f : Speed;
-				Vector2 velocity = Vector2.Normalize(direction) * speed;
-				RigidBody.ChangeVelocity(velocity);
+				info = new InputInfo(InputEvent.Movement, direction, isWalk);
 			}
+
+			StateMachine.OnInputEvent(info);
 		}
 
 		public partial void Client_InputInteraction(NetworkPlayer player,
@@ -62,6 +73,18 @@ namespace CTS.Instance.SyncObjects
 											   Vector2 direction)
 		{
 
+		}
+
+		public void UpdateRigid(Vector2 moveDirection, bool isWalk)
+		{
+			float speed = isWalk ? Speed * 0.5f : Speed;
+			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
+			RigidBody.ChangeVelocity(velocity);
+		}
+
+		public void UpdateRigidStop()
+		{
+			RigidBody.ChangeVelocity(Vector2.Zero);
 		}
 	}
 }
