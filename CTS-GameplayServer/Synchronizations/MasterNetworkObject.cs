@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
@@ -7,6 +8,7 @@ using CT.Common.Synchronizations;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.SyncObjects;
+using KaNet.Physics;
 using KaNet.Physics.RigidBodies;
 
 namespace CTS.Instance.Synchronizations
@@ -31,9 +33,12 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>유저의 소속입니다.</summary>
 		public Faction Faction { get; protected set; } = Faction.System;
 
-		/// <summary>물리 RigidBody입니다.</summary>
+		/// <summary>물리 강체 입니다.</summary>
 		public readonly NetRigidBody RigidBody;
 		private readonly KaRigidBody _physicsRigidBody;
+
+		/// <summary>물리 계산 월드입니다.</summary>
+		private KaPhysicsWorld? _physicsWorld;
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
@@ -48,9 +53,6 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
 
-		/// <summary>위치가 고정된 네트워크 객체인지 여부입니다.</summary>
-		public bool IsStatic { get; }
-
 		public Vector2Int CurrentCellPos { get; private set; }
 
 		public MasterNetworkObject()
@@ -60,14 +62,7 @@ namespace CTS.Instance.Synchronizations
 		}
 
 		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
-		public void UpdatePhysics(float deltaTime)
-		{
-			// 고정 물리 업데이트를 수행합니다.
-			if (!IsStatic)
-			{
-				fixedUpdate(deltaTime);
-			}
-		}
+		public virtual void OnFixedUpdate(float stepTime) {}
 
 		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>
 		public void UpdateWorldCell()
@@ -78,12 +73,6 @@ namespace CTS.Instance.Synchronizations
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
 				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
-		}
-
-		/// <summary>네트워크 객체의 고정 물리 업데이트입니다.</summary>
-		private void fixedUpdate(float deltaTime)
-		{
-			_physicsRigidBody.Step(deltaTime);
 		}
 
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
@@ -99,14 +88,16 @@ namespace CTS.Instance.Synchronizations
 		public void Initialize(WorldManager worldManager,
 							   WorldVisibilityManager worldPartitioner,
 							   GameplayManager gameManager,
+							   KaPhysicsWorld physicsWorld,
 							   NetworkIdentity id,
 							   Vector2 position,
 							   float rotation)
 		{
 			// Bind reference
 			WorldManager = worldManager;
-			GameplayManager = gameManager;
 			_worldVisibilityManager = worldPartitioner;
+			GameplayManager = gameManager;
+			_physicsWorld = physicsWorld;
 
 			// Initialize
 			Identity = id;
@@ -118,6 +109,7 @@ namespace CTS.Instance.Synchronizations
 			RigidBody.Reset();
 			RigidBody.MoveTo(position);
 			RigidBody.RotateTo(rotation);
+			_physicsWorld.AddRigidBody(_physicsRigidBody);
 		}
 
 		public void InitializeAfterFrame()
@@ -130,6 +122,13 @@ namespace CTS.Instance.Synchronizations
 			_worldVisibilityManager.OnCreated(this);
 		}
 
+		/// <summary>객체를 해제합니다.</summary>
+		public void Dispose()
+		{
+			Debug.Assert(_physicsWorld != null);
+			_physicsWorld.RemoveRigidBody(_physicsRigidBody);
+		}
+
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
 		public void Destroy()
 		{
@@ -140,11 +139,6 @@ namespace CTS.Instance.Synchronizations
 			{
 				_worldVisibilityManager.OnDestroy(this);
 			}
-		}
-
-		/// <summary>객체를 해제합니다.</summary>
-		public void Dispose()
-		{
 		}
 
 		#region Visibility authority

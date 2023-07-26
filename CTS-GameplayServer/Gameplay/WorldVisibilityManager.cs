@@ -32,7 +32,7 @@ namespace CTS.Instance.Gameplay
 		public const float INVERSE_CEll_SIZE = 1.0f / CELL_SIZE;
 
 		public const float ORIGIN_OFFSET_X = WORLD_MAX_WIDTH / 2; //128.0f;
-		public const float ORIGIN_OFFSET_Z = WORLD_MAX_HEIGHT / 2; //128.0f;
+		public const float ORIGIN_OFFSET_Y = WORLD_MAX_HEIGHT / 2; //128.0f;
 
 		public const int CELL_WIDTH = (int)(WORLD_MAX_WIDTH / CELL_SIZE); // 32;
 		public const int CELL_HEIGHT = (int)(WORLD_MAX_HEIGHT / CELL_SIZE); // 32;
@@ -110,7 +110,7 @@ namespace CTS.Instance.Gameplay
 		public static Vector2Int GetWorldCell(Vector2 position)
 		{
 			float curPosX = position.X + ORIGIN_OFFSET_X;
-			float curPosZ = position.Y + ORIGIN_OFFSET_Z;
+			float curPosZ = position.Y + ORIGIN_OFFSET_Y;
 			int cellX = (int)(curPosX * INVERSE_CEll_SIZE);
 			int cellZ = (int)(curPosZ * INVERSE_CEll_SIZE);
 			return new Vector2Int(cellX, cellZ);
@@ -119,7 +119,7 @@ namespace CTS.Instance.Gameplay
 		public static Vector2Int GetWorldCell(Vector3 position)
 		{
 			float curPosX = position.X + ORIGIN_OFFSET_X;
-			float curPosZ = position.Z + ORIGIN_OFFSET_Z;
+			float curPosZ = position.Z + ORIGIN_OFFSET_Y;
 			int cellX = (int)(curPosX * INVERSE_CEll_SIZE);
 			int cellZ = (int)(curPosZ * INVERSE_CEll_SIZE);
 			return new Vector2Int(cellX, cellZ);

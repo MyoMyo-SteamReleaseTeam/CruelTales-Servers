@@ -10,7 +10,7 @@ namespace CTS.Instance
 		public int FramePerMs = 66;
 		//public int FramePerMs = 1000;
 		public int AlarmTickMs = 40;
-		public int GameCount = 10;
+		public int GameCount = 1;
 
 		public ServerOption() {}
 	}

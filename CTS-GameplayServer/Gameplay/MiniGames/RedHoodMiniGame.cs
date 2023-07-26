@@ -47,14 +47,23 @@ namespace CTS.Instance.Gameplay.MiniGames
 		{
 			CheckGameOverCondition();
 
-			if (_testCubeList.Count < 40)
+			if (_testCubeList.Count < 1)
 			{
 				Vector2 lb = new Vector2(-30, -30);
 				Vector2 rt = new Vector2(30, 30);
-				var createPos = RandomHelper.NextVectorBetween(lb, rt);
+				//Vector2 lb = new Vector2(0, 0);
+				//Vector2 rt = new Vector2(0, 0);
+				//var createPos = RandomHelper.NextVectorBetween(lb, rt);
+				var createPos = Vector2.Zero;
 				var testCube = _worldManager.CreateObject<TestCube>(createPos);
+				testCube.BindMiniGame(this);
 				_testCubeList.Add(testCube);
 			}
+		}
+
+		public void OnTestCubeDestroyed(TestCube testCube)
+		{
+			_testCubeList.Remove(testCube);
 		}
 
 		public void OnGameStart()

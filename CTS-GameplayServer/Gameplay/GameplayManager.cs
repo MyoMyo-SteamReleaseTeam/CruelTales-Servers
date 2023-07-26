@@ -71,7 +71,7 @@ namespace CTS.Instance.Gameplay
 			WorldManager.UpdateVisibilityAndSendData();
 
 			// Update network objects physics
-			WorldManager.UpdatePhysics(deltaTime);
+			WorldManager.FixedUpdate(deltaTime);
 
 			// Update world partitions
 			WorldManager.UpdateWorldPartitions();

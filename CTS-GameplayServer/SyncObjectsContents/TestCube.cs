@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Numerics;
+using CTS.Instance.Gameplay.MiniGames;
 using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.SyncObjects
@@ -21,7 +22,7 @@ namespace CTS.Instance.SyncObjects
 			//Console.WriteLine($"{Identity}:{Transform} OnCREATED");
 
 			_radiusFactor = (float)_random.NextDouble();
-			_lifeTime = (float)(25 + _random.NextDouble() * 3);
+			_lifeTime = (float)(3 + _random.NextDouble() * 3);
 
 			R = (float)_random.NextDouble();
 			G = (float)_random.NextDouble();
@@ -34,9 +35,15 @@ namespace CTS.Instance.SyncObjects
 
 			float x = MathF.Cos(_radiusFactor);
 			float y = MathF.Sin(_radiusFactor);
-			RigidBody.MoveTo(RigidBody.Position + new Vector2(x, y));
+
+			Vector2 velocity = Vector2.Normalize(new Vector2(x, y)) * 10;
+			//Vector2 velocity = Vector2.Normalize(new Vector2(-1, 0));
+			RigidBody.ChangeVelocity(velocity);
+
+			Console.WriteLine(RigidBody.Position);
+
+			//RigidBody.MoveTo(RigidBody.Position + new Vector2(x, y));
 			_radiusFactor += 0.128f * 1f;
-			//Console.WriteLine(Identity.ToString() + Transform.ToString());
 
 			_lifeTime -= deltaTime;
 			if (_lifeTime < 0)
@@ -52,10 +59,22 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
+		// Test
+		private MiniGameController? _controller;
+
+		// Test
+		public void BindMiniGame(MiniGameController controller)
+		{
+			_controller = controller;
+		}
+
 		public override void OnDestroyed()
 		{
 			_pool?.Remove(this);
 			_pool = null;
+
+			// Test
+			_controller?.OnTestCubeDestroyed(this);
 		}
 
 		private IList? _pool;

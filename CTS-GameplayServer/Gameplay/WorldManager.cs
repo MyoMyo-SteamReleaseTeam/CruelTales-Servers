@@ -42,6 +42,7 @@ namespace CTS.Instance.Gameplay
 
 		// Physics World
 		private KaPhysicsWorld _physicsWorld;
+		private float _deltaTimeStack = 0;
 
 		// Getter
 		public int Count => _networkObjectById.Count;
@@ -78,14 +79,25 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void UpdatePhysics(float deltaTime)
+		public void FixedUpdate(float deltaTime)
 		{
-			foreach (var netObj in _networkObjectById.ForwardValues)
+			_deltaTimeStack += deltaTime;
+			int iterCount = 0;
+			float interval = 0.03f;
+			while (_deltaTimeStack > interval)
 			{
-				if (!netObj.IsAlive)
-					continue;
+				_deltaTimeStack -= interval;
+				_physicsWorld.Step(interval);
+				if (++iterCount >= 5)
+					break;
 
-				netObj.UpdatePhysics(deltaTime);
+				foreach (var netObj in _networkObjectById.ForwardValues)
+				{
+					if (!netObj.IsAlive)
+						continue;
+
+					netObj.OnFixedUpdate(deltaTime);
+				}
 			}
 		}
 
@@ -166,6 +178,7 @@ namespace CTS.Instance.Gameplay
 			netObj.Initialize(worldManager: this,
 							  _visibilityManager,
 							  _gameplayManager, 
+							  _physicsWorld,
 							  getNetworkIdentityCounter(),
 							  position, 
 							  rotation: 0);
@@ -218,8 +231,8 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
-			netObject.Dispose();
 			netObject.OnDestroyed();
+			netObject.Dispose();
 		}
 
 		#endregion

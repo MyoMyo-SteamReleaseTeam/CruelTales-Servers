@@ -123,10 +123,7 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Impulse(Vector2 direction, float power)
 		{
-			_rigidBody.ForceVelocity = direction * power;
-
-			Event.EventFlags |= PhysicsEventFlag.ForceVelocity;
-			Event.ForceVelocity = _rigidBody.ForceVelocity;
+			Impulse(direction * power);
 		}
 
 		/// <summary>순간적인 힘을 가합니다.</summary>
@@ -135,7 +132,8 @@ namespace CT.Common.Gameplay
 		{
 			_rigidBody.ForceVelocity = impluseVelocity;
 
-			Event.EventFlags |= PhysicsEventFlag.ForceVelocity;
+			Event.EventFlags |= PhysicsEventFlag.ForceVelocity | PhysicsEventFlag.Position;
+			Event.Position = _rigidBody.Position;
 			Event.ForceVelocity = _rigidBody.ForceVelocity;
 		}
 
@@ -145,7 +143,8 @@ namespace CT.Common.Gameplay
 		{
 			_rigidBody.LinearVelocity = linearVelocity;
 
-			Event.EventFlags |= PhysicsEventFlag.LinearVelocity;
+			Event.EventFlags |= PhysicsEventFlag.LinearVelocity | PhysicsEventFlag.Position;
+			Event.Position = _rigidBody.Position;
 			Event.LinearVelocity = _rigidBody.LinearVelocity;
 		}
 
