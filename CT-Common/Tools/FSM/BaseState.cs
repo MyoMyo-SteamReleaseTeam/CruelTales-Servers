@@ -1,4 +1,6 @@
-﻿namespace CT.Common.Tools.FSM
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CT.Common.Tools.FSM
 {
 	public abstract class BaseState
 	{
@@ -40,8 +42,8 @@
 		where R : class
 		where C : BaseStateMachine<R>
 	{
-		public R? Reference { get; private set; }
-		public C? StateMachine { get; private set; }
+		[AllowNull] public R Reference { get; private set; }
+		[AllowNull] public C StateMachine { get; private set; }
 
 		/// <summary>상태에 진입합니다.</summary>
 		/// <param name="reference">상태를 관리하는 컨트롤러입니다.</param>
