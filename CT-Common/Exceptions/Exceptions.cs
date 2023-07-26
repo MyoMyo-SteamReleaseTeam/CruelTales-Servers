@@ -3,6 +3,11 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.Exceptions
 {
+	public class NetworkRuntimeException : Exception
+	{
+		public NetworkRuntimeException(string message) : base(message) { }
+	}
+
 	public class WrongSyncType : Exception
 	{
 		public WrongSyncType(SyncType syncType) : base($"You cannot synchronize when it's {syncType}") {}
