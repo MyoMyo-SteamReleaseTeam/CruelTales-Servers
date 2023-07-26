@@ -67,8 +67,6 @@ namespace CT.Common.Gameplay
 
 			if (eventFlags.HasFlag(PhysicsEventFlag.Rotation))
 				reader.Ignore(sizeof(float));
-
-			throw new NotImplementedException();
 		}
 
 		public void Serialize(IPacketWriter writer)
