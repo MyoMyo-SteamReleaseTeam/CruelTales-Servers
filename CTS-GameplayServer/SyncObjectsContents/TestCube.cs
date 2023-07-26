@@ -40,7 +40,7 @@ namespace CTS.Instance.SyncObjects
 			//Vector2 velocity = Vector2.Normalize(new Vector2(-1, 0));
 			RigidBody.ChangeVelocity(velocity);
 
-			Console.WriteLine(RigidBody.Position);
+			//Console.WriteLine(RigidBody.Position);
 
 			//RigidBody.MoveTo(RigidBody.Position + new Vector2(x, y));
 			_radiusFactor += 0.128f * 1f;

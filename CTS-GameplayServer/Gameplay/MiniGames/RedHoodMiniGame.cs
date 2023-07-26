@@ -47,7 +47,7 @@ namespace CTS.Instance.Gameplay.MiniGames
 		{
 			CheckGameOverCondition();
 
-			if (_testCubeList.Count < 1)
+			if (_testCubeList.Count < 0)
 			{
 				Vector2 lb = new Vector2(-30, -30);
 				Vector2 rt = new Vector2(30, 30);

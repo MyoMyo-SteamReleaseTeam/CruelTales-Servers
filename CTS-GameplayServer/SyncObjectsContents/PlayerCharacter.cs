@@ -35,13 +35,16 @@ namespace CTS.Instance.SyncObjects
 			if (_userId != player.UserId)
 				return;
 
-			Vector2 velocity = Vector2.Zero;
-			if (direction.X != 0 && direction.Y != 0)
+			if (direction == Vector2.Zero)
 			{
-				velocity = Vector2.Normalize(new Vector2(direction.X, direction.Y)) * Speed;
+				RigidBody.ChangeVelocity(Vector2.Zero);
 			}
-			RigidBody.MoveTo(RigidBody.Position);
-			RigidBody.ChangeVelocity(velocity);
+			else
+			{
+				float speed = isWalk ? Speed * 0.5f : Speed;
+				Vector2 velocity = Vector2.Normalize(direction) * speed;
+				RigidBody.ChangeVelocity(velocity);
+			}
 		}
 
 		public partial void Client_InputInteraction(NetworkPlayer player,
@@ -52,8 +55,6 @@ namespace CTS.Instance.SyncObjects
 			{
 				return;
 			}
-
-
 		}
 
 		public partial void Client_InputAction(NetworkPlayer player,
