@@ -7,11 +7,8 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	public class PlayerCharacterModel
 	{
 		public IPlayerBehaviour Player { get; private set; }
-		public DokzaAnimationState AnimationState { get; private set; } = DokzaAnimationState.Idle;
-		public float AnimationTime { get; private set; }
 		public Vector2 ActionAxis { get; set; } = Vector2.Zero;
 		public Vector2 MoveDirection { get; set; } = Vector2.Zero;
-		public ProxyDirection CurrentDokzaDirection { get; private set; } = ProxyDirection.RightDown;
 
 		public PlayerCharacterModel(IPlayerBehaviour player)
 		{
@@ -20,23 +17,26 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		public void UpdateAnimation(DokzaAnimationState animationState)
 		{
-			AnimationState = animationState;
-			AnimationTime = 0;
+			Player.AnimationState = animationState;
+			Player.AnimationTime = 0.0f;
+			Player.OnAnimationChanged(Player.AnimationState);
 		}
 
 		public void UpdateDokzaDirection(ProxyDirection direction)
 		{
-			CurrentDokzaDirection = direction;
+			Player.ProxyDirection = direction;
+			Player.OnProxyDirectionChanged(Player.ProxyDirection);
 		}
 
 		public void UpdateDokzaDirection()
 		{
-			CurrentDokzaDirection = GetDokzaDirection();
+			Player.ProxyDirection = GetDokzaDirection();
+			Player.OnProxyDirectionChanged(Player.ProxyDirection);
 		}
 
 		public void Update(float deltaTime)
 		{
-			AnimationTime += deltaTime;
+			Player.AnimationTime += deltaTime;
 		}
 
 		public ProxyDirection GetDokzaDirection()
@@ -53,7 +53,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			}
 			else
 			{
-				direction |= CurrentDokzaDirection.IsRight() ?
+				direction |= Player.ProxyDirection.IsRight() ?
 					ProxyDirection.Right : ProxyDirection.Left;
 			}
 
@@ -67,7 +67,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			}
 			else
 			{
-				direction |= CurrentDokzaDirection.IsUp() ?
+				direction |= Player.ProxyDirection.IsUp() ?
 					ProxyDirection.Up : ProxyDirection.Down;
 			}
 

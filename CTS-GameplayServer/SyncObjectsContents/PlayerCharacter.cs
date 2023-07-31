@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
-using CT.Common.DataType;
-using CT.Common.Gameplay;
 using CT.Common.Gameplay.PlayerCharacterStates;
+using CT.Common.Gameplay.Players;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -20,10 +19,38 @@ namespace CTS.Instance.SyncObjects
 		private PlayerCharacterModel PlayerModel;
 		private PlayerCharacterStateMachine StateMachine;
 
+		#region Getter Setter
+
+		public DokzaAnimationState AnimationState
+		{
+			get => _animationState;
+			set => _animationState = value;
+		}
+
+		public ProxyDirection ProxyDirection
+		{
+			get => _proxyDirection;
+			set => _proxyDirection = value;
+		}
+
+		public float AnimationTime
+		{
+			get => _animationTime;
+			set => _animationTime = value;
+		}
+
+		#endregion
+
 		public PlayerCharacter() : base()
 		{
 			PlayerModel = new(this);
 			StateMachine = new(PlayerModel);
+		}
+
+		public override void OnCreated()
+		{
+			_animationState = DokzaAnimationState.Idle;
+			_proxyDirection = ProxyDirection.RightDown;
 		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)
@@ -52,6 +79,21 @@ namespace CTS.Instance.SyncObjects
 		}
 
 		#region Sync
+
+		public void OnAnimationChanged(DokzaAnimationState state)
+		{
+			this.Server_OnAnimationChanged(state);
+		}
+
+		public void OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
+		{
+			this.Server_OnAnimationChanged(state, direction);
+		}
+
+		public void OnProxyDirectionChanged(ProxyDirection direction)
+		{
+			this.Server_OnProxyDirectionChanged(direction);
+		}
 
 		public partial void Client_InputMovement(NetworkPlayer player,
 												 Vector2 direction, bool isWalk)
