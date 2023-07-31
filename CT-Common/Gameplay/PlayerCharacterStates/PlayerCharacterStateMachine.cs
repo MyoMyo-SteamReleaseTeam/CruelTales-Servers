@@ -74,6 +74,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			if (inputInfo.InputEvent == InputEvent.Movement)
 			{
 				Reference.MoveDirection = inputInfo.MoveDirection;
+				Reference.UpdateDokzaDirection();
 
 				BasePlayerCharacterState state = inputInfo.IsWalk ? 
 					StateMachine.WalkState : StateMachine.RunState;
@@ -107,6 +108,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			if (inputInfo.InputEvent == InputEvent.Movement)
 			{
 				Reference.MoveDirection = inputInfo.MoveDirection;
+				Reference.UpdateDokzaDirection();
 
 				if (!inputInfo.HasMovementInput)
 				{
@@ -156,6 +158,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			if (inputInfo.InputEvent == InputEvent.Movement)
 			{
 				Reference.MoveDirection = inputInfo.MoveDirection;
+				Reference.UpdateDokzaDirection();
 
 				if (!inputInfo.HasMovementInput)
 				{

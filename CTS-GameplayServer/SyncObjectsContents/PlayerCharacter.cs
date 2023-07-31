@@ -1,13 +1,18 @@
 ﻿using System.Numerics;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CT.Common.Quantization;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using KaNet.Physics;
+using log4net;
 
 namespace CTS.Instance.SyncObjects
 {
 	public partial class PlayerCharacter : MasterNetworkObject, IPlayerBehaviour
 	{
+		private static readonly ILog _log = LogManager.GetLogger(typeof(PlayerCharacter));
+
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
@@ -68,6 +73,12 @@ namespace CTS.Instance.SyncObjects
 
 		public void UpdateRigid(Vector2 moveDirection, bool isWalk)
 		{
+			if (KaPhysics.NearlyEqual(moveDirection.Length(), 0))
+			{
+				RigidBody.ChangeVelocity(moveDirection);
+				return;
+			}
+
 			float speed = isWalk ? Speed * 0.5f : Speed;
 			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
 			RigidBody.ChangeVelocity(velocity);
