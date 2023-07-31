@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -31,26 +32,20 @@ namespace CTS.Instance.SyncObjects
 		private UserId _userId = new();
 		[SyncVar]
 		private NetStringShort _username = new();
-		[SyncVar]
-		private int _costume;
-		[SyncVar]
-		private bool _isFreezed;
 		[SyncVar(SyncType.ColdData)]
-		private DokzaAnimation _currentAnimation = new();
+		private DokzaAnimationState _animationState = new();
+		[SyncVar(SyncType.ColdData)]
+		private ProxyDirection _proxyDirection = new();
 		[SyncVar(SyncType.ColdData)]
 		private float _animationTime;
-		[SyncVar(SyncType.ColdData)]
-		private bool _isRight;
-		[SyncVar(SyncType.ColdData)]
-		private bool _isUp;
 		[SyncRpc]
-		public partial void Server_OnAnimationChanged(DokzaAnimation animation, bool isRight, bool isUp);
+		public partial void Server_OnAnimationChanged(DokzaAnimationState state);
+		[SyncRpc]
+		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction);
+		[SyncRpc]
+		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_InputMovement(NetworkPlayer player, Vector2 direction, bool isWalk);
-		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_InputInteraction(NetworkPlayer player, NetworkIdentity target, Input_InteractType interactType);
-		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_InputAction(NetworkPlayer player, Input_PlayerAction actionType, Vector2 direction);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
@@ -82,36 +77,30 @@ namespace CTS.Instance.SyncObjects
 				_dirtyReliable_0[1] = true;
 			}
 		}
-		public int Costume
+		public partial void Server_OnAnimationChanged(DokzaAnimationState state)
 		{
-			get => _costume;
-			set
-			{
-				if (_costume == value) return;
-				_costume = value;
-				_dirtyReliable_0[2] = true;
-			}
+			Server_OnAnimationChangedDCallstack.Add(state);
+			_dirtyReliable_0[2] = true;
 		}
-		public bool IsFreezed
+		private List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
+		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
 		{
-			get => _isFreezed;
-			set
-			{
-				if (_isFreezed == value) return;
-				_isFreezed = value;
-				_dirtyReliable_0[3] = true;
-			}
+			Server_OnAnimationChangedDPCallstack.Add((state, direction));
+			_dirtyReliable_0[3] = true;
 		}
-		public partial void Server_OnAnimationChanged(DokzaAnimation animation, bool isRight, bool isUp)
+		private List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
+		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction)
 		{
-			Server_OnAnimationChangedCallstack.Add((animation, isRight, isUp));
+			Server_OnProxyDirectionChangedPCallstack.Add(direction);
 			_dirtyReliable_0[4] = true;
 		}
-		private List<(DokzaAnimation animation, bool isRight, bool isUp)> Server_OnAnimationChangedCallstack = new(4);
+		private List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			Server_OnAnimationChangedCallstack.Clear();
+			Server_OnAnimationChangedDCallstack.Clear();
+			Server_OnAnimationChangedDPCallstack.Clear();
+			Server_OnProxyDirectionChangedPCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -127,22 +116,33 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_costume);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				writer.Put(_isFreezed);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_OnAnimationChangedCallstack.Count;
+				byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Server_OnAnimationChangedCallstack[i];
-					writer.Put((int)arg.animation);
-					writer.Put(arg.isRight);
-					writer.Put(arg.isUp);
+					var arg = Server_OnAnimationChangedDCallstack[i];
+					writer.Put((byte)arg);
+				}
+			}
+			if (_dirtyReliable_0[3])
+			{
+				byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_OnAnimationChangedDPCallstack[i];
+					writer.Put((byte)arg.state);
+					writer.Put((byte)arg.direction);
+				}
+			}
+			if (_dirtyReliable_0[4])
+			{
+				byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_OnProxyDirectionChangedPCallstack[i];
+					writer.Put((byte)arg);
 				}
 			}
 		}
@@ -151,23 +151,17 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
-			writer.Put(_costume);
-			writer.Put(_isFreezed);
-			writer.Put((int)_currentAnimation);
+			writer.Put((byte)_animationState);
+			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
-			writer.Put(_isRight);
-			writer.Put(_isUp);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_userId = new();
 			_username = new();
-			_costume = 0;
-			_isFreezed = false;
-			_currentAnimation = (DokzaAnimation)0;
+			_animationState = (DokzaAnimationState)0;
+			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;
-			_isRight = false;
-			_isUp = false;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
@@ -181,29 +175,6 @@ namespace CTS.Instance.SyncObjects
 					if (!reader.TryReadVector2(out var direction)) return false;
 					if (!reader.TryReadBoolean(out bool isWalk)) return false;
 					Client_InputMovement(player, direction, isWalk);
-				}
-			}
-			if (dirtyUnreliable_0[1])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetworkIdentity target = new();
-					if (!target.TryDeserialize(reader)) return false;
-					if (!reader.TryReadByte(out var interactTypeValue)) return false;
-					Input_InteractType interactType = (Input_InteractType)interactTypeValue;
-					Client_InputInteraction(player, target, interactType);
-				}
-			}
-			if (dirtyUnreliable_0[2])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					if (!reader.TryReadByte(out var actionTypeValue)) return false;
-					Input_PlayerAction actionType = (Input_PlayerAction)actionTypeValue;
-					if (!reader.TryReadVector2(out var direction)) return false;
-					Client_InputAction(player, actionType, direction);
 				}
 			}
 			return true;
@@ -223,24 +194,6 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(1);
 				}
 			}
-			if (dirtyUnreliable_0[1])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetworkIdentity.IgnoreStatic(reader);
-					reader.Ignore(1);
-				}
-			}
-			if (dirtyUnreliable_0[2])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					reader.Ignore(1);
-					Vector2SerializeExtension.IgnoreStatic(reader);
-				}
-			}
 		}
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader)
 		{
@@ -252,24 +205,6 @@ namespace CTS.Instance.SyncObjects
 				{
 					Vector2SerializeExtension.IgnoreStatic(reader);
 					reader.Ignore(1);
-				}
-			}
-			if (dirtyUnreliable_0[1])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					NetworkIdentity.IgnoreStatic(reader);
-					reader.Ignore(1);
-				}
-			}
-			if (dirtyUnreliable_0[2])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					reader.Ignore(1);
-					Vector2SerializeExtension.IgnoreStatic(reader);
 				}
 			}
 		}

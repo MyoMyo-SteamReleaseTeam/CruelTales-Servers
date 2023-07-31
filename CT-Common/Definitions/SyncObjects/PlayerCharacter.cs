@@ -3,6 +3,7 @@
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.Synchronizations;
 
 namespace CT.Common.Definitions.SyncObjects
@@ -16,36 +17,33 @@ namespace CT.Common.Definitions.SyncObjects
 		[SyncVar]
 		public NetStringShort Username;
 
-		[SyncVar]
-		public int Costume;
-
-		[SyncVar]
-		public bool IsFreezed;
-
 		// Animations
 		[SyncVar(SyncType.ColdData)]
-		public DokzaAnimation CurrentAnimation;
+		public DokzaAnimationState AnimationState;
+
+		[SyncVar(SyncType.ColdData)]
+		public ProxyDirection ProxyDirection;
 
 		[SyncVar(SyncType.ColdData)]
 		public float AnimationTime;
 
-		[SyncVar(SyncType.ColdData)]
-		public bool IsRight;
-
-		[SyncVar(SyncType.ColdData)]
-		public bool IsUp;
+		[SyncRpc]
+		public void Server_OnAnimationChanged(DokzaAnimationState state) { }
 
 		[SyncRpc]
-		public void Server_OnAnimationChanged(DokzaAnimation animation, bool isRight, bool isUp) {}
+		public void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction) { }
+		
+		[SyncRpc]
+		public void Server_OnProxyDirectionChanged(ProxyDirection direction) { }
 
 		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
 		public void Client_InputMovement(Vector2 direction, bool isWalk) { }
 
-		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
-		public void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType) { }
+		//[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
+		//public void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType) { }
 
-		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
-		public void Client_InputAction(Input_PlayerAction actionType, Vector2 direction) { }
+		//[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
+		//public void Client_InputAction(Input_PlayerAction actionType, Vector2 direction) { }
 	}
 }
 #pragma warning restore IDE0051

@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -64,10 +65,10 @@ namespace CTS.Instance.SyncObjects
 		}
 		public partial void f1(NetworkPlayer player, NetStringShort a)
 		{
-			f1Callstack.Add(player, a);
+			f1NCallstack.Add(player, a);
 			_dirtyReliable_0[1] = true;
 		}
-		private TargetCallstack<NetworkPlayer, NetStringShort> f1Callstack = new(8);
+		private TargetCallstack<NetworkPlayer, NetStringShort> f1NCallstack = new(8);
 		public int Uv1
 		{
 			get => _uv1;
@@ -81,7 +82,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			f1Callstack.Clear();
+			f1NCallstack.Clear();
 		}
 		public void ClearDirtyUnreliable()
 		{
@@ -97,14 +98,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				int f1Count = f1Callstack.GetCallCount(player);
-				if (f1Count > 0)
+				int f1NCount = f1NCallstack.GetCallCount(player);
+				if (f1NCount > 0)
 				{
-					var f1callList = f1Callstack.GetCallList(player);
-					writer.Put((byte)f1Count);
-					for (int i = 0; i < f1Count; i++)
+					var f1NcallList = f1NCallstack.GetCallList(player);
+					writer.Put((byte)f1NCount);
+					for (int i = 0; i < f1NCount; i++)
 					{
-						var arg = f1callList[i];
+						var arg = f1NcallList[i];
 						arg.Serialize(writer);
 					}
 				}

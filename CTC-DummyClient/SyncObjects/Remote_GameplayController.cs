@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -102,37 +103,37 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		private byte Client_OnMapLoadedCallstackCount = 0;
 		public partial void ClientRoomSetReq_SetPassword(int password)
 		{
-			ClientRoomSetReq_SetPasswordCallstack.Add(password);
+			ClientRoomSetReq_SetPasswordiCallstack.Add(password);
 			_dirtyReliable_0[2] = true;
 		}
-		private List<int> ClientRoomSetReq_SetPasswordCallstack = new(4);
+		private List<int> ClientRoomSetReq_SetPasswordiCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomName(NetStringShort roomName)
 		{
-			ClientRoomSetReq_SetRoomNameCallstack.Add(roomName);
+			ClientRoomSetReq_SetRoomNameNCallstack.Add(roomName);
 			_dirtyReliable_0[3] = true;
 		}
-		private List<NetStringShort> ClientRoomSetReq_SetRoomNameCallstack = new(4);
+		private List<NetStringShort> ClientRoomSetReq_SetRoomNameNCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetStringShort roomDiscription)
 		{
-			ClientRoomSetReq_SetRoomDiscriptionCallstack.Add(roomDiscription);
+			ClientRoomSetReq_SetRoomDiscriptionNCallstack.Add(roomDiscription);
 			_dirtyReliable_0[4] = true;
 		}
-		private List<NetStringShort> ClientRoomSetReq_SetRoomDiscriptionCallstack = new(4);
+		private List<NetStringShort> ClientRoomSetReq_SetRoomDiscriptionNCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomMaxUser(int maxUser)
 		{
-			ClientRoomSetReq_SetRoomMaxUserCallstack.Add(maxUser);
+			ClientRoomSetReq_SetRoomMaxUseriCallstack.Add(maxUser);
 			_dirtyReliable_0[5] = true;
 		}
-		private List<int> ClientRoomSetReq_SetRoomMaxUserCallstack = new(4);
+		private List<int> ClientRoomSetReq_SetRoomMaxUseriCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			Client_ReadyToSyncCallstackCount = 0;
 			Client_OnMapLoadedCallstackCount = 0;
-			ClientRoomSetReq_SetPasswordCallstack.Clear();
-			ClientRoomSetReq_SetRoomNameCallstack.Clear();
-			ClientRoomSetReq_SetRoomDiscriptionCallstack.Clear();
-			ClientRoomSetReq_SetRoomMaxUserCallstack.Clear();
+			ClientRoomSetReq_SetPasswordiCallstack.Clear();
+			ClientRoomSetReq_SetRoomNameNCallstack.Clear();
+			ClientRoomSetReq_SetRoomDiscriptionNCallstack.Clear();
+			ClientRoomSetReq_SetRoomMaxUseriCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer)
@@ -148,41 +149,41 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				byte count = (byte)ClientRoomSetReq_SetPasswordCallstack.Count;
+				byte count = (byte)ClientRoomSetReq_SetPasswordiCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = ClientRoomSetReq_SetPasswordCallstack[i];
+					var arg = ClientRoomSetReq_SetPasswordiCallstack[i];
 					writer.Put(arg);
 				}
 			}
 			if (_dirtyReliable_0[3])
 			{
-				byte count = (byte)ClientRoomSetReq_SetRoomNameCallstack.Count;
+				byte count = (byte)ClientRoomSetReq_SetRoomNameNCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = ClientRoomSetReq_SetRoomNameCallstack[i];
+					var arg = ClientRoomSetReq_SetRoomNameNCallstack[i];
 					arg.Serialize(writer);
 				}
 			}
 			if (_dirtyReliable_0[4])
 			{
-				byte count = (byte)ClientRoomSetReq_SetRoomDiscriptionCallstack.Count;
+				byte count = (byte)ClientRoomSetReq_SetRoomDiscriptionNCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = ClientRoomSetReq_SetRoomDiscriptionCallstack[i];
+					var arg = ClientRoomSetReq_SetRoomDiscriptionNCallstack[i];
 					arg.Serialize(writer);
 				}
 			}
 			if (_dirtyReliable_0[5])
 			{
-				byte count = (byte)ClientRoomSetReq_SetRoomMaxUserCallstack.Count;
+				byte count = (byte)ClientRoomSetReq_SetRoomMaxUseriCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = ClientRoomSetReq_SetRoomMaxUserCallstack[i];
+					var arg = ClientRoomSetReq_SetRoomMaxUseriCallstack[i];
 					writer.Put(arg);
 				}
 			}

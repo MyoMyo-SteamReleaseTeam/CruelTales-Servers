@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -127,7 +128,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_dirtyReliable_0.Clear();
 			Server_P1CallstackCount = 0;
-			Server_p2Callstack.Clear();
+			Server_p2iiCallstack.Clear();
 			_dirtyReliable_1.Clear();
 			Server_C3CallstackCount = 0;
 			Server_c4Callstack.Clear();
@@ -158,14 +159,14 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_0[4])
 				{
-					int Server_p2Count = Server_p2Callstack.GetCallCount(player);
-					if (Server_p2Count > 0)
+					int Server_p2iiCount = Server_p2iiCallstack.GetCallCount(player);
+					if (Server_p2iiCount > 0)
 					{
-						var Server_p2callList = Server_p2Callstack.GetCallList(player);
-						writer.Put((byte)Server_p2Count);
-						for (int i = 0; i < Server_p2Count; i++)
+						var Server_p2iicallList = Server_p2iiCallstack.GetCallList(player);
+						writer.Put((byte)Server_p2iiCount);
+						for (int i = 0; i < Server_p2iiCount; i++)
 						{
-							var arg = Server_p2callList[i];
+							var arg = Server_p2iicallList[i];
 							writer.Put(arg.a);
 							writer.Put(arg.b);
 						}

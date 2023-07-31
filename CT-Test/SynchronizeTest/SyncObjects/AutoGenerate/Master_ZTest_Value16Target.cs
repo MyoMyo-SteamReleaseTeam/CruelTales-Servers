@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -252,16 +253,16 @@ namespace CTS.Instance.SyncObjects
 		private TargetVoidCallstack<NetworkPlayer> uft1Callstack = new(8);
 		public partial void uft2(NetworkPlayer player, int a)
 		{
-			uft2Callstack.Add(player, a);
+			uft2iCallstack.Add(player, a);
 			_dirtyUnreliable_0[5] = true;
 		}
-		private TargetCallstack<NetworkPlayer, int> uft2Callstack = new(8);
+		private TargetCallstack<NetworkPlayer, int> uft2iCallstack = new(8);
 		public partial void uft3(NetworkPlayer player, NetString a, int b)
 		{
-			uft3Callstack.Add(player, (a, b));
+			uft3NiCallstack.Add(player, (a, b));
 			_dirtyUnreliable_0[6] = true;
 		}
-		private TargetCallstack<NetworkPlayer, (NetString a, int b)> uft3Callstack = new(8);
+		private TargetCallstack<NetworkPlayer, (NetString a, int b)> uft3NiCallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -277,8 +278,8 @@ namespace CTS.Instance.SyncObjects
 			_v13.ClearDirtyUnreliable();
 			_v14.ClearDirtyUnreliable();
 			uft1Callstack.Clear();
-			uft2Callstack.Clear();
-			uft3Callstack.Clear();
+			uft2iCallstack.Clear();
+			uft3NiCallstack.Clear();
 		}
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
@@ -411,14 +412,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyUnreliable_0[5])
 			{
-				int uft2Count = uft2Callstack.GetCallCount(player);
-				if (uft2Count > 0)
+				int uft2iCount = uft2iCallstack.GetCallCount(player);
+				if (uft2iCount > 0)
 				{
-					var uft2callList = uft2Callstack.GetCallList(player);
-					writer.Put((byte)uft2Count);
-					for (int i = 0; i < uft2Count; i++)
+					var uft2icallList = uft2iCallstack.GetCallList(player);
+					writer.Put((byte)uft2iCount);
+					for (int i = 0; i < uft2iCount; i++)
 					{
-						var arg = uft2callList[i];
+						var arg = uft2icallList[i];
 						writer.Put(arg);
 					}
 				}
@@ -429,14 +430,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyUnreliable_0[6])
 			{
-				int uft3Count = uft3Callstack.GetCallCount(player);
-				if (uft3Count > 0)
+				int uft3NiCount = uft3NiCallstack.GetCallCount(player);
+				if (uft3NiCount > 0)
 				{
-					var uft3callList = uft3Callstack.GetCallList(player);
-					writer.Put((byte)uft3Count);
-					for (int i = 0; i < uft3Count; i++)
+					var uft3NicallList = uft3NiCallstack.GetCallList(player);
+					writer.Put((byte)uft3NiCount);
+					for (int i = 0; i < uft3NiCount; i++)
 					{
-						var arg = uft3callList[i];
+						var arg = uft3NicallList[i];
 						arg.a.Serialize(writer);
 						writer.Put(arg.b);
 					}

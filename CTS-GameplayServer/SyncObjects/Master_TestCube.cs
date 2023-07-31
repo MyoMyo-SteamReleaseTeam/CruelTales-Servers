@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -80,14 +81,14 @@ namespace CTS.Instance.SyncObjects
 		}
 		public partial void TestRPC(long someMessage)
 		{
-			TestRPCCallstack.Add(someMessage);
+			TestRPClCallstack.Add(someMessage);
 			_dirtyReliable_0[3] = true;
 		}
-		private List<long> TestRPCCallstack = new(4);
+		private List<long> TestRPClCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			TestRPCCallstack.Clear();
+			TestRPClCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -107,11 +108,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[3])
 			{
-				byte count = (byte)TestRPCCallstack.Count;
+				byte count = (byte)TestRPClCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = TestRPCCallstack[i];
+					var arg = TestRPClCallstack[i];
 					writer.Put(arg);
 				}
 			}

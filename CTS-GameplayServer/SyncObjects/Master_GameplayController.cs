@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -104,21 +105,21 @@ namespace CTS.Instance.SyncObjects
 		}
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
 		{
-			Server_LoadGameCallstack.Add(player, mapType);
+			Server_LoadGameGCallstack.Add(player, mapType);
 			_dirtyReliable_0[4] = true;
 		}
-		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameCallstack = new(8);
+		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameGCallstack = new(8);
 		public partial void ServerRoomSetAck_Callback(NetworkPlayer player, RoomSettingResult callback)
 		{
-			ServerRoomSetAck_CallbackCallstack.Add(player, callback);
+			ServerRoomSetAck_CallbackRCallstack.Add(player, callback);
 			_dirtyReliable_0[5] = true;
 		}
-		private TargetCallstack<NetworkPlayer, RoomSettingResult> ServerRoomSetAck_CallbackCallstack = new(8);
+		private TargetCallstack<NetworkPlayer, RoomSettingResult> ServerRoomSetAck_CallbackRCallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			Server_LoadGameCallstack.Clear();
-			ServerRoomSetAck_CallbackCallstack.Clear();
+			Server_LoadGameGCallstack.Clear();
+			ServerRoomSetAck_CallbackRCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -143,14 +144,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[4])
 			{
-				int Server_LoadGameCount = Server_LoadGameCallstack.GetCallCount(player);
-				if (Server_LoadGameCount > 0)
+				int Server_LoadGameGCount = Server_LoadGameGCallstack.GetCallCount(player);
+				if (Server_LoadGameGCount > 0)
 				{
-					var Server_LoadGamecallList = Server_LoadGameCallstack.GetCallList(player);
-					writer.Put((byte)Server_LoadGameCount);
-					for (int i = 0; i < Server_LoadGameCount; i++)
+					var Server_LoadGameGcallList = Server_LoadGameGCallstack.GetCallList(player);
+					writer.Put((byte)Server_LoadGameGCount);
+					for (int i = 0; i < Server_LoadGameGCount; i++)
 					{
-						var arg = Server_LoadGamecallList[i];
+						var arg = Server_LoadGameGcallList[i];
 						writer.Put((ushort)arg);
 					}
 				}
@@ -161,14 +162,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[5])
 			{
-				int ServerRoomSetAck_CallbackCount = ServerRoomSetAck_CallbackCallstack.GetCallCount(player);
-				if (ServerRoomSetAck_CallbackCount > 0)
+				int ServerRoomSetAck_CallbackRCount = ServerRoomSetAck_CallbackRCallstack.GetCallCount(player);
+				if (ServerRoomSetAck_CallbackRCount > 0)
 				{
-					var ServerRoomSetAck_CallbackcallList = ServerRoomSetAck_CallbackCallstack.GetCallList(player);
-					writer.Put((byte)ServerRoomSetAck_CallbackCount);
-					for (int i = 0; i < ServerRoomSetAck_CallbackCount; i++)
+					var ServerRoomSetAck_CallbackRcallList = ServerRoomSetAck_CallbackRCallstack.GetCallList(player);
+					writer.Put((byte)ServerRoomSetAck_CallbackRCount);
+					for (int i = 0; i < ServerRoomSetAck_CallbackRCount; i++)
 					{
-						var arg = ServerRoomSetAck_CallbackcallList[i];
+						var arg = ServerRoomSetAck_CallbackRcallList[i];
 						writer.Put((byte)arg);
 					}
 				}

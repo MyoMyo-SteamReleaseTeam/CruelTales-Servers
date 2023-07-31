@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -53,15 +54,15 @@ namespace CTS.Instance.SyncObjects
 		private byte Server_FromServerVoidCallstackCount = 0;
 		public partial void Server_FromServerArg(int a, int b)
 		{
-			Server_FromServerArgCallstack.Add((a, b));
+			Server_FromServerArgiiCallstack.Add((a, b));
 			_dirtyReliable_0[1] = true;
 		}
-		private List<(int a, int b)> Server_FromServerArgCallstack = new(4);
+		private List<(int a, int b)> Server_FromServerArgiiCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			Server_FromServerVoidCallstackCount = 0;
-			Server_FromServerArgCallstack.Clear();
+			Server_FromServerArgiiCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -73,11 +74,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				byte count = (byte)Server_FromServerArgCallstack.Count;
+				byte count = (byte)Server_FromServerArgiiCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Server_FromServerArgCallstack[i];
+					var arg = Server_FromServerArgiiCallstack[i];
 					writer.Put(arg.a);
 					writer.Put(arg.b);
 				}

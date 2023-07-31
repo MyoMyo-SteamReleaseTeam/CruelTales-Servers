@@ -39,6 +39,20 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer?.ReleaseViewTarget();
 		}
 
+		public void UpdateRigid(Vector2 moveDirection, bool isWalk)
+		{
+			float speed = isWalk ? Speed * 0.5f : Speed;
+			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
+			RigidBody.ChangeVelocity(velocity);
+		}
+
+		public void UpdateRigidStop()
+		{
+			RigidBody.ChangeVelocity(Vector2.Zero);
+		}
+
+		#region Sync
+
 		public partial void Client_InputMovement(NetworkPlayer player,
 												 Vector2 direction, bool isWalk)
 		{
@@ -58,33 +72,6 @@ namespace CTS.Instance.SyncObjects
 			StateMachine.OnInputEvent(info);
 		}
 
-		public partial void Client_InputInteraction(NetworkPlayer player,
-													NetworkIdentity target,
-													Input_InteractType interactType)
-		{
-			if (!WorldManager.TryGetNetworkObject(target, out var interactObject))
-			{
-				return;
-			}
-		}
-
-		public partial void Client_InputAction(NetworkPlayer player,
-											   Input_PlayerAction actionType,
-											   Vector2 direction)
-		{
-
-		}
-
-		public void UpdateRigid(Vector2 moveDirection, bool isWalk)
-		{
-			float speed = isWalk ? Speed * 0.5f : Speed;
-			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
-			RigidBody.ChangeVelocity(velocity);
-		}
-
-		public void UpdateRigidStop()
-		{
-			RigidBody.ChangeVelocity(Vector2.Zero);
-		}
+		#endregion
 	}
 }

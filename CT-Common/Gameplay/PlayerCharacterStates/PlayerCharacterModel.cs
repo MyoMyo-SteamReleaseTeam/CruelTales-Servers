@@ -11,7 +11,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public float AnimationTime { get; private set; }
 		public Vector2 ActionAxis { get; set; } = Vector2.Zero;
 		public Vector2 MoveDirection { get; set; } = Vector2.Zero;
-		public DokzaDirection CurrentDokzaDirection { get; private set; } = DokzaDirection.RightDown;
+		public ProxyDirection CurrentDokzaDirection { get; private set; } = ProxyDirection.RightDown;
 
 		public PlayerCharacterModel(IPlayerBehaviour player)
 		{
@@ -24,7 +24,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			AnimationTime = 0;
 		}
 
-		public void UpdateDokzaDirection(DokzaDirection direction)
+		public void UpdateDokzaDirection(ProxyDirection direction)
 		{
 			CurrentDokzaDirection = direction;
 		}
@@ -39,36 +39,36 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			AnimationTime += deltaTime;
 		}
 
-		public DokzaDirection GetDokzaDirection()
+		public ProxyDirection GetDokzaDirection()
 		{
-			DokzaDirection direction = DokzaDirection.None;
+			ProxyDirection direction = ProxyDirection.None;
 
 			if (MoveDirection.X < 0f)
 			{
-				direction |= DokzaDirection.Left;
+				direction |= ProxyDirection.Left;
 			}
 			else if (MoveDirection.X > 0f)
 			{
-				direction |= DokzaDirection.Right;
+				direction |= ProxyDirection.Right;
 			}
 			else
 			{
 				direction |= CurrentDokzaDirection.IsRight() ?
-					DokzaDirection.Right : DokzaDirection.Left;
+					ProxyDirection.Right : ProxyDirection.Left;
 			}
 
 			if (MoveDirection.Y > 0f)
 			{
-				direction |= DokzaDirection.Up;
+				direction |= ProxyDirection.Up;
 			}
 			else if (MoveDirection.Y < 0f)
 			{
-				direction |= DokzaDirection.Down;
+				direction |= ProxyDirection.Down;
 			}
 			else
 			{
 				direction |= CurrentDokzaDirection.IsUp() ?
-					DokzaDirection.Up : DokzaDirection.Down;
+					ProxyDirection.Up : ProxyDirection.Down;
 			}
 
 			Debug.Assert(!direction.IsAxisAligned());

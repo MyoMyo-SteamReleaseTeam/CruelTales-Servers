@@ -8,6 +8,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	{
 		public override bool ShouldRollBackMask => true;
 		private string _functionName;
+		private string _callstackName = string.Empty;
 		private SyncArgumentGroup _argGroup;
 
 		public TargetFunctionMemberToken(SyncType syncType, InheritType inheritType,
@@ -16,6 +17,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			_syncType = syncType;
 			_functionName = functionName;
+			_callstackName += functionName;
+			foreach (var arg in args)
+			{
+				_callstackName += arg.TypeName[0];
+			}
 			_argGroup = new SyncArgumentGroup(args);
 		}
 
@@ -42,7 +48,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			{
 				return string.Format(FuncMemberFormat.TargetCallWithStackVoid, AccessModifier,
 									 _functionName, dirtyBitname, memberIndex,
-									 _privateAccessModifier);
+									 _privateAccessModifier, _callstackName);
 			}
 
 			return string.Format(FuncMemberFormat.TargetCallWithStack,
@@ -52,24 +58,25 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _argGroup.GetTupleEnqueueValue(),
 								 _argGroup.GetTupleDeclaration(),
 								 dirtyBitname, memberIndex,
-								 _privateAccessModifier);
+								 _privateAccessModifier,
+								 _callstackName);
 		}
 
 		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (_argGroup.Count == 0)
-				return string.Format(FuncMemberFormat.TargetSerializeIfDirtyVoid, _functionName, dirtyBitname, dirtyBitIndex);
+				return string.Format(FuncMemberFormat.TargetSerializeIfDirtyVoid, _callstackName, dirtyBitname, dirtyBitIndex);
 
 			string content = _argGroup.GetWriteParameterContent();
 			CodeFormat.AddIndent(ref content, 2);
-			return string.Format(FuncMemberFormat.TargetSerializeIfDirty, _functionName, content, dirtyBitname, dirtyBitIndex);
+			return string.Format(FuncMemberFormat.TargetSerializeIfDirty, _callstackName, content, dirtyBitname, dirtyBitIndex);
 		}
 
 		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
 
 		public override string Master_ClearDirty(SyncType syncType)
 		{
-			return string.Format(FuncMemberFormat.ClearCallStack, _functionName);
+			return string.Format(FuncMemberFormat.ClearCallStack, _callstackName);
 		}
 
 		public override string Remote_InitializeProperty(SyncDirection direction)

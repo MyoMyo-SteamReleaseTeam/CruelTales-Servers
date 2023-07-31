@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -380,16 +381,16 @@ namespace CTS.Instance.SyncObjects
 		private byte f22CallstackCount = 0;
 		public partial void f24(int a)
 		{
-			f24Callstack.Add(a);
+			f24iCallstack.Add(a);
 			_dirtyReliable_3[6] = true;
 		}
-		private List<int> f24Callstack = new(4);
+		private List<int> f24iCallstack = new(4);
 		public partial void f28(int a)
 		{
-			f28Callstack.Add(a);
+			f28iCallstack.Add(a);
 			_dirtyReliable_3[7] = true;
 		}
-		private List<int> f28Callstack = new(4);
+		private List<int> f28iCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
@@ -402,8 +403,8 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_3.Clear();
 			ft15Callstack.Clear();
 			f22CallstackCount = 0;
-			f24Callstack.Clear();
-			f28Callstack.Clear();
+			f24iCallstack.Clear();
+			f28iCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable()
 		{
@@ -584,21 +585,21 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_3[6])
 				{
-					byte count = (byte)f24Callstack.Count;
+					byte count = (byte)f24iCallstack.Count;
 					writer.Put(count);
 					for (int i = 0; i < count; i++)
 					{
-						var arg = f24Callstack[i];
+						var arg = f24iCallstack[i];
 						writer.Put(arg);
 					}
 				}
 				if (_dirtyReliable_3[7])
 				{
-					byte count = (byte)f28Callstack.Count;
+					byte count = (byte)f28iCallstack.Count;
 					writer.Put(count);
 					for (int i = 0; i < count; i++)
 					{
-						var arg = f28Callstack[i];
+						var arg = f28iCallstack[i];
 						writer.Put(arg);
 					}
 				}

@@ -16,9 +16,6 @@ using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-#if UNITY_2021
-using UnityEngine;
-#endif
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
 {
@@ -102,15 +99,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		protected byte Client_P1CallstackCount = 0;
 		protected partial void Client_p2(int a, int b)
 		{
-			Client_p2Callstack.Add((a, b));
+			Client_p2iiCallstack.Add((a, b));
 			_dirtyReliable_0[3] = true;
 		}
-		protected List<(int a, int b)> Client_p2Callstack = new(4);
+		protected List<(int a, int b)> Client_p2iiCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			Client_P1CallstackCount = 0;
-			Client_p2Callstack.Clear();
+			Client_p2iiCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer)
@@ -130,11 +127,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (_dirtyReliable_0[3])
 			{
-				byte count = (byte)Client_p2Callstack.Count;
+				byte count = (byte)Client_p2iiCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Client_p2Callstack[i];
+					var arg = Client_p2iiCallstack[i];
 					writer.Put(arg.a);
 					writer.Put(arg.b);
 				}

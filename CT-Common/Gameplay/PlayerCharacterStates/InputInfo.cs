@@ -39,16 +39,9 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Power = 0;
 		}
 
-#if UNITY_2021
-		public System.Numerics.Vector2 GetAxisToNativeVector2()
-		{
-			return Axis.ToNativeVector2();
-		}
-#elif NET
 		public System.Numerics.Vector2 GetAxisToNativeVector2()
 		{
 			return MoveDirection;
 		}
-#endif
 	}
 }

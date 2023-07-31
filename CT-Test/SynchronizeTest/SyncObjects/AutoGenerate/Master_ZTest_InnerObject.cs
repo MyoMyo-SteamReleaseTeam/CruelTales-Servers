@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -64,10 +65,10 @@ namespace CTS.Instance.SyncObjects
 		}
 		public partial void f1(NetStringShort a)
 		{
-			f1Callstack.Add(a);
+			f1NCallstack.Add(a);
 			_dirtyReliable_0[1] = true;
 		}
-		private List<NetStringShort> f1Callstack = new(4);
+		private List<NetStringShort> f1NCallstack = new(4);
 		public int Uv1
 		{
 			get => _uv1;
@@ -81,7 +82,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
-			f1Callstack.Clear();
+			f1NCallstack.Clear();
 		}
 		public void ClearDirtyUnreliable()
 		{
@@ -96,11 +97,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				byte count = (byte)f1Callstack.Count;
+				byte count = (byte)f1NCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = f1Callstack[i];
+					var arg = f1NCallstack[i];
 					arg.Serialize(writer);
 				}
 			}

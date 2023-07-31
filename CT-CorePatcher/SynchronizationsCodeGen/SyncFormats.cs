@@ -87,6 +87,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -101,6 +102,7 @@ using CTS.Instance.SyncObjects;";
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
@@ -444,14 +446,15 @@ else
 		/// {5} Dirty bits name<br/>
 		/// {6} Dirty index<br/>
 		/// {7} Private access modifier<br/>
+		/// {8} Callstack name<br/>
 		/// </summary>
 		public static string CallWithStack =>
 @"{0} partial void {1}({2})
 {{
-	{1}Callstack.Add({3});
+	{8}Callstack.Add({3});
 	{5}[{6}] = true;
 }}
-{7} List<{4}> {1}Callstack = new(4);";
+{7} List<{4}> {8}Callstack = new(4);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -459,14 +462,15 @@ else
 		/// {2} Dirty bits name<br/>
 		/// {3} Member index<br/>
 		/// {4} Private access modifier<br/>
+		/// {5} Callstack name<br/>
 		/// </summary>
 		public static string CallWithStackVoid =>
 @"{0} partial void {1}()
 {{
-	{1}CallstackCount++;
+	{5}CallstackCount++;
 	{2}[{3}] = true;
 }}
-{4} byte {1}CallstackCount = 0;";
+{4} byte {5}CallstackCount = 0;";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -477,14 +481,15 @@ else
 		/// {5} Dirty bits name<br/>
 		/// {6} Dirty index<br/>
 		/// {7} Private access modifier<br/>
+		/// {8} Callstack name<br/>
 		/// </summary>
 		public static string TargetCallWithStack =>
 @"{0} partial void {1}(NetworkPlayer player, {2})
 {{
-	{1}Callstack.Add(player, {3});
+	{8}Callstack.Add(player, {3});
 	{5}[{6}] = true;
 }}
-{7} TargetCallstack<NetworkPlayer, {4}> {1}Callstack = new(8);";
+{7} TargetCallstack<NetworkPlayer, {4}> {8}Callstack = new(8);";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -492,23 +497,24 @@ else
 		/// {2} Dirty bits name<br/>
 		/// {3} Member index<br/>
 		/// {4} Private access modifier<br/>
+		/// {5} Callstack name<br/>
 		/// </summary>
 		public static string TargetCallWithStackVoid =>
 @"{0} partial void {1}(NetworkPlayer player)
 {{
-	{1}Callstack.Add(player);
+	{5}Callstack.Add(player);
 	{2}[{3}] = true;
 }}
-{4} TargetVoidCallstack<NetworkPlayer> {1}Callstack = new(8);";
+{4} TargetVoidCallstack<NetworkPlayer> {5}Callstack = new(8);";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// </summary>
 		public static string SerializeIfDirtyVoid =>
 @"writer.Put((byte){0}CallstackCount);";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// {1} Callstack serialize content<br/>
 		/// </summary>
 		public static string SerializeIfDirty =>
@@ -521,7 +527,7 @@ for (int i = 0; i < count; i++)
 }}";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// {1} Dirty bits name<br/>
 		/// {2} Dirty bits index<br/>
 		/// </summary>
@@ -537,7 +543,7 @@ else
 }}";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// {1} Callstack serialize content<br/>
 		/// {2} Dirty bits name<br/>
 		/// {3} Dirty bits index<br/>
@@ -640,12 +646,12 @@ if (!{1}.TryDeserialize(reader)) return false;";
 {0} {1} = ({0}){1}Value;";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// </summary>
 		public static string ClearCallStack => @"{0}Callstack.Clear();";
 
 		/// <summary>
-		/// {0} Function name<br/>
+		/// {0} Callstack name<br/>
 		/// </summary>
 		public static string ClearCallCount => @"{0}CallstackCount = 0;";
 	}
