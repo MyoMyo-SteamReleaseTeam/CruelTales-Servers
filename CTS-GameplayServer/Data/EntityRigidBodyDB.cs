@@ -10,7 +10,7 @@ namespace CTS.Instance.Data
 	{
 		private static Dictionary<NetworkObjectType, Func<KaRigidBody>> _rigidBodyByType = new()
 		{
-			{ NetworkObjectType.PlayerCharacter, () => new CircleRigidBody(0.5f, false, PhysicsLayerMask.Player) },
+			{ NetworkObjectType.PlayerCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
 			{ NetworkObjectType.TestCube, () => new CircleRigidBody(0.5f, false, PhysicsLayerMask.Player) },
 		};
 

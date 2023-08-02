@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 using CT.Common.Serialization;
+using KaNet.Physics;
 using KaNet.Physics.RigidBodies;
 
 namespace CT.Common.Gameplay
@@ -10,7 +11,13 @@ namespace CT.Common.Gameplay
 	{
 		private readonly KaRigidBody _rigidBody;
 		public bool IsDirty => Event.EventFlags != PhysicsEventFlag.None;
+		public KaPhysicsShapeType ShapeType => _rigidBody.ShapeType;
+		public LayerMask LayerMask => _rigidBody.LayerMask;
 		public Vector2 Position => _rigidBody.Position;
+		public Vector2 LinearVelocity => _rigidBody.LinearVelocity;
+		public Vector2 ForceVelocity => _rigidBody.ForceVelocity;
+		public float Rotation => _rigidBody.Rotation;
+		public bool IsStatic => _rigidBody.IsStatic;
 
 		public PhysicsEvent Event;
 
