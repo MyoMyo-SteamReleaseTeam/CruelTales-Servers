@@ -19,7 +19,7 @@ namespace CT.Common.Gameplay.Players
 		LeftUp = Left | Up,
 	}
 
-	public static class DokzaDirectionExtension
+	public static class ProxyDirectionExtension
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsRight(this ProxyDirection direction)
