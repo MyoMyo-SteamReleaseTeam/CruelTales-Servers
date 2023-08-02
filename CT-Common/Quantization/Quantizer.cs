@@ -1,29 +1,18 @@
 ﻿using System;
-
-#if NET
-using System.Numerics;
-#elif UNITY_2021
-using UnityEngine;
-#endif
-
 using System.Runtime.CompilerServices;
 
 namespace CT.Common.Quantization
 {
 	public static class MathExtension
 	{
-		public const float RADIAN_TO_DEGREE = 180.0f / MathF.PI;
-		public const float DEGREE_TO_RADIAN = MathF.PI / 180.0f;
-		public const float RADIAN = 180 / MathF.PI;
-
 		public static float DegreeToRadian(float angle)
 		{
-			return angle * RADIAN_TO_DEGREE;
+			return angle * KaMath.RADIAN_TO_DEGREE;
 		}
 
 		public static float RadianToDegree(float angle)
 		{
-			return angle * DEGREE_TO_RADIAN;
+			return angle * KaMath.DEGREE_TO_RADIAN;
 		}
 	}
 
@@ -57,35 +46,59 @@ namespace CT.Common.Quantization
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static byte Vec2ToRadByte(Vector2 vec2)
+		public static byte Vec2ToRadByte(System.Numerics.Vector2 vec2)
 		{
-#if NET
 			return vec2.Y >= 0 ?
 				(byte)(MathF.Acos(vec2.X) * QUANTIZE_RAD) :
 				(byte)(MathF.Acos(-vec2.X) * QUANTIZE_RAD + 128);
-#elif UNITY_2021
+		}
+
+#if UNITY_2021
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static byte Vec2ToRadByte(UnityEngine.Vector2 vec2)
+		{
 			return vec2.y >= 0 ?
 				(byte)(MathF.Acos(vec2.x) * QUANTIZE_RAD) : 
 				(byte)(MathF.Acos(-vec2.x) * QUANTIZE_RAD + 128);
-#endif
 		}
+#endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2 RadByteToVec2(byte radByte)
+		public static System.Numerics.Vector2 RadByteToVec2(byte radByte)
 		{
 			if (radByte <= 128)
 			{
 				float x = MathF.Round(MathF.Cos(radByte * REMAP_RAD_INVERSE), PRECISION);
 				float y = MathF.Round(MathF.Sqrt(1 - x * x), PRECISION);
-				return new Vector2(x, y);
+				return new System.Numerics.Vector2(x, y);
 			}
 			else
 			{
 				radByte -= 128;
 				float x = MathF.Round(MathF.Cos(radByte * REMAP_RAD_INVERSE), PRECISION);
 				float y = MathF.Round(MathF.Sqrt(1 - x * x), PRECISION);
-				return new Vector2(-x, -y);
+				return new System.Numerics.Vector2(-x, -y);
 			}
 		}
+
+#if UNITY_2021
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static UnityEngine.Vector2 RadByteToUnityVec2(byte radByte)
+		{
+			if (radByte <= 128)
+			{
+				float x = MathF.Round(MathF.Cos(radByte * REMAP_RAD_INVERSE), PRECISION);
+				float y = MathF.Round(MathF.Sqrt(1 - x * x), PRECISION);
+				return new UnityEngine.Vector2(x, y);
+			}
+			else
+			{
+				radByte -= 128;
+				float x = MathF.Round(MathF.Cos(radByte * REMAP_RAD_INVERSE), PRECISION);
+				float y = MathF.Round(MathF.Sqrt(1 - x * x), PRECISION);
+				return new UnityEngine.Vector2(-x, -y);
+			}
+		}
+#endif
 	}
 }

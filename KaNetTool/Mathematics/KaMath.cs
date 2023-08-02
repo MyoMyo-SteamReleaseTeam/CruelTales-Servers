@@ -4,6 +4,10 @@ using System.Runtime.CompilerServices;
 
 public static class KaMath
 {
+	public const float RADIAN_TO_DEGREE = 180.0f / MathF.PI;
+	public const float DEGREE_TO_RADIAN = MathF.PI / 180.0f;
+	public const float RADIAN = 180 / MathF.PI;
+
 	/// <summary>값을 스냅합니다.</summary>
 	/// <param name="value">스냅할 값입니다.</param>
 	/// <param name="snap">스냅 크기입니다.</param>

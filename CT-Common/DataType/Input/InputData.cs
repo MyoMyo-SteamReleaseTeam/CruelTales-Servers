@@ -1,8 +1,4 @@
-﻿#if NET
-using System.Numerics;
-#elif UNITY_2021
-using UnityEngine;
-#endif
+﻿using System.Numerics;
 using CT.Common.Quantization;
 using CT.Common.Serialization;
 
