@@ -32,7 +32,7 @@ namespace CT.Common.Gameplay.Players
 		public const float INV_SNAP_RAD = 1.0f / (MathF.PI * 0.5f / 8);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static InputDirection GetInputDirection(this System.Numerics.Vector2 vec)
+		public static InputDirection ToInputDirection(this System.Numerics.Vector2 vec)
 		{
 			return vec.Y >= 0 ?
 				(InputDirection)((MathF.Acos(vec.X) * INV_SNAP_RAD + 1) * 0.5f) :
@@ -51,14 +51,14 @@ namespace CT.Common.Gameplay.Players
 			System.Numerics.Vector2.Normalize(new System.Numerics.Vector2(1, -1)),
 		};
 
-		public static System.Numerics.Vector2 GetDirectionVector(this InputDirection inputDirection)
+		public static System.Numerics.Vector2 ToDirectionVector(this InputDirection inputDirection)
 		{
 			return _inputDirectionTable[(int)inputDirection];
 		}
 
 #if UNITY_2021
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static InputDirection GetInputDirection(this UnityEngine.Vector2 vec)
+		public static InputDirection ToInputDirection(this UnityEngine.Vector2 vec)
 		{
 			return vec.y >= 0 ?
 				(InputDirection)((MathF.Acos(vec.x) * INV_SNAP_RAD + 1) * 0.5f) :
@@ -77,7 +77,7 @@ namespace CT.Common.Gameplay.Players
 			new UnityEngine.Vector2(1, -1).normalized,
 		};
 		
-		public static UnityEngine.Vector2 GetDirectionUnityVector(this InputDirection inputDirection)
+		public static UnityEngine.Vector2 ToUnityDirectionVector(this InputDirection inputDirection)
 		{
 			return _inputDirectionTableUnity[(int)inputDirection];
 		}

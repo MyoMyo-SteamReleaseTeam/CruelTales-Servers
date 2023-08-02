@@ -29,8 +29,8 @@ namespace CT.Common.Gameplay.Players
 
 		public Vector2 MoveDirectionVector
 		{
-			get => MovementDirection.GetDirectionVector();
-			set => MovementDirection = value.GetInputDirection();
+			get => MovementDirection.ToDirectionVector();
+			set => MovementDirection = value.ToInputDirection();
 		}
 
 		public bool HasInteraction
@@ -54,7 +54,7 @@ namespace CT.Common.Gameplay.Players
 
 		public void SetMovementInput(MovementInputType inputType, Vector2 moveDirection)
 		{
-			SetMovementInput(inputType, moveDirection.GetInputDirection());
+			SetMovementInput(inputType, moveDirection.ToInputDirection());
 		}
 
 		public void Ignore(IPacketReader reader)
