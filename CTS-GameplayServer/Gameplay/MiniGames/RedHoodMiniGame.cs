@@ -1,44 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
+using CTS.Instance.Data;
 using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Gameplay.MiniGames
 {
-	public class MiniGameData
-	{
-		public List<Vector2> SpawnPositions = new()
-		{
-			new Vector2(-9.85f, 6.52f),
-			new Vector2(-8.35f, 4.82f),
-			new Vector2(-6.35f, 4.32f),
-			new Vector2(-4.35f, 4.82f),
-			new Vector2(-2.85f, 6.52f),
-			new Vector2(-7.55f, 6.82f),
-			new Vector2(-5.15f, 6.82f),
-			new Vector2(-6.35f, 5.62f),
-		};
-	}
-
 	public class MiniGameController
 	{
 		// Reference
 		public GameplayController GameplayController { get; private set; }
 		private GameplayManager _gameplayManager;
 		private WorldManager _worldManager;
-		private MiniGameData _miniGameData;
+		private MiniGameMapData _miniGameData;
 
 		// Player Management
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		private int _spawnIndex = 0;
 
-		public MiniGameController(GameplayController gameplayController)
+		public MiniGameController(GameplayController gameplayController, GameMapType mapType)
 		{
 			GameplayController = gameplayController;
 			_gameplayManager = gameplayController.GameplayManager;
 			_worldManager = _gameplayManager.WorldManager;
 			_playerCharacterByPlayer = new(_gameplayManager.Option.SystemMaxUser);
-			_miniGameData = new MiniGameData();
+			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(mapType);
 		}
 
 		private List<TestCube> _testCubeList = new();
@@ -68,6 +55,8 @@ namespace CTS.Instance.Gameplay.MiniGames
 
 		public void OnGameStart()
 		{
+			_worldManager.SetMiniGameMapData(_miniGameData);
+
 			_spawnIndex = 0;
 			var spawnPositions = _miniGameData.SpawnPositions;
 			int spawnPosCount = spawnPositions.Count;
@@ -81,6 +70,8 @@ namespace CTS.Instance.Gameplay.MiniGames
 
 		public void OnGameEnd()
 		{
+			_worldManager.ReleaseMiniGameMapData();
+
 			foreach (var pc in _playerCharacterByPlayer.ForwardValues)
 			{
 				pc.Destroy();

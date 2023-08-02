@@ -1,7 +1,7 @@
 {
   "MapType": 200,
   "Theme": 201,
-  "SpawnPosition": [
+  "SpawnPositions": [
     {
       "X": -5.77999973,
       "Y": 4.7
@@ -35,9 +35,10 @@
       "Y": 3.8
     }
   ],
-  "ColliderInfoList": [
+  "EnvironmentColliders": [
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -13.13,
         "Y": 7.48
@@ -50,6 +51,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 8.3,
         "Y": 7.48
@@ -62,6 +64,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -3.2,
         "Y": 13.17
@@ -74,6 +77,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -3.2,
         "Y": 18.3
@@ -86,6 +90,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -67.8,
         "Y": -12.5138912
@@ -98,6 +103,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 57.14,
         "Y": -12.5138912
@@ -110,6 +116,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 28.2,
         "Y": -37.4
@@ -122,6 +129,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -36.0,
         "Y": -37.4
@@ -134,6 +142,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -19.88,
         "Y": 8.61
@@ -146,6 +155,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -20.3732929,
         "Y": -9.272798
@@ -158,6 +168,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 15.35,
         "Y": 8.61
@@ -170,6 +181,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -11.93,
         "Y": -13.01
@@ -182,6 +194,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 15.6,
         "Y": -9.272798
@@ -194,6 +207,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 7.156707,
         "Y": -13.01
@@ -206,6 +220,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 19.8,
         "Y": 8.01
@@ -218,6 +233,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -24.97,
         "Y": 8.01
@@ -230,6 +246,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -24.97,
         "Y": -13.66
@@ -242,6 +259,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 18.81,
         "Y": -13.66
@@ -254,6 +272,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -15.1262465,
         "Y": -18.4581242
@@ -266,6 +285,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 10.07,
         "Y": -18.4581242
@@ -278,6 +298,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -30.8,
         "Y": -63.5
@@ -290,6 +311,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 27.4,
         "Y": -63.5
@@ -302,6 +324,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -1.5,
         "Y": -80.78
@@ -314,6 +337,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 37.94,
         "Y": 8.37
@@ -326,6 +350,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -53.74,
         "Y": -18.75
@@ -338,6 +363,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -53.74,
         "Y": -1.71
@@ -350,6 +376,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -61.35,
         "Y": -10.0
@@ -362,6 +389,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -42.07,
         "Y": -4.55
@@ -374,6 +402,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -42.07,
         "Y": -14.37
@@ -386,6 +415,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -44.5939026,
         "Y": -11.05719
@@ -398,6 +428,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -44.5939026,
         "Y": -7.86280966
@@ -410,11 +441,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": -46.8140831,
         "Y": -6.60708
       },
-      "Rotation": 58.9848328,
+      "Rotation": 1.0294795,
       "Radius": 1.69636714,
       "Width": 3.39273429,
       "Height": 0.8173913,
@@ -422,11 +454,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": -46.8357048,
         "Y": -12.3059607
       },
-      "Rotation": 301.761017,
+      "Rotation": 5.266723,
       "Radius": 1.69636714,
       "Width": 3.39273429,
       "Height": 0.8173913,
@@ -434,11 +467,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": -49.03002,
         "Y": -14.5342894
       },
-      "Rotation": 327.357727,
+      "Rotation": 5.71347,
       "Radius": 1.69636714,
       "Width": 3.39273429,
       "Height": 0.8173913,
@@ -446,6 +480,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -53.03,
         "Y": -15.5138474
@@ -458,6 +493,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -53.03,
         "Y": -6.03
@@ -470,11 +506,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": -58.6788521,
         "Y": -13.2649326
       },
-      "Rotation": 43.4168549,
+      "Rotation": 0.7577671,
       "Radius": 3.4348042,
       "Width": 6.8696084,
       "Height": 0.8173913,
@@ -482,6 +519,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -55.43,
         "Y": -12.27
@@ -494,6 +532,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -50.81,
         "Y": -12.27
@@ -506,6 +545,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -56.81,
         "Y": -9.58
@@ -518,6 +558,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -49.53,
         "Y": -9.58
@@ -530,11 +571,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": -58.6788521,
         "Y": -9.1
       },
-      "Rotation": 316.583,
+      "Rotation": 5.525416,
       "Radius": 3.4348042,
       "Width": 6.8696084,
       "Height": 0.8173913,
@@ -542,6 +584,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -48.3,
         "Y": 8.2
@@ -554,6 +597,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 54.3,
         "Y": -10.5
@@ -566,6 +610,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -2.31,
         "Y": -69.54
@@ -578,6 +623,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -4.2,
         "Y": -101.28
@@ -590,6 +636,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -4.31999969,
         "Y": -103.25
@@ -602,6 +649,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -4.31999969,
         "Y": -104.5
@@ -614,6 +662,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -9.78,
         "Y": -111.86
@@ -626,6 +675,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 1.46,
         "Y": -111.86
@@ -638,6 +688,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": -14.27272,
         "Y": -107.316826
@@ -650,6 +701,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 5.94000053,
         "Y": -107.316826
@@ -662,6 +714,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 50.0100021,
         "Y": 54.45
@@ -674,11 +727,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": 29.8900013,
         "Y": 50.82
       },
-      "Rotation": 303.0,
+      "Rotation": 5.28834772,
       "Radius": 5.16292524,
       "Width": 10.3258505,
       "Height": 1.51580215,
@@ -686,11 +740,12 @@
     },
     {
       "PhysicsShapeType": 2,
+      "LayerMask": 0,
       "Position": {
         "X": 70.67,
         "Y": 50.82
       },
-      "Rotation": 56.9999847,
+      "Rotation": 0.9948374,
       "Radius": 5.305991,
       "Width": 10.6119823,
       "Height": 1.51580215,
@@ -698,6 +753,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 40.0100021,
         "Y": 39.55
@@ -710,6 +766,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 73.7400055,
         "Y": 39.55
@@ -722,6 +779,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 60.07,
         "Y": 39.55
@@ -734,6 +792,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 26.6400013,
         "Y": 39.55
@@ -746,6 +805,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 50.0100021,
         "Y": 32.0599976
@@ -758,6 +818,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 44.08,
         "Y": 46.46
@@ -770,6 +831,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 56.1200027,
         "Y": 46.46
@@ -782,6 +844,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 50.11,
         "Y": 52.55
@@ -794,6 +857,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 50.08,
         "Y": 48.61
@@ -806,6 +870,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 67.28,
         "Y": 39.86
@@ -818,6 +883,7 @@
     },
     {
       "PhysicsShapeType": 1,
+      "LayerMask": 0,
       "Position": {
         "X": 33.2100029,
         "Y": 39.86

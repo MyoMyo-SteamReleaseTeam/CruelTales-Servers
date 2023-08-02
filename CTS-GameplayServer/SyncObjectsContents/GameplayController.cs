@@ -68,7 +68,7 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
-			MiniGameController = new MiniGameController(this);
+			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);
 			MiniGameController.OnGameStart();
 		}
 

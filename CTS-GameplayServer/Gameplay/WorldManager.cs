@@ -68,6 +68,16 @@ namespace CTS.Instance.Gameplay
 			_physicsWorld = new KaPhysicsWorld();
 		}
 
+		public void SetMiniGameMapData(MiniGameMapData mapData)
+		{
+			_physicsWorld.SetStaticRigidBodies(mapData.StaticRigidBodies);
+		}
+
+		public void ReleaseMiniGameMapData()
+		{
+			_physicsWorld.ReleaseStaticRigidBodies();
+		}
+
 		public void UpdateNetworkObjects(float deltaTime)
 		{
 			foreach (var netObj in _networkObjectById.ForwardValues)
@@ -83,11 +93,11 @@ namespace CTS.Instance.Gameplay
 		{
 			_deltaTimeStack += deltaTime;
 			int iterCount = 0;
-			float interval = 0.03f;
-			while (_deltaTimeStack > interval)
+			float stepTime = 0.03f;
+			while (_deltaTimeStack > stepTime)
 			{
-				_deltaTimeStack -= interval;
-				_physicsWorld.Step(interval);
+				_deltaTimeStack -= stepTime;
+				_physicsWorld.Step(stepTime);
 				if (++iterCount >= 5)
 					break;
 

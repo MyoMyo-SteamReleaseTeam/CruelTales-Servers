@@ -6,6 +6,7 @@ using System.Threading;
 using CT.Common.Tools.Data;
 #endif
 using CT.Networks.Runtimes;
+using CTS.Instance.Data;
 using CTS.Instance.Networks;
 using KaNet.Physics;
 using log4net;
@@ -69,6 +70,7 @@ namespace CTS.Instance
 
 			// Initialize
 			LayerMaskHelper.Initialize();
+			if (!MiniGameMapDataDB.TryLoad()) return;
 
 			// Start server
 			_serverTimer = new TickTimer();
