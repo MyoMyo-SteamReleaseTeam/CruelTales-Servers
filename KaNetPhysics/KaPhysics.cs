@@ -14,6 +14,8 @@ namespace KaNet.Physics
 		public const float MIN_COLLIDER_SIZE = 0.2f;
 		public const float FLOAT_EPSILON = 0.001f;
 
+		// Comparison
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool NearlyEqual(float a, float b)
 		{
@@ -37,6 +39,8 @@ namespace KaNet.Physics
 		{
 			return NearlyNotEqual(a.X, b.X) || NearlyNotEqual(a.Y, b.Y);
 		}
+
+		// Transform
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void ComputeTransform(in Vector2[] vertices, in Vector2[] transformed,
@@ -68,6 +72,37 @@ namespace KaNet.Physics
 				transformed[i] = vertices[i] + position;
 			}
 		}
+
+		// Compute
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void ComputePointSegmentDistance(Vector2 p, Vector2 a, Vector2 b,
+													   out float distance, out Vector2 nearestPoint)
+		{
+			Vector2 ab = b - a;
+			Vector2 ap = p - a;
+
+			float projection = Vector2.Dot(ap, ab);
+			float abLengthSq = ab.LengthSquared();
+			float d = projection / abLengthSq;
+
+			if (d <= 0f)
+			{
+				nearestPoint = a;
+			}
+			else if (d >= 1f)
+			{
+				nearestPoint = b;
+			}
+			else
+			{
+				nearestPoint = a + ab * d;
+			}
+
+			distance = Vector2.Distance(p, nearestPoint);
+		}
+
+		// Collision
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsCollideAABBs(BoxAABBRigidBody bodyA, BoxAABBRigidBody bodyB,
@@ -187,14 +222,14 @@ namespace KaNet.Physics
 				return false;
 			}
 
-			Vector2[] aVertices = bodyA.GetTransformedVertices();
-			Vector2[] bVertices = bodyB.GetTransformedVertices();
+			Vector2[] verticesA = bodyA.GetTransformedVertices();
+			Vector2[] verticesB = bodyB.GetTransformedVertices();
 
 			for (int i = 0; i < 2; i++)
 			{
-				Vector2 normalA = Vector2.Normalize(aVertices[i + 1] - aVertices[i]).RotateLeft();
-				float minA = Vector2.Dot(aVertices[i + 2], normalA);
-				float maxA = Vector2.Dot(aVertices[i], normalA);
+				Vector2 normalA = Vector2.Normalize(verticesA[i + 1] - verticesA[i]).RotateLeft();
+				float minA = Vector2.Dot(verticesA[i + 2], normalA);
+				float maxA = Vector2.Dot(verticesA[i], normalA);
 
 				float minB = float.MaxValue;
 				float maxB = float.MinValue;
@@ -203,7 +238,7 @@ namespace KaNet.Physics
 
 				for (int b = 0; b < 4; b++)
 				{
-					projection = Vector2.Dot(bVertices[b], normalA);
+					projection = Vector2.Dot(verticesB[b], normalA);
 					if (projection > maxB) { maxB = projection; }
 					if (projection < minB) { minB = projection; }
 				}
@@ -221,9 +256,9 @@ namespace KaNet.Physics
 
 			for (int i = 0; i < 2; i++)
 			{
-				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
-				float minB = Vector2.Dot(bVertices[i + 2], normalB);
-				float maxB = Vector2.Dot(bVertices[i], normalB);
+				Vector2 normalB = Vector2.Normalize(verticesB[i + 1] - verticesB[i]).RotateLeft();
+				float minB = Vector2.Dot(verticesB[i + 2], normalB);
+				float maxB = Vector2.Dot(verticesB[i], normalB);
 
 				float minA = float.MaxValue;
 				float maxA = float.MinValue;
@@ -232,7 +267,7 @@ namespace KaNet.Physics
 
 				for (int a = 0; a < 4; a++)
 				{
-					projection = Vector2.Dot(aVertices[a], normalB);
+					projection = Vector2.Dot(verticesA[a], normalB);
 					if (projection < minA) { minA = projection; }
 					if (projection > maxA) { maxA = projection; }
 				}
@@ -382,7 +417,7 @@ namespace KaNet.Physics
 			if (!IsIntersectAABBs(boundBoxA, boundBoxB))
 				return false;
 
-			Vector2[] bVertices = bodyB.GetTransformedVertices();
+			Vector2[] verticesB = bodyB.GetTransformedVertices();
 
 			{
 				Vector2 normalA = new Vector2(0, 1);
@@ -396,7 +431,7 @@ namespace KaNet.Physics
 
 				for (int b = 0; b < 4; b++)
 				{
-					projection = bVertices[b].Y;;
+					projection = verticesB[b].Y; ;
 					if (projection < minB) { minB = projection; }
 					if (projection > maxB) { maxB = projection; }
 				}
@@ -424,7 +459,7 @@ namespace KaNet.Physics
 
 				for (int b = 0; b < 4; b++)
 				{
-					projection = bVertices[b].X;
+					projection = verticesB[b].X;
 					if (projection < minB) { minB = projection; }
 					if (projection > maxB) { maxB = projection; }
 				}
@@ -440,13 +475,13 @@ namespace KaNet.Physics
 				}
 			}
 
-			Vector2[] aVertices = bodyA.GetTransformedVertices();
+			Vector2[] verticesA = bodyA.GetTransformedVertices();
 
 			for (int i = 0; i < 2; i++)
 			{
-				Vector2 normalB = Vector2.Normalize(bVertices[i + 1] - bVertices[i]).RotateLeft();
-				float minB = Vector2.Dot(bVertices[i + 2], normalB);
-				float maxB = Vector2.Dot(bVertices[i], normalB);
+				Vector2 normalB = Vector2.Normalize(verticesB[i + 1] - verticesB[i]).RotateLeft();
+				float minB = Vector2.Dot(verticesB[i + 2], normalB);
+				float maxB = Vector2.Dot(verticesB[i], normalB);
 
 				float minA = float.MaxValue;
 				float maxA = float.MinValue;
@@ -456,7 +491,7 @@ namespace KaNet.Physics
 
 				for (int a = 0; a < 4; a++)
 				{
-					va = aVertices[a];
+					va = verticesA[a];
 					projection = Vector2.Dot(va, normalB);
 					if (projection < minA) { minA = projection; }
 					if (projection > maxA) { maxA = projection; }
@@ -562,6 +597,8 @@ namespace KaNet.Physics
 			return true;
 		}
 
+		// Intersection
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsIntersectCircles(Vector2 centerA, float radiusA,
 											  Vector2 centerB, float radiusB)
@@ -643,27 +680,210 @@ namespace KaNet.Physics
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsIntersectCircleAABB(Vector2 centerA, float radiusA,
-												 BoundingBox boundingB)
+												 Vector2 centerB, float widthB, float heightB)
 		{
-			float closestX = KaMath.Clamp(centerA.X, boundingB.Min.X, boundingB.Max.X);
-			float closestY = KaMath.Clamp(centerA.Y, boundingB.Min.Y, boundingB.Max.Y);
-			Vector2 closestPoint = new Vector2(closestX, closestY);
+			float diameterA = radiusA * 2;
 
-			/*
-			 * 접촉검사 적중률이 높으면 Early Return이 더 빠를 수 있다.
-			 * 하지만 일반적으로 적중률은 높지 않기 때문에
-			 * 함수의 실행 속도 편차가 크지 않도록 분기를 제거함
-			 */
+			BoundingBox boundInB = new(centerB, widthB, heightB);
+			BoundingBox boundOutB = new(centerB, widthB + diameterA, heightB + diameterA);
 
-			//if (closestPoint == centerA)
-			//	return true;
+			if (!IsIntersectPointAABB(centerA, boundOutB))
+				return false;
 
-			Vector2 pointToCircle = centerA - closestPoint;
-			return radiusA * radiusA > pointToCircle.LengthSquared();
+			float closestVertexX;
+			float closestVertexY;
+
+			if (centerA.X <= boundInB.Min.X)
+			{
+				closestVertexX = boundInB.Min.X;
+			}
+			else if (centerA.X >= boundInB.Max.X)
+			{
+				closestVertexX = boundInB.Max.X;
+			}
+			else
+			{
+				return true;
+			}
+
+			if (centerA.Y <= boundInB.Min.Y)
+			{
+				closestVertexY = boundInB.Min.Y;
+			}
+			else if (centerA.Y >= boundInB.Max.Y)
+			{
+				closestVertexY = boundInB.Max.Y;
+			}
+			else
+			{
+				return true;
+			}
+
+			return IsIntersectPointCircle(new Vector2(closestVertexX, closestVertexY),
+										  centerA, radiusA);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool IsIntersectOBBs(Vector2 centerA, float boundaryRadiusA, Vector2[] aVertices, 
+		public static bool IsIntersectCircleOBB(Vector2 centerA, float radiusA,
+												Vector2 centerB, Vector2[] verticesB,
+												float widthB, float heightB, float boundaryRadius)
+		{
+			if (!IsIntersectCircles(centerA, radiusA, centerB, boundaryRadius))
+				return false;
+
+			Vector2 b0 = verticesB[0];
+			Vector2 b1 = verticesB[1];
+			Vector2 b3 = verticesB[3];
+
+			Vector2 normalRight = Vector2.Normalize(b1 - b0);
+			Vector2 normalUp = normalRight.RotateLeft();
+
+			float centerProjXA = Vector2.Dot(normalRight, centerA);
+			float centerProjXB = Vector2.Dot(normalRight, centerB);
+
+			float maxInXB = Vector2.Dot(normalRight, b1);
+			float minInXB = maxInXB - widthB;
+			float maxOutXB = maxInXB + radiusA;
+			float minOutXB = minInXB - radiusA;
+
+			float centerProjYA = Vector2.Dot(normalUp, centerA);
+			float centerProjYB = Vector2.Dot(normalUp, centerB);
+
+			float maxInYB = Vector2.Dot(normalUp, b1);
+			float minInYB = maxInYB - heightB;
+			float maxOutYB = maxInYB + radiusA;
+			float minOutYB = minInYB - radiusA;
+
+			float closestVertexRefX;
+			float closestVertexRefY;
+
+			if (centerProjXA <= minInXB)
+			{
+				closestVertexRefX = 0;
+			}
+			else if (centerProjXA >= maxInXB)
+			{
+				closestVertexRefX = widthB;
+			}
+			else
+			{
+				if (centerProjYA < centerProjYB)
+				{
+					return centerProjYA - minOutYB > 0;
+				}
+				else
+				{
+					return maxOutYB - centerProjYA > 0;
+				}
+			}
+
+			if (centerProjYA <= minInYB)
+			{
+				closestVertexRefY = 0;
+			}
+			else if (centerProjYA >= maxInYB)
+			{
+				closestVertexRefY = heightB;
+			}
+			else
+			{
+				if (centerProjXA < centerProjXB)
+				{
+					return centerProjXA - minOutXB > 0;
+				}
+				else
+				{
+					return maxOutXB - centerProjXA > 0;
+				}
+			}
+
+			Vector2 closestVertex = b3 + normalRight * closestVertexRefX + normalUp * closestVertexRefY;
+			return IsIntersectPointCircle(closestVertex, centerA, radiusA);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsIntersectAABBOBB(BoundingBox boundA,
+											  Vector2[] verticesB, BoundingBox boundB)
+		{
+			if (!IsIntersectAABBs(boundA, boundB))
+				return false;
+
+			Span<Vector2> verticesA = stackalloc Vector2[4];
+
+			verticesA[0] = boundA.LeftTop;
+			verticesA[1] = boundA.RightTop;
+			verticesA[2] = boundA.RightBottom;
+			verticesA[3] = boundA.LeftBottom;
+
+			{
+				float minA = boundA.Min.Y;
+				float maxA = boundA.Max.Y;
+
+				float minB = float.MaxValue;
+				float maxB = float.MinValue;
+
+				float projection;
+
+				for (int b = 0; b < 4; b++)
+				{
+					projection = verticesB[b].Y; ;
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+			}
+
+			{
+				float minA = boundA.Min.X;
+				float maxA = boundA.Max.X;
+
+				float minB = float.MaxValue;
+				float maxB = float.MinValue;
+
+				float projection;
+
+				for (int b = 0; b < 4; b++)
+				{
+					projection = verticesB[b].X;
+					if (projection < minB) { minB = projection; }
+					if (projection > maxB) { maxB = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				Vector2 normalB = Vector2.Normalize(verticesB[i + 1] - verticesB[i]).RotateLeft();
+				float minB = Vector2.Dot(verticesB[i + 2], normalB);
+				float maxB = Vector2.Dot(verticesB[i], normalB);
+
+				float minA = float.MaxValue;
+				float maxA = float.MinValue;
+
+				float projection;
+				Vector2 va;
+
+				for (int a = 0; a < 4; a++)
+				{
+					va = verticesA[a];
+					projection = Vector2.Dot(va, normalB);
+					if (projection < minA) { minA = projection; }
+					if (projection > maxA) { maxA = projection; }
+				}
+
+				if (maxA <= minB || maxB <= minA)
+					return false;
+			}
+
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsIntersectOBBs(Vector2 centerA, float boundaryRadiusA, Vector2[] aVertices,
 										   Vector2 centerB, float boundaryRadiusB, Vector2[] bVertices)
 		{
 			if (!IsIntersectCircles(centerA, boundaryRadiusA,
@@ -697,33 +917,6 @@ namespace KaNet.Physics
 			}
 
 			return true;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void ComputePointSegmentDistance(Vector2 p, Vector2 a, Vector2 b,
-													   out float distance, out Vector2 nearestPoint)
-		{
-			Vector2 ab = b - a;
-			Vector2 ap = p - a;
-
-			float projection = Vector2.Dot(ap, ab);
-			float abLengthSq = ab.LengthSquared();
-			float d = projection / abLengthSq;
-
-			if (d <= 0f)
-			{
-				nearestPoint = a;
-			}
-			else if (d >= 1f)
-			{
-				nearestPoint = b;
-			}
-			else
-			{
-				nearestPoint = a + ab * d;
-			}
-
-			distance = Vector2.Distance(p, nearestPoint);
 		}
 	}
 }

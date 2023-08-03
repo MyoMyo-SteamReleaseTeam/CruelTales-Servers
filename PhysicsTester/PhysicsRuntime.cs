@@ -7,6 +7,7 @@ namespace PhysicsTester
 		protected MainForm _mainForm;
 		protected InputManager _inputManager;
 		protected Renderer _renderer = new();
+		public Vector2 MouseWorldPosition { get; private set; }
 
 		public PhysicsRuntime(MainForm mainForm, InputManager inputManager)
 		{
@@ -45,6 +46,11 @@ namespace PhysicsTester
 		public void OnMouseRightClick(Vector2 clickPos)
 		{
 			onMouseRightClick(_renderer.GetMousePosition(clickPos));
+		}
+
+		public void OnMouseMove(Vector2 mousePos)
+		{
+			MouseWorldPosition = _renderer.GetMousePosition(mousePos);
 		}
 
 		protected abstract void onMouseLeftClick(Vector2 worldPosition);

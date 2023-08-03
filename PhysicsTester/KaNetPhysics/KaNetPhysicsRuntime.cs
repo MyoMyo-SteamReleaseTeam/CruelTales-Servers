@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Text;
 using KaNet.Physics.RigidBodies;
 using PhysicsTester;
 using PhysicsTester.KaNetPhysics;
@@ -41,6 +42,9 @@ namespace KaNet.Physics
 		// Color
 		private Color _staticObjectColor = Color.FromArgb(20, 20, 20);
 
+		// Renderer
+		private Action<Renderer>? _customRendering;
+
 		public KaNetPhysicsRuntime(MainForm mainForm, InputManager inputManager, Vector2 screenSize)
 			: base(mainForm, inputManager)
 		{
@@ -72,12 +76,12 @@ namespace KaNet.Physics
 			inputManager.GetInputData(GameKey.ShiftKey).OnPressed += () => _isRun = true;
 			inputManager.GetInputData(GameKey.ShiftKey).OnReleased += () => _isRun = false;
 
-			inputManager.GetInputData(GameKey.F1).OnPressed += () => setupWorld_1(viewLB, viewRT, viewHalfSize);
-			inputManager.GetInputData(GameKey.F2).OnPressed += () => setupWorld_2_LayerTest(viewLB, viewRT, viewHalfSize);
-			inputManager.GetInputData(GameKey.F3).OnPressed += () => setupWorld_3(viewLB, viewRT, viewHalfSize);
-			inputManager.GetInputData(GameKey.F4).OnPressed += () => setupWorld_4(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F1).OnPressed += () => setupWorld_1_LayerTest(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F2).OnPressed += () => setupWorld_2_ThreeShapesAndStatic(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F3).OnPressed += () => setupWorld_3_RaycastTest(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F4).OnPressed += () => setupWorld_4_RaycastWithMask(viewLB, viewRT, viewHalfSize);
 
-			inputManager.GetInputData(GameKey.F2).ForceInvokePressed();
+			inputManager.GetInputData(GameKey.F4).ForceInvokePressed();
 
 			inputManager.GetInputData(GameKey.Num0).OnPressed += () => selectEntity(0);
 			inputManager.GetInputData(GameKey.Num1).OnPressed += () => selectEntity(1);
@@ -95,51 +99,10 @@ namespace KaNet.Physics
 			_physicsCalcTimer.Start();
 		}
 
-		private void setupWorld_1(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		private void setupWorld_1_LayerTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
 			_entityManager.Clear();
-
-			int dynamicCount = 20;
-			int staticCount = 10;
-			float radiusMin = 1.0f;
-			float radiusMax = 2.0f;
-
-			// Bind inputs
-			OnPressLeftMouseClick = (worldPos) =>
-			{
-				float width = RandomHelper.NextSingle(radiusMin, radiusMax);
-				float height = RandomHelper.NextSingle(radiusMin, radiusMax);
-				createAABBEntity(width, height, isStatic: false, position: worldPos);
-			};
-
-			// Create world
-			OnPressRightMouseClick = (worldPos) =>
-			{
-				float radius = RandomHelper.NextSingle(radiusMin, radiusMax);
-				createCircleEntity(radius, isStatic: false, position: worldPos);
-			};
-
-			createAABBEntity(width: viewHalfSize.X * 2f * 0.9f,
-							 height: 3f,
-							 isStatic: true,
-							 position: new Vector2(0, -12)) .Color = Color.DarkGreen;
-
-			createOBBEntity(width: 20.0f,
-							height: 2.0f,
-							rotation: -MathF.PI * 2 / 20f,
-							isStatic: true,
-							position: new Vector2(-10, 1)).Color = Color.DarkGray;
-
-			createOBBEntity(width: 20.0f,
-							height: 2.0f,
-							rotation: MathF.PI * 2 / 20f,
-							isStatic: true,
-							position: new Vector2(10, 10)).Color = Color.DarkGray;
-		}
-
-		private void setupWorld_2_LayerTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
-		{
-			_entityManager.Clear();
+			_customRendering = null;
 
 			int dynamicCount = 5;
 			int staticCount = 0;
@@ -187,9 +150,10 @@ namespace KaNet.Physics
 			//					sizeMin, sizeMax, viewLB, viewRT);
 		}
 
-		private void setupWorld_3(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		private void setupWorld_2_ThreeShapesAndStatic(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
 			_entityManager.Clear();
+			_customRendering = null;
 
 			int dynamicCount = 10;
 			int staticCount = 10;
@@ -231,61 +195,160 @@ namespace KaNet.Physics
 							  sizeMin, sizeMax, viewLB, viewRT);
 		}
 
-		private void setupWorld_4(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		private int _shapeType = 0;
+		private bool _isRaycastHit = false;
+		private string _hitListString = string.Empty;
+		private StringBuilder _hitStringSB = new StringBuilder(128);
+		private void setupWorld_3_RaycastTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
-			_entityManager.Clear();
+			float radius = 1.0f;
+			float width = 4.0f;
+			float height = 1.2f;
 
-			int dynamicCount = 0;
-			int staticCount = 1;
-			float sizeMin = 2.0f;
-			float sizeMax = 4.0f;
+			selectEntity(0);
+			_entityManager.Clear();
+			_customRendering = (r) =>
+			{
+				Color outlineColor = _isRaycastHit ? Color.Red : Color.Yellow;
+
+				if (_shapeType == 0)
+				{
+					r.DrawBox(MouseWorldPosition, width, height, outlineColor);
+				}
+				else if (_shapeType == 1)
+				{
+					r.DrawCircle(MouseWorldPosition, radius, outlineColor);
+				}
+
+				r.DrawTextGUI($"Raycast hit : {_hitListString}", new Vector2(10, 170), Color.White);
+			};
 
 			// Bind Events
 			OnProcessUpdate = () =>
 			{
-				if (_entityManager.TryGetEntity(_selectedEntity, out var entity))
+				if (_shapeType == 0)
 				{
-					_renderer.CameraWorldPosition = entity.Body.Position;
+					_isRaycastHit = _world.Raycast(MouseWorldPosition, width, height, out List<int> raycastHitList);
+					_hitListString = toString(raycastHitList);
+				}
+				else if (_shapeType == 1)
+				{
+					_isRaycastHit = _world.Raycast(MouseWorldPosition, radius, out List<int> raycastHitList);
+					_hitListString = toString(raycastHitList);
+				}
+
+				string toString(List<int> raycastHitList)
+				{
+					_hitStringSB.Clear();
+					int hitCount = raycastHitList.Count;
+
+					for (int i = 0; i < hitCount; i++)
+					{
+						_hitStringSB.Append(raycastHitList[i]);
+						if (i < hitCount - 1)
+						{
+							_hitStringSB.Append(", ");
+						}
+					}
+
+					return _hitStringSB.ToString();
 				}
 			};
 
 			// Bind inputs
 			OnPressLeftMouseClick = (worldPos) =>
 			{
-				for (int i = 0; i < 1; i++)
-				{
-					float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
-					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
-					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
-					createOBBEntity(width, height, rotation, isStatic: false,
-									PhysicsLayerMask.None, worldPos);
-				}
+				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
 			};
 
 			OnPressRightMouseClick = (worldPos) =>
 			{
-				for (int i = 0; i < 1; i++)
+				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
+			};
+
+			Vector2 offset = new Vector2(-10, 0);
+
+			createAABBEntity(2, 3, false, PhysicsLayerMask.None, offset);
+			createOBBEntity(3, 6, MathF.PI * 0.2f, false, PhysicsLayerMask.None, Vector2.Zero);
+			createCircleEntity(1.5f, false, PhysicsLayerMask.None, -offset);
+		}
+
+		private void setupWorld_4_RaycastWithMask(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		{
+			float radius = 1.0f;
+			float width = 4.0f;
+			float height = 1.2f;
+
+			selectEntity(0);
+			_entityManager.Clear();
+			_customRendering = (r) =>
+			{
+				Color outlineColor = _isRaycastHit ? Color.Red : Color.Yellow;
+
+				if (_shapeType == 0)
 				{
-					float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
-					float width = RandomHelper.NextSingle(sizeMin, sizeMax);
-					float height = RandomHelper.NextSingle(sizeMin, sizeMax);
-					createAABBEntity(width, height, isStatic: false, position: worldPos);
+					r.DrawBox(MouseWorldPosition, width, height, outlineColor);
+				}
+				else if (_shapeType == 1)
+				{
+					r.DrawCircle(MouseWorldPosition, radius, outlineColor);
+				}
+
+				r.DrawTextGUI($"Raycast hit : {_hitListString}", new Vector2(10, 170), Color.White);
+			};
+
+			// Bind Events
+			OnProcessUpdate = () =>
+			{
+				if (_shapeType == 0)
+				{
+					_isRaycastHit = _world.Raycast(MouseWorldPosition, width, height,
+												   out List<int> raycastHitList,
+												   PhysicsLayerMask.Player);
+					_hitListString = toString(raycastHitList);
+				}
+				else if (_shapeType == 1)
+				{
+					_isRaycastHit = _world.Raycast(MouseWorldPosition, radius,
+												   out List<int> raycastHitList,
+												   PhysicsLayerMask.Environment);
+					_hitListString = toString(raycastHitList);
+				}
+
+				string toString(List<int> raycastHitList)
+				{
+					_hitStringSB.Clear();
+					int hitCount = raycastHitList.Count;
+
+					for (int i = 0; i < hitCount; i++)
+					{
+						_hitStringSB.Append(raycastHitList[i]);
+						if (i < hitCount - 1)
+						{
+							_hitStringSB.Append(", ");
+						}
+					}
+
+					return _hitStringSB.ToString();
 				}
 			};
 
-			createRandomWorldBy(dynamicObjectCount: 1,
-								staticObjectCount: 0,
-								PhysicsLayerMask.None,
-								KaPhysicsShapeType.Box_AABB,
-								sizeMin, sizeMax,
-								viewLB, viewRT);
+			// Bind inputs
+			OnPressLeftMouseClick = (worldPos) =>
+			{
+				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
+			};
 
-			// Create world
-			createRandomWorldBy(dynamicCount, staticCount,
-								PhysicsLayerMask.None,
-								KaPhysicsShapeType.Box_OBB,
-								sizeMin, sizeMax,
-								viewLB, viewRT);
+			OnPressRightMouseClick = (worldPos) =>
+			{
+				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
+			};
+
+			Vector2 offset = new Vector2(-10, 0);
+
+			createAABBEntity(2, 3, false, PhysicsLayerMask.Environment, offset).Color =	Color.Green;
+			createOBBEntity(3, 6, MathF.PI * 0.2f, false, PhysicsLayerMask.Player, Vector2.Zero).Color = Color.Yellow;
+			createCircleEntity(1.5f, false, PhysicsLayerMask.Player, -offset).Color = Color.Yellow;
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -446,6 +509,8 @@ namespace KaNet.Physics
 			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 110), Color.White);
 			_renderer.DrawTextGUI($"DeltaTime : {_deltaTime:F4} ms", new Vector2(10, 130), Color.White);
 			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 150), Color.White);
+
+			_customRendering?.Invoke(_renderer);
 		}
 
 		protected override void onMouseLeftClick(Vector2 worldPos)

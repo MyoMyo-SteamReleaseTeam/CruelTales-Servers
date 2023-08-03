@@ -11,6 +11,7 @@ namespace KaNet.Physics
 		private List<KaRigidBody> _rigidBodies = new(128);
 		private List<KaRigidBody>? _staticRigidBodies;
 		public int BodyCount => _rigidBodies.Count;
+		private List<int> _raycastHitList = new(128);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void AddRigidBody(KaRigidBody rigidBody)
@@ -156,6 +157,109 @@ namespace KaNet.Physics
 
 			body = _rigidBodies[id];
 			return true;
+		}
+
+		public bool Raycast(Vector2 center, float radius,
+							out List<int> raycastHitList,
+							PhysicsLayerMask mask = LayerMaskHelper.ALL_MASK)
+		{
+			_raycastHitList.Clear();
+
+			foreach (var rigid in  _rigidBodies)
+			{
+				if ((mask & rigid.LayerMask.Flags) != mask)
+					continue;
+
+				if (rigid.IsStatic)
+					continue;
+
+				bool isCollide = false;
+
+				switch (rigid.ShapeType)
+				{
+					case KaPhysicsShapeType.Box_AABB:
+						var boxRigid = (BoxAABBRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectCircleAABB(center, radius, boxRigid.Position,
+												   boxRigid.Width, boxRigid.Height);
+						break;
+
+					case KaPhysicsShapeType.Box_OBB:
+						var obbRigid = (BoxOBBRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectCircleOBB(center, radius, obbRigid.Position,
+												  obbRigid.GetTransformedVertices(),
+												  obbRigid.Width, obbRigid.Height,
+												  obbRigid.BoundaryRadius);
+						break;
+
+					case KaPhysicsShapeType.Circle:
+						var circleRigid = (CircleRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectCircles(center, radius,
+												circleRigid.Position, circleRigid.Radius);
+						break;
+				}
+
+				if (isCollide)
+				{
+					_raycastHitList.Add(rigid.ID);
+				}
+			}
+
+			raycastHitList = _raycastHitList;
+			return raycastHitList.Count != 0;
+		}
+
+		public bool Raycast(Vector2 center, float width, float height,
+							out List<int> raycastHitList,
+							PhysicsLayerMask mask = LayerMaskHelper.ALL_MASK)
+		{
+			_raycastHitList.Clear();
+
+			foreach (var rigid in _rigidBodies)
+			{
+				if ((mask & rigid.LayerMask.Flags) != mask)
+					continue;
+
+				if (rigid.IsStatic)
+					continue;
+
+				bool isCollide = false;
+
+				switch (rigid.ShapeType)
+				{
+					case KaPhysicsShapeType.Box_AABB:
+						var boxRigid = (BoxAABBRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectAABBs(new BoundingBox(center, width, height),
+											  boxRigid.GetBoundingBox());
+						break;
+
+					case KaPhysicsShapeType.Box_OBB:
+						var obbRigid = (BoxOBBRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectAABBOBB(new BoundingBox(center, width, height),
+												obbRigid.GetTransformedVertices(),
+												obbRigid.GetBoundingBox());
+						break;
+
+					case KaPhysicsShapeType.Circle:
+						var circleRigid = (CircleRigidBody)rigid;
+						isCollide |= KaPhysics
+							.IsIntersectCircleAABB(circleRigid.Position, circleRigid.Radius,
+												   center, width, height);
+						break;
+				}
+
+				if (isCollide)
+				{
+					_raycastHitList.Add(rigid.ID);
+				}
+			}
+
+			raycastHitList = _raycastHitList;
+			return raycastHitList.Count != 0;
 		}
 	}
 }

@@ -51,6 +51,14 @@ namespace KaNet.Physics
 		private static List<PhysicsLayerMask> _layerMaskEnums = new();
 		private static Dictionary<PhysicsLayerMask, PhysicsLayerMask> _flagsByLayerMask = new();
 
+		public const PhysicsLayerMask ALL_MASK =
+			PhysicsLayerMask.System |
+			PhysicsLayerMask.Environment |
+			PhysicsLayerMask.Invisible |
+			PhysicsLayerMask.Item |
+			PhysicsLayerMask.LayerMask_6 |
+			PhysicsLayerMask.LayerMask_7;
+
 		private static bool _isInitialized = false;
 
 		public static void Initialize()

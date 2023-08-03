@@ -146,6 +146,8 @@ namespace PhysicsTester
 				_physicsRuntime.Drag(delta);
 				_lastMousePos = curMousePos;
 			}
+
+			_physicsRuntime.OnMouseMove(new Vector2(e.X, e.Y));
 		}
 
 		#endregion
