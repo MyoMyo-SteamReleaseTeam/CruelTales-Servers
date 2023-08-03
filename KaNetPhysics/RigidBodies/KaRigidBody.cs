@@ -8,6 +8,15 @@ namespace KaNet.Physics.RigidBodies
 	[Serializable]
 	public abstract class KaRigidBody
 	{
+		/// <summary>물리 식별자입니다.</summary>
+		public int ID { get; private set; } = -1;
+
+		/// <summary>
+		/// 다른 다이나믹 강체와 부딪혔을 때 발생합니다.
+		/// 정적 강체의 충돌은 감지되지 않습니다.
+		/// </summary>
+		public Action<int>? OnCollisionWith { get; private set; }
+
 		/// <summary>물리 형상 타입</summary>
 		[field: UnityEngine.SerializeField]
 		public KaPhysicsShapeType ShapeType { get; private set; }
@@ -68,6 +77,12 @@ namespace KaNet.Physics.RigidBodies
 			LayerMask = LayerMaskHelper.GetLayerMask(layerMask);
 		}
 
+		public void Initialize(int id, Action<int> onCollisionWith)
+		{
+			ID = id;
+			OnCollisionWith = onCollisionWith;
+		}
+
 		public abstract void CalcurateProperties();
 
 		/// <summary>AABB 볼륨을 반환합니다.</summary>
@@ -123,5 +138,10 @@ namespace KaNet.Physics.RigidBodies
 		/// <param name="depth">충돌한 대상과의 접촉 거리입니다.</param>
 		/// <returns>충돌 여부입니다.</returns>
 		public abstract bool IsCollideWith(KaRigidBody otherBody, out Vector2 normal, out float depth);
+
+		public void OnCollided(int id)
+		{
+			OnCollisionWith?.Invoke(id);
+		}
 	}
 }

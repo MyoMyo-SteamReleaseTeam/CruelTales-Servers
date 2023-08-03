@@ -9,12 +9,14 @@ namespace KaNet.Physics
 	{
 		[AllowNull]
 		public KaPhysicsWorld World { get; private set; }
-		public int Id { get; private set; }
+		public int ID { get; private set; }
 
 		[AllowNull]
 		public readonly KaRigidBody Body;
 		public Color Color { get; set; }
 		private static int[] _vertexIndices = new int[6] { 0, 1, 2, 0, 2, 3 };
+
+		private int CollideID = -1;
 
 		private KaEntity() { }
 
@@ -69,11 +71,24 @@ namespace KaNet.Physics
 
 		public void SetID(int id)
 		{
-			this.Id = id;
+			this.ID = id;
+			Body.Initialize(ID, OnCollisionWith);
+		}
+
+		private void OnCollisionWith(int obj)
+		{
+			CollideID = obj;
 		}
 
 		public void Draw(Renderer renderer)
 		{
+			Color fillColor = Color;
+
+			if (CollideID >= 0)
+			{
+				fillColor = Color.Red;
+			}
+
 			Vector2 position = Body.Position;
 
 			switch (Body.ShapeType)
@@ -84,7 +99,7 @@ namespace KaNet.Physics
 				case KaPhysicsShapeType.Box_AABB:
 					{
 						BoxAABBRigidBody body = (BoxAABBRigidBody)Body;
-						renderer.DrawBoxFill(body.Position, body.Width, body.Height, Color);
+						renderer.DrawBoxFill(body.Position, body.Width, body.Height, fillColor);
 						renderer.DrawBox(body.Position, body.Width, body.Height, Color.White);
 					}
 					break;
@@ -92,7 +107,7 @@ namespace KaNet.Physics
 				case KaPhysicsShapeType.Box_OBB:
 					{
 						BoxOBBRigidBody body = (BoxOBBRigidBody)Body;
-						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, Color);
+						renderer.DrawPolygonFill(body.GetTransformedVertices(), _vertexIndices, fillColor);
 						renderer.DrawPolygon(body.GetTransformedVertices(), _vertexIndices, Color.White);
 					}
 					break;
@@ -105,7 +120,7 @@ namespace KaNet.Physics
 						float y = MathF.Cos(body.Rotation);
 						Vector2 rotationLine = new Vector2(x, y) * body.Radius;
 
-						renderer.DrawCircleFill(position, body.Radius, Color);
+						renderer.DrawCircleFill(position, body.Radius, fillColor);
 						renderer.DrawCircle(position, body.Radius, Color.White);
 						renderer.DrawLine(position, rotationLine + body.Position, Color.White);
 					}
@@ -124,8 +139,19 @@ namespace KaNet.Physics
 
 			renderer.DrawText(Body.Rotation.ToString("F3"), position - new Vector2(0, 1f), Color.Orange,
 							  isCenter: true);
-			renderer.DrawText(this.Id.ToString(), position, Color.LightGreen, Color.Black,
-							  isCenter: true, font: renderer.DefaultFont16);
+
+			if (CollideID >= 0)
+			{
+				renderer.DrawText(CollideID.ToString(), position, Color.Black, Color.White,
+								  isCenter: true, font: renderer.DefaultFont16);
+			}
+			else
+			{
+				renderer.DrawText(this.ID.ToString(), position, Color.LightGreen, Color.Black,
+								  isCenter: true, font: renderer.DefaultFont16);
+			}
+
+			CollideID = -1;
 		}
 	}
 }

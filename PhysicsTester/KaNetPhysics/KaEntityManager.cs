@@ -25,8 +25,8 @@ namespace PhysicsTester.KaNetPhysics
 				for (int i = 0; i < _entityRemovalList.Count; ++i)
 				{
 					KaEntity entity = _entityRemovalList[i];
-					_idStack.Push(entity.Id);
-					_entityById.Remove(entity.Id);
+					_idStack.Push(entity.ID);
+					_entityById.Remove(entity.ID);
 					entity.World.RemoveRigidBody(entity.Body);
 				}
 
@@ -38,7 +38,7 @@ namespace PhysicsTester.KaNetPhysics
 		{
 			int newId = getNewId();
 			entity.SetID(newId);
-			_entityById.Add(entity.Id, entity);
+			_entityById.Add(entity.ID, entity);
 		}
 
 		public void RemoveEntity(KaEntity entity)

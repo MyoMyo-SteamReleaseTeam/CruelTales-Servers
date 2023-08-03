@@ -107,6 +107,12 @@ namespace KaNet.Physics
 					if (!bodyA.IsCollideWith(bodyB, out Vector2 normal, out float depth))
 						continue;
 
+					if (!bodyA.IsStatic && !bodyB.IsStatic)
+					{
+						bodyA.OnCollided(bodyB.ID);
+						bodyB.OnCollided(bodyA.ID);
+					}
+
 					solve(bodyA, bodyB, normal, depth);
 				}
 			}
@@ -140,15 +146,15 @@ namespace KaNet.Physics
 			}
 		}
 
-		public bool TryGetBody(int i, [NotNullWhen(true)] out KaRigidBody? body)
+		public bool TryGetBody(int id, [NotNullWhen(true)] out KaRigidBody? body)
 		{
-			if (i < 0 || i >= BodyCount)
+			if (id < 0 || id >= BodyCount)
 			{
 				body = null;
 				return false;
 			}
 
-			body = _rigidBodies[i];
+			body = _rigidBodies[id];
 			return true;
 		}
 	}
