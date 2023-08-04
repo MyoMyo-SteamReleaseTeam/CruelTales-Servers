@@ -222,6 +222,8 @@ namespace CT.Common.Tools.Collections
 
 	public static class BitmaskExtension
 	{
+		// BitmaskByte
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Put(this IPacketWriter writer, BitmaskByte value)
 		{
@@ -239,6 +241,21 @@ namespace CT.Common.Tools.Collections
 		{
 			return new BitmaskByte(reader.ReadByte());
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool TryReadBitmaskByte(this IPacketReader reader, out BitmaskByte bitmaskByte)
+		{
+			if (!reader.TryReadByte(out byte value))
+			{
+				bitmaskByte = 0;
+				return false;
+			}
+
+			bitmaskByte = value;
+			return true;
+		}
+
+		// Bitmask32
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Put(this IPacketWriter writer, Bitmask32 value)

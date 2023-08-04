@@ -8,6 +8,24 @@ public static class KaMath
 	public const float DEGREE_TO_RADIAN = MathF.PI / 180.0f;
 	public const float RADIAN = 180 / MathF.PI;
 
+	/// <summary>각도를 라디안각으로 변환합니다.</summary>
+	/// <param name="angle">각도</param>
+	/// <returns>라디안각</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static float DegreeToRadian(float angle)
+	{
+		return angle * RADIAN_TO_DEGREE;
+	}
+
+	/// <summary>라디안각을 각도로 변환합니다.</summary>
+	/// <param name="angle">라디안각</param>
+	/// <returns>각도</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static float RadianToDegree(float angle)
+	{
+		return angle * DEGREE_TO_RADIAN;
+	}
+
 	/// <summary>값을 스냅합니다.</summary>
 	/// <param name="value">스냅할 값입니다.</param>
 	/// <param name="snap">스냅 크기입니다.</param>

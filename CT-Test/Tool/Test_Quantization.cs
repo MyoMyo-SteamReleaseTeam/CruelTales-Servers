@@ -31,7 +31,7 @@ namespace CT.Test.Tool
 			void check(Vector2 value)
 			{
 				var vec = Vector2.Normalize(value);
-				var a = Quantizer.Vec2ToRadByte(vec);
+				var a = Quantizer.Vector2ToByte(vec);
 				var qVec = Quantizer.RadByteToVec2(a);
 				Console.WriteLine($"Expected:{vec} / Actual:{qVec}");
 
@@ -61,7 +61,7 @@ namespace CT.Test.Tool
 		private void printQuantizeAngle(Vector2 direction, string name = "vec")
 		{
 			Vector2 vec2 = Vector2.Normalize(direction);
-			byte angle = Quantizer.Vec2ToRadByte(vec2);
+			byte angle = Quantizer.Vector2ToByte(vec2);
 			Console.WriteLine($"{name} : " + vec2);
 			Console.WriteLine($"{name} : " + angle);
 		}

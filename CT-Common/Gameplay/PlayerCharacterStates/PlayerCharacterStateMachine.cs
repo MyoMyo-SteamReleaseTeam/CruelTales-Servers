@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Numerics;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.FSM;
 
@@ -57,7 +56,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			Reference.UpdateDokzaDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Idle);
-			Reference.Player.UpdateRigidStop();
+			Reference.Player.StopMove();
 		}
 
 		public override void OnExit()
@@ -90,7 +89,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			Reference.UpdateDokzaDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Run);
-			Reference.Player.UpdateRigid(Reference.MoveDirection, isWalk: false);
+			Reference.Player.Move(Reference.MoveDirection, isWalk: false);
 		}
 
 		public override void OnExit()
@@ -129,7 +128,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 						Reference.UpdateAnimation(DokzaAnimationState.Run);
 					}
 
-					Reference.Player.UpdateRigid(Reference.MoveDirection, isWalk: false);
+					Reference.Player.Move(Reference.MoveDirection, isWalk: false);
 				}
 			}
 		}
@@ -141,7 +140,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			Reference.UpdateDokzaDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Walk);
-			Reference.Player.UpdateRigid(Reference.MoveDirection, isWalk: true);
+			Reference.Player.Move(Reference.MoveDirection, isWalk: true);
 		}
 
 		public override void OnExit()
@@ -175,7 +174,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 						Reference.UpdateAnimation(DokzaAnimationState.Walk);
 					}
 
-					Reference.Player.UpdateRigid(Reference.MoveDirection, isWalk: true);
+					Reference.Player.Move(Reference.MoveDirection, isWalk: true);
 				}
 				else
 				{

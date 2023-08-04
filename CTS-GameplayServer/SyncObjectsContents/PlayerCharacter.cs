@@ -71,7 +71,7 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer?.ReleaseViewTarget();
 		}
 
-		public void UpdateRigid(Vector2 moveDirection, bool isWalk)
+		public void Move(Vector2 moveDirection, bool isWalk)
 		{
 			if (KaPhysics.NearlyEqual(moveDirection.Length(), 0))
 			{
@@ -84,7 +84,7 @@ namespace CTS.Instance.SyncObjects
 			RigidBody.ChangeVelocity(velocity);
 		}
 
-		public void UpdateRigidStop()
+		public void StopMove()
 		{
 			RigidBody.ChangeVelocity(Vector2.Zero);
 		}

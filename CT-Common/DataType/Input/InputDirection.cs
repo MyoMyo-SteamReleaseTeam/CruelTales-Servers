@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace CT.Common.Gameplay.Players
+namespace CT.Common.DataType.Input
 {
 	/// <summary>8방향 입력 enum flag입니다.</summary>
 	public enum InputDirection : byte
@@ -17,54 +17,38 @@ namespace CT.Common.Gameplay.Players
 		RightDown = 7,
 	}
 
-	/// <summary>움직임 입력 타입입니다. 2비트입니다.</summary>
-	public enum MovementInputType : byte
-	{
-		/// <summary>입력이 존재하지 않습니다.</summary>
-		NoInput = 0,
-		Stop = 1,
-		Walk = 2,
-		Run = 3,
-	}
-
 	public static class InputDirectionExtension
 	{
 		public const float INV_SNAP_RAD = 1.0f / (MathF.PI * 0.5f / 8);
 
+		private static readonly Vector2[] _inputDirectionTable = new Vector2[]
+		{
+			new Vector2(1, 0),
+			Vector2.Normalize(new Vector2(1, 1)),
+			new Vector2(0, 1),
+			Vector2.Normalize(new Vector2(-1, 1)),
+			new Vector2(-1, 0),
+			Vector2.Normalize(new Vector2(-1, -1)),
+			new Vector2(0, -1),
+			Vector2.Normalize(new Vector2(1, -1)),
+		};
+
+		/// <summary>입력 방향을 방향 벡터로 변환합니다.</summary>
+		public static Vector2 ToDirectionVector(this InputDirection inputDirection)
+		{
+			return _inputDirectionTable[(int)inputDirection];
+		}
+
+		/// <summary>방향 벡터를 8방향 입력 enum flag로 변환합니다.</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static InputDirection ToInputDirection(this System.Numerics.Vector2 vec)
+		public static InputDirection ToInputDirection(this Vector2 vec)
 		{
 			return vec.Y >= 0 ?
 				(InputDirection)((MathF.Acos(vec.X) * INV_SNAP_RAD + 1) * 0.5f) :
 				(InputDirection)((int)((MathF.Acos(-vec.X) * INV_SNAP_RAD + 9) * 0.5f) % 8);
 		}
 
-		private static readonly System.Numerics.Vector2[] _inputDirectionTable = new System.Numerics.Vector2[]
-		{
-			new System.Numerics.Vector2(1, 0),
-			System.Numerics.Vector2.Normalize(new System.Numerics.Vector2(1, 1)),
-			new Vector2(0, 1),
-			System.Numerics.Vector2.Normalize(new System.Numerics.Vector2(-1, 1)),
-			new Vector2(-1, 0),
-			System.Numerics.Vector2.Normalize(new System.Numerics.Vector2(-1, -1)),
-			new Vector2(0, -1),
-			System.Numerics.Vector2.Normalize(new System.Numerics.Vector2(1, -1)),
-		};
-
-		public static System.Numerics.Vector2 ToDirectionVector(this InputDirection inputDirection)
-		{
-			return _inputDirectionTable[(int)inputDirection];
-		}
-
 #if UNITY_2021
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static InputDirection ToInputDirection(this UnityEngine.Vector2 vec)
-		{
-			return vec.y >= 0 ?
-				(InputDirection)((MathF.Acos(vec.x) * INV_SNAP_RAD + 1) * 0.5f) :
-				(InputDirection)((int)((MathF.Acos(-vec.x) * INV_SNAP_RAD + 9) * 0.5f) % 8);
-		}
-
 		private static readonly UnityEngine.Vector2[] _inputDirectionTableUnity = new UnityEngine.Vector2[]
 		{
 			new UnityEngine.Vector2(1, 0),
@@ -77,9 +61,19 @@ namespace CT.Common.Gameplay.Players
 			new UnityEngine.Vector2(1, -1).normalized,
 		};
 		
+		/// <summary>입력 방향을 방향 벡터로 변환합니다.</summary>
 		public static UnityEngine.Vector2 ToUnityDirectionVector(this InputDirection inputDirection)
 		{
 			return _inputDirectionTableUnity[(int)inputDirection];
+		}
+
+		/// <summary>방향 벡터를 8방향 입력 enum flag로 변환합니다.</summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static InputDirection ToInputDirection(this UnityEngine.Vector2 vec)
+		{
+			return vec.y >= 0 ?
+				(InputDirection)((MathF.Acos(vec.x) * INV_SNAP_RAD + 1) * 0.5f) :
+				(InputDirection)((int)((MathF.Acos(-vec.x) * INV_SNAP_RAD + 9) * 0.5f) % 8);
 		}
 #endif
 
@@ -115,6 +109,7 @@ namespace CT.Common.Gameplay.Players
 				direction == InputDirection.LeftDown;
 		}
 
+		/// <summary>축에 수직하거나 수평하는 방향인지 여부입니다.</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsAxisAligned(this InputDirection direction)
 		{
