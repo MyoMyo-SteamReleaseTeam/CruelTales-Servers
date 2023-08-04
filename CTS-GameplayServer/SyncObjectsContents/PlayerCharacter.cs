@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
+using CT.Common.DataType;
+using CT.Common.DataType.Input;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
-using CT.Common.Quantization;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
@@ -106,23 +107,15 @@ namespace CTS.Instance.SyncObjects
 			this.Server_OnProxyDirectionChanged(direction);
 		}
 
-		public partial void Client_InputMovement(NetworkPlayer player,
-												 Vector2 direction, bool isWalk)
+		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData)
 		{
 			if (_userId != player.UserId)
+			{
+				player.Session?.Disconnect(DisconnectReasonType.ServerError_UnauthorizedBehaviour);
 				return;
-
-			InputInfo info;
-			if (direction == Vector2.Zero)
-			{
-				info = new InputInfo(InputEvent.Movement);
-			}
-			else
-			{
-				info = new InputInfo(InputEvent.Movement, direction, isWalk);
 			}
 
-			StateMachine.OnInputEvent(info);
+			StateMachine.OnInputEvent(inputData);
 		}
 
 		#endregion

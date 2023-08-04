@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using CT.Common.DataType.Input;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.FSM;
 
@@ -30,16 +31,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			ChangeState(IdleState);
 		}
 
-		public void OnInputEvent(InputInfo inputInfo)
+		public void OnInputEvent(InputData inputData)
 		{
-			CurrentPlayerState.OnInputEvent(inputInfo);
+			CurrentPlayerState.OnInputEvent(inputData);
 		}
 	}
 
 	public abstract class BasePlayerCharacterState
 		: BaseState<PlayerCharacterModel, PlayerCharacterStateMachine>
 	{
-		public abstract void OnInputEvent(InputInfo inputInfo);
+		public abstract void OnInputEvent(InputData inputData);
 
 		public sealed override void OnUpdate(float deltaTime)
 		{
@@ -68,14 +69,19 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		}
 
-		public override void OnInputEvent(InputInfo inputInfo)
+		public override void OnInputEvent(InputData inputData)
 		{
-			if (inputInfo.InputEvent == InputEvent.Movement)
+			InputType inputType = inputData.Type;
+
+			if (inputType == InputType.Movement)
 			{
-				Reference.MoveDirection = inputInfo.MoveDirection;
+				MovementInputData moveInput = inputData.MovementInput;
+
+				Reference.MoveDirection = moveInput.MoveDirectionVector;
 				Reference.UpdateDokzaDirection();
 
-				BasePlayerCharacterState state = inputInfo.IsWalk ? 
+				BasePlayerCharacterState state =
+					moveInput.MoveInputType == MovementType.Walk ? 
 					StateMachine.WalkState : StateMachine.RunState;
 
 				StateMachine.ChangeState(state);
@@ -102,24 +108,28 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		}
 
-		public override void OnInputEvent(InputInfo inputInfo)
+		public override void OnInputEvent(InputData inputData)
 		{
-			if (inputInfo.InputEvent == InputEvent.Movement)
+			InputType inputType = inputData.Type;
+
+			if (inputType == InputType.Movement)
 			{
-				Reference.MoveDirection = inputInfo.MoveDirection;
+				MovementInputData moveInput = inputData.MovementInput;
+
+				Reference.MoveDirection = moveInput.MoveDirectionVector;
 				Reference.UpdateDokzaDirection();
 
-				if (!inputInfo.HasMovementInput)
+				MovementType moveType = moveInput.MoveInputType;
+
+				if (moveType == MovementType.Stop)
 				{
 					StateMachine.ChangeState(StateMachine.IdleState);
-					return;
 				}
-
-				if (inputInfo.IsWalk)
+				else if (moveType == MovementType.Walk)
 				{
 					StateMachine.ChangeState(StateMachine.WalkState);
 				}
-				else
+				else if (moveType == MovementType.Run)
 				{
 					ProxyDirection curDirection = Reference.GetDokzaDirection();
 					if (Reference.Player.ProxyDirection != curDirection)
@@ -152,20 +162,24 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		}
 
-		public override void OnInputEvent(InputInfo inputInfo)
+		public override void OnInputEvent(InputData inputData)
 		{
-			if (inputInfo.InputEvent == InputEvent.Movement)
+			InputType inputType = inputData.Type;
+
+			if (inputType == InputType.Movement)
 			{
-				Reference.MoveDirection = inputInfo.MoveDirection;
+				MovementInputData moveInput = inputData.MovementInput;
+
+				Reference.MoveDirection = moveInput.MoveDirectionVector;
 				Reference.UpdateDokzaDirection();
 
-				if (!inputInfo.HasMovementInput)
+				MovementType moveType = moveInput.MoveInputType;
+
+				if (moveType == MovementType.Stop)
 				{
 					StateMachine.ChangeState(StateMachine.IdleState);
-					return;
 				}
-
-				if (inputInfo.IsWalk)
+				else if (moveType == MovementType.Walk)
 				{
 					ProxyDirection curDirection = Reference.GetDokzaDirection();
 					if (Reference.Player.ProxyDirection != curDirection)
@@ -176,7 +190,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 					Reference.Player.Move(Reference.MoveDirection, isWalk: true);
 				}
-				else
+				else if (moveType == MovementType.Run)
 				{
 					StateMachine.ChangeState(StateMachine.RunState);
 				}

@@ -2,6 +2,7 @@
 
 using System.Numerics;
 using CT.Common.DataType;
+using CT.Common.DataType.Input;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.Players;
 using CT.Common.Synchronizations;
@@ -37,7 +38,7 @@ namespace CT.Common.Definitions.SyncObjects
 		public void Server_OnProxyDirectionChanged(ProxyDirection direction) { }
 
 		[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
-		public void Client_InputMovement(Vector2 direction, bool isWalk) { }
+		public void Client_RequestInput(InputData inputData) { }
 
 		//[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
 		//public void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType) { }

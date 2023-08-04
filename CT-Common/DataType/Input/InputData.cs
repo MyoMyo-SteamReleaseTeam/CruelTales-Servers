@@ -76,7 +76,20 @@ namespace CT.Common.DataType.Input
 
 		public void Ignore(IPacketReader reader)
 		{
-			switch (Type)
+			InputData.IgnoreStatic(reader);
+		}
+
+		public static void IgnoreStatic(IPacketReader reader)
+		{
+			if (!reader.TryReadByte(out byte typeValue))
+			{
+				// TODO : 위험한 코드
+				return;
+			}
+
+			InputType type = (InputType)typeValue;
+
+			switch (type)
 			{
 				case InputType.Movement:
 					MovementInputData.IgnoreStatic(reader);

@@ -41,6 +41,7 @@ namespace CT.Common.DataType
 		ServerError_YouTryRejoin,
 		ServerError_YouAreNotInTheWaitingQueue,
 		ServerError_YouAreNotHost,
+		ServerError_UnauthorizedBehaviour,
 
 		// Reject from server
 		Reject_ThereIsNoSuchGameInstance,

@@ -15,11 +15,12 @@ namespace CT.Common.DataType.Input
 		LeftDown = 5,
 		Down = 6,
 		RightDown = 7,
+		None = 8,
 	}
 
 	public static class InputDirectionExtension
 	{
-		public const float INV_SNAP_RAD = 1.0f / (MathF.PI * 0.5f / 8);
+		public const float INV_SNAP_RAD = 1.0f / (MathF.PI / 8);
 
 		private static readonly Vector2[] _inputDirectionTable = new Vector2[]
 		{

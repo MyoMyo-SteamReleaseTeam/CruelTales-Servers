@@ -26,34 +26,34 @@ namespace CT.Common.DataType.Input
 		public int SerializeSize => sizeof(byte);
 
 		/// <summary>이동 데이터 비트마스크입니다.</summary>
-		public BitmaskByte MovementData;
+		public BitmaskByte MoveData;
 
 		/// <summary>이동 타입입니다.</summary>
-		public MovementType MovementInputType
+		public MovementType MoveInputType
 		{
-			get => (MovementType)(MovementData.Mask & 0b_0000_0011);
-			set => MovementData.Mask = (byte)(MovementData.Mask & 0b_1111_1100 | (int)value);
+			get => (MovementType)(MoveData.Mask & 0b_0000_0011);
+			set => MoveData.Mask = (byte)(MoveData.Mask & 0b_1111_1100 | (int)value);
 		}
 
 		/// <summary>이동 방향입니다. 8방향입니다.</summary>
-		public InputDirection MovementDirection
+		public InputDirection MoveDirection
 		{
-			get => (InputDirection)(MovementData.Mask & 0b_0001_1100 >> 2);
-			set => MovementData.Mask = (byte)(MovementData.Mask & 0b_1110_0011 | (int)value << 2);
+			get => (InputDirection)((MoveData.Mask & 0b_0001_1100) >> 2);
+			set => MoveData.Mask = (byte)(MoveData.Mask & 0b_1110_0011 | (int)value << 2);
 		}
 
 		/// <summary>이동 방향 벡터입니다.</summary>
 		public Vector2 MoveDirectionVector
 		{
-			get => MovementDirection.ToDirectionVector();
-			set => MovementDirection = value.ToInputDirection();
+			get => MoveDirection.ToDirectionVector();
+			set => MoveDirection = value.ToInputDirection();
 		}
 
 		[Obsolete("프로퍼티로 설정하세요.")]
 		public void SetMovementInput(MovementType inputType,
 									 InputDirection direction)
 		{
-			MovementData.Mask = (byte)(MovementData.Mask & 0b_1110_0000 |
+			MoveData.Mask = (byte)(MoveData.Mask & 0b_1110_0000 |
 				(int)direction << 2 | (int)inputType);
 		}
 
@@ -75,12 +75,12 @@ namespace CT.Common.DataType.Input
 
 		public void Serialize(IPacketWriter writer)
 		{
-			MovementData.Serialize(writer);
+			MoveData.Serialize(writer);
 		}
 
 		public bool TryDeserialize(IPacketReader reader)
 		{
-			return reader.TryReadBitmaskByte(out MovementData);
+			return reader.TryReadBitmaskByte(out MoveData);
 		}
 	}
 }

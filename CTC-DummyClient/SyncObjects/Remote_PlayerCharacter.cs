@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
+using CT.Common.DataType.Input;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -27,7 +28,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_InputMovement(Vector2 direction, bool isWalk);
+		public partial void Client_RequestInput(InputData inputData);
 		[SyncVar]
 		private UserId _userId = new();
 		public UserId UserId => _userId;
@@ -90,17 +91,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				return isDirty;
 			}
 		}
-		public partial void Client_InputMovement(Vector2 direction, bool isWalk)
+		public partial void Client_RequestInput(InputData inputData)
 		{
-			Client_InputMovementVbCallstack.Add((direction, isWalk));
+			Client_RequestInputICallstack.Add(inputData);
 			_dirtyUnreliable_0[0] = true;
 		}
-		private List<(Vector2 direction, bool isWalk)> Client_InputMovementVbCallstack = new(4);
+		private List<InputData> Client_RequestInputICallstack = new(4);
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable()
 		{
 			_dirtyUnreliable_0.Clear();
-			Client_InputMovementVbCallstack.Clear();
+			Client_RequestInputICallstack.Clear();
 		}
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer)
@@ -108,13 +109,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_dirtyUnreliable_0.Serialize(writer);
 			if (_dirtyUnreliable_0[0])
 			{
-				byte count = (byte)Client_InputMovementVbCallstack.Count;
+				byte count = (byte)Client_RequestInputICallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Client_InputMovementVbCallstack[i];
-					writer.Put(arg.direction);
-					writer.Put(arg.isWalk);
+					var arg = Client_RequestInputICallstack[i];
+					arg.Serialize(writer);
 				}
 			}
 		}
