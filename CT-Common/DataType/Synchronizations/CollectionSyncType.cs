@@ -2,7 +2,7 @@
 
 namespace CT.Common.DataType.Synchronizations
 {
-	public enum CollectionOperationType : byte
+	public enum CollectionSyncType : byte
 	{
 		None = 0,
 		Clear,

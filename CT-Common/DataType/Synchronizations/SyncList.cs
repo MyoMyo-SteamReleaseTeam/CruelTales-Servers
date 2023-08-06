@@ -8,25 +8,28 @@ using CT.Common.Synchronizations;
 
 namespace CT.Common.DataType.Synchronizations
 {
-	/// <summary>
-	/// 동기화 객체의 배열을 동기화하는 Collection 입니다.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class SyncList<T> : IRemoteSynchronizable, IList<T> where T : struct, IPacketSerializable, IEquatable<T>
+	/// <summary>구조체 배열을 동기화하는 Collection 입니다.</summary>
+	public class SyncList<T> : IRemoteSynchronizable, IList<T> 
+		where T : struct, IPacketSerializable, IEquatable<T>
 	{
-		private struct CollectionOperationToken
+		private struct SyncToken
 		{
-			public CollectionOperationType Operation;
+			public CollectionSyncType Operation;
 			public T Data;
 			public byte Index;
 		}
 
 		private List<T> _list = new(8);
-		private List<CollectionOperationToken> _operationStack = new();
+		private List<SyncToken> _syncOperations = new();
+
+		public event Action<int>? OnRemoved;
+		public event Action<int>? OnChanged;
+		public event Action<T>? OnAdded;
+		public event Action<int, T>? OnInserted;
+		public event Action? OnCleared;
 
 		public int Count => _list.Count;
-
-		public bool IsDirtyReliable => _operationStack.Count > 0;
+		public bool IsDirtyReliable => _syncOperations.Count > 0;
 
 		public T this[int index]
 		{
@@ -39,9 +42,9 @@ namespace CT.Common.DataType.Synchronizations
 				}
 
 				_list[index] = value;
-				_operationStack.Add(new CollectionOperationToken()
+				_syncOperations.Add(new SyncToken()
 				{
-					Operation = CollectionOperationType.Change,
+					Operation = CollectionSyncType.Change,
 					Data = value,
 					Index = (byte)index
 				});
@@ -53,19 +56,19 @@ namespace CT.Common.DataType.Synchronizations
 		public void Add(T item)
 		{
 			_list.Add(item);
-			_operationStack.Add(new CollectionOperationToken()
+			_syncOperations.Add(new SyncToken()
 			{
 				Data = item,
-				Operation = CollectionOperationType.Add
+				Operation = CollectionSyncType.Add
 			});
 		}
 
 		public void Insert(int index, T item)
 		{
 			_list.Insert(index, item);
-			_operationStack.Add(new CollectionOperationToken()
+			_syncOperations.Add(new SyncToken()
 			{
-				Operation = CollectionOperationType.Insert,
+				Operation = CollectionSyncType.Insert,
 				Data = item,
 				Index = (byte)index
 			});
@@ -74,9 +77,9 @@ namespace CT.Common.DataType.Synchronizations
 		public void RemoveAt(int index)
 		{
 			_list.RemoveAt(index);
-			_operationStack.Add(new CollectionOperationToken()
+			_syncOperations.Add(new SyncToken()
 			{
-				Operation = CollectionOperationType.Remove,
+				Operation = CollectionSyncType.Remove,
 				Index = (byte)index
 			});
 		}
@@ -97,9 +100,9 @@ namespace CT.Common.DataType.Synchronizations
 				return false;
 
 			_list.RemoveAt(removeIndex);
-			_operationStack.Add(new CollectionOperationToken()
+			_syncOperations.Add(new SyncToken()
 			{
-				Operation = CollectionOperationType.Remove,
+				Operation = CollectionSyncType.Remove,
 				Index = (byte)removeIndex
 			});
 
@@ -111,9 +114,9 @@ namespace CT.Common.DataType.Synchronizations
 		public void Clear()
 		{
 			_list.Clear();
-			_operationStack.Add(new CollectionOperationToken()
+			_syncOperations.Add(new SyncToken()
 			{
-				Operation = CollectionOperationType.Clear,
+				Operation = CollectionSyncType.Clear,
 			});
 		}
 
@@ -123,13 +126,14 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void ClearDirtyReliable()
 		{
-			_operationStack.Clear();
+			_syncOperations.Clear();
 		}
 
 		public void SerializeEveryProperty(IPacketWriter writer)
 		{
-			writer.Put((byte)_list.Count);
-			for (int i = 0; i < _list.Count; i++)
+			byte count = (byte)_list.Count;
+			writer.Put(count);
+			for (int i = 0; i < count; i++)
 			{
 				_list[i].Serialize(writer);
 			}
@@ -137,34 +141,34 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void SerializeSyncReliable(IPacketWriter writer)
 		{
-			writer.Put((byte)_operationStack.Count);
-			byte operationCount = (byte)_operationStack.Count;
+			writer.Put((byte)_syncOperations.Count);
+			byte operationCount = (byte)_syncOperations.Count;
 			if (operationCount > 0)
 			{
 				for (int i = 0; i < operationCount; i++)
 				{
-					var opToken = _operationStack[i];
+					var opToken = _syncOperations[i];
 					writer.Put((byte)opToken.Operation);
 
 					switch (opToken.Operation)
 					{
-						case CollectionOperationType.Clear:
+						case CollectionSyncType.Clear:
 							break;
 
-						case CollectionOperationType.Add:
+						case CollectionSyncType.Add:
 							opToken.Data.Serialize(writer);
 							break;
 
-						case CollectionOperationType.Remove:
+						case CollectionSyncType.Remove:
 							writer.Put(opToken.Index);
 							break;
 
-						case CollectionOperationType.Change:
+						case CollectionSyncType.Change:
 							writer.Put(opToken.Index);
 							opToken.Data.Serialize(writer);
 							break;
 
-						case CollectionOperationType.Insert:
+						case CollectionSyncType.Insert:
 							writer.Put(opToken.Index);
 							opToken.Data.Serialize(writer);
 							break;
@@ -197,43 +201,39 @@ namespace CT.Common.DataType.Synchronizations
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
 			{
-				var operation = (CollectionOperationType)reader.ReadByte();
+				var operation = (CollectionSyncType)reader.ReadByte();
 				switch (operation)
 				{
-					case CollectionOperationType.Clear:
+					case CollectionSyncType.Clear:
 						_list.Clear();
+						OnCleared?.Invoke();
 						break;
 
-					case CollectionOperationType.Add:
+					case CollectionSyncType.Add:
 						T addData = new();
-						if (!addData.TryDeserialize(reader))
-						{
-							return false;
-						}
+						if (!addData.TryDeserialize(reader)) return false;
 						_list.Add(addData);
+						OnAdded?.Invoke(addData);
 						break;
 
-					case CollectionOperationType.Remove:
+					case CollectionSyncType.Remove:
 						byte removeIndex = reader.ReadByte();
 						_list.RemoveAt(removeIndex);
+						OnRemoved?.Invoke(removeIndex);
 						break;
 
-					case CollectionOperationType.Change:
+					case CollectionSyncType.Change:
 						byte changeIndex = reader.ReadByte();
-						if (!_list[i].TryDeserialize(reader))
-						{
-							return false;
-						}
+						if (!_list[i].TryDeserialize(reader)) return false;
+						OnChanged?.Invoke(changeIndex);
 						break;
 
-					case CollectionOperationType.Insert:
+					case CollectionSyncType.Insert:
 						byte insertIndex = reader.ReadByte();
 						T insertData = new();
-						if (!insertData.TryDeserialize(reader))
-						{
-							return false;
-						}
+						if (!insertData.TryDeserialize(reader)) return false;
 						_list.Insert(insertIndex, insertData);
+						OnInserted?.Invoke(insertIndex, insertData);
 						break;
 
 					default:
@@ -247,19 +247,19 @@ namespace CT.Common.DataType.Synchronizations
 		public void InitializeProperties()
 		{
 			this._list.Clear();
-			this._operationStack.Clear();
+			this._syncOperations.Clear();
 		}
 
 		public void InitializeMasterProperties()
 		{
 			this._list.Clear();
-			this._operationStack.Clear();
+			this._syncOperations.Clear();
 		}
 
 		public void InitializeRemoteProperties()
 		{
 			this._list.Clear();
-			this._operationStack.Clear();
+			this._syncOperations.Clear();
 		}
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -267,25 +267,25 @@ namespace CT.Common.DataType.Synchronizations
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
 			{
-				var operation = (CollectionOperationType)reader.ReadByte();
+				var operation = (CollectionSyncType)reader.ReadByte();
 				switch (operation)
 				{
-					case CollectionOperationType.Clear:
+					case CollectionSyncType.Clear:
 						break;
 
-					case CollectionOperationType.Add:
+					case CollectionSyncType.Add:
 						ignoreElement(reader);
 						break;
 
-					case CollectionOperationType.Remove:
+					case CollectionSyncType.Remove:
 						reader.Ignore(sizeof(byte));
 						break;
 
-					case CollectionOperationType.Change:
+					case CollectionSyncType.Change:
 						reader.Ignore(sizeof(byte));
 						break;
 
-					case CollectionOperationType.Insert:
+					case CollectionSyncType.Insert:
 						ignoreElement(reader);
 						break;
 
@@ -297,13 +297,12 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 		public bool IsReadOnly => throw new NotImplementedException();
-		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
-		public bool IsDirtyUnreliable => throw _exception;
-		public void ClearDirtyUnreliable() => throw _exception;
-		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
-		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
-		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw _exception;
-		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
+		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
+		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
+		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
+		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
+		public void IgnoreSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		private static void ignoreElement(IPacketReader reader)
 		{
 			T temp = new();

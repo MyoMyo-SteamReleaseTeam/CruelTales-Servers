@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using CT.Common.Exceptions;
 using CT.Common.Serialization;
@@ -7,15 +8,13 @@ using CT.Common.Tools.Collections;
 
 namespace CT.Common.DataType.Synchronizations
 {
-	/// <summary>
-	/// 동기화 객체의 배열을 동기화하는 Collection 입니다.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <summary>동기화 객체의 배열을 동기화하는 Collection 입니다.</summary>
+	[Obsolete("테스트 되지 않았습니다.")]
 	public class SyncObjectList<T> : IRemoteSynchronizable where T : IRemoteSynchronizable, new()
 	{
 		private struct CollectionOperationToken
 		{
-			public CollectionOperationType Operation;
+			public CollectionSyncType Operation;
 			public T Data;
 			public byte Index;
 		}
@@ -48,7 +47,7 @@ namespace CT.Common.DataType.Synchronizations
 			_operationStack.Add(new CollectionOperationToken()
 			{
 				Data = item,
-				Operation = CollectionOperationType.Add
+				Operation = CollectionSyncType.Add
 			});
 		}
 
@@ -67,7 +66,7 @@ namespace CT.Common.DataType.Synchronizations
 			_list.RemoveAt(removeIndex);
 			_operationStack.Add(new CollectionOperationToken()
 			{
-				Operation = CollectionOperationType.Remove,
+				Operation = CollectionSyncType.Remove,
 				Index = removeIndex
 			});
 		}
@@ -77,7 +76,7 @@ namespace CT.Common.DataType.Synchronizations
 			_list.Clear();
 			_operationStack.Add(new CollectionOperationToken()
 			{
-				Operation = CollectionOperationType.Clear,
+				Operation = CollectionSyncType.Clear,
 			});
 		}
 
@@ -143,14 +142,14 @@ namespace CT.Common.DataType.Synchronizations
 
 					switch (opToken.Operation)
 					{
-						case CollectionOperationType.Clear:
+						case CollectionSyncType.Clear:
 							break;
 
-						case CollectionOperationType.Add:
+						case CollectionSyncType.Add:
 							opToken.Data.SerializeEveryProperty(writer);
 							break;
 
-						case CollectionOperationType.Remove:
+						case CollectionSyncType.Remove:
 							writer.Put(opToken.Index);
 							break;
 
@@ -186,14 +185,14 @@ namespace CT.Common.DataType.Synchronizations
 				byte operationCount = reader.ReadByte();
 				for (int i = 0; i < operationCount; i++)
 				{
-					var operation = (CollectionOperationType)reader.ReadByte();
+					var operation = (CollectionSyncType)reader.ReadByte();
 					switch (operation)
 					{
-						case CollectionOperationType.Clear:
+						case CollectionSyncType.Clear:
 							_list.Clear();
 							break;
 
-						case CollectionOperationType.Add:
+						case CollectionSyncType.Add:
 							T data = new T();
 							if (!data.TryDeserializeEveryProperty(reader))
 							{
@@ -202,7 +201,7 @@ namespace CT.Common.DataType.Synchronizations
 							_list.Add(data);
 							break;
 
-						case CollectionOperationType.Remove:
+						case CollectionSyncType.Remove:
 							byte index = reader.ReadByte();
 							_list.RemoveAt(index);
 							break;
