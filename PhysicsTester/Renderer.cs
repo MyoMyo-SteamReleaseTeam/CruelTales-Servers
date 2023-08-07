@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Numerics;
 using KaNet.Physics;
 
@@ -111,6 +112,40 @@ namespace PhysicsTester
 		#endregion
 
 		#region Circle
+
+		public void DrawEllipseFill(Vector2 center, float radiusX, float radiusY, Color color)
+		{
+			if (IsCulled(center, radiusX, radiusY))
+				return;
+
+			center *= Zoom;
+			center = center.FlipY() - ScreenCameraPosition.FlipY();
+			radiusX *= Zoom * 2;
+			radiusY *= Zoom * 2;
+			center -= new Vector2(radiusX, radiusY) * 0.5f;
+
+			using (Brush b = new SolidBrush(color))
+			{
+				_graphics.FillEllipse(b, center.X, center.Y, radiusX, radiusY);
+			}
+		}
+
+		public void DrawEllipse(Vector2 center, float radiusX, float radiusY, Color color)
+		{
+			if (IsCulled(center, radiusX, radiusY))
+				return;
+
+			center *= Zoom;
+			center = center.FlipY() - ScreenCameraPosition.FlipY();
+			radiusX *= Zoom * 2;
+			radiusY *= Zoom * 2;
+			center -= new Vector2(radiusX, radiusY) * 0.5f;
+
+			using (Pen p = new Pen(color))
+			{
+				_graphics.DrawEllipse(p, center.X, center.Y, radiusX, radiusY);
+			}
+		}
 
 		public void DrawCircleFill(Vector2 center, float radius, Color color)
 		{

@@ -49,6 +49,16 @@ namespace PhysicsTester
 
 		private void Timer_Tick_Tick(object sender, EventArgs e)
 		{
+			if (_isLeftMousePressed)
+			{
+				_physicsRuntime.OnLeftMousePress?.Invoke(_lastMousePos);
+			}
+
+			if (_isRightMousePressed)
+			{
+				_physicsRuntime.OnRightMousePress?.Invoke(_lastMousePos);
+			}
+
 			Vector2 screenSize = new Vector2(MainCanvas.Width, MainCanvas.Height);
 			_physicsRuntime.SetScreenSize(screenSize);
 
@@ -109,6 +119,9 @@ namespace PhysicsTester
 		#region Set Mouse Input
 
 		private bool _isDragging = false;
+		private bool _isLeftMousePressed = false;
+		private bool _isRightMousePressed = false;
+
 		private Vector2 _lastMousePos = new Vector2();
 		private void Main_MouseDown(object sender, MouseEventArgs e)
 		{
@@ -116,10 +129,12 @@ namespace PhysicsTester
 
 			if (e.Button == MouseButtons.Left)
 			{
+				_isLeftMousePressed = true;
 				_physicsRuntime.OnMouseLeftClick(clickPos);
 			}
 			else if (e.Button == MouseButtons.Right)
 			{
+				_isRightMousePressed = true;
 				_physicsRuntime.OnMouseRightClick(clickPos);
 			}
 			else if (e.Button == MouseButtons.Middle)
@@ -131,7 +146,15 @@ namespace PhysicsTester
 
 		private void Main_MouseUp(object sender, MouseEventArgs e)
 		{
-			if (e.Button == MouseButtons.Middle)
+			if (e.Button == MouseButtons.Left)
+			{
+				_isLeftMousePressed = false;
+			}
+			else if (e.Button == MouseButtons.Right)
+			{
+				_isRightMousePressed = false;
+			}
+			else if (e.Button == MouseButtons.Middle)
 			{
 				_isDragging = false;
 			}
@@ -139,12 +162,12 @@ namespace PhysicsTester
 
 		private void Main_MouseMove(object sender, MouseEventArgs e)
 		{
+			Vector2 mousePos = new Vector2(e.X, e.Y);
 			if (_isDragging)
 			{
-				Vector2 curMousePos = new Vector2(e.X, e.Y);
-				Vector2 delta = _lastMousePos - curMousePos;
+				Vector2 delta = _lastMousePos - mousePos;
 				_physicsRuntime.Drag(delta);
-				_lastMousePos = curMousePos;
+				_lastMousePos = mousePos;
 			}
 
 			_physicsRuntime.OnMouseMove(new Vector2(e.X, e.Y));

@@ -9,6 +9,15 @@ namespace PhysicsTester
 		protected Renderer _renderer = new();
 		public Vector2 MouseWorldPosition { get; private set; }
 
+		// Inputs
+		public Action<Vector2>? OnLeftMouseClick;
+		public Action<Vector2>? OnRightMouseClick;
+		public Action<Vector2>? OnLeftMousePress;
+		public Action<Vector2>? OnRightMousePress;
+
+		public InputData InputSpaceBar => _inputManager.GetInputData(GameKey.Space);
+		public InputData InputEnter => _inputManager.GetInputData(GameKey.Enter);
+
 		public PhysicsRuntime(MainForm mainForm, InputManager inputManager)
 		{
 			_mainForm = mainForm;
@@ -38,22 +47,33 @@ namespace PhysicsTester
 			_renderer.ScreenSize = screenSize;
 		}
 
-		public void OnMouseLeftClick(Vector2 clickPos)
+		public void OnMouseLeftClick(Vector2 mousePos)
 		{
-			onMouseLeftClick(_renderer.GetMousePosition(clickPos));
+			Vector2 worldPos = _renderer.GetMousePosition(mousePos);
+			OnLeftMouseClick?.Invoke(worldPos);
 		}
 
-		public void OnMouseRightClick(Vector2 clickPos)
+		public void OnMouseRightClick(Vector2 mousePos)
 		{
-			onMouseRightClick(_renderer.GetMousePosition(clickPos));
+			Vector2 worldPos = _renderer.GetMousePosition(mousePos);
+			OnRightMouseClick?.Invoke(worldPos);
+		}
+
+		public void OnMouseLeftPress(Vector2 mousePos)
+		{
+			Vector2 worldPos = _renderer.GetMousePosition(mousePos);
+			OnLeftMousePress?.Invoke(worldPos);
+		}
+
+		public void OnMouseRightPress(Vector2 mousePos)
+		{
+			Vector2 worldPos = _renderer.GetMousePosition(mousePos);
+			OnRightMousePress?.Invoke(worldPos);
 		}
 
 		public void OnMouseMove(Vector2 mousePos)
 		{
 			MouseWorldPosition = _renderer.GetMousePosition(mousePos);
 		}
-
-		protected abstract void onMouseLeftClick(Vector2 worldPosition);
-		protected abstract void onMouseRightClick(Vector2 worldPosition);
 	}
 }

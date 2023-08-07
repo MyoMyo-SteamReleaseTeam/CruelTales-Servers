@@ -43,14 +43,15 @@ namespace PhysicsTester
 		F12,
 
 		Space,
+		Enter,
 		LControlKey,
 		ShiftKey,
 	}
 
 	public class InputData
 	{
-		public event Action? OnPressed;
-		public event Action? OnReleased;
+		public Action? OnPressed;
+		public Action? OnReleased;
 		public bool IsPressed;
 
 		public void OnInputPressed()
@@ -142,6 +143,7 @@ namespace PhysicsTester
 
 			// Others
 			addInput(GameKey.Space, Keys.Space);
+			addInput(GameKey.Enter, Keys.Enter);
 			addInput(GameKey.LControlKey, Keys.LControlKey);
 			addInput(GameKey.ShiftKey, Keys.ShiftKey);
 

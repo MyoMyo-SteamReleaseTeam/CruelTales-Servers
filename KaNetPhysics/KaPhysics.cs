@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.SymbolStore;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using KaNet.Physics.RigidBodies;
@@ -13,6 +14,25 @@ namespace KaNet.Physics
 	{
 		public const float MIN_COLLIDER_SIZE = 0.2f;
 		public const float FLOAT_EPSILON = 0.001f;
+
+		/// <summary>타원의 법선 벡터를 구합니다.</summary>
+		/// <param name="ex">타원의 너비</param>
+		/// <param name="ey">타원의 높이</param>
+		/// <param name="tx">테스트 삼각형 너비</param>
+		/// <param name="ty">테스트 삼각형 높이</param>
+		/// <param name="tp">접점</param>
+		/// <param name="n">법선 벡터</param>
+		public static void ComputeEllipseNormal(float ex, float ey,
+												float tx, float ty,
+												out Vector2 tp,
+												out Vector2 n)
+		{
+			float t = MathF.Atan2(tx, ty);
+			float tanX = MathF.Cos(t) * ex;
+			float tanY = MathF.Sin(t) * ey;
+			tp = new Vector2(tanX, tanY);
+			n = Vector2.Normalize(new Vector2(ty / ex, tx / ey));
+		}
 
 		// Comparison
 
@@ -514,6 +534,15 @@ namespace KaNet.Physics
 			}
 
 			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsCollideCircleEllipse(CircleRigidBody bodyA, EllipseRigidBody bodyB,
+												  out Vector2 normal, out float depth)
+		{
+			normal = Vector2.Zero;
+			depth = 0;
+			return false;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

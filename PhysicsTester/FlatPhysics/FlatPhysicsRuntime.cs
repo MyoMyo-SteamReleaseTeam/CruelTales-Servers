@@ -6,7 +6,6 @@ namespace PhysicsTester.FlatPhysics
 {
 	public class FlatPhysicsRuntime : PhysicsRuntime
 	{
-
 		private FlatWorld world = new();
 		private List<FlatEntity> entityList = new();
 		private List<FlatEntity> entityRemovalList = new();
@@ -59,6 +58,20 @@ namespace PhysicsTester.FlatPhysics
 			// Timer;
 			_sampleTimer.Start();
 			_physicsCalcTimer.Start();
+
+			// Events
+			OnLeftMouseClick = (mousePos) =>
+			{
+				float width = RandomHelper.NextSingle(1f, 2f);
+				float height = RandomHelper.NextSingle(1f, 2f);
+				entityList.Add(new FlatEntity(world, width, height, isStatic: false, mousePos));
+			};
+
+			OnRightMouseClick = (mousePos) =>
+			{
+				float radius = RandomHelper.NextSingle(0.75f, 1f);
+				entityList.Add(new FlatEntity(world, radius, isStatic: false, mousePos));
+			};
 		}
 
 		private Stopwatch _physicsCalcTimer = new Stopwatch();
@@ -259,19 +272,6 @@ namespace PhysicsTester.FlatPhysics
 			_renderer.DrawTextGUI($"Elapsed per count : {_stepElapsedPerCount:F3} ms", new Vector2(10, 50), Color.White);
 
 			_renderer.DrawTextGUI($"Current FPS : {_currentFps:F0} fps", new Vector2(10, 70), Color.White);
-		}
-
-		protected override void onMouseLeftClick(Vector2 clickPos)
-		{
-			float width = RandomHelper.NextSingle(1f, 2f);
-			float height = RandomHelper.NextSingle(1f, 2f);
-			entityList.Add(new FlatEntity(world, width, height, isStatic: false, clickPos));
-		}
-
-		protected override void onMouseRightClick(Vector2 clickPos)
-		{
-			float radius = RandomHelper.NextSingle(0.75f, 1f);
-			entityList.Add(new FlatEntity(world, radius, isStatic: false, clickPos));
 		}
 	}
 }

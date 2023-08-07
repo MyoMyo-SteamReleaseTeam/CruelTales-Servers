@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using KaNet.Physics.RigidBodies;
 using PhysicsTester;
@@ -34,10 +35,6 @@ namespace KaNet.Physics
 
 		// Inputs
 		private Action? OnProcessUpdate;
-		private Action? OnPressSpaceBar;
-		private Action? OnPressEnter;
-		private Action<Vector2>? OnPressLeftMouseClick;
-		private Action<Vector2>? OnPressRightMouseClick;
 
 		// Color
 		private Color _staticObjectColor = Color.FromArgb(20, 20, 20);
@@ -61,7 +58,7 @@ namespace KaNet.Physics
 			Vector2 viewHalfSize = screenHalfSize.FlipY() / _renderer.Zoom;
 
 			// Setup
-			this.OnPressSpaceBar = () =>
+			InputSpaceBar.OnPressed = () =>
 			{
 				foreach (KaEntity entity in _entityManager.Entities)
 				{
@@ -80,8 +77,9 @@ namespace KaNet.Physics
 			inputManager.GetInputData(GameKey.F2).OnPressed += () => setupWorld_2_ThreeShapesAndStatic(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F3).OnPressed += () => setupWorld_3_RaycastTest(viewLB, viewRT, viewHalfSize);
 			inputManager.GetInputData(GameKey.F4).OnPressed += () => setupWorld_4_RaycastWithMask(viewLB, viewRT, viewHalfSize);
+			inputManager.GetInputData(GameKey.F5).OnPressed += () => setupWorld_5_EllipseTest(viewLB, viewRT, viewHalfSize);
 
-			inputManager.GetInputData(GameKey.F4).ForceInvokePressed();
+			inputManager.GetInputData(GameKey.F5).ForceInvokePressed();
 
 			inputManager.GetInputData(GameKey.Num0).OnPressed += () => selectEntity(0);
 			inputManager.GetInputData(GameKey.Num1).OnPressed += () => selectEntity(1);
@@ -119,7 +117,7 @@ namespace KaNet.Physics
 			};
 
 			// Bind inputs
-			OnPressLeftMouseClick = (worldPos) =>
+			OnLeftMouseClick = (worldPos) =>
 			{
 				float width = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
@@ -128,7 +126,7 @@ namespace KaNet.Physics
 
 			};
 
-			OnPressRightMouseClick = (worldPos) =>
+			OnRightMouseClick = (worldPos) =>
 			{
 				float width = RandomHelper.NextSingle(sizeMin * 2, sizeMax * 2);
 				float height = RandomHelper.NextSingle(sizeMin * 2, sizeMax * 2);
@@ -170,7 +168,7 @@ namespace KaNet.Physics
 			};
 
 			// Bind inputs
-			OnPressLeftMouseClick = (worldPos) =>
+			OnLeftMouseClick = (worldPos) =>
 			{
 				for (int i = 0; i < 1; i++)
 				{
@@ -179,7 +177,7 @@ namespace KaNet.Physics
 				}
 			};
 
-			OnPressRightMouseClick = (worldPos) =>
+			OnRightMouseClick = (worldPos) =>
 			{
 				for (int i = 0; i < 1; i++)
 				{
@@ -256,12 +254,12 @@ namespace KaNet.Physics
 			};
 
 			// Bind inputs
-			OnPressLeftMouseClick = (worldPos) =>
+			OnLeftMouseClick = (worldPos) =>
 			{
 				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
 			};
 
-			OnPressRightMouseClick = (worldPos) =>
+			OnRightMouseClick = (worldPos) =>
 			{
 				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
 			};
@@ -334,12 +332,12 @@ namespace KaNet.Physics
 			};
 
 			// Bind inputs
-			OnPressLeftMouseClick = (worldPos) =>
+			OnLeftMouseClick = (worldPos) =>
 			{
 				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
 			};
 
-			OnPressRightMouseClick = (worldPos) =>
+			OnRightMouseClick = (worldPos) =>
 			{
 				_shapeType = _shapeType >= 1 ? 0 : _shapeType + 1;
 			};
@@ -349,6 +347,68 @@ namespace KaNet.Physics
 			createAABBEntity(2, 3, false, PhysicsLayerMask.Environment, offset).Color =	Color.Green;
 			createOBBEntity(3, 6, MathF.PI * 0.2f, false, PhysicsLayerMask.Player, Vector2.Zero).Color = Color.Yellow;
 			createCircleEntity(1.5f, false, PhysicsLayerMask.Player, -offset).Color = Color.Yellow;
+		}
+
+		float theta = 0;
+		float ellipseX = 20.0f;
+		float ellipseY = 5.0f;
+
+		float testX = 1f;
+		float testY = 1f;
+
+		private void setupWorld_5_EllipseTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
+		{
+			float acc = 0.02f;
+			Vector2 center = Vector2.Zero;
+
+			selectEntity(0);
+			_entityManager.Clear();
+			_customRendering = (r) =>
+			{
+				r.DrawEllipse(center, ellipseX, ellipseY, Color.White);
+				
+				if (MouseWorldPosition.LengthSquared() < 0.001f)
+				{
+					return;
+				}
+
+				KaPhysics.ComputeEllipseNormal(ellipseX, ellipseY,
+											   testX, testY,
+											   out Vector2 tp,
+											   out Vector2 n);
+
+				r.DrawLine(Vector2.Zero, tp, Color.Blue);
+				r.DrawLine(tp, tp + n * 5, Color.Red);
+
+				//r.DrawCircle(new(testY / ellipseX, testX / ellipseY), 0.1f, Color.Red);
+				//r.DrawLine(Vector2.Zero, new(testY, testX), Color.Red);
+
+				//r.DrawTextGUI($"Control Theta : {theta}", new(10, 200), Color.Wheat);
+				//r.DrawTextGUI($"Actural Theta : {Vector2.Normalize(tanLine).X}", new(10, 215), Color.Wheat);
+			};
+
+			// Bind Events
+			OnProcessUpdate = () =>
+			{
+				//if (this.OnPressLeftMouseClick)
+
+			};
+
+			// Bind inputs
+			OnLeftMousePress = (worldPos) =>
+			{
+				theta += acc;
+				testX += acc;
+				//ellipseX += acc;
+			};
+
+			OnRightMousePress = (worldPos) =>
+			{
+				theta -= acc;
+				testX -= acc;
+				//ellipseX -= acc;
+			};
+
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -511,16 +571,6 @@ namespace KaNet.Physics
 			_renderer.DrawTextGUI($"Selected Entity : {_selectedEntity}", new Vector2(10, 150), Color.White);
 
 			_customRendering?.Invoke(_renderer);
-		}
-
-		protected override void onMouseLeftClick(Vector2 worldPos)
-		{
-			this.OnPressLeftMouseClick?.Invoke(worldPos);
-		}
-
-		protected override void onMouseRightClick(Vector2 worldPos)
-		{
-			this.OnPressRightMouseClick?.Invoke(worldPos);
 		}
 
 		private void selectEntity(int entityId)

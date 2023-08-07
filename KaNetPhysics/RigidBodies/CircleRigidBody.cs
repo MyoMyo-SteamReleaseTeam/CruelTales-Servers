@@ -50,7 +50,6 @@ namespace KaNet.Physics.RigidBodies
 														out normal, out depth);
 					break;
 
-
 				case KaPhysicsShapeType.Circle:
 					result = KaPhysics.IsCollideCircles(this, (CircleRigidBody)otherBody,
 													  out normal, out depth);

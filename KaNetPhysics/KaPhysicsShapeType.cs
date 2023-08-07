@@ -13,5 +13,8 @@
 		
 		/// <summary>원</summary>
 		Circle = 3,
+
+		/// <summary>타원</summary>
+		Ellipse = 4,
 	}
 }
