@@ -31,9 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTC-Networks", "CTC-Network
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhysicsTester", "PhysicsTester\PhysicsTester.csproj", "{B035F5F7-1B27-4345-912D-5EF6D8332478}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaNetPhysics", "KaNetPhysics\KaNetPhysics.csproj", "{5ECB6A19-9132-43B0-BC05-B1D32AAB3F82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaNetPhysics", "KaNetPhysics\KaNetPhysics.csproj", "{5ECB6A19-9132-43B0-BC05-B1D32AAB3F82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaNetTool", "KaNetTool\KaNetTool.csproj", "{53C753E9-83E5-48A8-BF0F-34BF7134B02E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaNetTool", "KaNetTool\KaNetTool.csproj", "{53C753E9-83E5-48A8-BF0F-34BF7134B02E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,7 +54,6 @@ Global
 		{21EC260A-2D83-4675-9455-71742391ACCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21EC260A-2D83-4675-9455-71742391ACCE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1421471-DCEB-4F96-AF3E-5C2DC1F7CF86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1421471-DCEB-4F96-AF3E-5C2DC1F7CF86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1421471-DCEB-4F96-AF3E-5C2DC1F7CF86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1421471-DCEB-4F96-AF3E-5C2DC1F7CF86}.Release|Any CPU.Build.0 = Release|Any CPU
 		{025037AA-D3CC-41B7-9B3D-BBE9DF75AD0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

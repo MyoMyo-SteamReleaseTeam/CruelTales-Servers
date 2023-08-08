@@ -1,13 +1,14 @@
 ﻿using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Synchronizations;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
 using log4net;
 
 namespace CTS.Instance.Gameplay
 {
-	public class NetworkPlayer
+	public class NetworkPlayer : INetworkPlayer
 	{
 		// Log
 		private readonly static ILog _log = LogManager.GetLogger(typeof(NetworkPlayer));

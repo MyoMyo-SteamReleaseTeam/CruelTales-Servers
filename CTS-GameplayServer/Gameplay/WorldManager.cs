@@ -33,7 +33,7 @@ namespace CTS.Instance.Gameplay
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
 		private Queue<MasterNetworkObject> _destroyObjectStack;
 
-		private Queue<MasterNetworkObject> _createObjectEueue;
+		private Queue<MasterNetworkObject> _createObjectQueue;
 
 		private NetworkIdentity _idCounter;
 
@@ -59,7 +59,7 @@ namespace CTS.Instance.Gameplay
 			// Network Object Management
 			_objectPoolManager = new();
 			_destroyObjectStack = new(option.WorldMaximumObjectCount);
-			_createObjectEueue = new(option.WorldMaximumObjectCount);
+			_createObjectQueue = new(option.WorldMaximumObjectCount);
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
@@ -126,9 +126,9 @@ namespace CTS.Instance.Gameplay
 
 		public void UpdateObjectLifeCycle()
 		{
-			while (_createObjectEueue.Count > 0)
+			while (_createObjectQueue.Count > 0)
 			{
-				var createdObj = _createObjectEueue.Dequeue();
+				var createdObj = _createObjectQueue.Dequeue();
 				createdObj.InitializeAfterFrame();
 				_networkObjectById.Add(createdObj.Identity, createdObj);
 			}
@@ -192,8 +192,7 @@ namespace CTS.Instance.Gameplay
 							  getNetworkIdentityCounter(),
 							  position, 
 							  rotation: 0);
-			netObj.OnCreated();
-			_createObjectEueue.Enqueue(netObj);
+			_createObjectQueue.Enqueue(netObj);
 
 			return netObj;
 

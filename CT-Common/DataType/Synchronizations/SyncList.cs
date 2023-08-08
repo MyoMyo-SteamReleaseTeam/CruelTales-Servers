@@ -19,8 +19,8 @@ namespace CT.Common.DataType.Synchronizations
 			public byte Index;
 		}
 
-		private List<T> _list = new(8);
-		private List<SyncToken> _syncOperations = new();
+		private List<T> _list;
+		private List<SyncToken> _syncOperations;
 
 		public event Action<int>? OnRemoved;
 		public event Action<int>? OnChanged;
@@ -30,6 +30,12 @@ namespace CT.Common.DataType.Synchronizations
 
 		public int Count => _list.Count;
 		public bool IsDirtyReliable => _syncOperations.Count > 0;
+
+		public SyncList(int capacity = 8)
+		{
+			_list = new List<T>(capacity);
+			_syncOperations = new List<SyncToken>(4);
+		}
 
 		public T this[int index]
 		{

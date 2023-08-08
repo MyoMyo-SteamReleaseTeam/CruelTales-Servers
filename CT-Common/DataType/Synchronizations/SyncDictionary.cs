@@ -21,8 +21,8 @@ namespace CT.Common.DataType.Synchronizations
 			public Value Value;
 		}
 
-		private Dictionary<Key, Value> _dictionary = new(8);
-		private List<SyncToken> _syncOperations = new();
+		private Dictionary<Key, Value> _dictionary;
+		private List<SyncToken> _syncOperations;
 
 		public event Action<Key>? OnRemoved;
 		public event Action<Key>? OnChanged;
@@ -34,6 +34,12 @@ namespace CT.Common.DataType.Synchronizations
 
 		public int Count => _dictionary.Count;
 		public bool IsDirtyReliable => _syncOperations.Count > 0;
+
+		public SyncDictionary(int capacity = 8)
+		{
+			_dictionary = new(capacity);
+			_syncOperations = new(4);
+		}
 
 		public Value this[Key key]
 		{

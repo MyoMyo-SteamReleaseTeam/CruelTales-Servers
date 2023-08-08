@@ -27,195 +27,97 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class GameplayController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
+		[SyncObject(dir: SyncDirection.FromRemote)]
+		private readonly RoomSessionManager _sessionManager = new();
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync();
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_OnMapLoaded();
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void ClientRoomSetReq_SetPassword(int password);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void ClientRoomSetReq_SetRoomName(NetStringShort roomName);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void ClientRoomSetReq_SetRoomDiscription(NetStringShort roomDiscription);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void ClientRoomSetReq_SetRoomMaxUser(int maxUser);
-		[SyncVar]
-		private int _currentPlayerCount;
-		public int CurrentPlayerCount => _currentPlayerCount;
-		private Action<int>? _onCurrentPlayerCountChanged;
-		public event Action<int> OnCurrentPlayerCountChanged
+		private Action<RoomSessionManager>? _onSessionManagerChanged;
+		public event Action<RoomSessionManager> OnSessionManagerChanged
 		{
-			add => _onCurrentPlayerCountChanged += value;
-			remove => _onCurrentPlayerCountChanged -= value;
-		}
-		[SyncVar]
-		private NetStringShort _roomName = new();
-		public NetStringShort RoomName => _roomName;
-		private Action<NetStringShort>? _onRoomNameChanged;
-		public event Action<NetStringShort> OnRoomNameChanged
-		{
-			add => _onRoomNameChanged += value;
-			remove => _onRoomNameChanged -= value;
-		}
-		[SyncVar]
-		private NetStringShort _roomDiscription = new();
-		public NetStringShort RoomDiscription => _roomDiscription;
-		private Action<NetStringShort>? _onRoomDiscriptionChanged;
-		public event Action<NetStringShort> OnRoomDiscriptionChanged
-		{
-			add => _onRoomDiscriptionChanged += value;
-			remove => _onRoomDiscriptionChanged -= value;
-		}
-		[SyncVar]
-		private int _password;
-		public int Password => _password;
-		private Action<int>? _onPasswordChanged;
-		public event Action<int> OnPasswordChanged
-		{
-			add => _onPasswordChanged += value;
-			remove => _onPasswordChanged -= value;
+			add => _onSessionManagerChanged += value;
+			remove => _onSessionManagerChanged -= value;
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(GameMapType mapType);
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void ServerRoomSetAck_Callback(RoomSettingResult callback);
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{
 			get
 			{
 				bool isDirty = false;
+				isDirty |= _sessionManager.IsDirtyReliable;
 				isDirty |= _dirtyReliable_0.AnyTrue();
 				return isDirty;
 			}
 		}
 		public override bool IsDirtyUnreliable => false;
+		public RoomSessionManager SessionManager => _sessionManager;
 		public partial void Client_ReadyToSync()
 		{
 			Client_ReadyToSyncCallstackCount++;
-			_dirtyReliable_0[0] = true;
+			_dirtyReliable_0[1] = true;
 		}
 		private byte Client_ReadyToSyncCallstackCount = 0;
 		public partial void Client_OnMapLoaded()
 		{
 			Client_OnMapLoadedCallstackCount++;
-			_dirtyReliable_0[1] = true;
-		}
-		private byte Client_OnMapLoadedCallstackCount = 0;
-		public partial void ClientRoomSetReq_SetPassword(int password)
-		{
-			ClientRoomSetReq_SetPasswordiCallstack.Add(password);
 			_dirtyReliable_0[2] = true;
 		}
-		private List<int> ClientRoomSetReq_SetPasswordiCallstack = new(4);
-		public partial void ClientRoomSetReq_SetRoomName(NetStringShort roomName)
-		{
-			ClientRoomSetReq_SetRoomNameNCallstack.Add(roomName);
-			_dirtyReliable_0[3] = true;
-		}
-		private List<NetStringShort> ClientRoomSetReq_SetRoomNameNCallstack = new(4);
-		public partial void ClientRoomSetReq_SetRoomDiscription(NetStringShort roomDiscription)
-		{
-			ClientRoomSetReq_SetRoomDiscriptionNCallstack.Add(roomDiscription);
-			_dirtyReliable_0[4] = true;
-		}
-		private List<NetStringShort> ClientRoomSetReq_SetRoomDiscriptionNCallstack = new(4);
-		public partial void ClientRoomSetReq_SetRoomMaxUser(int maxUser)
-		{
-			ClientRoomSetReq_SetRoomMaxUseriCallstack.Add(maxUser);
-			_dirtyReliable_0[5] = true;
-		}
-		private List<int> ClientRoomSetReq_SetRoomMaxUseriCallstack = new(4);
+		private byte Client_OnMapLoadedCallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
+			_sessionManager.ClearDirtyReliable();
 			Client_ReadyToSyncCallstackCount = 0;
 			Client_OnMapLoadedCallstackCount = 0;
-			ClientRoomSetReq_SetPasswordiCallstack.Clear();
-			ClientRoomSetReq_SetRoomNameNCallstack.Clear();
-			ClientRoomSetReq_SetRoomDiscriptionNCallstack.Clear();
-			ClientRoomSetReq_SetRoomMaxUseriCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			_dirtyReliable_0[0] = _sessionManager.IsDirtyReliable;
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				writer.Put((byte)Client_ReadyToSyncCallstackCount);
+				_sessionManager.SerializeSyncReliable(writer);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				writer.Put((byte)Client_OnMapLoadedCallstackCount);
+				writer.Put((byte)Client_ReadyToSyncCallstackCount);
 			}
 			if (_dirtyReliable_0[2])
 			{
-				byte count = (byte)ClientRoomSetReq_SetPasswordiCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = ClientRoomSetReq_SetPasswordiCallstack[i];
-					writer.Put(arg);
-				}
+				writer.Put((byte)Client_OnMapLoadedCallstackCount);
 			}
-			if (_dirtyReliable_0[3])
+			if (dirtyReliable_0.AnyTrue())
 			{
-				byte count = (byte)ClientRoomSetReq_SetRoomNameNCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = ClientRoomSetReq_SetRoomNameNCallstack[i];
-					arg.Serialize(writer);
-				}
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
 			}
-			if (_dirtyReliable_0[4])
+			else
 			{
-				byte count = (byte)ClientRoomSetReq_SetRoomDiscriptionNCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = ClientRoomSetReq_SetRoomDiscriptionNCallstack[i];
-					arg.Serialize(writer);
-				}
-			}
-			if (_dirtyReliable_0[5])
-			{
-				byte count = (byte)ClientRoomSetReq_SetRoomMaxUseriCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = ClientRoomSetReq_SetRoomMaxUseriCallstack[i];
-					writer.Put(arg);
-				}
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public override void SerializeEveryProperty(IPacketWriter writer) { }
-		public override void InitializeMasterProperties() { }
+		public override void SerializeEveryProperty(IPacketWriter writer)
+		{
+			_sessionManager.SerializeEveryProperty(writer);
+		}
+		public override void InitializeMasterProperties()
+		{
+			_sessionManager.InitializeRemoteProperties();
+		}
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				if (!reader.TryReadInt32(out _currentPlayerCount)) return false;
-				_onCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
+				if (!_sessionManager.TryDeserializeSyncReliable(reader)) return false;
+				_onSessionManagerChanged?.Invoke(_sessionManager);
 			}
 			if (dirtyReliable_0[1])
-			{
-				if (!_roomName.TryDeserialize(reader)) return false;
-				_onRoomNameChanged?.Invoke(_roomName);
-			}
-			if (dirtyReliable_0[2])
-			{
-				if (!_roomDiscription.TryDeserialize(reader)) return false;
-				_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
-			}
-			if (dirtyReliable_0[3])
-			{
-				if (!reader.TryReadInt32(out _password)) return false;
-				_onPasswordChanged?.Invoke(_password);
-			}
-			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -225,71 +127,32 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 					Server_LoadGame(mapType);
 				}
 			}
-			if (dirtyReliable_0[5])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					if (!reader.TryReadByte(out var callbackValue)) return false;
-					RoomSettingResult callback = (RoomSettingResult)callbackValue;
-					ServerRoomSetAck_Callback(callback);
-				}
-			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			if (!reader.TryReadInt32(out _currentPlayerCount)) return false;
-			_onCurrentPlayerCountChanged?.Invoke(_currentPlayerCount);
-			if (!_roomName.TryDeserialize(reader)) return false;
-			_onRoomNameChanged?.Invoke(_roomName);
-			if (!_roomDiscription.TryDeserialize(reader)) return false;
-			_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
-			if (!reader.TryReadInt32(out _password)) return false;
-			_onPasswordChanged?.Invoke(_password);
+			if (!_sessionManager.TryDeserializeEveryProperty(reader)) return false;
+			_onSessionManagerChanged?.Invoke(_sessionManager);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
 		{
-			_currentPlayerCount = 0;
-			_roomName = new();
-			_roomDiscription = new();
-			_password = 0;
+			_sessionManager.InitializeRemoteProperties();
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				reader.Ignore(4);
+				_sessionManager.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[1])
-			{
-				NetStringShort.IgnoreStatic(reader);
-			}
-			if (dirtyReliable_0[2])
-			{
-				NetStringShort.IgnoreStatic(reader);
-			}
-			if (dirtyReliable_0[3])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(2);
-				}
-			}
-			if (dirtyReliable_0[5])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					reader.Ignore(1);
 				}
 			}
 		}
@@ -298,34 +161,14 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				reader.Ignore(4);
+				RoomSessionManager.IgnoreSyncStaticReliable(reader);
 			}
 			if (dirtyReliable_0[1])
-			{
-				NetStringShort.IgnoreStatic(reader);
-			}
-			if (dirtyReliable_0[2])
-			{
-				NetStringShort.IgnoreStatic(reader);
-			}
-			if (dirtyReliable_0[3])
-			{
-				reader.Ignore(4);
-			}
-			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(2);
-				}
-			}
-			if (dirtyReliable_0[5])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					reader.Ignore(1);
 				}
 			}
 		}

@@ -26,7 +26,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					return true;
 				else  if (m is SyncObjectMemberToken)
 				{
-					if (m.TypeName.Contains(NameTable.SyncList))
+					if (NameTable.IsCollection(m.TypeName))
 						return false;
 
 					if (!SynchronizerGenerator.TryGetSyncObjectByTypeName(m.TypeName, out var syncObjectInfo) ||

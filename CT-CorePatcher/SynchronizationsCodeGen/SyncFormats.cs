@@ -1,4 +1,6 @@
-﻿using CT.Common.Synchronizations;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
@@ -17,7 +19,21 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static string NetworkPlayerTypeName => "NetworkPlayer";
 		public static string NetworkPlayerParameter => $"{NetworkPlayerTypeName} {NetworkPlayerParameterName}";
 		public static string SerializeTargetName => "Target";
-		public static string SyncList => "SyncList";
+
+		private static HashSet<string> _collectionNames = new()
+		{
+			"SyncList", "SyncDictionary"
+		};
+
+		public static bool IsCollection(string typeName)
+		{
+			return _collectionNames.Contains(typeName);
+		}
+
+		public static bool GetTypeName(FieldInfo field)
+		{
+
+		}
 
 		/// <summary>Master 혹은 Remote 문자열을 SyncDirection 로 반환받습니다.</summary>
 		public static string GetDirectionStringBy(SyncDirection direction)

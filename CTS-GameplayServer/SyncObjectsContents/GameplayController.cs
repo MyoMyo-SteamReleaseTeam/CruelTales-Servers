@@ -20,6 +20,20 @@ namespace CTS.Instance.SyncObjects
 		public MiniGameController? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
+		public override void OnUpdate(float deltaTime)
+		{
+			// Update minigame controller
+			MiniGameController?.Update();
+		}
+
+		public override void OnCreated()
+		{
+			SessionManager.Initialize(this);
+
+			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_Dueoksini_0);
+			MiniGameController.OnGameStart();
+		}
+
 		public void OnPlayerEnter(NetworkPlayer player)
 		{
 			if (!PlayerSet.Add(player))
@@ -35,7 +49,6 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			MiniGameController?.OnPlayerEnter(player);
-			CurrentPlayerCount = PlayerSet.Count;
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
@@ -57,19 +70,6 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			MiniGameController?.OnPlayerLeave(player);
-			CurrentPlayerCount = PlayerSet.Count;
-		}
-
-		public override void OnUpdate(float deltaTime)
-		{
-			// Update minigame controller
-			MiniGameController?.Update();
-		}
-
-		public override void OnCreated()
-		{
-			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_Dueoksini_0);
-			MiniGameController.OnGameStart();
 		}
 
 		public partial void Client_ReadyToSync(NetworkPlayer player)
@@ -82,72 +82,5 @@ namespace CTS.Instance.SyncObjects
 		{
 			player.CanSeeViewObject = true;
 		}
-
-		#region Room Setting Request
-
-		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)
-		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Password = password;
-				Password = GameplayManager.RoomOption.Password;
-			}
-		}
-
-		public partial void ClientRoomSetReq_SetRoomName(NetworkPlayer player, NetStringShort roomName)
-		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Name = roomName;
-				RoomName = roomName;
-			}
-		}
-
-		public partial void ClientRoomSetReq_SetRoomDiscription(NetworkPlayer player, NetStringShort roomDiscription)
-		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Discription = roomDiscription;
-				RoomDiscription = roomDiscription;
-			}
-		}
-
-		public partial void ClientRoomSetReq_SetRoomMaxUser(NetworkPlayer player, int maxUser)
-		{
-			if (checkAuthOrDisconnect(player))
-			{
-				if (GameplayManager.CurrentPlayerCount > maxUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.MaximumUsersReached);
-					return;
-				}
-
-				if (GameplayManager.CurrentPlayerCount < GameplayManager.Option.SystemMinUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.MinimumUsersRequired);
-					return;
-				}
-
-				if (maxUser > GameplayManager.Option.SystemMaxUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMaxUserUnderConnections);
-					return;
-				}
-
-				GameplayManager.RoomOption.MaxUser = maxUser;
-			}
-		}
-
-		private bool checkAuthOrDisconnect(NetworkPlayer player)
-		{
-			if (!player.IsHost)
-			{
-				player.Session?.Disconnect(DisconnectReasonType.ServerError_YouAreNotHost);
-			}
-
-			return player.IsHost;
-		}
-
-		#endregion
 	}
 }

@@ -79,7 +79,7 @@ namespace CTS.Instance.Gameplay
 			// Reset dirtys
 			WorldManager.ClearDirtys();
 
-			// Remove objects
+			// Update objects life cycle
 			WorldManager.UpdateObjectLifeCycle();
 		}
 

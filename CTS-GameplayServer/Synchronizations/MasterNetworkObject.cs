@@ -114,6 +114,8 @@ namespace CTS.Instance.Synchronizations
 
 		public void InitializeAfterFrame()
 		{
+			OnCreated();
+
 			// Add to trace visibility
 			if (Visibility == VisibilityType.View)
 			{

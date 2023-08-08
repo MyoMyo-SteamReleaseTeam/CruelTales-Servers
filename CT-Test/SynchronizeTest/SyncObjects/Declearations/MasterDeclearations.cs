@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
-using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;

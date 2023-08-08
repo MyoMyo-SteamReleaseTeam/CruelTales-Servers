@@ -1,246 +1,247 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using CT.Common.Exceptions;
-using CT.Common.Serialization;
-using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Diagnostics;
+//using CT.Common.Exceptions;
+//using CT.Common.Serialization;
+//using CT.Common.Synchronizations;
+//using CT.Common.Tools.Collections;
 
-namespace CT.Common.DataType.Synchronizations
-{
-	/// <summary>동기화 객체의 배열을 동기화하는 Collection 입니다.</summary>
-	[Obsolete("테스트 되지 않았습니다.")]
-	public class SyncObjectList<T> : IRemoteSynchronizable where T : IRemoteSynchronizable, new()
-	{
-		private struct CollectionOperationToken
-		{
-			public CollectionSyncType Operation;
-			public T Data;
-			public byte Index;
-		}
+//namespace CT.Common.DataType.Synchronizations
+//{
+//	/// <summary>동기화 객체의 배열을 동기화하는 Collection 입니다.</summary>
+//	[Obsolete("테스트 되지 않았습니다.")]
+//	public class SyncObjectList<T> : IRemoteSynchronizable
+//		where T : IRemoteSynchronizable, IMasterSynchronizable, new()
+//	{
+//		private struct SyncToken
+//		{
+//			public CollectionSyncType Operation;
+//			public T Data;
+//			public byte Index;
+//		}
 
-		private List<T> _list = new(8);
-		private List<CollectionOperationToken> _operationStack = new();
+//		private List<T> _list = new(8);
+//		private List<SyncToken> _operationStack = new();
 
-		public int Count => _list.Count;
+//		public int Count => _list.Count;
 
-		public bool IsDirtyReliable
-		{
-			get
-			{
-				if (_operationStack.Count > 0)
-					return true;
+//		public bool IsDirtyReliable
+//		{
+//			get
+//			{
+//				if (_operationStack.Count > 0)
+//					return true;
 
-				for (int i = 0; i < _list.Count; i++)
-				{
-					if (_list[i].IsDirtyReliable)
-						return true;
-				}
+//				for (int i = 0; i < _list.Count; i++)
+//				{
+//					if (_list[i].IsDirtyReliable)
+//						return true;
+//				}
 
-				return false;
-			}
-		}
+//				return false;
+//			}
+//		}
 
-		public void Add(T item)
-		{
-			_list.Add(item);
-			_operationStack.Add(new CollectionOperationToken()
-			{
-				Data = item,
-				Operation = CollectionSyncType.Add
-			});
-		}
+//		public void Add(T item)
+//		{
+//			_list.Add(item);
+//			_operationStack.Add(new SyncToken()
+//			{
+//				Data = item,
+//				Operation = CollectionSyncType.Add
+//			});
+//		}
 
-		public void Remove(T item)
-		{
-			byte removeIndex = 0;
-			for (byte i = 0; i < _list.Count; i++)
-			{
-				if (_list[i].Equals(item))
-				{
-					removeIndex = i;
-					break;
-				}
-			}
+//		public void Remove(T item)
+//		{
+//			byte removeIndex = 0;
+//			for (byte i = 0; i < _list.Count; i++)
+//			{
+//				if (_list[i].Equals(item))
+//				{
+//					removeIndex = i;
+//					break;
+//				}
+//			}
 
-			_list.RemoveAt(removeIndex);
-			_operationStack.Add(new CollectionOperationToken()
-			{
-				Operation = CollectionSyncType.Remove,
-				Index = removeIndex
-			});
-		}
+//			_list.RemoveAt(removeIndex);
+//			_operationStack.Add(new SyncToken()
+//			{
+//				Operation = CollectionSyncType.Remove,
+//				Index = removeIndex
+//			});
+//		}
 
-		public void Clear()
-		{
-			_list.Clear();
-			_operationStack.Add(new CollectionOperationToken()
-			{
-				Operation = CollectionSyncType.Clear,
-			});
-		}
+//		public void Clear()
+//		{
+//			_list.Clear();
+//			_operationStack.Add(new SyncToken()
+//			{
+//				Operation = CollectionSyncType.Clear,
+//			});
+//		}
 
-		public bool Contains(T item)
-		{
-			return _list.Contains(item);
-		}
+//		public bool Contains(T item)
+//		{
+//			return _list.Contains(item);
+//		}
 
-		public void ClearDirtyReliable()
-		{
-			_operationStack.Clear();
-		}
+//		public void ClearDirtyReliable()
+//		{
+//			_operationStack.Clear();
+//		}
 
-		public void SerializeEveryProperty(IPacketWriter writer)
-		{
-			writer.Put((byte)_list.Count);
-			for (int i = 0; i < _list.Count; i++)
-			{
-				_list[i].SerializeEveryProperty(writer);
-			}
-		}
+//		public void SerializeEveryProperty(IPacketWriter writer)
+//		{
+//			writer.Put((byte)_list.Count);
+//			for (int i = 0; i < _list.Count; i++)
+//			{
+//				_list[i].SerializeEveryProperty(writer);
+//			}
+//		}
 
-		public bool TryDeserializeEveryProperty(IPacketReader reader)
-		{
-			byte count = reader.ReadByte();
-			for (int i = 0; i < count; i++)
-			{
-				T item = new();
-				if (!item.TryDeserializeEveryProperty(reader))
-				{
-					return false;
-				}
-				_list.Add(item);
-			}
-			return true;
-		}
+//		public bool TryDeserializeEveryProperty(IPacketReader reader)
+//		{
+//			byte count = reader.ReadByte();
+//			for (int i = 0; i < count; i++)
+//			{
+//				T item = new();
+//				if (!item.TryDeserializeEveryProperty(reader))
+//				{
+//					return false;
+//				}
+//				_list.Add(item);
+//			}
+//			return true;
+//		}
 
-		public void SerializeSyncReliable(IPacketWriter writer)
-		{
-			BitmaskByte masterDirty = new BitmaskByte();
-			masterDirty[0] = _operationStack.Count > 0;
-			byte changeCount = 0;
-			for (int i = 0; i < _list.Count; i++)
-			{
-				if (_list[i].IsDirtyReliable)
-				{
-					changeCount ++;
-				}
-			}
-			masterDirty[1] = changeCount > 0;
+//		public void SerializeSyncReliable(IPacketWriter writer)
+//		{
+//			BitmaskByte masterDirty = new BitmaskByte();
+//			masterDirty[0] = _operationStack.Count > 0;
+//			byte changeCount = 0;
+//			for (int i = 0; i < _list.Count; i++)
+//			{
+//				if (_list[i].IsDirtyReliable)
+//				{
+//					changeCount ++;
+//				}
+//			}
+//			masterDirty[1] = changeCount > 0;
 
-			writer.Put(masterDirty);
+//			writer.Put(masterDirty);
 
-			// Serialize if there is even a single operation
-			if (masterDirty[0])
-			{
-				byte operationCount = (byte)_operationStack.Count;
-				writer.Put(operationCount);
-				for (int i = 0; i < operationCount; i++)
-				{
-					var opToken = _operationStack[i];
-					writer.Put((byte)opToken.Operation);
+//			// Serialize if there is even a single operation
+//			if (masterDirty[0])
+//			{
+//				byte operationCount = (byte)_operationStack.Count;
+//				writer.Put(operationCount);
+//				for (int i = 0; i < operationCount; i++)
+//				{
+//					var opToken = _operationStack[i];
+//					writer.Put((byte)opToken.Operation);
 
-					switch (opToken.Operation)
-					{
-						case CollectionSyncType.Clear:
-							break;
+//					switch (opToken.Operation)
+//					{
+//						case CollectionSyncType.Clear:
+//							break;
 
-						case CollectionSyncType.Add:
-							opToken.Data.SerializeEveryProperty(writer);
-							break;
+//						case CollectionSyncType.Add:
+//							opToken.Data.SerializeEveryProperty(writer);
+//							break;
 
-						case CollectionSyncType.Remove:
-							writer.Put(opToken.Index);
-							break;
+//						case CollectionSyncType.Remove:
+//							writer.Put(opToken.Index);
+//							break;
 
-						default:
-							Debug.Assert(false);
-							break;
-					}
-				}
-			}
+//						default:
+//							Debug.Assert(false);
+//							break;
+//					}
+//				}
+//			}
 
-			// Serialize if dirty objects
-			if (masterDirty[1])
-			{
-				writer.Put(changeCount);
-				for (byte i = 0; i < _list.Count; i++)
-				{
-					if (_list[i].IsDirtyReliable)
-					{
-						writer.Put(i);
-						_list[i].SerializeSyncReliable(writer);
-					}
-				}
-			}
-		}
+//			// Serialize if dirty objects
+//			if (masterDirty[1])
+//			{
+//				writer.Put(changeCount);
+//				for (byte i = 0; i < _list.Count; i++)
+//				{
+//					if (_list[i].IsDirtyReliable)
+//					{
+//						writer.Put(i);
+//						_list[i].SerializeSyncReliable(writer);
+//					}
+//				}
+//			}
+//		}
 
-		public bool TryDeserializeSyncReliable(IPacketReader reader)
-		{
-			BitmaskByte masterDirty = reader.ReadBitmaskByte();
+//		public bool TryDeserializeSyncReliable(IPacketReader reader)
+//		{
+//			BitmaskByte masterDirty = reader.ReadBitmaskByte();
 
-			// Serialize if there is even a single operation
-			if (masterDirty[0])
-			{
-				byte operationCount = reader.ReadByte();
-				for (int i = 0; i < operationCount; i++)
-				{
-					var operation = (CollectionSyncType)reader.ReadByte();
-					switch (operation)
-					{
-						case CollectionSyncType.Clear:
-							_list.Clear();
-							break;
+//			// Serialize if there is even a single operation
+//			if (masterDirty[0])
+//			{
+//				byte operationCount = reader.ReadByte();
+//				for (int i = 0; i < operationCount; i++)
+//				{
+//					var operation = (CollectionSyncType)reader.ReadByte();
+//					switch (operation)
+//					{
+//						case CollectionSyncType.Clear:
+//							_list.Clear();
+//							break;
 
-						case CollectionSyncType.Add:
-							T data = new T();
-							if (!data.TryDeserializeEveryProperty(reader))
-							{
-								return false;
-							}
-							_list.Add(data);
-							break;
+//						case CollectionSyncType.Add:
+//							T data = new T();
+//							if (!data.TryDeserializeEveryProperty(reader))
+//							{
+//								return false;
+//							}
+//							_list.Add(data);
+//							break;
 
-						case CollectionSyncType.Remove:
-							byte index = reader.ReadByte();
-							_list.RemoveAt(index);
-							break;
+//						case CollectionSyncType.Remove:
+//							byte index = reader.ReadByte();
+//							_list.RemoveAt(index);
+//							break;
 
-						default:
-							Debug.Assert(false);
-							break;
-					}
-				}
-			}
+//						default:
+//							Debug.Assert(false);
+//							break;
+//					}
+//				}
+//			}
 
-			// Serialize if dirty objects
-			if (masterDirty[1])
-			{
-				byte changeCount = reader.ReadByte();
-				for (int i = 0; i < changeCount; i++)
-				{
-					byte index = reader.ReadByte();
-					if (!_list[index].TryDeserializeSyncReliable(reader))
-					{
-						return false;
-					}
-				}
-			}
+//			// Serialize if dirty objects
+//			if (masterDirty[1])
+//			{
+//				byte changeCount = reader.ReadByte();
+//				for (int i = 0; i < changeCount; i++)
+//				{
+//					byte index = reader.ReadByte();
+//					if (!_list[index].TryDeserializeSyncReliable(reader))
+//					{
+//						return false;
+//					}
+//				}
+//			}
 
-			return true;
-		}
+//			return true;
+//		}
 
-		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
-		public bool IsDirtyUnreliable => throw _exception;
-		public void ClearDirtyUnreliable() => throw _exception;
-		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
-		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
-		#if NET
-		public static void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
-		public static void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
-#else
-		public void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
-		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
-#endif
-	}
-}
+//		private static readonly WrongSyncType _exception = new WrongSyncType(SyncType.Unreliable);
+//		public bool IsDirtyUnreliable => throw _exception;
+//		public void ClearDirtyUnreliable() => throw _exception;
+//		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw _exception;
+//		public void SerializeSyncUnreliable(IPacketWriter writer) => throw _exception;
+//		#if NET
+//		public static void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
+//		public static void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
+//#else
+//		public void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
+//		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
+//#endif
+//	}
+//}
