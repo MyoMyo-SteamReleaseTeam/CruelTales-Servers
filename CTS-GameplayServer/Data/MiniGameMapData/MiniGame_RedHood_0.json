@@ -38,10 +38,10 @@
   "EnvironmentColliders": [
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -25.97495,
-        "Y": 19.1309338
+        "X": -98.57495,
+        "Y": 37.0309334
       },
       "Rotation": 0.0,
       "Radius": 9.113555,
@@ -51,10 +51,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -8.826645,
-        "Y": 21.3746662
+        "X": -81.42664,
+        "Y": 39.2746658
       },
       "Rotation": 0.0,
       "Radius": 8.03475,
@@ -64,10 +64,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -9.27,
-        "Y": 17.24
+        "X": -81.8699951,
+        "Y": 35.14
       },
       "Rotation": 0.0,
       "Radius": 2.69073939,
@@ -77,10 +77,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 4.57652855,
-        "Y": 11.9128571
+        "X": -68.02347,
+        "Y": 29.8128567
       },
       "Rotation": 0.0,
       "Radius": 5.36842346,
@@ -90,10 +90,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -26.1679249,
-        "Y": -7.76
+        "X": -98.76792,
+        "Y": 10.1399994
       },
       "Rotation": 0.0,
       "Radius": 8.920578,
@@ -103,10 +103,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 15.8972254,
-        "Y": 15.35861
+        "X": -56.702774,
+        "Y": 33.25861
       },
       "Rotation": 0.0,
       "Radius": 5.952274,
@@ -116,10 +116,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -34.6240349,
-        "Y": 2.78694
+        "X": -107.22403,
+        "Y": 20.68694
       },
       "Rotation": 0.0,
       "Radius": 0.464469731,
@@ -129,10 +129,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 37.9517555,
-        "Y": 3.13427162
+        "X": -34.648243,
+        "Y": 21.0342712
       },
       "Rotation": 0.0,
       "Radius": 0.64370954,
@@ -142,10 +142,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 37.69,
-        "Y": -20.82071
+        "X": -34.91,
+        "Y": -2.92070961
       },
       "Rotation": 0.0,
       "Radius": 0.64370954,
@@ -155,10 +155,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -0.24,
-        "Y": -29.9427032
+        "X": -72.84,
+        "Y": -12.0427036
       },
       "Rotation": 0.0,
       "Radius": 40.5189819,
@@ -168,10 +168,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 13.52,
-        "Y": -3.74
+        "X": -59.079998,
+        "Y": 14.16
       },
       "Rotation": 0.0,
       "Radius": 8.305951,
@@ -181,10 +181,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 0.09083605,
-        "Y": -7.10704565
+        "X": -72.50916,
+        "Y": 10.7929535
       },
       "Rotation": 5.790945,
       "Radius": 7.03286457,
@@ -194,10 +194,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -16.9621315,
-        "Y": -15.9550991
+        "X": -89.56213,
+        "Y": 1.94490051
       },
       "Rotation": 5.790945,
       "Radius": 8.869164,
@@ -207,10 +207,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -14.0578289,
-        "Y": -26.3977146
+        "X": -86.65783,
+        "Y": -8.497715
       },
       "Rotation": 5.790945,
       "Radius": 8.886002,
@@ -220,10 +220,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -8.88,
-        "Y": -11.69
+        "X": -81.4799957,
+        "Y": 6.21
       },
       "Rotation": 5.44446945,
       "Radius": 0.507082641,
@@ -233,10 +233,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -6.25,
-        "Y": -10.2
+        "X": -78.85,
+        "Y": 7.7
       },
       "Rotation": 5.44446945,
       "Radius": 0.7351684,
@@ -246,10 +246,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -27.22,
-        "Y": 2.59
+        "X": -99.82,
+        "Y": 20.49
       },
       "Rotation": 0.0,
       "Radius": 3.907587,
@@ -259,10 +259,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 2.805,
-        "Y": -11.49
+        "X": -69.795,
+        "Y": 6.41
       },
       "Rotation": 0.0,
       "Radius": 1.6423434,
@@ -272,10 +272,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 13.78,
-        "Y": -12.0471926
+        "X": -58.82,
+        "Y": 5.852807
       },
       "Rotation": 0.0,
       "Radius": 6.8815074,
@@ -285,10 +285,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 18.83,
-        "Y": -19.67
+        "X": -53.7699966,
+        "Y": -1.77000046
       },
       "Rotation": 0.0,
       "Radius": 4.366458,
@@ -298,10 +298,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 18.79,
-        "Y": -20.96
+        "X": -53.8099976,
+        "Y": -3.05999947
       },
       "Rotation": 0.0,
       "Radius": 2.95440173,
@@ -311,10 +311,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 27.93,
-        "Y": -19.56
+        "X": -44.67,
+        "Y": -1.65999985
       },
       "Rotation": 0.0,
       "Radius": 0.191704229,
@@ -324,10 +324,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 31.32,
-        "Y": -19.56
+        "X": -41.28,
+        "Y": -1.65999985
       },
       "Rotation": 0.0,
       "Radius": 0.191704229,
@@ -337,10 +337,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 33.8384666,
-        "Y": -18.968977
+        "X": -38.76153,
+        "Y": -1.06897736
       },
       "Rotation": 0.0,
       "Radius": 2.32676458,
@@ -350,10 +350,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 25.3572788,
-        "Y": -18.3701744
+        "X": -47.24272,
+        "Y": -0.4701748
       },
       "Rotation": 0.146603137,
       "Radius": 2.6206696,
@@ -363,10 +363,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 11.4,
-        "Y": -21.55
+        "X": -61.1999969,
+        "Y": -3.64999962
       },
       "Rotation": 5.69905758,
       "Radius": 0.191704229,
@@ -376,10 +376,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 6.62849951,
-        "Y": -22.3873768
+        "X": -65.9715,
+        "Y": -4.487377
       },
       "Rotation": 5.37351131,
       "Radius": 1.41233671,
@@ -389,10 +389,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 13.467021,
-        "Y": -19.22819
+        "X": -59.1329765,
+        "Y": -1.32818985
       },
       "Rotation": 5.69905758,
       "Radius": 2.813004,
@@ -402,10 +402,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 17.06,
-        "Y": 12.35
+        "X": -55.54,
+        "Y": 30.25
       },
       "Rotation": 0.0,
       "Radius": 2.90049815,
@@ -415,10 +415,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 30.57,
-        "Y": 12.36
+        "X": -42.03,
+        "Y": 30.2599983
       },
       "Rotation": 0.0,
       "Radius": 2.58360934,
@@ -428,10 +428,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 34.33,
-        "Y": 5.31
+        "X": -38.2699966,
+        "Y": 23.21
       },
       "Rotation": 0.0,
       "Radius": 2.4906168,
@@ -441,10 +441,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 14.28,
-        "Y": 6.47
+        "X": -58.32,
+        "Y": 24.3699989
       },
       "Rotation": 0.0,
       "Radius": 0.75067544,
@@ -454,10 +454,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 18.1,
-        "Y": 2.25
+        "X": -54.5,
+        "Y": 20.15
       },
       "Rotation": 0.0,
       "Radius": 0.694113255,
@@ -467,10 +467,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -6.07,
-        "Y": -4.05
+        "X": -78.67,
+        "Y": 13.8499994
       },
       "Rotation": 0.0,
       "Radius": 0.452659518,
@@ -480,10 +480,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 33.9020233,
-        "Y": -13.515625
+        "X": -38.6979752,
+        "Y": 4.38437462
       },
       "Rotation": 0.0,
       "Radius": 1.39192092,
@@ -493,10 +493,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 29.726263,
-        "Y": -11.8716116
+        "X": -42.8737335,
+        "Y": 6.028388
       },
       "Rotation": 0.0,
       "Radius": 1.39192092,
@@ -506,10 +506,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -10.625,
-        "Y": 3.522
+        "X": -83.225,
+        "Y": 21.421999
       },
       "Rotation": 0.0,
       "Radius": 0.3283728,
@@ -519,10 +519,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 5.33560133,
-        "Y": -24.91303
+        "X": -67.2644,
+        "Y": -7.013031
       },
       "Rotation": 4.997521,
       "Radius": 1.62093878,
@@ -532,10 +532,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 4.797503,
-        "Y": -27.84157
+        "X": -67.8025,
+        "Y": -9.94157
       },
       "Rotation": 4.77514172,
       "Radius": 1.41233671,
@@ -545,10 +545,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 24.4000549,
-        "Y": 23.47823
+        "X": -48.1999435,
+        "Y": 41.3782272
       },
       "Rotation": 0.0,
       "Radius": 14.4551039,
@@ -558,10 +558,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 32.41,
-        "Y": 15.35861
+        "X": -40.19,
+        "Y": 33.25861
       },
       "Rotation": 0.0,
       "Radius": 6.185466,
@@ -571,10 +571,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 31.41,
-        "Y": -3.74
+        "X": -41.19,
+        "Y": 14.16
       },
       "Rotation": 0.0,
       "Radius": 7.44727945,
@@ -584,10 +584,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 8.81,
-        "Y": -23.01
+        "X": -63.7899971,
+        "Y": -5.11000061
       },
       "Rotation": 5.69905758,
       "Radius": 0.191704229,
@@ -597,10 +597,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -0.24,
-        "Y": -27.4
+        "X": -72.84,
+        "Y": -9.5
       },
       "Rotation": 0.0,
       "Radius": 5.11229658,
@@ -610,10 +610,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 24.4000549,
-        "Y": 23.47823
+        "X": -48.1999435,
+        "Y": 41.3782272
       },
       "Rotation": 0.0,
       "Radius": 14.4551039,
@@ -623,10 +623,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 32.41,
-        "Y": 15.35861
+        "X": -40.19,
+        "Y": 33.25861
       },
       "Rotation": 0.0,
       "Radius": 6.185466,
@@ -636,10 +636,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 31.41,
-        "Y": -3.74
+        "X": -41.19,
+        "Y": 14.16
       },
       "Rotation": 0.0,
       "Radius": 7.44727945,
@@ -649,10 +649,10 @@
     },
     {
       "PhysicsShapeType": 2,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": 8.81,
-        "Y": -23.01
+        "X": -63.7899971,
+        "Y": -5.11000061
       },
       "Rotation": 5.69905758,
       "Radius": 0.191704229,
@@ -662,10 +662,10 @@
     },
     {
       "PhysicsShapeType": 1,
-      "LayerMask": 0,
+      "LayerMask": 2,
       "Position": {
-        "X": -0.24,
-        "Y": -27.4
+        "X": -72.84,
+        "Y": -9.5
       },
       "Rotation": 0.0,
       "Radius": 5.11229658,
