@@ -7,12 +7,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	{
 		public override bool ShouldRollBackMask => false;
 		private bool _isCollection = false;
+		private bool _isBidirectionSync = false;
 
 		public SyncObjectMemberToken(SyncType syncType, InheritType inheritType,
-									 string typeName, string memberName, bool isPublic, bool isCollection)
+									 string typeName, string memberName, bool isPublic, bool isCollection, bool isBidirectionSync)
 			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
 			_isCollection = isCollection;
+			_isBidirectionSync = isBidirectionSync;
 			_syncType = syncType;
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
@@ -43,7 +45,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.ObjectGetter, AccessModifier, _typeName, _publicMemberName, _privateMemberName);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (syncType == SyncType.None)
 			{
@@ -61,6 +63,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			if (syncObj == null)
 			{
 				throw new System.Exception($"There is no such sync object type : {TypeName}");
+			}
+
+			if (direction == SyncDirection.FromRemote)
+			{
+				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 			}
 
 			if (syncObj.HasTarget)
@@ -98,8 +105,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_Declaration(SyncDirection direction)
 		{
+			string format;
+
+			if (_isBidirectionSync)
+			{
+				if (IsPublic)
+				{
+					return string.Format(MemberFormat.RemoteReadonlyDeclarationAsPublic_NoDef,
+										 _typeName, _publicMemberName, _privateAccessModifier);
+				}
+				else
+				{
+					return string.Format(MemberFormat.RemoteReadonlyDeclaration_NoDef,
+										 _typeName, _publicMemberName);
+				}
+			}
+
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			string format = IsPublic ? MemberFormat.RemoteReadonlyDeclarationAsPublic : MemberFormat.RemoteReadonlyDeclaration;
+			format = IsPublic ?
+				MemberFormat.RemoteReadonlyDeclarationAsPublic :
+				MemberFormat.RemoteReadonlyDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
 								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier, _privateAccessModifier);
 		}
@@ -109,8 +134,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			StringBuilder sb = new StringBuilder();
 			if (syncType == SyncType.None)
 				sb.AppendLine(string.Format(MemberFormat.ReadSyncObjectEntire, _privateMemberName));
-			else
+			else if (direction == SyncDirection.FromMaster)
+			{
+				sb.AppendLine(string.Format(MemberFormat.ReadSyncObjectWithPlayer, _privateMemberName, syncType));
+			}
+			else if (direction == SyncDirection.FromRemote)
+			{
 				sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, syncType));
+			}
+
 			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
 			return sb.ToString();
 		}

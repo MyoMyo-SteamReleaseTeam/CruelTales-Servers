@@ -761,6 +761,30 @@ public event Action<{1}> On{3}Changed
 	remove => _on{3}Changed -= value;
 }}";
 
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Public property name<br/>
+		/// </summary>
+		public static string RemoteReadonlyDeclaration_NoDef =>
+@"public event Action<{0}> On{1}Changed
+{{
+	add => _on{1}Changed += value;
+	remove => _on{1}Changed -= value;
+}}";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Public property name<br/>
+		/// {2} Private access modifier<br/>
+		/// </summary>
+		public static string RemoteReadonlyDeclarationAsPublic_NoDef =>
+@"{2} Action<{0}>? _on{1}Changed;
+public event Action<{0}> On{1}Changed
+{{
+	add => _on{1}Changed += value;
+	remove => _on{1}Changed -= value;
+}}";
+
 		public static string NewInitializer => " = new()";
 
 		/// <summary>
@@ -865,6 +889,12 @@ if (writer.Size == curSize)
 		/// {1} Read function name<br/>
 		/// </summary>
 		public static string ReadSyncObject => @"if (!{0}.TryDeserializeSync{1}(reader)) return false;";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Read function name<br/>
+		/// </summary>
+		public static string ReadSyncObjectWithPlayer => @"if (!{0}.TryDeserializeSync{1}(player, reader)) return false;";
 
 		/// <summary>
 		/// {0} Private member name<br/>

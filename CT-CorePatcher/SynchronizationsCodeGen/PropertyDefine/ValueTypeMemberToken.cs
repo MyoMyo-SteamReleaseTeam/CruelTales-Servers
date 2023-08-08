@@ -38,7 +38,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _privateMemberName, dirtyBitname, memberIndex);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
 		{
 			string format = IsNativeStruct ? MemberFormat.WritePut : MemberFormat.WriteSerialize;
 			return string.Format(format, _privateMemberName);

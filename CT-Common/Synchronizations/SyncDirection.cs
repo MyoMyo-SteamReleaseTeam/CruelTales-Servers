@@ -18,6 +18,12 @@
 		/// Client에서 Server로 동기화합니다.
 		/// </summary>
 		FromRemote,
+
+		/// <summary>
+		/// 양방향으로 동기화합니다.
+		/// 네트워크 객체인 경우만 가능합니다.
+		/// </summary>
+		Bidirection,
 	}
 
 	public static class SyncDirectionExtension

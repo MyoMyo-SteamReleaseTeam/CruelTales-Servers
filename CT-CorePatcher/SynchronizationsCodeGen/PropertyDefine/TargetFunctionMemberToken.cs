@@ -62,7 +62,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _callstackName);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.TargetSerializeIfDirtyVoid, _callstackName, dirtyBitname, dirtyBitIndex);

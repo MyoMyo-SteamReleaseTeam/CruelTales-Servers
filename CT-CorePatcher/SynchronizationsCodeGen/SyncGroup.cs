@@ -153,7 +153,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			else
 				contents.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
 
-			contents.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName));
+			contents.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(_direction, dirtyBitName, tempDirtyBitName));
 
 			if (_hasAnyTargetMember)
 				contents.AppendLine(string.Format(DirtyGroupFormat.RollBackSerializeMask, tempDirtyBitName, string.Empty));
@@ -181,7 +181,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				else
 					contents.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
 
-				string content = dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName);
+				string content = dirtyGroup.Master_MemberSerializeIfDirtys(_direction, dirtyBitName, tempDirtyBitName);
 				CodeFormat.AddIndent(ref content);
 				contents.AppendLine(string.Format(CommonFormat.IfDirtyAny, dirtyBitName, content));
 
@@ -229,7 +229,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					ctx.AppendLine(string.Format(MemberFormat.WriteSerialize, dirtyBitName));
 
 				// Content
-				ctx.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(dirtyBitName, tempDirtyBitName));
+				ctx.AppendLine(dirtyGroup.Master_MemberSerializeIfDirtys(_direction, dirtyBitName, tempDirtyBitName));
 
 				if (dirtyGroup.HasTargetMember)
 				{

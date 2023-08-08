@@ -451,6 +451,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					{
 						throw new WrongSyncSetting(type, method.Name, $"You can not set target type from remote side!");
 					}
+					if (direction == SyncDirection.Bidirection)
+					{
+						throw new WrongSyncSetting(type, method.Name,
+												   $"You can not set bidirection sync if it's method.");
+					}
 
 					MemberToken member = parseSyncFunction(method, syncType, memberInheritType);
 					member.InheritType = memberInheritType;
@@ -546,6 +551,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 						{
 							throw new WrongSyncSetting(type, method.Name, $"You can not set target type from remote side!");
 						}
+						if (direction == SyncDirection.Bidirection)
+						{
+							throw new WrongSyncSetting(type, method.Name,
+													   $"You can not set bidirection sync if it's method.");
+						}
 
 						MemberToken member = parseSyncFunction(method, syncType, memberInheritType);
 						member.InheritType = memberInheritType;
@@ -629,6 +639,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							throw new WrongSyncSetting(type, field.Name,
 													   $"You can not set cold data from remote side!");
 						}
+						if (direction == SyncDirection.Bidirection)
+						{
+							throw new WrongSyncSetting(type, field.Name,
+													   $"You can not set bidirection sync if it's variable.");
+						}
 						member = parseValueField(field, syncType, memberInheritType);
 					}
 					else if (att is SyncObjectAttribute syncObjAtt)
@@ -640,7 +655,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							throw new WrongSyncSetting(type, field.Name,
 													   $"You can not set cold/hot data at sync object!");
 						}
-						member = parseSyncObjectField(field, syncType, memberInheritType);
+						member = parseSyncObjectField(field, syncType, memberInheritType, direction == SyncDirection.Bidirection);
 					}
 					else
 					{
@@ -656,6 +671,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					}
 					else if (direction == SyncDirection.FromRemote)
 					{
+						remoteMembers.Add(member);
+					}
+					else if (direction == SyncDirection.Bidirection)
+					{
+						masterMembers.Add(member);
 						remoteMembers.Add(member);
 					}
 
@@ -746,6 +766,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								throw new WrongSyncSetting(type, field.Name,
 														   $"You can not set cold data from remote side!");
 							}
+							if (direction == SyncDirection.Bidirection)
+							{
+								throw new WrongSyncSetting(type, field.Name,
+														   $"You can not set bidirection sync if it's variable.");
+							}
 							member = parseValueField(field, syncType, memberInheritType);
 						}
 						else if (syncObjAtt != null)
@@ -757,7 +782,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 								throw new WrongSyncSetting(type, field.Name,
 														   $"You can not set cold/hot data at sync object!");
 							}
-							member = parseSyncObjectField(field, syncType, memberInheritType);
+							member = parseSyncObjectField(field, syncType, memberInheritType, direction == SyncDirection.Bidirection);
 						}
 						else
 						{
@@ -773,6 +798,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 						}
 						else if (direction == SyncDirection.FromRemote)
 						{
+							remoteMembers.Add(member);
+						}
+						else if (direction == SyncDirection.Bidirection)
+						{
+							masterMembers.Add(member);
 							remoteMembers.Add(member);
 						}
 
@@ -828,7 +858,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return member;
 		}
 
-		private static MemberToken parseSyncObjectField(FieldInfo fieldInfo, SyncType syncType, InheritType inheritType)
+		private static MemberToken parseSyncObjectField(FieldInfo fieldInfo, SyncType syncType,
+														InheritType inheritType, bool isbidirectionSync)
 		{
 			bool isPublic = fieldInfo.IsPublic;
 			string typeName = fieldInfo.FieldType.Name;
@@ -844,7 +875,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				isCollection = true;
 			}
 
-			member.Member = new SyncObjectMemberToken(syncType, inheritType, typeName, memberName, isPublic, isCollection);
+			member.Member = new SyncObjectMemberToken(syncType, inheritType, typeName, memberName,
+													  isPublic, isCollection, isbidirectionSync);
 			return member;
 		}
 

@@ -69,13 +69,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(string dirtyBitName, string tempDirtyBitName)
+		public string Master_MemberSerializeIfDirtys(SyncDirection direction, string dirtyBitName, string tempDirtyBitName)
 		{
 			StringBuilder sb = new();
 			int index = 0;
 			foreach (var m in _members)
 			{
-				string serialize = m.Master_SerializeByWriter(_syncType, tempDirtyBitName, index);
+				string serialize = m.Master_SerializeByWriter(_syncType, direction, tempDirtyBitName, index);
 				CodeFormat.AddIndent(ref serialize);
 				string content = string.Format(CommonFormat.IfDirty, dirtyBitName, index, serialize);
 				index++;

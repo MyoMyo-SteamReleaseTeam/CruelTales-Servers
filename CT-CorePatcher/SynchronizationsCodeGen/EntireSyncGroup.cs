@@ -42,7 +42,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Master_SerializeByWriter(_syncType, dirtyBitname: string.Empty, index++));
+				contents.AppendLine(m.Master_SerializeByWriter(_syncType, _direction, dirtyBitname: string.Empty, index++));
 			}
 			CodeFormat.AddIndent(contents);
 
