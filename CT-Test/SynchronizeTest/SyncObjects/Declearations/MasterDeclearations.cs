@@ -188,4 +188,21 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
 	}
+
+	public partial class ZTest_OutterTest : MasterNetworkObject
+	{
+		public override NetworkObjectType Type => NetworkObjectType.None;
+		public override VisibilityType Visibility => throw new NotImplementedException();
+		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+	}
+
+	public partial class ZTest_InnerTest : IMasterSynchronizable
+	{
+		public Dictionary<NetworkPlayer, int> CallTable = new();
+
+		public partial void Client_Test(NetworkPlayer player)
+		{
+			CallTable[player]++;
+		}
+	}
 }

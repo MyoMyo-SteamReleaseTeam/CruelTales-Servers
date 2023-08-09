@@ -44,6 +44,7 @@ namespace CTS.Instance.SyncObjects
 		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary = new();
 		[SyncObject]
 		private readonly ZTest_InnerTest _inner = new();
+		private Action<ZTest_InnerTest>? _onInnerChanged;
 		public event Action<ZTest_InnerTest> OnInnerChanged
 		{
 			add => _onInnerChanged += value;
@@ -74,14 +75,28 @@ namespace CTS.Instance.SyncObjects
 		{
 			_dirtyReliable_0[0] = _dictionary.IsDirtyReliable;
 			_dirtyReliable_0[1] = _inner.IsDirtyReliable;
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				_dictionary.SerializeSyncReliable(writer);
 			}
 			if (_dirtyReliable_0[1])
 			{
+				int curSize = writer.Size;
 				_inner.SerializeSyncReliable(player, writer);
+				if (writer.Size == curSize)
+				{
+					dirtyReliable_0[1] = false;
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }

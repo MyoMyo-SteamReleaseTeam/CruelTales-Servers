@@ -24,10 +24,22 @@ namespace CT.Common.Definitions.SyncObjects
 	public partial class ZTest_InnerTest
 	{
 		[SyncVar]
-		public float A;
+		public int A;
+
+		[SyncVar]
+		public float B;
 
 		[SyncVar(dir: SyncDirection.FromRemote)]
-		public float B;
+		public float C;
+
+		[SyncRpc]
+		public void Server_Test() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_Test() { }
+
+		[SyncRpc(SyncType.ReliableTarget)]
+		public void Server_TestTarget() { }
 	}
 
 	#endregion

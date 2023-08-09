@@ -165,6 +165,18 @@ namespace CT.Common.DataType.Synchronizations
 			return _dictionary.GetEnumerator();
 		}
 
+		public void InitializeMasterProperties()
+		{
+			_dictionary.Clear();
+			_syncOperations.Clear();
+		}
+
+		public void InitializeRemoteProperties()
+		{
+			_dictionary.Clear();
+			_syncOperations.Clear();
+		}
+
 		public void ClearDirtyReliable()
 		{
 			_syncOperations.Clear();
@@ -284,6 +296,9 @@ namespace CT.Common.DataType.Synchronizations
 			}
 			return true;
 		}
+
+		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new NotImplementedException();
+		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 
 		public void CopyTo(KeyValuePair<Key, Value>[] array, int arrayIndex) => throw new NotImplementedException();
 		public bool IsReadOnly => throw new NotImplementedException();

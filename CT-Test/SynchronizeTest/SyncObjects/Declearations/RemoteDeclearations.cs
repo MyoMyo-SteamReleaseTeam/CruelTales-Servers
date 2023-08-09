@@ -393,4 +393,25 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			f22Count++;
 		}
 	}
+
+	public partial class ZTest_OutterTest : RemoteNetworkObject
+	{
+		public override NetworkObjectType Type => throw new NotImplementedException();
+	}
+
+	public partial class ZTest_InnerTest
+	{
+		public int ServerTest = 0;
+		public int ServerTestTarget = 0;
+
+		public partial void Server_Test()
+		{
+			ServerTest++;
+		}
+
+		public partial void Server_TestTarget()
+		{ 
+			ServerTestTarget++;
+		}
+	}
 }

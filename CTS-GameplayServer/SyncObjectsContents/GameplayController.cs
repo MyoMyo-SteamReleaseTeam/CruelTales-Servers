@@ -30,7 +30,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			SessionManager.Initialize(this);
 
-			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_Dueoksini_0);
+			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);
 			MiniGameController.OnGameStart();
 		}
 
@@ -75,7 +75,7 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_ReadyToSync(NetworkPlayer player)
 		{
 			_log.Debug($"Client {player} ready to controll");
-			Server_LoadGame(player, GameMapType.MiniGame_Dueoksini_0);
+			Server_LoadGame(player, GameMapType.MiniGame_RedHood_0);
 		}
 
 		public partial void Client_OnMapLoaded(NetworkPlayer player)

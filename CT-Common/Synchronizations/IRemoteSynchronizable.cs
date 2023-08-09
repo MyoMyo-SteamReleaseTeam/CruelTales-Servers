@@ -49,6 +49,16 @@ namespace CT.Common.Synchronizations
 		public bool TryDeserializeEveryProperty(IPacketReader reader);
 
 		/// <summary>
+		/// Master 프로퍼티를 초기화합니다.
+		/// </summary>
+		public void InitializeMasterProperties();
+
+		/// <summary>
+		/// Remote 프로퍼티를 초기화합니다.
+		/// </summary>
+		public void InitializeRemoteProperties();
+
+		/// <summary>
 		/// 신뢰성 Dirty Bits를 초기화합니다.
 		/// </summary>
 		public void ClearDirtyReliable();
@@ -57,10 +67,5 @@ namespace CT.Common.Synchronizations
 		/// 비신뢰성 Dirty Bits를 초기화합니다.
 		/// </summary>
 		public void ClearDirtyUnreliable();
-	}
-
-	public interface INetworkSynchronizable
-	{
-
 	}
 }
