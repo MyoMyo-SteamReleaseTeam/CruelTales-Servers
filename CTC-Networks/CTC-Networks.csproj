@@ -5,6 +5,14 @@
     <RootNamespace>CTC.Networks</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);CT_CLIENT</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);CT_CLIENT</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CT-Common\CT-Common.csproj" />
     <ProjectReference Include="..\CT-NetworkCore\CT-NetworkCore.csproj" />

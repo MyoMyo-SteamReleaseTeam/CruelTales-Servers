@@ -9,6 +9,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);CT_SERVER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants);CT_SERVER</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="SyncObjects\fwfw\**" />
     <EmbeddedResource Remove="SyncObjects\fwfw\**" />

@@ -68,6 +68,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public void GenerateCode(string[] args)
 		{
+			UsingTable.Initialize();
+
 			// Parse options
 			StringArgumentArray masterTargetPathList = new();
 			StringArgumentArray remoteTargetPathList = new();

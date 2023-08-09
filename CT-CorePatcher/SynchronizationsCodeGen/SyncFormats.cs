@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
@@ -19,6 +21,107 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static bool CanSyncEntire(BaseMemberToken token)
 		{
 			return token is FunctionMemberToken || token is TargetFunctionMemberToken;
+		}
+	}
+
+	public static class UsingTable
+	{
+		private static string _systemUsingStatements =>
+@"using System;
+using System.Numerics;
+using System.Collections.Generic;";
+
+		private static string _parsedUsingStatements = string.Empty;
+
+		public static string MasterUsingStatements => _systemUsingStatements + Environment.NewLine +
+													  _parsedUsingStatements + Environment.NewLine +
+@"using CTS.Instance.Gameplay;
+using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;";
+
+		public static string RemoteUsingStatements => _systemUsingStatements + Environment.NewLine +
+													  _parsedUsingStatements + Environment.NewLine +
+@"using CTC.Networks.Synchronizations;";
+
+		public static string DebugRemoteUsingStatements => _systemUsingStatements + Environment.NewLine +
+														   _parsedUsingStatements + Environment.NewLine;
+
+		class UsingToken
+		{
+			public string Path = string.Empty;
+			public string Token = string.Empty;
+		}
+
+		private static List<string> _excludeDirNames = new()
+		{
+			"bin", "obj", "Definitions", "Debug", "Release", "Packets", "Extensions"
+		};
+
+		public static void Initialize()
+		{
+			string ctCommonPath;
+
+#pragma warning disable CA1416
+			if (MainProcess.IsDebug)
+#pragma warning restore CA1416
+			{
+				ctCommonPath = "../../../../CT-Common";
+			}
+			else
+			{
+				ctCommonPath = "../CT-Common";
+			}
+
+			List<UsingToken> tokens = new();
+
+			Queue<UsingToken> traversal = new();
+			traversal.Enqueue(new UsingToken()
+			{
+				Path = ctCommonPath,
+				Token = (Path.GetFileName(ctCommonPath) ?? string.Empty).Replace("-", ".")
+			});
+
+			while (traversal.Count > 0)
+			{
+				UsingToken curToken = traversal.Dequeue();
+				string[] curPaths = Directory.GetDirectories(curToken.Path);
+				foreach (var dir in curPaths)
+				{
+					bool shouldExclude = false;
+
+					foreach (var estr in _excludeDirNames)
+					{
+						if (dir.Contains(estr))
+						{
+							shouldExclude = true;
+							break;
+						}
+					}
+
+					if (shouldExclude)
+						continue;
+
+					string curDirName = Path.GetFileName(dir) ?? string.Empty;
+					traversal.Enqueue(new UsingToken()
+					{
+						Path = dir,
+						Token = curToken.Token + "." + curDirName
+					});
+				}
+
+				tokens.Add(curToken);
+			}
+
+			_parsedUsingStatements = string.Empty;
+			for (int i = 0; i < tokens.Count; i++)
+			{
+				_parsedUsingStatements += $"using {tokens[i].Token};";
+
+				if (i < tokens.Count - 1)
+				{
+					_parsedUsingStatements += Environment.NewLine;
+				}
+			}
 		}
 	}
 
@@ -43,7 +146,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public static PredefinedType GetPredefinedType(string typeName)
 		{
-			foreach (var gt in  _genericTypeName.Keys)
+			foreach (var gt in _genericTypeName.Keys)
 			{
 				if (typeName.Contains(_genericTypeName[gt]))
 				{
@@ -133,47 +236,6 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 
 	public static class CommonFormat
 	{
-		public static string MasterUsingStatements =>
-@"using System;
-using System.Numerics;
-using System.Collections.Generic;
-using CT.Common.Gameplay;
-using CT.Common.Gameplay.Players;
-using CT.Common.DataType;
-using CT.Common.DataType.Input;
-using CT.Common.DataType.Synchronizations;
-using CT.Common.Serialization;
-using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;
-using CTS.Instance.Gameplay;
-using CTS.Instance.Synchronizations;
-using CTS.Instance.SyncObjects;";
-
-		public static string RemoteUsingStatements =>
-@"using System;
-using System.Numerics;
-using System.Collections.Generic;
-using CT.Common.Gameplay;
-using CT.Common.Gameplay.Players;
-using CT.Common.DataType;
-using CT.Common.DataType.Input;
-using CT.Common.DataType.Synchronizations;
-using CT.Common.Serialization;
-using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;
-using CTC.Networks.Synchronizations;";
-
-		public static string DebugRemoteUsingStatements =>
-@"using System;
-using System.Numerics;
-using System.Collections.Generic;
-using CT.Common.DataType;
-using CT.Common.DataType.Input;
-using CT.Common.DataType.Synchronizations;
-using CT.Common.Serialization;
-using CT.Common.Synchronizations;
-using CT.Common.Tools.Collections;";
-
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
 
@@ -291,7 +353,7 @@ public partial class {0} : {1}
 		/// {1} Dirty bit name<br/>
 		/// </summary>
 		public static string MasterDirtyAnyTrue => @"masterDirty[{0}] = {1}.AnyTrue();";
-		
+
 		/// <summary>
 		/// {0} Dirty bit name<br/>
 		/// {1} Dirty bit index<br/>
@@ -762,7 +824,7 @@ public event Action<{1}> On{3}Changed
 		/// {5} Access modifier<br/>
 		/// {6} Private access modifier<br/>
 		/// </summary>
-		public static string RemoteDeclarationAsPublic=>
+		public static string RemoteDeclarationAsPublic =>
 @"[{0}]
 {6} {1} {2}{4};
 public {1} {3} => {2};

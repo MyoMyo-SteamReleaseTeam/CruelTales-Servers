@@ -59,7 +59,7 @@ namespace CT.CorePatcher
 						startIndex = i;
 						break;
 					}
-					sb.AppendLine(line);
+					sb.AppendLine(line.Replace("\r", ""));
 				}
 			}
 
