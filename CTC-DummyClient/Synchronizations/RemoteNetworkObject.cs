@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
-using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CTC.Networks.SyncObjects.TestSyncObjects;
@@ -11,9 +10,6 @@ namespace CTC.Networks.Synchronizations
 	{
 		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
 		[AllowNull] private RemoteWorldManager _worldManager;
-
-		/// <summary>네트워크 객체의 Transform입니다.</summary>
-		public NetworkTransform Transform { get; private set; } = new NetworkTransform();
 
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; }
