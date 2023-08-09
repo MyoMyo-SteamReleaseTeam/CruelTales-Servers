@@ -118,7 +118,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 				else
 				{
 					return string.Format(MemberFormat.RemoteReadonlyDeclaration_NoDef,
-										 _typeName, _publicMemberName);
+										 _typeName, _publicMemberName, _privateAccessModifier);
 				}
 			}
 

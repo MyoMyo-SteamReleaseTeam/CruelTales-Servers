@@ -877,9 +877,11 @@ public event Action<{1}> On{3}Changed
 		/// <summary>
 		/// {0} Type name<br/>
 		/// {1} Public property name<br/>
+		/// {2} Private access modifier<br/>
 		/// </summary>
 		public static string RemoteReadonlyDeclaration_NoDef =>
-@"public event Action<{0}> On{1}Changed
+@"{2} Action<{0}>? _on{1}Changed;
+public event Action<{0}> On{1}Changed
 {{
 	add => _on{1}Changed += value;
 	remove => _on{1}Changed -= value;

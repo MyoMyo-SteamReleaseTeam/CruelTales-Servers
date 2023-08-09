@@ -107,7 +107,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Gen_MasterCode()
 		{
-			string genCode = gnerateCode(CommonFormat.MasterUsingStatements,
+			string genCode = gnerateCode(UsingTable.MasterUsingStatements,
 										 CommonFormat.MasterNamespace,
 										 SyncDirection.FromMaster,
 										 _masterSideMembers,
@@ -122,9 +122,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		public string Gen_RemoteCode()
 		{
-			string usingStatements = IsDebugObject ? 
-				CommonFormat.DebugRemoteUsingStatements : 
-				CommonFormat.RemoteUsingStatements;
+			string usingStatements = IsDebugObject ?
+				UsingTable.DebugRemoteUsingStatements :
+				UsingTable.RemoteUsingStatements;
 
 			string genCode = gnerateCode(usingStatements,
 										 CommonFormat.RemoteNamespace,
