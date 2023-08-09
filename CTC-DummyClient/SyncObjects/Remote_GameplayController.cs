@@ -101,10 +101,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public override void SerializeEveryProperty(IPacketWriter writer)
-		{
-			_sessionManager.SerializeEveryProperty(writer);
-		}
 		public override void InitializeMasterProperties()
 		{
 			_sessionManager.InitializeRemoteProperties();

@@ -15,6 +15,7 @@ using CT.Common.Gameplay;
 using CT.Common.Gameplay.Players;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;

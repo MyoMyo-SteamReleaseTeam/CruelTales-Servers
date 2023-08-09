@@ -46,7 +46,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public abstract bool IsDirtyUnreliable { get; }
 		public abstract void SerializeSyncReliable(IPacketWriter writer);
 		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
-		public abstract void SerializeEveryProperty(IPacketWriter writer);
 		public abstract bool TryDeserializeSyncReliable(IPacketReader reader);
 		public abstract bool TryDeserializeEveryProperty(IPacketReader reader);
 		public abstract bool TryDeserializeSyncUnreliable(IPacketReader reader);

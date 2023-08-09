@@ -866,17 +866,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string memberName = fieldInfo.Name;
 			MemberToken member = new();
 			member.SyncType = syncType;
-			bool isCollection = false;
+			bool isPredefined = false;
 
-			if (fieldInfo.FieldType.IsGenericType && typeName.Contains(NameTable.SyncList))
+			if (fieldInfo.FieldType.IsGenericType)
 			{
-				var genericTypeName = fieldInfo.FieldType.GenericTypeArguments[0].Name;
-				typeName = $"{NameTable.SyncList}<{genericTypeName}>";
-				isCollection = true;
+				var pType = NameTable.GetPredefinedType(typeName);
+				if (pType != PredefinedType.None)
+				{
+					isPredefined = true;
+					typeName = NameTable.GetPredefinedTypeName(fieldInfo.FieldType, pType);
+				}
 			}
 
 			member.Member = new SyncObjectMemberToken(syncType, inheritType, typeName, memberName,
-													  isPublic, isCollection, isbidirectionSync);
+													  isPublic, isPredefined, isbidirectionSync);
 			return member;
 		}
 

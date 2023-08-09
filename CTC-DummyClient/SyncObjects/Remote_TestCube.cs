@@ -71,7 +71,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public override void SerializeEveryProperty(IPacketWriter writer) { }
 		public override void InitializeMasterProperties() { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{

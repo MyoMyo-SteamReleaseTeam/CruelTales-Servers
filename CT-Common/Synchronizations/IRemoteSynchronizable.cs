@@ -30,11 +30,6 @@ namespace CT.Common.Synchronizations
 		public void SerializeSyncUnreliable(IPacketWriter writer);
 
 		/// <summary>
-		/// 모든 동기화 요소를 직렬화합니다.
-		/// </summary>
-		public void SerializeEveryProperty(IPacketWriter writer);
-
-		/// <summary>
 		/// 신뢰성 속성을 가진 동기화 요소를 역직렬화합니다.
 		/// 역직렬화 된 멤버는 고유한 이벤트를 발생시킵니다.
 		/// </summary>

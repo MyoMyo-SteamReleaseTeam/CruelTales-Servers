@@ -118,7 +118,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 			}
 		}
-		public override void SerializeEveryProperty(IPacketWriter writer) { }
 		public override void InitializeMasterProperties() { }
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
 		{

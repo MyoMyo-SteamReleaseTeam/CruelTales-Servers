@@ -1,10 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
+	public enum PredefinedType
+	{
+		None,
+		SyncList,
+		SyncDictionary,
+		SyncObjectList,
+	}
+
 	public static class SyncRule
 	{
 		public static bool CanSyncEntire(BaseMemberToken token)
@@ -20,19 +29,45 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public static string NetworkPlayerParameter => $"{NetworkPlayerTypeName} {NetworkPlayerParameterName}";
 		public static string SerializeTargetName => "Target";
 
-		private static HashSet<string> _collectionNames = new()
+		private static Dictionary<PredefinedType, string> _genericTypeName = new()
 		{
-			"SyncList", "SyncDictionary"
+			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
+			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
+			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
 		};
 
-		public static bool IsCollection(string typeName)
+		public static bool IsPredefinedType(string typeName)
 		{
-			return _collectionNames.Contains(typeName);
+			return GetPredefinedType(typeName) != PredefinedType.None;
 		}
 
-		public static bool GetTypeName(FieldInfo field)
+		public static PredefinedType GetPredefinedType(string typeName)
 		{
+			foreach (var gt in  _genericTypeName.Keys)
+			{
+				if (typeName.Contains(_genericTypeName[gt]))
+				{
+					return gt;
+				}
+			}
 
+			return PredefinedType.None;
+		}
+
+		public static string GetPredefinedTypeName(Type type, PredefinedType ptype)
+		{
+			int genericCount = type.GenericTypeArguments.Length;
+			string genericNames = string.Empty;
+			for (int i = 0; i < genericCount; i++)
+			{
+				genericNames += type.GenericTypeArguments[i].Name;
+				if (i < genericCount - 1)
+				{
+					genericNames += ", ";
+				}
+			}
+
+			return $"{ptype}<{genericNames}>";
 		}
 
 		/// <summary>Master 혹은 Remote 문자열을 SyncDirection 로 반환받습니다.</summary>

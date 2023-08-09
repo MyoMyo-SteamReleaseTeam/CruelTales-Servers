@@ -152,7 +152,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public void SerializeEveryProperty(IPacketWriter writer) { }
 		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{

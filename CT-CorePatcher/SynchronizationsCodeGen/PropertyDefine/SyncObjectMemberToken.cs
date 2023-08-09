@@ -6,14 +6,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	public class SyncObjectMemberToken : BaseMemberToken
 	{
 		public override bool ShouldRollBackMask => false;
-		private bool _isCollection = false;
+		private bool _isPredefined = false;
 		private bool _isBidirectionSync = false;
 
 		public SyncObjectMemberToken(SyncType syncType, InheritType inheritType,
-									 string typeName, string memberName, bool isPublic, bool isCollection, bool isBidirectionSync)
+									 string typeName, string memberName, bool isPublic, bool isPredefined, bool isBidirectionSync)
 			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
-			_isCollection = isCollection;
+			_isPredefined = isPredefined;
 			_isBidirectionSync = isBidirectionSync;
 			_syncType = syncType;
 			_typeName = typeName;
@@ -54,7 +54,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 									 SyncGroupFormat.EntireFunctionSuffix);
 			}
 
-			if (_isCollection)
+			if (_isPredefined)
 			{
 				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 			}
@@ -69,6 +69,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			{
 				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 			}
+
 
 			if (syncObj.HasTarget)
 			{

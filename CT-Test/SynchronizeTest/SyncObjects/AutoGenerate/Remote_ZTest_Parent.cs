@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Input;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -138,11 +139,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 		}
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public override void SerializeEveryProperty(IPacketWriter writer)
-		{
-			writer.Put(_field_Client_P1);
-			writer.Put(_field_Client_P2);
-		}
 		public override void InitializeMasterProperties()
 		{
 			_field_Client_P1 = 0;

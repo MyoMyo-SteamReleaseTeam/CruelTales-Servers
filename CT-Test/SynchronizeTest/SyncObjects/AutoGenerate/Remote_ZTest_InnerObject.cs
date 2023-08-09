@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Input;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -48,7 +49,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(IPacketWriter writer) { }
 		public void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public void SerializeEveryProperty(IPacketWriter writer) { }
 		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{

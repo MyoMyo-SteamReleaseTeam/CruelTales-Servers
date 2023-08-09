@@ -80,7 +80,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			foreach (var m in syncObj)
 			{
 				string typeName = m.Member.TypeName;
-				if (NameTable.IsCollection(typeName))
+				if (NameTable.IsPredefinedType(typeName))
 				{
 					continue;
 				}
