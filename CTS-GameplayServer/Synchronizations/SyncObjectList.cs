@@ -53,7 +53,7 @@ namespace CT.Common.DataType.Synchronizations
 				if (_syncOperation.Count > 0)
 					return true;
 
-				for (int i = 0; i < _list.Count; i++)
+				for (int i = 0; i < Count; i++)
 				{
 					if (_list[i].IsDirtyReliable)
 						return true;
@@ -105,7 +105,7 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void Remove(T item)
 		{
-			for (byte i = 0; i < _list.Count; i++)
+			for (byte i = 0; i < Count; i++)
 			{
 				if (_list[i].Equals(item))
 				{
@@ -161,8 +161,7 @@ namespace CT.Common.DataType.Synchronizations
 		{
 			_syncOperation.Clear();
 
-			int count = Count;
-			for (int i = 0; i < count; i++)
+			for (int i = 0; i < Count; i++)
 			{
 				if (_list[i].IsDirtyReliable)
 				{
@@ -263,7 +262,7 @@ namespace CT.Common.DataType.Synchronizations
 				writer.OffsetSize(sizeof(byte));
 
 				byte serializeCount = 0;
-				for (byte i = 0; i < _list.Count; i++)
+				for (byte i = 0; i < Count; i++)
 				{
 					if (_list[i].IsDirtyReliable)
 					{

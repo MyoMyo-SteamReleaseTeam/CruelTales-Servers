@@ -145,6 +145,21 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			Assert.AreEqual(0, src[5].GetCallStackValue(p2));
 			Assert.AreEqual(2, src[6].GetCallStackValue(p2));
 			Assert.AreEqual(0, src[7].GetCallStackValue(p2));
+
+			src.Clear();
+			src.Add((obj) => { });
+
+			Sync(data, p1, src, desp1);
+			Sync(data, p2, src, desp2);
+			Clear(src, desp1);
+			Clear(src, desp2);
+
+			src[0].Server_TestTarget(p1);
+
+			Sync(data, p1, src, desp1);
+			Sync(data, p2, src, desp2);
+			Clear(src, desp1);
+			Clear(src, desp2);
 		}
 
 		public void Sync(ByteBuffer buffer,
