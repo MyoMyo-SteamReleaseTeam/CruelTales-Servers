@@ -198,11 +198,26 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_InnerTest : IMasterSynchronizable
 	{
-		public Dictionary<NetworkPlayer, int> CallTable = new();
+		private Dictionary<UserId, int> _callTable = new();
 
 		public partial void Client_Test(NetworkPlayer player)
 		{
-			CallTable[player]++;
+			if (!_callTable.ContainsKey(player.UserId))
+			{
+				_callTable.Add(player.UserId, 0);
+			}
+
+			_callTable[player.UserId]++;
+		}
+
+		public int GetCallStackValue(NetworkPlayer player)
+		{
+			if (_callTable.TryGetValue(player.UserId, out int stack))
+			{
+				return stack;
+			}
+
+			return 0;
 		}
 	}
 }

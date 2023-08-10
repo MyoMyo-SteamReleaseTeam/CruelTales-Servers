@@ -65,7 +65,14 @@ namespace CT.Common.DataType.Synchronizations
 
 		public T this[int index]
 		{
-			get => _list[index];
+			get
+			{
+				if (index < 0 || index >= Count)
+				{
+					throw new ArgumentOutOfRangeException($"Current sync object list count is {Count}. Index : {index}");
+				}
+				return _list[index];
+			}
 		}
 
 		public SyncObjectList(int maxCapacity = 8)
@@ -201,17 +208,18 @@ namespace CT.Common.DataType.Synchronizations
 		{
 			BitmaskByte masterDirty = new BitmaskByte();
 			masterDirty[0] = _syncOperation.Count > 0;
-			byte changeCount = 0;
+
 			for (int i = 0; i < Count; i++)
 			{
 				if (_list[i].IsDirtyReliable)
 				{
-					changeCount++;
+					masterDirty[1] = true;
+					break;
 				}
 			}
-			masterDirty[1] = changeCount > 0;
 
-			writer.Put(masterDirty);
+			int masterDirtyIndex = writer.Size;
+			writer.OffsetSize(sizeof(byte));
 
 			// Serialize if there is even a single operation
 			if (masterDirty[0])
@@ -251,19 +259,51 @@ namespace CT.Common.DataType.Synchronizations
 			// Serialize if dirty objects
 			if (masterDirty[1])
 			{
-				writer.Put(changeCount);
+				int changeIndexPos = writer.Size;
+				writer.OffsetSize(sizeof(byte));
+
+				byte serializeCount = 0;
 				for (byte i = 0; i < _list.Count; i++)
 				{
 					if (_list[i].IsDirtyReliable)
 					{
-						writer.Put(i);
+						int indexPos = writer.Size;
+						writer.OffsetSize(sizeof(byte));
 #if CT_SERVER
 						_list[i].SerializeSyncReliable(player, writer);
 #elif CT_CLIENT
 						_list[i].SerializeSyncReliable(writer);
 #endif
+						if (indexPos + sizeof(byte) == writer.Size)
+						{
+							writer.SetSize(indexPos);
+						}
+						else
+						{
+							serializeCount++;
+							writer.PutTo(i, indexPos);
+						}
 					}
 				}
+
+				if (changeIndexPos + sizeof(byte) == writer.Size)
+				{
+					writer.SetSize(changeIndexPos);
+					masterDirty[1] = false;
+				}
+				else
+				{
+					writer.PutTo(serializeCount, changeIndexPos);
+				}
+			}
+
+			if (masterDirty.AnyTrue())
+			{
+				writer.PutTo(masterDirty, masterDirtyIndex);
+			}
+			else
+			{
+				writer.SetSize(masterDirtyIndex);
 			}
 		}
 
@@ -273,7 +313,7 @@ namespace CT.Common.DataType.Synchronizations
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 #endif
 		{
-			BitmaskByte masterDirty = reader.ReadBitmaskByte();
+			if (!reader.TryReadBitmaskByte(out BitmaskByte masterDirty)) return false;
 
 			// Serialize if there is even a single operation
 			if (masterDirty[0])
@@ -282,14 +322,15 @@ namespace CT.Common.DataType.Synchronizations
 				/// Remote cannot run collection operation.
 				Debug.Assert(false);
 #elif CT_CLIENT
-				byte operationCount = reader.ReadByte();
+				if (!reader.TryReadByte(out byte operationCount)) return false;
 				for (int i = 0; i < operationCount; i++)
 				{
-					var operation = (CollectionSyncType)reader.ReadByte();
+					if (!reader.TryReadByte(out byte operationValue)) return false;
+					var operation = (CollectionSyncType)operationValue;
 					switch (operation)
 					{
 						case CollectionSyncType.Clear:
-							_list.Clear();
+							Count = 0;
 							break;
 
 						case CollectionSyncType.Add:
@@ -301,7 +342,7 @@ namespace CT.Common.DataType.Synchronizations
 							break;
 
 						case CollectionSyncType.Remove:
-							byte index = reader.ReadByte();
+							if (!reader.TryReadByte(out byte index)) return false;
 							T temp = _list[index];
 							Count--;
 							for (int r = index; r < Count; r++)
@@ -322,10 +363,10 @@ namespace CT.Common.DataType.Synchronizations
 			// Serialize if dirty objects
 			if (masterDirty[1])
 			{
-				byte changeCount = reader.ReadByte();
+				if (!reader.TryReadByte(out byte changeCount)) return false;
 				for (int i = 0; i < changeCount; i++)
 				{
-					byte index = reader.ReadByte();
+					if (!reader.TryReadByte(out byte index)) return false;
 
 #if CT_SERVER
 					if (!_list[index].TryDeserializeSyncReliable(player, reader))
