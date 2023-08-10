@@ -220,6 +220,203 @@ namespace CT.Common.Tools.Collections
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(uint));
 	}
 
+	public struct Bitmask256 : IPacketSerializable
+	{
+		public Bitmask32 Mask_0;
+		public Bitmask32 Mask_1;
+		public Bitmask32 Mask_2;
+		public Bitmask32 Mask_3;
+		public Bitmask32 Mask_4;
+		public Bitmask32 Mask_5;
+		public Bitmask32 Mask_6;
+		public Bitmask32 Mask_7;
+
+		public const int SyncSize = sizeof(uint) * 8;
+		public int SerializeSize => SyncSize;
+
+		public Bitmask256()
+		{
+			Mask_0 = new();
+			Mask_1 = new();
+			Mask_2 = new();
+			Mask_3 = new();
+			Mask_4 = new();
+			Mask_5 = new();
+			Mask_6 = new();
+			Mask_7 = new();
+		}
+
+		/// <summary>해당 비트를 참조합니다.</summary>
+		/// <param name="x">bitmask 인덱스</param>
+		/// <returns>값</returns>
+		public bool this[int index]
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				int bucketIndex = index / 32;
+				int maskIndex = index - bucketIndex * 32;
+				switch (bucketIndex)
+				{
+					case 0: return Mask_0[maskIndex];
+					case 1: return Mask_1[maskIndex];
+					case 2: return Mask_2[maskIndex];
+					case 3: return Mask_3[maskIndex];
+					case 4: return Mask_4[maskIndex];
+					case 5: return Mask_5[maskIndex];
+					case 6: return Mask_6[maskIndex];
+					case 7: return Mask_7[maskIndex];
+				}
+
+				throw new ArgumentOutOfRangeException();
+			}
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set
+			{
+				int bucketIndex = index / 32;
+				int maskIndex = index - bucketIndex * 32;
+				switch (bucketIndex)
+				{
+					case 0: Mask_0[maskIndex] = value; break;
+					case 1: Mask_1[maskIndex] = value; break;
+					case 2: Mask_2[maskIndex] = value; break;
+					case 3: Mask_3[maskIndex] = value; break;
+					case 4: Mask_4[maskIndex] = value; break;
+					case 5: Mask_5[maskIndex] = value; break;
+					case 6: Mask_6[maskIndex] = value; break;
+					case 7: Mask_7[maskIndex] = value; break;
+				}
+
+				throw new ArgumentOutOfRangeException();
+			}
+		}
+
+		public Bitmask32 GetMask(int bucketIndex)
+		{
+			switch (bucketIndex)
+			{
+				case 0: return Mask_0;
+				case 1: return Mask_1;
+				case 2: return Mask_2;
+				case 3: return Mask_3;
+				case 4: return Mask_4;
+				case 5: return Mask_5;
+				case 6: return Mask_6;
+				case 7: return Mask_7;
+			}
+
+			throw new ArgumentOutOfRangeException();
+		}
+
+		/// <summary>모든 비트를 value로 초기화합니다.</summary>
+		/// <param name="value">초기화할 값</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Clear(bool value = false)
+		{
+			Mask_0.Clear(value);
+			Mask_1.Clear(value);
+			Mask_2.Clear(value);
+			Mask_3.Clear(value);
+			Mask_4.Clear(value);
+			Mask_5.Clear(value);
+			Mask_6.Clear(value);
+			Mask_7.Clear(value);
+		}
+
+		/// <summary>모든 비트를 뒤집습니다.</summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Flip()
+		{
+			Mask_0.Flip();
+			Mask_1.Flip();
+			Mask_2.Flip();
+			Mask_3.Flip();
+			Mask_4.Flip();
+			Mask_5.Flip();
+			Mask_6.Flip();
+			Mask_7.Flip();
+		}
+
+		/// <summary>해당 index의 비트를 false로 설정합니다.</summary>
+		/// <param name="x">인덱스 x</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void SetFalse(int index) => this[index] = false;
+
+		/// <summary>해당 index의 비트를 true로 설정합니다.</summary>
+		/// <param name="x">인덱스</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void SetTrue(int index) => this[index] = true;
+
+		/// <summary>모든 비트가 true라면 true를 반환합니다.</summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool IsAllTrue()
+		{
+			bool isAllTrue = true;
+			isAllTrue &= Mask_0.IsAllTrue();
+			isAllTrue &= Mask_1.IsAllTrue();
+			isAllTrue &= Mask_2.IsAllTrue();
+			isAllTrue &= Mask_3.IsAllTrue();
+			isAllTrue &= Mask_4.IsAllTrue();
+			isAllTrue &= Mask_5.IsAllTrue();
+			isAllTrue &= Mask_6.IsAllTrue();
+			isAllTrue &= Mask_7.IsAllTrue();
+			return isAllTrue;
+		}
+
+		/// <summary>모든 비트가 false라면 true를 반환합니다.</summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool IsAllFalse()
+		{
+			bool isAllFalse = true;
+			isAllFalse &= Mask_0.IsAllFalse();
+			isAllFalse &= Mask_1.IsAllFalse();
+			isAllFalse &= Mask_2.IsAllFalse();
+			isAllFalse &= Mask_3.IsAllFalse();
+			isAllFalse &= Mask_4.IsAllFalse();
+			isAllFalse &= Mask_5.IsAllFalse();
+			isAllFalse &= Mask_6.IsAllFalse();
+			isAllFalse &= Mask_7.IsAllFalse();
+			return isAllFalse;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void IgnoreStatic(IPacketReader reader)
+		{
+			reader.Ignore(SyncSize);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Serialize(IPacketWriter writer)
+		{
+			Mask_0.Serialize(writer);
+			Mask_1.Serialize(writer);
+			Mask_2.Serialize(writer);
+			Mask_3.Serialize(writer);
+			Mask_4.Serialize(writer);
+			Mask_5.Serialize(writer);
+			Mask_6.Serialize(writer);
+			Mask_7.Serialize(writer);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool TryDeserialize(IPacketReader reader)
+		{
+			if (!reader.CanRead(SyncSize)) return false;
+			Mask_0 = reader.ReadUInt32();
+			Mask_1 = reader.ReadUInt32();
+			Mask_2 = reader.ReadUInt32();
+			Mask_3 = reader.ReadUInt32();
+			Mask_4 = reader.ReadUInt32();
+			Mask_5 = reader.ReadUInt32();
+			Mask_6 = reader.ReadUInt32();
+			Mask_7 = reader.ReadUInt32();
+			return true;
+		}
+	}
+
 	public static class BitmaskExtension
 	{
 		// BitmaskByte
