@@ -35,6 +35,9 @@ namespace KaNet.Physics
 
 		// Inputs
 		private Action? OnProcessUpdate;
+		private Vector2 _movePosition;
+		private bool _moveCameraByInput = false;
+		private float _moveSpeed = 1.0f;
 
 		// Color
 		private Color _staticObjectColor = Color.FromArgb(20, 20, 20);
@@ -99,6 +102,7 @@ namespace KaNet.Physics
 
 		private void setupWorld_1_LayerTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
+			_moveCameraByInput = true;
 			_entityManager.Clear();
 			_customRendering = null;
 
@@ -150,6 +154,7 @@ namespace KaNet.Physics
 
 		private void setupWorld_2_ThreeShapesAndStatic(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
+			_moveCameraByInput = true;
 			_entityManager.Clear();
 			_customRendering = null;
 
@@ -199,6 +204,7 @@ namespace KaNet.Physics
 		private StringBuilder _hitStringSB = new StringBuilder(128);
 		private void setupWorld_3_RaycastTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
+			_moveCameraByInput = true;
 			float radius = 1.0f;
 			float width = 4.0f;
 			float height = 1.2f;
@@ -273,6 +279,7 @@ namespace KaNet.Physics
 
 		private void setupWorld_4_RaycastWithMask(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
+			_moveCameraByInput = true;
 			float radius = 1.0f;
 			float width = 4.0f;
 			float height = 1.2f;
@@ -351,13 +358,13 @@ namespace KaNet.Physics
 
 		float theta = 0;
 		float ellipseX = 20.0f;
-		float ellipseY = 5.0f;
-
-		float testX = 1f;
-		float testY = 1f;
+		float ellipseY = 1.0f;
+		float testRadius = 2.0f;
 
 		private void setupWorld_5_EllipseTest(Vector2 viewLB, Vector2 viewRT, Vector2 viewHalfSize)
 		{
+			_moveCameraByInput = false;
+			_moveSpeed = 15.0f;
 			float acc = 0.02f;
 			Vector2 center = Vector2.Zero;
 
@@ -366,22 +373,26 @@ namespace KaNet.Physics
 			_customRendering = (r) =>
 			{
 				r.DrawEllipse(center, ellipseX, ellipseY, Color.White);
+				r.DrawEllipse(center, ellipseX + testRadius, ellipseY + testRadius, Color.White);
 				
 				if (MouseWorldPosition.LengthSquared() < 0.001f)
 				{
 					return;
 				}
 
+				Vector2 testPos = new Vector2(_movePosition.Y / ellipseY, _movePosition.X / ellipseX);
+
 				KaPhysics.ComputeEllipseNormal(ellipseX, ellipseY,
-											   testX, testY,
+											   testPos.X, testPos.Y,
 											   out Vector2 tp,
 											   out Vector2 n);
 
 				r.DrawLine(Vector2.Zero, tp, Color.Blue);
-				r.DrawLine(tp, tp + n * 5, Color.Red);
+				r.DrawLine(tp, tp + n * testRadius, Color.Red);
 
-				//r.DrawCircle(new(testY / ellipseX, testX / ellipseY), 0.1f, Color.Red);
-				//r.DrawLine(Vector2.Zero, new(testY, testX), Color.Red);
+
+				r.DrawLine(Vector2.Zero, _movePosition, Color.Yellow);
+				r.DrawCircle(_movePosition, testRadius, Color.Yellow);
 
 				//r.DrawTextGUI($"Control Theta : {theta}", new(10, 200), Color.Wheat);
 				//r.DrawTextGUI($"Actural Theta : {Vector2.Normalize(tanLine).X}", new(10, 215), Color.Wheat);
@@ -398,14 +409,12 @@ namespace KaNet.Physics
 			OnLeftMousePress = (worldPos) =>
 			{
 				theta += acc;
-				testX += acc;
 				//ellipseX += acc;
 			};
 
 			OnRightMousePress = (worldPos) =>
 			{
 				theta -= acc;
-				testX -= acc;
 				//ellipseX -= acc;
 			};
 
@@ -454,20 +463,24 @@ namespace KaNet.Physics
 
 		private void processCameraInput(float deltaTime)
 		{
-			Vector2 cameraMoveDirection = new();
+			Vector2 moveDirection = new();
 			if (_inputManager.IsPressed(GameKey.CameraMoveUp))
-				cameraMoveDirection += new Vector2(0, 1);
+				moveDirection += new Vector2(0, 1);
 			if (_inputManager.IsPressed(GameKey.CameraMoveDown))
-				cameraMoveDirection += new Vector2(0, -1);
+				moveDirection += new Vector2(0, -1);
 			if (_inputManager.IsPressed(GameKey.CameraMoveLeft))
-				cameraMoveDirection += new Vector2(-1, 0);
+				moveDirection += new Vector2(-1, 0);
 			if (_inputManager.IsPressed(GameKey.CameraMoveRight))
-				cameraMoveDirection += new Vector2(1, 0);
+				moveDirection += new Vector2(1, 0);
 
-			if (cameraMoveDirection.Length() != 0)
+			if (moveDirection.Length() != 0)
 			{
-				cameraMoveDirection = Vector2.Normalize(cameraMoveDirection);
-				_renderer.CameraWorldPosition += cameraMoveDirection / _renderer.Zoom * deltaTime * 500.0f;
+				moveDirection = Vector2.Normalize(moveDirection);
+				_movePosition += moveDirection * _moveSpeed * deltaTime;
+				if (_moveCameraByInput)
+				{
+					_renderer.CameraWorldPosition += moveDirection / _renderer.Zoom * deltaTime * 500.0f;
+				}
 			}
 		}
 
