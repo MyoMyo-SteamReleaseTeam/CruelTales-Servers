@@ -234,18 +234,6 @@ namespace CT.Common.Tools.Collections
 		public const int SyncSize = sizeof(uint) * 8;
 		public int SerializeSize => SyncSize;
 
-		public Bitmask256()
-		{
-			Mask_0 = new();
-			Mask_1 = new();
-			Mask_2 = new();
-			Mask_3 = new();
-			Mask_4 = new();
-			Mask_5 = new();
-			Mask_6 = new();
-			Mask_7 = new();
-		}
-
 		/// <summary>해당 비트를 참조합니다.</summary>
 		/// <param name="x">bitmask 인덱스</param>
 		/// <returns>값</returns>
