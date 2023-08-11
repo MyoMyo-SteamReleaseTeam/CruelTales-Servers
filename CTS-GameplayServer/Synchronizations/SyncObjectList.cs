@@ -388,12 +388,9 @@ namespace CT.Common.DataType.Synchronizations
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 #endif
 
-#if NET
-		public static void IgnoreSyncReliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
-		public static void IgnoreSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
-#else
-		public void IgnoreSyncReliable(IPacketReader reader) => throw _exception;
-		public void IgnoreSyncUnreliable(IPacketReader reader) => throw _exception;
-#endif
+		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new NotImplementedException();
+		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new NotImplementedException();
+		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
+		public void IgnoreSyncUnreliable(IPacketReader reader) => IgnoreSyncStaticUnreliable(reader);
 	}
 }

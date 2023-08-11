@@ -189,6 +189,18 @@ using CTS.Instance.SyncObjects;";
 				return "NONE";
 			}
 		}
+
+		public static string[] GetGenericTypeNames(string typeName)
+		{
+			int s = typeName.IndexOf('<') + 1;
+			int e = typeName.IndexOf('>');
+			string[] tokens = typeName[s..e].Split(',');
+			for (int i = 0; i < tokens.Length; i++)
+			{
+				tokens[i] = tokens[i].Trim();
+			}
+			return tokens;
+		}
 	}
 
 	public static class ObjectPoolFormat

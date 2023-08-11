@@ -11,14 +11,26 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
-using CT.Common.Gameplay;
-using CT.Common.Gameplay.Players;
+using CT.Common;
 using CT.Common.DataType;
-using CT.Common.DataType.Input;
-using CT.Common.DataType.Synchronizations;
+using CT.Common.Exceptions;
+using CT.Common.Gameplay;
+using CT.Common.Quantization;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
+using CT.Common.Tools;
+using CT.Common.DataType.Input;
+using CT.Common.DataType.Primitives;
+using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.PlayerCharacterStates;
+using CT.Common.Gameplay.Players;
+using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Collections;
+using CT.Common.Tools.ConsoleHelper;
+using CT.Common.Tools.Data;
+using CT.Common.Tools.FSM;
+using CT.Common.Tools.GetOpt;
+using CT.Common.Tools.SharpJson;
 using CTC.Networks.Synchronizations;
 
 namespace CTC.Networks.SyncObjects.TestSyncObjects
@@ -60,6 +72,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			add => _onPasswordChanged += value;
 			remove => _onPasswordChanged -= value;
+		}
+		[SyncObject]
+		private readonly SyncObjectList<PlayerState> _playerStates = new();
+		public SyncObjectList<PlayerState> PlayerStates => _playerStates;
+		private Action<SyncObjectList<PlayerState>>? _onPlayerStatesChanged;
+		public event Action<SyncObjectList<PlayerState>> OnPlayerStatesChanged
+		{
+			add => _onPlayerStatesChanged += value;
+			remove => _onPlayerStatesChanged -= value;
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void ServerRoomSetAck_Callback(RoomSettingResult callback);
@@ -173,6 +194,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
+				if (!_playerStates.TryDeserializeSyncReliable(reader)) return false;
+				_onPlayerStatesChanged?.Invoke(_playerStates);
+			}
+			if (dirtyReliable_0[4])
+			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
@@ -192,6 +218,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
 			if (!reader.TryReadInt32(out _password)) return false;
 			_onPasswordChanged?.Invoke(_password);
+			if (!_playerStates.TryDeserializeEveryProperty(reader)) return false;
+			_onPlayerStatesChanged?.Invoke(_playerStates);
 			return true;
 		}
 		public void InitializeRemoteProperties()
@@ -199,6 +227,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_roomName = new();
 			_roomDiscription = new();
 			_password = 0;
+			_playerStates.InitializeRemoteProperties();
 		}
 		public void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -216,6 +245,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				_playerStates.IgnoreSyncReliable(reader);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
@@ -240,6 +273,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				reader.Ignore(4);
 			}
 			if (dirtyReliable_0[3])
+			{
+				SyncObjectList<PlayerState>.IgnoreSyncStaticReliable(reader);
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)

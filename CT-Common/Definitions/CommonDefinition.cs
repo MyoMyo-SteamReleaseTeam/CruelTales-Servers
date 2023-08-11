@@ -9,4 +9,9 @@
 	public class CommonDefinition
 	{
 	}
+
+	public class SyncObjectList<T>
+	{
+
+	}
 }

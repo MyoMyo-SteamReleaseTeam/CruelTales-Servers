@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 using CT.Common.Definitions;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
@@ -61,9 +61,36 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private static Dictionary<Type, HashSet<(string TypeName, string PropertyName)>> _propertySetByType = new();
 		private static Dictionary<Type, HashSet<string>> _functionSetByType = new();
 
-		public static bool TryGetSyncObjectByTypeName(string typeName, out SyncObjectInfo? syncObjectInfo)
+		public static bool TryGetSyncObjectByTypeName(string typeName,
+													  [NotNullWhen(true)]
+													  out SyncObjectInfo? syncObjectInfo)
 		{
 			return _syncObjectByName.TryGetValue(typeName, out syncObjectInfo);
+		}
+
+		public static bool HasTarget(string typeName)
+		{
+			if (TryGetSyncObjectByTypeName(typeName, out var syncObj))
+			{
+				return syncObj.HasTarget;
+			}
+
+			var definedType = NameTable.GetPredefinedType(typeName);
+			var genericTypes = NameTable.GetGenericTypeNames(typeName);
+
+			switch (definedType)
+			{
+				case PredefinedType.SyncList:
+					return false;
+
+				case PredefinedType.SyncDictionary:
+					return false;
+
+				case PredefinedType.SyncObjectList:
+					return HasTarget(genericTypes[0]);
+			}
+
+			throw new ArgumentException($"There is no such type to check HasTarget: {typeName}");
 		}
 
 		public void GenerateCode(string[] args)

@@ -54,24 +54,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 									 SyncGroupFormat.EntireFunctionSuffix);
 			}
 
-			if (_isPredefined)
-			{
-				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
-			}
-
-			SynchronizerGenerator.TryGetSyncObjectByTypeName(TypeName, out var syncObj);
-			if (syncObj == null)
-			{
-				throw new System.Exception($"There is no such sync object type : {TypeName}");
-			}
-
 			if (direction == SyncDirection.FromRemote)
 			{
 				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 			}
 
-
-			if (syncObj.HasTarget)
+			if (SynchronizerGenerator.HasTarget(TypeName))
 			{
 				return string.Format(MemberFormat.WriteSyncObjectWithPlayerAndRollback,
 									 _privateMemberName, syncType,

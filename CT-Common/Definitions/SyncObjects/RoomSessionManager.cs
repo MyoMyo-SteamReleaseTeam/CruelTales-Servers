@@ -6,7 +6,7 @@ using CT.Common.Synchronizations;
 namespace CT.Common.Definitions.SyncObjects
 {
 	[SyncObjectDefinition]
-	public class  RoomSessionManager
+	public class RoomSessionManager
 	{
 		[SyncVar]
 		public NetStringShort RoomName;
@@ -16,6 +16,9 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncVar]
 		public int Password;
+
+		[SyncObject]
+		public SyncObjectList<PlayerState> PlayerStates = new();
 
 		[SyncRpc(SyncType.ReliableTarget)]
 		public void ServerRoomSetAck_Callback(RoomSettingResult callback) { }

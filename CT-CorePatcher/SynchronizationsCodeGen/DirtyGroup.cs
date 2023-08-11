@@ -24,21 +24,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m is TargetFunctionMemberToken)
 					return true;
-				else  if (m is SyncObjectMemberToken)
-				{
-					if (NameTable.IsPredefinedType(m.TypeName))
-						return false;
-
-					if (!SynchronizerGenerator.TryGetSyncObjectByTypeName(m.TypeName, out var syncObjectInfo) ||
-						syncObjectInfo == null)
-					{
-						throw new System.Exception();
-					}
-
-					return syncObjectInfo.HasTarget;
-				}
-
-				return false;
+				else if (m is SyncObjectMemberToken)
+					return SynchronizerGenerator.HasTarget(m.TypeName);
+				else
+					return false;
 			});
 
 			HasChildMember = members.Any((m) => m.InheritType == InheritType.Child);
