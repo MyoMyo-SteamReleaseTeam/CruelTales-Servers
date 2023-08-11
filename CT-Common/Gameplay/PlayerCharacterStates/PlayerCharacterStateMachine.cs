@@ -131,7 +131,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 				}
 				else if (moveType == MovementType.Run)
 				{
-					ProxyDirection curDirection = Reference.GetDokzaDirection();
+					ProxyDirection curDirection = Reference.GetProxyDirectionByDokza();
 					if (Reference.Player.ProxyDirection != curDirection)
 					{
 						Reference.UpdateDokzaDirection(curDirection);
@@ -181,7 +181,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 				}
 				else if (moveType == MovementType.Walk)
 				{
-					ProxyDirection curDirection = Reference.GetDokzaDirection();
+					ProxyDirection curDirection = Reference.GetProxyDirectionByDokza();
 					if (Reference.Player.ProxyDirection != curDirection)
 					{
 						Reference.UpdateDokzaDirection(curDirection);

@@ -30,7 +30,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		public void UpdateDokzaDirection()
 		{
-			Player.ProxyDirection = GetDokzaDirection();
+			Player.ProxyDirection = GetProxyDirectionByDokza();
 			Player.OnProxyDirectionChanged(Player.ProxyDirection);
 		}
 
@@ -39,7 +39,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Player.AnimationTime += deltaTime;
 		}
 
-		public ProxyDirection GetDokzaDirection()
+		public ProxyDirection GetProxyDirectionByDokza()
 		{
 			ProxyDirection direction = ProxyDirection.None;
 
