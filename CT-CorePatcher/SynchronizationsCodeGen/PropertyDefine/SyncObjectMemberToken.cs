@@ -6,19 +6,43 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 	public class SyncObjectMemberToken : BaseMemberToken
 	{
 		public override bool ShouldRollBackMask => false;
+		private string _constructorContent;
 		private bool _isPredefined = false;
 		private bool _isBidirectionSync = false;
 
+		public string GetTypeName(SyncDirection direction)
+		{
+#pragma warning disable CA1416
+			if (MainProcess.IsDebug)
+#pragma warning restore CA1416
+			{
+				if (NameTable.IsDuplicatedNamespace(_typeName) && 
+					direction == SyncDirection.FromMaster)
+				{
+					return $"Synchronizations.{_typeName}";
+				}
+			}
+
+			return _typeName;
+		}
+
 		public SyncObjectMemberToken(SyncType syncType, InheritType inheritType,
-									 string typeName, string memberName, bool isPublic, bool isPredefined, bool isBidirectionSync)
+									 string typeName, string memberName, string constructorContent,
+									 bool isPublic, bool isPredefined, bool isBidirectionSync)
 			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
+			_constructorContent = constructorContent;
 			_isPredefined = isPredefined;
 			_isBidirectionSync = isBidirectionSync;
 			_syncType = syncType;
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
+		}
+
+		public string Master_Constructor()
+		{
+			return string.Format(MemberFormat.Constructor, _privateMemberName, _constructorContent);
 		}
 
 		public override string Master_InitializeProperty(SyncDirection direction)
@@ -30,8 +54,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override string Master_Declaration(SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, _typeName,
-								 _privateMemberName, MemberFormat.NewInitializer, _privateAccessModifier);
+			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, GetTypeName(direction),
+								 _privateMemberName, _privateAccessModifier);
 		}
 
 		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
@@ -42,7 +66,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			if (syncType.IsUnreliable() && _syncType == SyncType.ReliableOrUnreliable)
 				return string.Empty;
 
-			return string.Format(MemberFormat.ObjectGetter, AccessModifier, _typeName, _publicMemberName, _privateMemberName);
+#pragma warning disable CA1416
+			// Collection과 같은 미리 정의된 함수의 경우 namespace 문제로 테스트시 동작하지 않음
+			if (MainProcess.IsDebug && _isPredefined)
+				return string.Empty;
+#pragma warning restore CA1416
+
+				return string.Format(MemberFormat.ObjectGetter, AccessModifier, _typeName, _publicMemberName, _privateMemberName);
 		}
 
 		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
@@ -101,12 +131,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 				if (IsPublic)
 				{
 					return string.Format(MemberFormat.RemoteReadonlyDeclarationAsPublic_NoDef,
-										 _typeName, _publicMemberName, _privateAccessModifier);
+										 GetTypeName(direction), _publicMemberName, _privateAccessModifier);
 				}
 				else
 				{
 					return string.Format(MemberFormat.RemoteReadonlyDeclaration_NoDef,
-										 _typeName, _publicMemberName, _privateAccessModifier);
+										 GetTypeName(direction), _publicMemberName, _privateAccessModifier);
 				}
 			}
 
@@ -114,7 +144,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			format = IsPublic ?
 				MemberFormat.RemoteReadonlyDeclarationAsPublic :
 				MemberFormat.RemoteReadonlyDeclaration;
-			return string.Format(format, attribute, _typeName, _privateMemberName,
+			return string.Format(format, attribute, GetTypeName(direction), _privateMemberName,
 								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier, _privateAccessModifier);
 		}
 
@@ -138,6 +168,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
 		{
+#pragma warning disable CA1416
+			// Collection과 같은 미리 정의된 함수의 경우 namespace 문제로 테스트시 동작하지 않음
+			if (MainProcess.IsDebug && _isPredefined)
+				return string.Empty;
+#pragma warning restore CA1416
+
 			if (isStatic)
 				return string.Format(MemberFormat.IgnoreObjectTypeStatic, _typeName, syncType);
 			else

@@ -3,7 +3,7 @@
 using CT.Common.Gameplay;
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(capacity: 1)]
 	public class GameplayController

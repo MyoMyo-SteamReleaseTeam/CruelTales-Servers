@@ -12,6 +12,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string ObjectName => _objectName;
 		private string _objectName;
 		private string _modifier;
+		private string _parentTypeName;
 		public  bool IsNetworkObject { get; private set; } = false;
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
@@ -41,7 +42,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							  bool isNetworkObject,
 							  int capacity,
 							  bool multiplyByMaxUser,
-							  bool isDebugObject)
+							  bool isDebugObject,
+							  string parent)
 		{
 			_objectName = objectName;
 			_inheritType = inheritType;
@@ -50,6 +52,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			this.IsDebugObject = isDebugObject;
 			MultiplyByMaxUser = multiplyByMaxUser;
 			_modifier = IsNetworkObject ? "override " : string.Empty;
+			_parentTypeName = parent;
 
 			_masterSideMembers = masterSideMembers;
 			_remoteSideMembers = remoteSideMembers;
@@ -163,6 +166,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 			sb.AppendLine(getNetworkTypeDefinition());
 
+			// Declarations
 			foreach (var m in forwardMember)
 			{
 				if (m.InheritType == InheritType.Child)
@@ -176,6 +180,24 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				sb.AppendLine(m.Member.Remote_Declaration(direction.Reverse()));
 			}
 
+			// Constructor
+			StringBuilder csb = new();
+			foreach (var m in forwardMember)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
+
+				if (m.Member is SyncObjectMemberToken token)
+				{
+					csb.AppendLine(token.Master_Constructor());
+				}
+			}
+
+			CodeFormat.AddIndent(csb);
+			sb.AppendLine(string.Format(CommonFormat.Constructor,
+										ObjectName, csb.ToString()));
+
+			// Synchronizations
 			sb.AppendLine(forward.Gen_SynchronizerProperties());
 			sb.AppendLine(forward.Gen_SerializeSyncFuntions());
 			sb.AppendLine(backward.Gen_SerializeSyncFuntions());

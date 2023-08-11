@@ -6,7 +6,7 @@ using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	#region Inner Test
 

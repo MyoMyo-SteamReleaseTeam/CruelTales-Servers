@@ -2,7 +2,7 @@
 
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(capacity: 120)]
 	public class TestCube

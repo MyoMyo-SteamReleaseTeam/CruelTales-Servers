@@ -1,18 +1,20 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
-using CT.Common.DataType;
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	[SyncObjectDefinition]
-	public class PlayerState
+	public class PlayerCostume
 	{
 		[SyncVar]
-		public NetStringShort Username;
+		public int Head;
 
-		[SyncObject]
-		public PlayerCostume Costume = new();
+		[SyncVar]
+		public int Hair;
+
+		[SyncVar]
+		public int Body;
 	}
 }
 #pragma warning restore IDE0051

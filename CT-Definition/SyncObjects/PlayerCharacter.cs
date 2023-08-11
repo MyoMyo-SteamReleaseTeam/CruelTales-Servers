@@ -7,7 +7,7 @@ using CT.Common.Gameplay;
 using CT.Common.Gameplay.Players;
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(1, true)]
 	public class PlayerCharacter
@@ -33,7 +33,7 @@ namespace CT.Common.Definitions.SyncObjects
 
 		[SyncRpc]
 		public void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction) { }
-		
+
 		[SyncRpc]
 		public void Server_OnProxyDirectionChanged(ProxyDirection direction) { }
 

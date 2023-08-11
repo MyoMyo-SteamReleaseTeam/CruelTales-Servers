@@ -15,8 +15,32 @@ namespace CT.Benchmark
 
 			//StringBufferBenchmark sb = new();
 			//sb.SBToByteArrayByIter();
-			InheritReflectionTest.Test();
+			//InheritReflectionTest.Test();
 
+			Child a = new Child();
+			Console.WriteLine(a.A);
+			Console.WriteLine(a.B);
+
+		}
+	}
+
+	public class Parent
+	{
+		public int A;
+
+		public Parent()
+		{
+			A = 50;
+		}
+	}
+
+	public class Child : Parent
+	{
+		public int B;
+
+		public Child()
+		{
+			B = 20;
 		}
 	}
 }

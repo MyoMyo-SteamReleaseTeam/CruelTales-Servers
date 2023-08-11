@@ -3,7 +3,7 @@
 using CT.Common.DataType;
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	[SyncObjectDefinition]
 	public class RoomSessionManager

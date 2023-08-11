@@ -49,12 +49,16 @@ namespace CT.Common.Synchronizations
 	{
 		public SyncType SyncType { get; private set; }
 		public SyncDirection SyncDirection { get; private set; }
+		public string ConstructorContent { get; private set; }
 
+		/// <param name="cc">생성자 인자 문자열입니다.</param>
 		public SyncObjectAttribute(SyncType sync = SyncType.Reliable,
-								   SyncDirection dir = SyncDirection.FromMaster)
+								   SyncDirection dir = SyncDirection.FromMaster,
+								   string cc = "")
 		{
 			SyncType = sync;
 			SyncDirection = dir;
+			ConstructorContent = cc;
 		}
 	}
 

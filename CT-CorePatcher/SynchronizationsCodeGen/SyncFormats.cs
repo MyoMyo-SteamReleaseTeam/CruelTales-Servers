@@ -139,6 +139,24 @@ using CTS.Instance.SyncObjects;";
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
 		};
 
+		private static Dictionary<PredefinedType, string> _duplicatedNamespaceTypeNames = new()
+		{
+			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
+		};
+
+		public static bool IsDuplicatedNamespace(string typeName)
+		{
+			foreach (var gt in _duplicatedNamespaceTypeNames.Keys)
+			{
+				if (typeName.Contains(_genericTypeName[gt]))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public static bool IsPredefinedType(string typeName)
 		{
 			return GetPredefinedType(typeName) != PredefinedType.None;
@@ -326,6 +344,16 @@ public partial class {0} : {1}
 		/// </summary>
 		public static string IfDirtyAny =>
 @"if ({0}.AnyTrue())
+{{
+{1}
+}}";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Constructor content<br/>
+		/// </summary>
+		public static string Constructor =>
+@"public {0}()
 {{
 {1}
 }}";
@@ -801,12 +829,11 @@ if (!{1}.TryDeserialize(reader)) return false;";
 		/// {0} Attribute<br/>
 		/// {1} Type name<br/>
 		/// {2} Property name<br/>
-		/// {3} Initialize<br/>
-		/// {4} Private access modifier<br/>
+		/// {3} Private access modifier<br/>
 		/// </summary>
 		public static string MasterReadonlyDeclaration =>
 @"[{0}]
-{4} readonly {1} {2}{3};";
+{3} readonly {1} {2};";
 
 		/// <summary>
 		/// {0} Attribute<br/>
@@ -913,6 +940,12 @@ public event Action<{0}> On{1}Changed
 }}";
 
 		public static string NewInitializer => " = new()";
+
+		/// <summary>
+		/// {0} Private member name<br/>
+		/// {1} Constructor content<br/>
+		/// </summary>
+		public static string Constructor => @"{0} = new({1});";
 
 		/// <summary>
 		/// {0} Access modifier<br/>

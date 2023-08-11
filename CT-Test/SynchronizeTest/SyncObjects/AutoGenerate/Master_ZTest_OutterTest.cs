@@ -41,14 +41,25 @@ namespace CTS.Instance.SyncObjects
 	public partial class ZTest_OutterTest
 	{
 		[SyncObject]
-		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary = new();
+		private readonly Synchronizations.SyncDictionary<NetInt32, NetInt32> _dictionary;
 		[SyncObject]
-		private readonly ZTest_InnerTest _inner = new();
+		private readonly Synchronizations.SyncObjectList<ZTest_InnerTest> _innerList;
+		[SyncObject]
+		private readonly Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList;
+		[SyncObject]
+		private readonly ZTest_InnerTest _inner;
 		private Action<ZTest_InnerTest>? _onInnerChanged;
 		public event Action<ZTest_InnerTest> OnInnerChanged
 		{
 			add => _onInnerChanged += value;
 			remove => _onInnerChanged -= value;
+		}
+		public ZTest_OutterTest()
+		{
+			_dictionary = new();
+			_innerList = new();
+			_noTargetList = new();
+			_inner = new();
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
@@ -57,37 +68,56 @@ namespace CTS.Instance.SyncObjects
 			{
 				bool isDirty = false;
 				isDirty |= _dictionary.IsDirtyReliable;
+				isDirty |= _innerList.IsDirtyReliable;
+				isDirty |= _noTargetList.IsDirtyReliable;
 				isDirty |= _inner.IsDirtyReliable;
 				isDirty |= _dirtyReliable_0.AnyTrue();
 				return isDirty;
 			}
 		}
 		public override bool IsDirtyUnreliable => false;
-		public SyncDictionary<NetInt32, NetInt32> Dictionary => _dictionary;
+		public ZTest_InnerTest Inner => _inner;
 		public override void ClearDirtyReliable()
 		{
 			_dirtyReliable_0.Clear();
 			_dictionary.ClearDirtyReliable();
+			_innerList.ClearDirtyReliable();
+			_noTargetList.ClearDirtyReliable();
 			_inner.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
 			_dirtyReliable_0[0] = _dictionary.IsDirtyReliable;
-			_dirtyReliable_0[1] = _inner.IsDirtyReliable;
+			_dirtyReliable_0[1] = _innerList.IsDirtyReliable;
+			_dirtyReliable_0[2] = _noTargetList.IsDirtyReliable;
+			_dirtyReliable_0[3] = _inner.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				_dictionary.SerializeSyncReliable(writer);
+				_dictionary.SerializeSyncReliable(player, writer);
 			}
 			if (_dirtyReliable_0[1])
+			{
+				int curSize = writer.Size;
+				_innerList.SerializeSyncReliable(player, writer);
+				if (writer.Size == curSize)
+				{
+					dirtyReliable_0[1] = false;
+				}
+			}
+			if (_dirtyReliable_0[2])
+			{
+				_noTargetList.SerializeSyncReliable(player, writer);
+			}
+			if (_dirtyReliable_0[3])
 			{
 				int curSize = writer.Size;
 				_inner.SerializeSyncReliable(player, writer);
 				if (writer.Size == curSize)
 				{
-					dirtyReliable_0[1] = false;
+					dirtyReliable_0[3] = false;
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())
@@ -103,11 +133,15 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_dictionary.SerializeEveryProperty(writer);
+			_innerList.SerializeEveryProperty(writer);
+			_noTargetList.SerializeEveryProperty(writer);
 			_inner.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_dictionary.InitializeMasterProperties();
+			_innerList.InitializeMasterProperties();
+			_noTargetList.InitializeMasterProperties();
 			_inner.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
