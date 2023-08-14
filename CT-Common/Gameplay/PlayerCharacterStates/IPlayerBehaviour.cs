@@ -7,6 +7,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	{
 		public DokzaAnimationState AnimationState { get; set; }
 		public ProxyDirection ProxyDirection { get; set; }
+		public Vector2 MoveDirection { get; set; }
 		public float AnimationTime { get; set; }
 
 		public void StopMove();

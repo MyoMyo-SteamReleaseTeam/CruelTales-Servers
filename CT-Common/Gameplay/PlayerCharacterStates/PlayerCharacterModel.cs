@@ -8,7 +8,6 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	{
 		public IPlayerBehaviour Player { get; private set; }
 		public Vector2 ActionAxis { get; set; } = Vector2.Zero;
-		public Vector2 MoveDirection { get; set; } = Vector2.Zero;
 
 		public PlayerCharacterModel(IPlayerBehaviour player)
 		{
@@ -22,32 +21,37 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Player.OnAnimationChanged(Player.AnimationState);
 		}
 
-		public void UpdateDokzaDirection(ProxyDirection direction)
+		public void UpdateAnimation(DokzaAnimationState animationState, ProxyDirection proxyDirection)
+		{
+			Player.AnimationState = animationState;
+			Player.AnimationTime = 0.0f;
+			Player.OnAnimationChanged(animationState, proxyDirection);
+		}
+		
+
+		public void UpdateProxyDirectionOnly(ProxyDirection direction)
 		{
 			Player.ProxyDirection = direction;
-			Player.OnProxyDirectionChanged(Player.ProxyDirection);
 		}
 
-		public void UpdateDokzaDirection()
+		public void UpdateMoveDirectionOnly(Vector2 moveDirection)
 		{
-			Player.ProxyDirection = GetProxyDirectionByDokza();
-			Player.OnProxyDirectionChanged(Player.ProxyDirection);
+			Player.MoveDirection = moveDirection;
 		}
-
-		public void Update(float deltaTime)
-		{
-			Player.AnimationTime += deltaTime;
-		}
-
-		public ProxyDirection GetProxyDirectionByDokza()
+		
+		/// <summary>
+		/// Player.MoveDirection을 기반으로 ProxyDirection을 변경합니다.
+		/// </summary>
+		/// <returns>ProxyDirection의 변경 여부를 전달합니다.</returns>
+		public bool UpdateProxyDirectionByMoveDirection()
 		{
 			ProxyDirection direction = ProxyDirection.None;
 
-			if (MoveDirection.X < 0f)
+			if (Player.MoveDirection.X < 0f)
 			{
 				direction |= ProxyDirection.Left;
 			}
-			else if (MoveDirection.X > 0f)
+			else if (Player.MoveDirection.X > 0f)
 			{
 				direction |= ProxyDirection.Right;
 			}
@@ -57,11 +61,11 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 					ProxyDirection.Right : ProxyDirection.Left;
 			}
 
-			if (MoveDirection.Y > 0f)
+			if (Player.MoveDirection.Y > 0f)
 			{
 				direction |= ProxyDirection.Up;
 			}
-			else if (MoveDirection.Y < 0f)
+			else if (Player.MoveDirection.Y < 0f)
 			{
 				direction |= ProxyDirection.Down;
 			}
@@ -73,7 +77,32 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 			Debug.Assert(!direction.IsAxisAligned());
 
-			return direction;
+			if (direction == Player.ProxyDirection)
+			{
+				return false;
+			}
+			
+			Player.ProxyDirection = direction;
+			return true;
+		}
+
+		public void SendProxyDirection()
+		{
+			Player.OnProxyDirectionChanged(Player.ProxyDirection);
+		}
+		
+		public void UpdateMoveDirectionWithProxy(Vector2 moveDirection)
+		{
+			if (moveDirection == Player.MoveDirection)
+				return;
+			
+			Player.MoveDirection = moveDirection;
+			UpdateProxyDirectionByMoveDirection();
+		}
+		
+		public void Update(float deltaTime)
+		{
+			Player.AnimationTime += deltaTime;
 		}
 	}
 }

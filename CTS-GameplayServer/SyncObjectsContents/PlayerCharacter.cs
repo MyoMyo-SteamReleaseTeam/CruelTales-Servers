@@ -39,6 +39,12 @@ namespace CTS.Instance.SyncObjects
 			set => _proxyDirection = value;
 		}
 
+		public Vector2 MoveDirection
+		{
+			get;
+			set;
+		}
+
 		public float AnimationTime
 		{
 			get => _animationTime;
