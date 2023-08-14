@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -65,44 +66,26 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _v11 = new();
 		[SyncObject]
-		private readonly SyncList<NetString> _v12 = new();
+		private readonly SyncList<NetString> _v12;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _v13 = new();
+		private readonly ZTest_InnerObjectTarget _v13;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObject _v14 = new();
+		private readonly ZTest_InnerObject _v14;
 		[SyncVar(SyncType.Unreliable)]
 		private byte _uv0;
 		[SyncVar(SyncType.Unreliable)]
 		private sbyte _uv1;
 		[SyncRpc]
 		public partial void f0();
+		public ZTest_Value16NonTarget()
+		{
+			_v12 = new(this);
+			_v13 = new(this);
+			_v14 = new(this);
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
-		public override bool IsDirtyReliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				isDirty |= _v12.IsDirtyReliable;
-				isDirty |= _v13.IsDirtyReliable;
-				isDirty |= _v14.IsDirtyReliable;
-				isDirty |= _dirtyReliable_1.AnyTrue();
-				return isDirty;
-			}
-		}
-		public override bool IsDirtyUnreliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _v13.IsDirtyUnreliable;
-				isDirty |= _v14.IsDirtyUnreliable;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
 		public byte V0
 		{
 			get => _v0;
@@ -111,6 +94,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v0 == value) return;
 				_v0 = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public sbyte V1
@@ -121,6 +105,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v1 == value) return;
 				_v1 = value;
 				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public ushort V2
@@ -131,6 +116,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v2 == value) return;
 				_v2 = value;
 				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public short V3
@@ -141,6 +127,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v3 == value) return;
 				_v3 = value;
 				_dirtyReliable_0[3] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public uint V4
@@ -151,6 +138,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v4 == value) return;
 				_v4 = value;
 				_dirtyReliable_0[4] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int V5
@@ -161,6 +149,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v5 == value) return;
 				_v5 = value;
 				_dirtyReliable_0[5] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public ulong V6
@@ -171,6 +160,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v6 == value) return;
 				_v6 = value;
 				_dirtyReliable_0[6] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public long V7
@@ -181,6 +171,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v7 == value) return;
 				_v7 = value;
 				_dirtyReliable_0[7] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public float V8
@@ -191,6 +182,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v8 == value) return;
 				_v8 = value;
 				_dirtyReliable_1[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public double V9
@@ -201,6 +193,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v9 == value) return;
 				_v9 = value;
 				_dirtyReliable_1[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public NetString V10
@@ -211,6 +204,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v10 == value) return;
 				_v10 = value;
 				_dirtyReliable_1[2] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public NetStringShort V11
@@ -221,15 +215,16 @@ namespace CTS.Instance.SyncObjects
 				if (_v11 == value) return;
 				_v11 = value;
 				_dirtyReliable_1[3] = true;
+				MarkDirtyReliable();
 			}
 		}
-		public SyncList<NetString> V12 => _v12;
 		public ZTest_InnerObjectTarget V13 => _v13;
 		public ZTest_InnerObject V14 => _v14;
 		public partial void f0()
 		{
 			f0CallstackCount++;
 			_dirtyReliable_1[7] = true;
+			MarkDirtyReliable();
 		}
 		private byte f0CallstackCount = 0;
 		public byte Uv0
@@ -240,6 +235,7 @@ namespace CTS.Instance.SyncObjects
 				if (_uv0 == value) return;
 				_uv0 = value;
 				_dirtyUnreliable_0[2] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public sbyte Uv1
@@ -250,10 +246,12 @@ namespace CTS.Instance.SyncObjects
 				if (_uv1 == value) return;
 				_uv1 = value;
 				_dirtyUnreliable_0[3] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_dirtyReliable_1.Clear();
 			_v12.ClearDirtyReliable();
@@ -263,6 +261,7 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void ClearDirtyUnreliable()
 		{
+			_isDirtyUnreliable = false;
 			_dirtyUnreliable_0.Clear();
 			_v13.ClearDirtyUnreliable();
 			_v14.ClearDirtyUnreliable();

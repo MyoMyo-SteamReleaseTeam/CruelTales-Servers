@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -46,20 +47,27 @@ namespace CTS.Instance.SyncObjects
 		private int _hair;
 		[SyncVar]
 		private int _body;
-		public PlayerCostume()
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerCostume(IDirtyable owner)
 		{
+			_owner = owner;
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public bool IsDirtyReliable
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
-		public bool IsDirtyUnreliable => false;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
+		{
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
+		}
 		public int Head
 		{
 			get => _head;
@@ -68,6 +76,7 @@ namespace CTS.Instance.SyncObjects
 				if (_head == value) return;
 				_head = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int Hair
@@ -78,6 +87,7 @@ namespace CTS.Instance.SyncObjects
 				if (_hair == value) return;
 				_hair = value;
 				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int Body
@@ -88,10 +98,12 @@ namespace CTS.Instance.SyncObjects
 				if (_body == value) return;
 				_body = value;
 				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 		}
 		public void ClearDirtyUnreliable() { }

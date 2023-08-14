@@ -61,8 +61,10 @@ namespace CTS.Instance.Synchronizations
 			RigidBody = new NetRigidBody(_physicsRigidBody);
 		}
 
-		/// <summary>객체의 생성자입니다. 단 한 번만 호출됩니다.</summary>
+		/// <summary>객체의 사용자 정의 생성자입니다. 단 한 번만 호출됩니다.</summary>
 		public virtual void Constructor() { }
+
+		public void BindOwner(IDirtyable owner) => throw new System.NotImplementedException();
 
 		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
 		public virtual void OnFixedUpdate(float stepTime) {}
@@ -183,13 +185,17 @@ namespace CTS.Instance.Synchronizations
 
 		#endregion
 
-		public abstract bool IsDirtyReliable { get; }
-		public abstract bool IsDirtyUnreliable { get; }
+		protected bool _isDirtyReliable;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
 		public abstract void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer);
 		public abstract void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer);
 		public abstract void SerializeEveryProperty(IPacketWriter writer);
 		public abstract bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader);
 		public abstract bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader);
+		public void MarkDirtyReliable() => _isDirtyReliable = true;
+		public void MarkDirtyUnreliable() => _isDirtyUnreliable = true;
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void InitializeMasterProperties();

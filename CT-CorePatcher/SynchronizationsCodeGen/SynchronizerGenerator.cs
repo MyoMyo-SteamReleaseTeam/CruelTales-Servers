@@ -154,7 +154,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (!MainProcess.IsDebug)
 			{
 				var networkEnums = syncObjects
-					.Where(obj => obj.IsNetworkObject)
+					.Where(obj => obj.SyncObjectType == SyncObjectType.NetworkObject)
 					.Select(obj => obj.ObjectName).ToList();
 				var netTypeFileName = CommonFormat.NetworkObjectTypeTypeName + ".cs";
 
@@ -276,7 +276,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (syncObjDefinitionTypes != null && syncObjDefinitionTypes.Count > 0)
 			{
-				var syncObjs = parseTypeToSyncObjectInfo(syncObjDefinitionTypes, isNetworkObject: false);
+				var syncObjs = parseTypeToSyncObjectInfo(syncObjDefinitionTypes,
+														 SyncObjectType.SyncObject);
 				syncObjects.AddRange(syncObjs);
 			}
 
@@ -286,14 +287,16 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			if (netObjDefititionTypes != null && netObjDefititionTypes.Count > 0)
 			{
-				var syncObjs = parseTypeToSyncObjectInfo(netObjDefititionTypes, isNetworkObject: true);
+				var syncObjs = parseTypeToSyncObjectInfo(netObjDefititionTypes,
+														 SyncObjectType.NetworkObject);
 				syncObjects.AddRange(syncObjs);
 			}
 
 			return syncObjects;
 		}
 
-		private List<SyncObjectInfo> parseTypeToSyncObjectInfo(IEnumerable<Type> types, bool isNetworkObject)
+		private List<SyncObjectInfo> parseTypeToSyncObjectInfo(IEnumerable<Type> types,
+															   SyncObjectType objectType)
 		{
 			// Parse inheritance tree
 			HashSet<Type> baseTypes = new();
@@ -407,7 +410,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				}
 				SyncObjectInfo objectInfo = new(t.Name, inheritType,
 												masterMembers, remoteMembers,
-												isNetworkObject, capacity,
+												objectType, capacity,
 												multiplyByMaxUser, isDebugObject, parentName);
 				objectInfo.HasReliable = masterMembers.Any((m) => m.SyncType.IsReliable());
 				objectInfo.HasUnreliable = masterMembers.Any((m) => m.SyncType.IsUnreliable());

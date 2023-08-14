@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -74,7 +75,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onPasswordChanged -= value;
 		}
 		[SyncObject]
-		private readonly SyncObjectList<PlayerState> _playerStates = new();
+		private readonly SyncObjectList<PlayerState> _playerStates;
 		public SyncObjectList<PlayerState> PlayerStates => _playerStates;
 		private Action<SyncObjectList<PlayerState>>? _onPlayerStatesChanged;
 		public event Action<SyncObjectList<PlayerState>> OnPlayerStatesChanged
@@ -84,46 +85,59 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void ServerRoomSetAck_Callback(RoomSettingResult callback);
-		public RoomSessionManager()
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public RoomSessionManager(IDirtyable owner)
 		{
+			_owner = owner;
+			_playerStates = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public bool IsDirtyReliable
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
-		public bool IsDirtyUnreliable => false;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
+		{
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
+		}
 		public partial void ClientRoomSetReq_SetPassword(int password)
 		{
 			ClientRoomSetReq_SetPasswordiCallstack.Add(password);
 			_dirtyReliable_0[0] = true;
+			MarkDirtyReliable();
 		}
 		private List<int> ClientRoomSetReq_SetPasswordiCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomName(NetStringShort roomName)
 		{
 			ClientRoomSetReq_SetRoomNameNCallstack.Add(roomName);
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private List<NetStringShort> ClientRoomSetReq_SetRoomNameNCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetStringShort roomDiscription)
 		{
 			ClientRoomSetReq_SetRoomDiscriptionNCallstack.Add(roomDiscription);
 			_dirtyReliable_0[2] = true;
+			MarkDirtyReliable();
 		}
 		private List<NetStringShort> ClientRoomSetReq_SetRoomDiscriptionNCallstack = new(4);
 		public partial void ClientRoomSetReq_SetRoomMaxUser(int maxUser)
 		{
 			ClientRoomSetReq_SetRoomMaxUseriCallstack.Add(maxUser);
 			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
 		}
 		private List<int> ClientRoomSetReq_SetRoomMaxUseriCallstack = new(4);
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			ClientRoomSetReq_SetPasswordiCallstack.Clear();
 			ClientRoomSetReq_SetRoomNameNCallstack.Clear();

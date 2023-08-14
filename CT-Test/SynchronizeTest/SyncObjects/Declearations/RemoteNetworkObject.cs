@@ -18,6 +18,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
 
+		public virtual void Constructor() => throw new System.NotImplementedException();
+
+		public void BindOwner(IDirtyable owner) => throw new System.NotImplementedException();
+
 		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
 		public virtual void OnDestroyed() { }
 
@@ -42,8 +46,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			IsAlive = false;
 		}
 
-		public abstract bool IsDirtyReliable { get; }
-		public abstract bool IsDirtyUnreliable { get; }
+		protected bool _isDirtyReliable;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
 		public abstract void SerializeSyncReliable(IPacketWriter writer);
 		public abstract void SerializeSyncUnreliable(IPacketWriter writer);
 		public abstract bool TryDeserializeSyncReliable(IPacketReader reader);
@@ -51,6 +57,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public abstract bool TryDeserializeSyncUnreliable(IPacketReader reader);
 		public abstract void InitializeMasterProperties();
 		public abstract void InitializeRemoteProperties();
+		public virtual void MarkDirtyReliable() => _isDirtyReliable = true;
+		public virtual void MarkDirtyUnreliable() => _isDirtyUnreliable = true;
 		public abstract void ClearDirtyReliable();
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);

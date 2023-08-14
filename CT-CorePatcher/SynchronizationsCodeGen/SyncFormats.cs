@@ -30,7 +30,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private static string _systemUsingStatements =>
 @"using System;
 using System.Numerics;
-using System.Collections.Generic;";
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;";
 
 		private static string _parsedUsingStatements = string.Empty;
 
@@ -358,6 +359,11 @@ public partial class {0} : {1}
 {1}
 }}";
 
+		public static string OwnerDeclaration => @"[AllowNull] public IDirtyable _owner;";
+
+		public static string BindOwner =>
+@"public void BindOwner(IDirtyable owner) => _owner = owner;";
+
 		/// <summary>
 		/// {0} Type name<br/>
 		/// {1} Constructor content<br/>
@@ -365,6 +371,17 @@ public partial class {0} : {1}
 		public static string Constructor =>
 @"public {0}()
 {{
+{1}
+}}";
+
+		/// <summary>
+		/// {0} Type name<br/>
+		/// {1} Constructor content<br/>
+		/// </summary>
+		public static string ConstructorWithOwner =>
+@"public {0}(IDirtyable owner)
+{{
+	_owner = owner;
 {1}
 }}";
 	}
@@ -375,6 +392,8 @@ public partial class {0} : {1}
 		/// {0} Modifire<br/>
 		/// {1} SyncType<br/>
 		/// {2} Content<br/>
+		/// </summary>
+		[Obsolete("IsDirty는 프로퍼티가 아니라 필드로 변경됨")]
 		public static string IsDirty =>
 @"public {0}bool IsDirty{1}
 {{
@@ -387,14 +406,29 @@ public partial class {0} : {1}
 }}";
 
 		/// <summary>
+		/// {0} Modifire<br/>
+		/// {1} SyncType<br/>
+		[Obsolete("IsDirty는 프로퍼티가 아니라 필드로 변경됨")]
+		public static string IsDirtyIfNoElement => @"public {0}bool IsDirty{1} => false;";
+
+		/// <summary>
 		/// {0} Dirty bit name<br/>
 		/// </summary>
+		[Obsolete("IsDirty는 프로퍼티가 아니라 필드로 변경됨")]
 		public static string IsBitmaskDirty => @"isDirty |= {0}.AnyTrue();";
 
 		/// <summary>
-		/// {0} Modifire<br/>
-		/// {1} SyncType<br/>
-		public static string IsDirtyIfNoElement => @"public {0}bool IsDirty{1} => false;";
+		/// {0} SyncType<br/>
+		/// </summary>
+		public static string IsDirtyField =>
+@"protected bool _isDirty{0};
+public bool IsDirty{0} => _isDirty{0};
+
+public void MarkDirty{0}()
+{{
+	_isDirty{0} = true;
+	_owner.MarkDirty{0}();
+}}";
 
 		public static string MasterDirtyBitName => @"masterDirty";
 
@@ -511,6 +545,11 @@ public partial class {0} : {1}
 		public static string ClearDirtyFunctionIfEmpty => @"public {0}void ClearDirty{1}() {{ }}";
 
 		/// <summary>
+		/// {0} SyncType<br/>
+		/// </summary>
+		public static string ClearObjectDirty => @"_isDirty{0} = false;";
+
+		/// <summary>
 		/// {0} Modifire<br/>
 		/// </summary>
 		public static string InitializeMasterProperties => @"public {0}void InitializeMasterProperties()";
@@ -613,12 +652,14 @@ else
 		/// {6} Dirty index<br/>
 		/// {7} Private access modifier<br/>
 		/// {8} Callstack name<br/>
+		/// {9} Sync type<br/>
 		/// </summary>
 		public static string CallWithStack =>
 @"{0} partial void {1}({2})
 {{
 	{8}Callstack.Add({3});
 	{5}[{6}] = true;
+	MarkDirty{9}();
 }}
 {7} List<{4}> {8}Callstack = new(4);";
 
@@ -629,12 +670,14 @@ else
 		/// {3} Member index<br/>
 		/// {4} Private access modifier<br/>
 		/// {5} Callstack name<br/>
+		/// {6} Sync type<br/>
 		/// </summary>
 		public static string CallWithStackVoid =>
 @"{0} partial void {1}()
 {{
 	{5}CallstackCount++;
 	{2}[{3}] = true;
+	MarkDirty{6}();
 }}
 {4} byte {5}CallstackCount = 0;";
 
@@ -648,12 +691,14 @@ else
 		/// {6} Dirty index<br/>
 		/// {7} Private access modifier<br/>
 		/// {8} Callstack name<br/>
+		/// {9} Sync type<br/>
 		/// </summary>
 		public static string TargetCallWithStack =>
 @"{0} partial void {1}(NetworkPlayer player, {2})
 {{
 	{8}Callstack.Add(player, {3});
 	{5}[{6}] = true;
+	MarkDirty{9}();
 }}
 {7} TargetCallstack<NetworkPlayer, {4}> {8}Callstack = new(8);";
 
@@ -664,12 +709,14 @@ else
 		/// {3} Member index<br/>
 		/// {4} Private access modifier<br/>
 		/// {5} Callstack name<br/>
+		/// {6} Sync type<br/>
 		/// </summary>
 		public static string TargetCallWithStackVoid =>
 @"{0} partial void {1}(NetworkPlayer player)
 {{
 	{5}Callstack.Add(player);
 	{2}[{3}] = true;
+	MarkDirty{6}();
 }}
 {4} TargetVoidCallstack<NetworkPlayer> {5}Callstack = new(8);";
 
@@ -955,7 +1002,7 @@ public event Action<{0}> On{1}Changed
 		/// {0} Private member name<br/>
 		/// {1} Constructor content<br/>
 		/// </summary>
-		public static string Constructor => @"{0} = new({1});";
+		public static string ConstructorWithOwner => @"{0} = new(this{1});";
 
 		/// <summary>
 		/// {0} Access modifier<br/>
@@ -964,6 +1011,7 @@ public event Action<{0}> On{1}Changed
 		/// {3} Private member name<br/>
 		/// {4} Dirty bits name<br/>
 		/// {5} Dirty index<br/>
+		/// {6} Sync type<br/>
 		/// </summary>
 		public static string GetterSetter =>
 @"{0} {1} {2}
@@ -974,8 +1022,15 @@ public event Action<{0}> On{1}Changed
 		if ({3} == value) return;
 		{3} = value;
 		{4}[{5}] = true;
+		MarkDirty{6}();
 	}}
 }}";
+
+		/// <summary>
+		/// {0} Sync type<br/>
+		/// </summary>
+		public static string DirtyOwner =>
+"_owner.MarkDirty{0}();";
 
 		/// <summary>
 		/// {0} Access modifier<br/>

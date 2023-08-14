@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -39,7 +40,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class ZTest_SyncCollection
 	{
 		[SyncObject]
-		private readonly SyncList<UserId> _userIdList = new();
+		private readonly SyncList<UserId> _userIdList;
 		public SyncList<UserId> UserIdList => _userIdList;
 		private Action<SyncList<UserId>>? _onUserIdListChanged;
 		public event Action<SyncList<UserId>> OnUserIdListChanged
@@ -48,7 +49,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onUserIdListChanged -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _syncObj = new();
+		private readonly ZTest_InnerObjectTarget _syncObj;
 		public ZTest_InnerObjectTarget SyncObj => _syncObj;
 		private Action<ZTest_InnerObjectTarget>? _onSyncObjChanged;
 		public event Action<ZTest_InnerObjectTarget> OnSyncObjChanged
@@ -56,8 +57,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onSyncObjChanged += value;
 			remove => _onSyncObjChanged -= value;
 		}
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public ZTest_SyncCollection()
+		{
+			_userIdList = new(this);
+			_syncObj = new(this);
+		}
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
@@ -106,7 +110,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				_userIdList.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[1])
 			{
@@ -118,7 +121,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 			}
 			if (dirtyReliable_0[1])
 			{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
@@ -166,6 +167,8 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+
+		public SyncList<NetString> V12 => _v12;
 	}
 
 	public partial class ZTest_Value16Target : MasterNetworkObject
@@ -173,6 +176,8 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+
+		public SyncList<NetString> V12 => _v12;
 	}
 
 	public partial class ZTest_Value32Target : MasterNetworkObject
@@ -180,6 +185,9 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+
+		public SyncList<UserId> V7 => _v7;
+		public SyncList<UserId> V23 => _v23;
 	}
 
 	public partial class ZTest_Value32NonTarget : MasterNetworkObject
@@ -187,6 +195,8 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.None;
 		public override VisibilityType Visibility => throw new NotImplementedException();
 		public override VisibilityAuthority InitialVisibilityAuthority => throw new NotImplementedException();
+
+		public SyncList<UserId> V7 => _v7;
 	}
 
 	public partial class ZTest_OutterTest : MasterNetworkObject
@@ -199,6 +209,11 @@ namespace CTS.Instance.SyncObjects
 	public partial class ZTest_InnerTest : IMasterSynchronizable
 	{
 		private Dictionary<UserId, int> _callTable = new();
+
+		public ZTest_InnerTest()
+		{
+			
+		}
 
 		public partial void Client_Test(NetworkPlayer player)
 		{
@@ -218,6 +233,13 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			return 0;
+		}
+	}
+
+	public partial class ZTest_InnerTestNoTarget : IMasterSynchronizable
+	{
+		public ZTest_InnerTestNoTarget()
+		{
 		}
 	}
 }

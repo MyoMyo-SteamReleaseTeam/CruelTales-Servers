@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -49,9 +50,9 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _v3;
 		[SyncObject]
-		private readonly SyncList<UserId> _v4 = new();
+		private readonly SyncList<UserId> _v4;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _v5 = new();
+		private readonly ZTest_InnerObjectTarget _v5;
 		[SyncVar(SyncType.Unreliable)]
 		private int _uv0;
 		[SyncVar(SyncType.Unreliable)]
@@ -70,29 +71,13 @@ namespace CTS.Instance.SyncObjects
 		public partial void uf1(int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uft2(NetworkPlayer player);
+		public ZTest_Value8Target()
+		{
+			_v4 = new(this);
+			_v5 = new(this);
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
-		public override bool IsDirtyReliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _v4.IsDirtyReliable;
-				isDirty |= _v5.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
-		public override bool IsDirtyUnreliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _v5.IsDirtyUnreliable;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
 		public NetString V0
 		{
 			get => _v0;
@@ -101,6 +86,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v0 == value) return;
 				_v0 = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public NetStringShort V1
@@ -111,6 +97,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v1 == value) return;
 				_v1 = value;
 				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public TestEnumType V2
@@ -121,6 +108,7 @@ namespace CTS.Instance.SyncObjects
 				if (_v2 == value) return;
 				_v2 = value;
 				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int V3
@@ -131,20 +119,22 @@ namespace CTS.Instance.SyncObjects
 				if (_v3 == value) return;
 				_v3 = value;
 				_dirtyReliable_0[3] = true;
+				MarkDirtyReliable();
 			}
 		}
-		public SyncList<UserId> V4 => _v4;
 		public ZTest_InnerObjectTarget V5 => _v5;
 		public partial void ft0(NetworkPlayer player, NetString v0, NetStringShort v1, TestEnumType v2, int v3)
 		{
 			ft0NNTiCallstack.Add(player, (v0, v1, v2, v3));
 			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, (NetString v0, NetStringShort v1, TestEnumType v2, int v3)> ft0NNTiCallstack = new(8);
 		public partial void f1()
 		{
 			f1CallstackCount++;
 			_dirtyReliable_0[7] = true;
+			MarkDirtyReliable();
 		}
 		private byte f1CallstackCount = 0;
 		public int Uv0
@@ -155,6 +145,7 @@ namespace CTS.Instance.SyncObjects
 				if (_uv0 == value) return;
 				_uv0 = value;
 				_dirtyUnreliable_0[1] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public int Uv1
@@ -165,6 +156,7 @@ namespace CTS.Instance.SyncObjects
 				if (_uv1 == value) return;
 				_uv1 = value;
 				_dirtyUnreliable_0[2] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public int Uv2
@@ -175,6 +167,7 @@ namespace CTS.Instance.SyncObjects
 				if (_uv2 == value) return;
 				_uv2 = value;
 				_dirtyUnreliable_0[3] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public int Uv3
@@ -185,28 +178,33 @@ namespace CTS.Instance.SyncObjects
 				if (_uv3 == value) return;
 				_uv3 = value;
 				_dirtyUnreliable_0[4] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public partial void uf0(int a, byte b)
 		{
 			uf0ibCallstack.Add((a, b));
 			_dirtyUnreliable_0[5] = true;
+			MarkDirtyUnreliable();
 		}
 		private List<(int a, byte b)> uf0ibCallstack = new(4);
 		public partial void uf1(int a, double b)
 		{
 			uf1idCallstack.Add((a, b));
 			_dirtyUnreliable_0[6] = true;
+			MarkDirtyUnreliable();
 		}
 		private List<(int a, double b)> uf1idCallstack = new(4);
 		public partial void uft2(NetworkPlayer player)
 		{
 			uft2Callstack.Add(player);
 			_dirtyUnreliable_0[7] = true;
+			MarkDirtyUnreliable();
 		}
 		private TargetVoidCallstack<NetworkPlayer> uft2Callstack = new(8);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_v4.ClearDirtyReliable();
 			_v5.ClearDirtyReliable();
@@ -215,6 +213,7 @@ namespace CTS.Instance.SyncObjects
 		}
 		public override void ClearDirtyUnreliable()
 		{
+			_isDirtyUnreliable = false;
 			_dirtyUnreliable_0.Clear();
 			_v5.ClearDirtyUnreliable();
 			uf0ibCallstack.Clear();

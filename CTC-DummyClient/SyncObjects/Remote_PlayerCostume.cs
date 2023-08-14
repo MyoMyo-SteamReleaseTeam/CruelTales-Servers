@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -65,11 +66,26 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onBodyChanged += value;
 			remove => _onBodyChanged -= value;
 		}
-		public PlayerCostume()
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerCostume(IDirtyable owner)
 		{
+			_owner = owner;
 		}
-		public bool IsDirtyReliable => false;
-		public bool IsDirtyUnreliable => false;
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
+		{
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
+		}
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
+		{
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
+		}
 		public void ClearDirtyReliable() { }
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(IPacketWriter writer) { }

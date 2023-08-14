@@ -21,6 +21,8 @@ namespace CT.Common.DataType.Synchronizations
 			public Value Value;
 		}
 
+		[AllowNull]
+		private IDirtyable _owner;
 		private Dictionary<Key, Value> _dictionary;
 		private List<SyncToken> _syncOperations;
 
@@ -33,12 +35,21 @@ namespace CT.Common.DataType.Synchronizations
 		public ICollection<Value> Values => _dictionary.Values;
 
 		public int Count => _dictionary.Count;
-		public bool IsDirtyReliable => _syncOperations.Count > 0;
+		private bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
 
-		public SyncDictionary(int capacity = 8)
+		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
+		public SyncDictionary(int capacity = 8, int operationCapacity = 4)
 		{
 			_dictionary = new(capacity);
-			_syncOperations = new(4);
+			_syncOperations = new(operationCapacity);
+		}
+
+		public SyncDictionary(IDirtyable owner, int capacity = 8, int operationCapacity = 4)
+		{
+			BindOwner(owner);
+			_dictionary = new(capacity);
+			_syncOperations = new(operationCapacity);
 		}
 
 		public Value this[Key key]
@@ -54,6 +65,7 @@ namespace CT.Common.DataType.Synchronizations
 					return;
 
 				_dictionary[key] = value;
+				MarkDirtyReliable();
 				_syncOperations.Add(new SyncToken()
 				{
 					Operation = CollectionSyncType.Change,
@@ -63,9 +75,17 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
+		public void Constructor() { }
+
+		public void BindOwner(IDirtyable owner)
+		{
+			_owner = owner;
+		}
+
 		public void Add(Key key, Value value)
 		{
 			_dictionary.Add(key, value);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Add,
@@ -99,6 +119,7 @@ namespace CT.Common.DataType.Synchronizations
 			if (!_dictionary.Remove(key))
 				return false;
 
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Remove,
@@ -117,6 +138,7 @@ namespace CT.Common.DataType.Synchronizations
 				if (item.Value.Equals(value))
 				{
 					_dictionary.Remove(key);
+					MarkDirtyReliable();
 					_syncOperations.Add(new SyncToken()
 					{
 						Operation = CollectionSyncType.Remove,
@@ -138,6 +160,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void Add(KeyValuePair<Key, Value> item)
 		{
 			_dictionary.Add(item.Key, item.Value);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Add,
@@ -149,6 +172,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void Clear()
 		{
 			_dictionary.Clear();
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Clear
@@ -179,7 +203,14 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_syncOperations.Clear();
+		}
+
+		public void MarkDirtyReliable()
+		{
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
 
 		public void SerializeEveryProperty(IPacketWriter writer)
@@ -304,6 +335,7 @@ namespace CT.Common.DataType.Synchronizations
 		public bool IsReadOnly => throw new NotImplementedException();
 		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
 		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
+		public void MarkDirtyUnreliable() => throw new NotImplementedException();
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);

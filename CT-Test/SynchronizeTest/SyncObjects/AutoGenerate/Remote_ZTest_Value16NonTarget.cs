@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -147,7 +148,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV11Changed -= value;
 		}
 		[SyncObject]
-		private readonly SyncList<NetString> _v12 = new();
+		private readonly SyncList<NetString> _v12;
 		public SyncList<NetString> V12 => _v12;
 		private Action<SyncList<NetString>>? _onV12Changed;
 		public event Action<SyncList<NetString>> OnV12Changed
@@ -156,7 +157,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV12Changed -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _v13 = new();
+		private readonly ZTest_InnerObjectTarget _v13;
 		public ZTest_InnerObjectTarget V13 => _v13;
 		private Action<ZTest_InnerObjectTarget>? _onV13Changed;
 		public event Action<ZTest_InnerObjectTarget> OnV13Changed
@@ -165,7 +166,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV13Changed -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObject _v14 = new();
+		private readonly ZTest_InnerObject _v14;
 		public ZTest_InnerObject V14 => _v14;
 		private Action<ZTest_InnerObject>? _onV14Changed;
 		public event Action<ZTest_InnerObject> OnV14Changed
@@ -193,8 +194,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc]
 		public partial void f0();
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public ZTest_Value16NonTarget()
+		{
+			_v12 = new(this);
+			_v13 = new(this);
+			_v14 = new(this);
+		}
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
@@ -437,7 +442,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[4])
 				{
-					_v12.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_1[5])
 				{
@@ -512,7 +516,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_1[4])
 				{
-					SyncList<NetString>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_1[5])
 				{

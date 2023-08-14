@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -94,18 +95,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public virtual partial void Server_CC5();
 		[SyncRpc(SyncType.ReliableTarget)]
 		protected virtual partial void Server_cc6();
-		protected BitmaskByte _dirtyReliable_1 = new();
-		public override bool IsDirtyReliable
+		public ZTest_ChildChild()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				isDirty |= _dirtyReliable_1.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public int Field_Client_CC5
 		{
 			get => _field_Client_CC5;
@@ -114,6 +107,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				if (_field_Client_CC5 == value) return;
 				_field_Client_CC5 = value;
 				_dirtyReliable_1[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		protected int Field_Client_CC6
@@ -124,22 +118,26 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				if (_field_Client_CC6 == value) return;
 				_field_Client_CC6 = value;
 				_dirtyReliable_1[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public partial void Client_CC5()
 		{
 			Client_CC5CallstackCount++;
 			_dirtyReliable_1[2] = true;
+			MarkDirtyReliable();
 		}
 		protected byte Client_CC5CallstackCount = 0;
 		protected partial void Client_cc6()
 		{
 			Client_cc6CallstackCount++;
 			_dirtyReliable_1[3] = true;
+			MarkDirtyReliable();
 		}
 		protected byte Client_cc6CallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Client_P1CallstackCount = 0;
 			Client_p2iiCallstack.Clear();

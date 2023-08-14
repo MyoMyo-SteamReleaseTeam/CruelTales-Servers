@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -46,25 +47,27 @@ namespace CTS.Instance.SyncObjects
 		private int _uv1;
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void f1(NetworkPlayer player, NetStringShort a);
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_InnerObjectTarget(IDirtyable owner)
+		{
+			_owner = owner;
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
-		public bool IsDirtyReliable
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
-		public bool IsDirtyUnreliable
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
 		}
 		public int V0
 		{
@@ -74,12 +77,14 @@ namespace CTS.Instance.SyncObjects
 				if (_v0 == value) return;
 				_v0 = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public partial void f1(NetworkPlayer player, NetStringShort a)
 		{
 			f1NCallstack.Add(player, a);
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, NetStringShort> f1NCallstack = new(8);
 		public int Uv1
@@ -90,15 +95,18 @@ namespace CTS.Instance.SyncObjects
 				if (_uv1 == value) return;
 				_uv1 = value;
 				_dirtyUnreliable_0[0] = true;
+				MarkDirtyUnreliable();
 			}
 		}
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			f1NCallstack.Clear();
 		}
 		public void ClearDirtyUnreliable()
 		{
+			_isDirtyUnreliable = false;
 			_dirtyUnreliable_0.Clear();
 		}
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.Exceptions;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -19,6 +20,8 @@ namespace CT.Common.DataType.Synchronizations
 			public byte Index;
 		}
 
+		[AllowNull]
+		private IDirtyable _owner;
 		private List<T> _list;
 		private List<SyncToken> _syncOperations;
 
@@ -29,12 +32,21 @@ namespace CT.Common.DataType.Synchronizations
 		public event Action? OnCleared;
 
 		public int Count => _list.Count;
-		public bool IsDirtyReliable => _syncOperations.Count > 0;
+		private bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
 
-		public SyncList(int capacity = 8)
+		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
+		public SyncList(int capacity = 8, int operationCapacity = 4)
 		{
+			_list = new(capacity);
+			_syncOperations = new(operationCapacity);
+		}
+
+		public SyncList(IDirtyable owner, int capacity = 8, int operationCapacity = 4)
+		{
+			BindOwner(owner);
 			_list = new List<T>(capacity);
-			_syncOperations = new List<SyncToken>(4);
+			_syncOperations = new List<SyncToken>(operationCapacity);
 		}
 
 		public T this[int index]
@@ -48,6 +60,7 @@ namespace CT.Common.DataType.Synchronizations
 				}
 
 				_list[index] = value;
+				MarkDirtyReliable();
 				_syncOperations.Add(new SyncToken()
 				{
 					Operation = CollectionSyncType.Change,
@@ -57,11 +70,19 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
+		public void Constructor() {}
+
+		public void BindOwner(IDirtyable owner)
+		{
+			_owner = owner;
+		}
+
 		public int IndexOf(T item) => _list.IndexOf(item);
 
 		public void Add(T item)
 		{
 			_list.Add(item);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Data = item,
@@ -72,6 +93,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void Insert(int index, T item)
 		{
 			_list.Insert(index, item);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Insert,
@@ -83,6 +105,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void RemoveAt(int index)
 		{
 			_list.RemoveAt(index);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Remove,
@@ -106,6 +129,7 @@ namespace CT.Common.DataType.Synchronizations
 				return false;
 
 			_list.RemoveAt(removeIndex);
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Remove,
@@ -120,6 +144,7 @@ namespace CT.Common.DataType.Synchronizations
 		public void Clear()
 		{
 			_list.Clear();
+			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Clear,
@@ -132,7 +157,14 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_syncOperations.Clear();
+		}
+
+		public void MarkDirtyReliable()
+		{
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
 
 		public void SerializeEveryProperty(IPacketWriter writer)
@@ -252,21 +284,22 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void InitializeProperties()
 		{
-			this._list.Clear();
-			this._syncOperations.Clear();
+			_list.Clear();
+			_syncOperations.Clear();
 		}
 
 		public void InitializeMasterProperties()
 		{
-			this._list.Clear();
-			this._syncOperations.Clear();
+			_list.Clear();
+			_syncOperations.Clear();
 		}
 
 		public void InitializeRemoteProperties()
 		{
-			this._list.Clear();
-			this._syncOperations.Clear();
+			_list.Clear();
+			_syncOperations.Clear();
 		}
+
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -305,6 +338,7 @@ namespace CT.Common.DataType.Synchronizations
 		public bool IsReadOnly => throw new NotImplementedException();
 		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
 		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
+		public void MarkDirtyUnreliable() => throw new NotImplementedException();
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);

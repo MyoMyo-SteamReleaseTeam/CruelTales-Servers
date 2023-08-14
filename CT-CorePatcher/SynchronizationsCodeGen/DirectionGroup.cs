@@ -47,34 +47,37 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_entireGroup = new EntireSerializeSyncGroup(sAllMembers, SyncType.None, _direction, _modifier);
 		}
 
-		public string Gen_SynchronizerProperties()
+		public string Gen_SynchronizerProperties(GenOption option)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(_reliableGruop.Master_BitmaskDeclarations(_inheritType));
-			sb.AppendLine(_unreliableGruop.Master_BitmaskDeclarations(_inheritType));
+			sb.AppendLine(_reliableGruop.Master_BitmaskDeclarations(option));
+			sb.AppendLine(_unreliableGruop.Master_BitmaskDeclarations(option));
 
-			sb.AppendLine(_reliableGruop.Master_DirtyProperty());
-			sb.AppendLine(_unreliableGruop.Master_DirtyProperty());
+			if (option.ObjectType != SyncObjectType.NetworkObject)
+			{
+				sb.AppendLine(_reliableGruop.Master_DirtyProperty(option));
+				sb.AppendLine(_unreliableGruop.Master_DirtyProperty(option));
+			}
 
-			sb.AppendLine(_reliableGruop.Master_GetterSetter());
-			sb.AppendLine(_unreliableGruop.Master_GetterSetter());
+			sb.AppendLine(_reliableGruop.Master_GetterSetter(option));
+			sb.AppendLine(_unreliableGruop.Master_GetterSetter(option));
 			return sb.ToString();
 		}
 
-		public string Gen_SerializeSyncFuntions()
+		public string Gen_SerializeSyncFuntions(GenOption option)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(_reliableGruop.Master_ClearDirty());
-			sb.AppendLine(_unreliableGruop.Master_ClearDirty());
+			sb.AppendLine(_reliableGruop.Master_ClearDirty(option));
+			sb.AppendLine(_unreliableGruop.Master_ClearDirty(option));
 
-			sb.AppendLine(_reliableGruop.Master_SerializeSync());
-			sb.AppendLine(_unreliableGruop.Master_SerializeSync());
+			sb.AppendLine(_reliableGruop.Master_SerializeSync(option));
+			sb.AppendLine(_unreliableGruop.Master_SerializeSync(option));
 
 			if (_direction == SyncDirection.FromMaster)
 			{
-				sb.AppendLine(_entireGroup.Master_SerializeSyncAll());
+				sb.AppendLine(_entireGroup.Master_SerializeSyncAll(option));
 			}
-			sb.AppendLine(_entireGroup.Master_InitilaizeProperties());
+			sb.AppendLine(_entireGroup.Master_InitilaizeProperties(option));
 			return sb.ToString();
 		}
 	}
@@ -120,20 +123,20 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			_entireGroup = new EntireDeserializeSyncGroup(dAllMembers, SyncType.None, direction, _modifier);
 		}
 
-		public string Gen_SerializeSyncFuntions()
+		public string Gen_SerializeSyncFuntions(GenOption option)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine(_reliableGruop.Remote_DeserializeSync());
-			sb.AppendLine(_unreliableGruop.Remote_DeserializeSync());
+			sb.AppendLine(_reliableGruop.Remote_DeserializeSync(option));
+			sb.AppendLine(_unreliableGruop.Remote_DeserializeSync(option));
 
-			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll());
-			sb.AppendLine(_entireGroup.Remote_InitilaizeProperties());
+			sb.AppendLine(_entireGroup.Remote_DeserializeSyncAll(option));
+			sb.AppendLine(_entireGroup.Remote_InitilaizeProperties(option));
 
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(_inheritType, isStatic: false));
-			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(_inheritType, isStatic: true));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(option, isStatic: false));
+			sb.AppendLine(_reliableGruop.Remote_IgnoreSync(option, isStatic: true));
 
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(_inheritType, isStatic: false));
-			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(_inheritType, isStatic: true));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(option, isStatic: false));
+			sb.AppendLine(_unreliableGruop.Remote_IgnoreSync(option, isStatic: true));
 			return sb.ToString();
 		}
 	}

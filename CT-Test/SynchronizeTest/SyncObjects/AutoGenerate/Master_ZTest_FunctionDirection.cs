@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -48,31 +49,27 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_FromClientVoid(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_FromServerArg(NetworkPlayer player, int a, int b);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public ZTest_FunctionDirection()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public partial void Server_FromServerVoid()
 		{
 			Server_FromServerVoidCallstackCount++;
 			_dirtyReliable_0[0] = true;
+			MarkDirtyReliable();
 		}
 		private byte Server_FromServerVoidCallstackCount = 0;
 		public partial void Server_FromServerArg(int a, int b)
 		{
 			Server_FromServerArgiiCallstack.Add((a, b));
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private List<(int a, int b)> Server_FromServerArgiiCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_FromServerVoidCallstackCount = 0;
 			Server_FromServerArgiiCallstack.Clear();

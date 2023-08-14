@@ -27,15 +27,23 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			IPacketWriter pw = data;
 			IPacketReader pr = data;
 
-			CTS.Instance.Synchronizations.SyncObjectList
-				<CTS.Instance.SyncObjects.ZTest_InnerTest> src = new();
-			CT.Common.DataType.Synchronizations.SyncObjectList
-				<CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp1 = new();
-			CT.Common.DataType.Synchronizations.SyncObjectList
-				<CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp2 = new();
+			DirtyableMockup dsrc = new DirtyableMockup();
+			DirtyableMockup ddes1 = new DirtyableMockup();
+			DirtyableMockup ddes2 = new DirtyableMockup();
 
+			CTS.Instance.Synchronizations.SyncObjectList
+				<CTS.Instance.SyncObjects.ZTest_InnerTest> src = new(dsrc);
+			CT.Common.DataType.Synchronizations.SyncObjectList
+				<CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp1 = new(ddes1);
+			CT.Common.DataType.Synchronizations.SyncObjectList
+				<CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp2 = new(ddes2);
+
+			Assert.IsFalse(dsrc.IsDirtyReliable);
 			src.Add(createSyncObj);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 			src[0].B = 20;
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			// Sync
 			Sync(data, p1, src, desp1);
@@ -46,7 +54,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			Assert.AreEqual(src.Count, 1);
 			Assert.AreEqual(src.Count, desp1.Count);
 			Assert.AreEqual(20, desp1[0].B);
+			dsrc.ClearDirtyReliable();
 			src.RemoveAt(0);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			// Sync
 			Sync(data, p1, src, desp1);
@@ -61,7 +71,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				src.Add(createSyncObj);
 			}
 
+			dsrc.ClearDirtyReliable();
 			src[0].A = 30;
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 			src[7].A = 70;
 
 			// Sync
@@ -79,15 +91,19 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 
 			Assert.AreEqual(0, desp1[0].B);
 
+			dsrc.ClearDirtyReliable();
 			src[3].B = 30;
 			src[4].B = 40;
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			for (int i = 0; i < 3; i++)
 			{
 				src[3].Server_Test();
 				src[4].Server_Test();
 			}
+			dsrc.ClearDirtyReliable();
 			src[5].Server_TestTarget(p1);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			src[6].Server_TestTarget(p2);
 			src[6].Server_TestTarget(p2);
@@ -146,15 +162,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			Assert.AreEqual(2, src[6].GetCallStackValue(p2));
 			Assert.AreEqual(0, src[7].GetCallStackValue(p2));
 
+			dsrc.ClearDirtyReliable();
 			src.Clear();
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+
+			dsrc.ClearDirtyReliable();
 			src.Add((obj) => { });
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			Sync(data, p1, src, desp1);
 			Sync(data, p2, src, desp2);
 			Clear(src, desp1);
 			Clear(src, desp2);
 
+			dsrc.ClearDirtyReliable();
 			src[0].Server_TestTarget(p1);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			Sync(data, p1, src, desp1);
 			Sync(data, p2, src, desp2);

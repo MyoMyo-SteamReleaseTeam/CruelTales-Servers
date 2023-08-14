@@ -8,7 +8,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		public static string GenerateMasterNetworkObjectPoolCode(List<SyncObjectInfo> objList)
 		{
-			var netObjs = objList.Where(obj => obj.IsNetworkObject);
+			var netObjs = objList.Where(obj => obj.SyncObjectType == SyncObjectType.NetworkObject);
 
 			StringBuilder content = new StringBuilder(2048);
 			foreach (var netObj in netObjs)

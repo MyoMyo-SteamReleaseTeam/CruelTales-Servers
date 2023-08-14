@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -41,7 +42,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncObject(dir: SyncDirection.FromRemote)]
 		private readonly ZTest_InnerTest _inner;
 		[SyncObject]
-		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary = new();
+		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary;
 		public SyncDictionary<NetInt32, NetInt32> Dictionary => _dictionary;
 		private Action<SyncDictionary<NetInt32, NetInt32>>? _onDictionaryChanged;
 		public event Action<SyncDictionary<NetInt32, NetInt32>> OnDictionaryChanged
@@ -50,7 +51,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onDictionaryChanged -= value;
 		}
 		[SyncObject]
-		private readonly SyncObjectList<ZTest_InnerTest> _innerList = new();
+		private readonly SyncObjectList<ZTest_InnerTest> _innerList;
 		public SyncObjectList<ZTest_InnerTest> InnerList => _innerList;
 		private Action<SyncObjectList<ZTest_InnerTest>>? _onInnerListChanged;
 		public event Action<SyncObjectList<ZTest_InnerTest>> OnInnerListChanged
@@ -59,7 +60,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onInnerListChanged -= value;
 		}
 		[SyncObject]
-		private readonly SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList = new();
+		private readonly SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList;
 		public SyncObjectList<ZTest_InnerTestNoTarget> NoTargetList => _noTargetList;
 		private Action<SyncObjectList<ZTest_InnerTestNoTarget>>? _onNoTargetListChanged;
 		public event Action<SyncObjectList<ZTest_InnerTestNoTarget>> OnNoTargetListChanged
@@ -73,25 +74,27 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onInnerChanged += value;
 			remove => _onInnerChanged -= value;
 		}
+		[SyncVar]
+		private int _testInt;
+		public int TestInt => _testInt;
+		private Action<int>? _onTestIntChanged;
+		public event Action<int> OnTestIntChanged
+		{
+			add => _onTestIntChanged += value;
+			remove => _onTestIntChanged -= value;
+		}
 		public ZTest_OutterTest()
 		{
-			_inner = new();
+			_inner = new(this);
+			_dictionary = new(this);
+			_innerList = new(this, 8);
+			_noTargetList = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _inner.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
-		public override bool IsDirtyUnreliable => false;
 		public ZTest_InnerTest Inner => _inner;
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_inner.ClearDirtyReliable();
 		}
@@ -142,6 +145,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				if (!_inner.TryDeserializeSyncReliable(reader)) return false;
 				_onInnerChanged?.Invoke(_inner);
 			}
+			if (dirtyReliable_0[4])
+			{
+				if (!reader.TryReadInt32(out _testInt)) return false;
+				_onTestIntChanged?.Invoke(_testInt);
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
@@ -155,6 +163,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onNoTargetListChanged?.Invoke(_noTargetList);
 			if (!_inner.TryDeserializeEveryProperty(reader)) return false;
 			_onInnerChanged?.Invoke(_inner);
+			if (!reader.TryReadInt32(out _testInt)) return false;
+			_onTestIntChanged?.Invoke(_testInt);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
@@ -163,6 +173,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_innerList.InitializeRemoteProperties();
 			_noTargetList.InitializeRemoteProperties();
 			_inner.InitializeRemoteProperties();
+			_testInt = 0;
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -180,6 +191,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			{
 				_inner.IgnoreSyncReliable(reader);
 			}
+			if (dirtyReliable_0[4])
+			{
+				reader.Ignore(4);
+			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -196,6 +211,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (dirtyReliable_0[3])
 			{
 				ZTest_InnerTest.IgnoreSyncStaticReliable(reader);
+			}
+			if (dirtyReliable_0[4])
+			{
+				reader.Ignore(4);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -44,22 +45,28 @@ namespace CTS.Instance.SyncObjects
 		private NetStringShort _username = new();
 		[SyncObject]
 		private readonly PlayerCostume _costume;
-		public PlayerState()
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerState(IDirtyable owner)
 		{
-			_costume = new();
+			_owner = owner;
+			_costume = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public bool IsDirtyReliable
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _costume.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
-		public bool IsDirtyUnreliable => false;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
+		{
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
+		}
 		public NetStringShort Username
 		{
 			get => _username;
@@ -68,11 +75,13 @@ namespace CTS.Instance.SyncObjects
 				if (_username == value) return;
 				_username = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public PlayerCostume Costume => _costume;
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_costume.ClearDirtyReliable();
 		}

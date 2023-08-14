@@ -5,12 +5,14 @@ using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
+
 
 #if CT_SERVER
 using CTS.Instance.Gameplay;
 using CT.Common.DataType.Synchronizations;
 #endif
-
 #if CT_SERVER
 namespace CTS.Instance.Synchronizations
 #elif CT_CLIENT
@@ -40,28 +42,15 @@ namespace CT.Common.DataType.Synchronizations
 			public byte Index;
 		}
 
+		[AllowNull] private IDirtyable _owner;
 		private List<T> _list;
-		private List<SyncToken> _syncOperation;
+		private List<SyncToken> _syncOperations;
 
 		public readonly int MaxCapacity;
 		public int Count { get; private set; } = 0;
 
-		public bool IsDirtyReliable
-		{
-			get
-			{
-				if (_syncOperation.Count > 0)
-					return true;
-
-				for (int i = 0; i < Count; i++)
-				{
-					if (_list[i].IsDirtyReliable)
-						return true;
-				}
-
-				return false;
-			}
-		}
+		private bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
 
 		public T this[int index]
 		{
@@ -75,15 +64,30 @@ namespace CT.Common.DataType.Synchronizations
 			}
 		}
 
-		public SyncObjectList(int maxCapacity = 8)
+		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
+		public SyncObjectList(int capacity = 8, int operationCapacity = 4)
 		{
+			_list = new(capacity);
+			_syncOperations = new(operationCapacity);
+		}
+
+		public SyncObjectList(IDirtyable owner, int maxCapacity = 8, int operationCapacity = 4)
+		{
+			BindOwner(owner);
 			MaxCapacity = maxCapacity;
 			_list = new(MaxCapacity);
 			for (int i = 0; i < MaxCapacity; i++)
 			{
-				_list.Add(new T());
+				var netObj = new T();
+				netObj.BindOwner(this);
+				_list.Add(netObj);
 			}
-			_syncOperation = new(4);
+			_syncOperations = new(operationCapacity);
+		}
+
+		public void BindOwner(IDirtyable owner)
+		{
+			_owner = owner;
 		}
 
 #if CT_SERVER
@@ -96,7 +100,8 @@ namespace CT.Common.DataType.Synchronizations
 			onCreated(item);
 
 			Count++;
-			_syncOperation.Add(new SyncToken()
+			MarkDirtyReliable();
+			_syncOperations.Add(new SyncToken()
 			{
 				Data = item,
 				Operation = CollectionSyncType.Add
@@ -125,7 +130,8 @@ namespace CT.Common.DataType.Synchronizations
 			}
 			_list[Count] = temp;
 
-			_syncOperation.Add(new SyncToken()
+			MarkDirtyReliable();
+			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Remove,
 				Index = (byte)index
@@ -135,7 +141,8 @@ namespace CT.Common.DataType.Synchronizations
 		public void Clear()
 		{
 			Count = 0;
-			_syncOperation.Add(new SyncToken()
+			MarkDirtyReliable();
+			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Clear,
 			});
@@ -159,7 +166,8 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void ClearDirtyReliable()
 		{
-			_syncOperation.Clear();
+			_isDirtyReliable = false;
+			_syncOperations.Clear();
 
 			for (int i = 0; i < Count; i++)
 			{
@@ -168,6 +176,12 @@ namespace CT.Common.DataType.Synchronizations
 					_list[i].ClearDirtyReliable();
 				}
 			}
+		}
+
+		public void MarkDirtyReliable()
+		{
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
 
 #if CT_SERVER
@@ -196,8 +210,6 @@ namespace CT.Common.DataType.Synchronizations
 		}
 #endif
 
-		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
-		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
 
 #if CT_SERVER
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -206,7 +218,7 @@ namespace CT.Common.DataType.Synchronizations
 #endif
 		{
 			BitmaskByte masterDirty = new BitmaskByte();
-			masterDirty[0] = _syncOperation.Count > 0;
+			masterDirty[0] = _syncOperations.Count > 0;
 
 			for (int i = 0; i < Count; i++)
 			{
@@ -224,11 +236,11 @@ namespace CT.Common.DataType.Synchronizations
 			if (masterDirty[0])
 			{
 #if CT_SERVER
-				byte operationCount = (byte)_syncOperation.Count;
+				byte operationCount = (byte)_syncOperations.Count;
 				writer.Put(operationCount);
 				for (int i = 0; i < operationCount; i++)
 				{
-					var opToken = _syncOperation[i];
+					var opToken = _syncOperations[i];
 					writer.Put((byte)opToken.Operation);
 
 					switch (opToken.Operation)
@@ -388,6 +400,10 @@ namespace CT.Common.DataType.Synchronizations
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 #endif
 
+		public void Constructor() => throw new NotImplementedException();
+		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
+		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
+		public void MarkDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new NotImplementedException();
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new NotImplementedException();
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);

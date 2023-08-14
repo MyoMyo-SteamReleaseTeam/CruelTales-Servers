@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -48,6 +49,8 @@ namespace CTS.Instance.SyncObjects
 		private readonly Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList;
 		[SyncObject]
 		private readonly ZTest_InnerTest _inner;
+		[SyncVar]
+		private int _testInt;
 		private Action<ZTest_InnerTest>? _onInnerChanged;
 		public event Action<ZTest_InnerTest> OnInnerChanged
 		{
@@ -56,29 +59,27 @@ namespace CTS.Instance.SyncObjects
 		}
 		public ZTest_OutterTest()
 		{
-			_dictionary = new();
-			_innerList = new(8);
-			_noTargetList = new();
-			_inner = new();
+			_dictionary = new(this);
+			_innerList = new(this, 8);
+			_noTargetList = new(this);
+			_inner = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public ZTest_InnerTest Inner => _inner;
+		public int TestInt
 		{
-			get
+			get => _testInt;
+			set
 			{
-				bool isDirty = false;
-				isDirty |= _dictionary.IsDirtyReliable;
-				isDirty |= _innerList.IsDirtyReliable;
-				isDirty |= _noTargetList.IsDirtyReliable;
-				isDirty |= _inner.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
+				if (_testInt == value) return;
+				_testInt = value;
+				_dirtyReliable_0[4] = true;
+				MarkDirtyReliable();
 			}
 		}
-		public override bool IsDirtyUnreliable => false;
-		public ZTest_InnerTest Inner => _inner;
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_dictionary.ClearDirtyReliable();
 			_innerList.ClearDirtyReliable();
@@ -120,6 +121,10 @@ namespace CTS.Instance.SyncObjects
 					dirtyReliable_0[3] = false;
 				}
 			}
+			if (_dirtyReliable_0[4])
+			{
+				writer.Put(_testInt);
+			}
 			if (dirtyReliable_0.AnyTrue())
 			{
 				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
@@ -136,6 +141,7 @@ namespace CTS.Instance.SyncObjects
 			_innerList.SerializeEveryProperty(writer);
 			_noTargetList.SerializeEveryProperty(writer);
 			_inner.SerializeEveryProperty(writer);
+			writer.Put(_testInt);
 		}
 		public override void InitializeMasterProperties()
 		{
@@ -143,6 +149,7 @@ namespace CTS.Instance.SyncObjects
 			_innerList.InitializeMasterProperties();
 			_noTargetList.InitializeMasterProperties();
 			_inner.InitializeMasterProperties();
+			_testInt = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
