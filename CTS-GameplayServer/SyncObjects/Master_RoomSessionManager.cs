@@ -47,7 +47,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private int _password;
 		[SyncObject]
-		private readonly SyncObjectList<PlayerState> _playerStates = new();
+		private readonly SyncObjectList<PlayerState> _playerStates;
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void ServerRoomSetAck_Callback(NetworkPlayer player, RoomSettingResult callback);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -58,6 +58,10 @@ namespace CTS.Instance.SyncObjects
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetworkPlayer player, NetStringShort roomDiscription);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void ClientRoomSetReq_SetRoomMaxUser(NetworkPlayer player, int maxUser);
+		public RoomSessionManager()
+		{
+			_playerStates = new();
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{

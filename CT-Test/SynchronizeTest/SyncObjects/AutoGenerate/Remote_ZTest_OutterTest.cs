@@ -41,28 +41,28 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		[SyncObject(dir: SyncDirection.FromRemote)]
 		private readonly ZTest_InnerTest _inner;
 		[SyncObject]
-		private readonly Synchronizations.SyncDictionary<NetInt32, NetInt32> _dictionary = new();
-		public Synchronizations.SyncDictionary<NetInt32, NetInt32> Dictionary => _dictionary;
-		private Action<Synchronizations.SyncDictionary<NetInt32, NetInt32>>? _onDictionaryChanged;
-		public event Action<Synchronizations.SyncDictionary<NetInt32, NetInt32>> OnDictionaryChanged
+		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary = new();
+		public SyncDictionary<NetInt32, NetInt32> Dictionary => _dictionary;
+		private Action<SyncDictionary<NetInt32, NetInt32>>? _onDictionaryChanged;
+		public event Action<SyncDictionary<NetInt32, NetInt32>> OnDictionaryChanged
 		{
 			add => _onDictionaryChanged += value;
 			remove => _onDictionaryChanged -= value;
 		}
 		[SyncObject]
-		private readonly Synchronizations.SyncObjectList<ZTest_InnerTest> _innerList = new();
-		public Synchronizations.SyncObjectList<ZTest_InnerTest> InnerList => _innerList;
-		private Action<Synchronizations.SyncObjectList<ZTest_InnerTest>>? _onInnerListChanged;
-		public event Action<Synchronizations.SyncObjectList<ZTest_InnerTest>> OnInnerListChanged
+		private readonly SyncObjectList<ZTest_InnerTest> _innerList = new();
+		public SyncObjectList<ZTest_InnerTest> InnerList => _innerList;
+		private Action<SyncObjectList<ZTest_InnerTest>>? _onInnerListChanged;
+		public event Action<SyncObjectList<ZTest_InnerTest>> OnInnerListChanged
 		{
 			add => _onInnerListChanged += value;
 			remove => _onInnerListChanged -= value;
 		}
 		[SyncObject]
-		private readonly Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList = new();
-		public Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget> NoTargetList => _noTargetList;
-		private Action<Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget>>? _onNoTargetListChanged;
-		public event Action<Synchronizations.SyncObjectList<ZTest_InnerTestNoTarget>> OnNoTargetListChanged
+		private readonly SyncObjectList<ZTest_InnerTestNoTarget> _noTargetList = new();
+		public SyncObjectList<ZTest_InnerTestNoTarget> NoTargetList => _noTargetList;
+		private Action<SyncObjectList<ZTest_InnerTestNoTarget>>? _onNoTargetListChanged;
+		public event Action<SyncObjectList<ZTest_InnerTestNoTarget>> OnNoTargetListChanged
 		{
 			add => _onNoTargetListChanged += value;
 			remove => _onNoTargetListChanged -= value;

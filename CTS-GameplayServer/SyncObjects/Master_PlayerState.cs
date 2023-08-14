@@ -43,7 +43,11 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncObject]
-		private readonly PlayerCostume _costume = new();
+		private readonly PlayerCostume _costume;
+		public PlayerState()
+		{
+			_costume = new();
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{

@@ -84,6 +84,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void ServerRoomSetAck_Callback(RoomSettingResult callback);
+		public RoomSessionManager()
+		{
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{

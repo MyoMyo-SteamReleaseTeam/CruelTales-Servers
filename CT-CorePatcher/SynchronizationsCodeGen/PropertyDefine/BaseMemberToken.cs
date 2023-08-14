@@ -51,7 +51,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		// Master Side
 		public abstract string Master_InitializeProperty(SyncDirection direction);
-		public abstract string Master_Declaration(SyncDirection direction);
+		public abstract string Master_Declaration(CodeGenDirection genDirection, SyncDirection direction);
 		public abstract string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex);
 		public abstract string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int index);
 		public abstract string Master_CheckDirty(SyncType syncType); // Object Only
@@ -59,7 +59,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		// Remote Side
 		public abstract string Remote_InitializeProperty(SyncDirection direction);
-		public abstract string Remote_Declaration(SyncDirection direction);
+		public abstract string Remote_Declaration(CodeGenDirection genDirection, SyncDirection direction);
 		public abstract string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction);
 		public abstract string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic);
 	}

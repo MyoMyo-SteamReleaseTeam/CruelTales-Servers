@@ -40,7 +40,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
 		[SyncObject(dir: SyncDirection.FromRemote)]
-		private readonly RoomSessionManager _sessionManager = new();
+		private readonly RoomSessionManager _sessionManager;
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync();
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -53,6 +53,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(GameMapType mapType);
+		public GameplayController()
+		{
+			_sessionManager = new();
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{

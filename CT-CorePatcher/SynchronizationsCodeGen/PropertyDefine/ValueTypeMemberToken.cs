@@ -25,7 +25,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
@@ -52,7 +52,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;

@@ -32,7 +32,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Empty;
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			if (direction == SyncDirection.FromMaster)
 			{
@@ -88,7 +88,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Empty;
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
 			string format = string.Empty;

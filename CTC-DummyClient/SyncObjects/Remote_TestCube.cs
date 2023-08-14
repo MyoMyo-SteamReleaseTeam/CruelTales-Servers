@@ -77,6 +77,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
+		public TestCube()
+		{
+		}
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable => false;
 		public override void ClearDirtyReliable() { }

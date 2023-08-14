@@ -41,7 +41,7 @@ namespace CTS.Instance.SyncObjects
 	public partial class ZTest_OutterTest
 	{
 		[SyncObject]
-		private readonly Synchronizations.SyncDictionary<NetInt32, NetInt32> _dictionary;
+		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary;
 		[SyncObject]
 		private readonly Synchronizations.SyncObjectList<ZTest_InnerTest> _innerList;
 		[SyncObject]
@@ -57,7 +57,7 @@ namespace CTS.Instance.SyncObjects
 		public ZTest_OutterTest()
 		{
 			_dictionary = new();
-			_innerList = new();
+			_innerList = new(8);
 			_noTargetList = new();
 			_inner = new();
 		}
@@ -96,7 +96,7 @@ namespace CTS.Instance.SyncObjects
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				_dictionary.SerializeSyncReliable(player, writer);
+				_dictionary.SerializeSyncReliable(writer);
 			}
 			if (_dirtyReliable_0[1])
 			{

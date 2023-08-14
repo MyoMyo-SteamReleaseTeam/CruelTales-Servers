@@ -26,6 +26,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 			for (int i = 0; i < _initialCapacity; i++)
 			{
 				var inst = new T();
+				inst.Constructor();
 				_objectStack.Push(inst);
 			}
 		}

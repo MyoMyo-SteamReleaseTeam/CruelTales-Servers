@@ -46,6 +46,9 @@ namespace CTS.Instance.SyncObjects
 		private int _hair;
 		[SyncVar]
 		private int _body;
+		public PlayerCostume()
+		{
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public bool IsDirtyReliable
 		{

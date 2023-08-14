@@ -92,6 +92,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction);
 		[SyncRpc]
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
+		public PlayerCharacter()
+		{
+		}
 		private BitmaskByte _dirtyUnreliable_0 = new();
 		public override bool IsDirtyReliable => false;
 		public override bool IsDirtyUnreliable

@@ -16,7 +16,7 @@ namespace CT.Definitions.SyncObjects
 		[SyncObject]
 		public SyncDictionary<NetInt32, NetInt32> Dictionary = new();
 
-		[SyncObject]
+		[SyncObject(cc: "8")]
 		public SyncObjectList<ZTest_InnerTest> InnerList = new();
 
 		[SyncObject]

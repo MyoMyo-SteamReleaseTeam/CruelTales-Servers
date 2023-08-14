@@ -56,6 +56,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onCostumeChanged += value;
 			remove => _onCostumeChanged -= value;
 		}
+		public PlayerState()
+		{
+		}
 		public bool IsDirtyReliable => false;
 		public bool IsDirtyUnreliable => false;
 		public void ClearDirtyReliable() { }

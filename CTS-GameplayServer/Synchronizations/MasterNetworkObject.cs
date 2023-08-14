@@ -61,6 +61,9 @@ namespace CTS.Instance.Synchronizations
 			RigidBody = new NetRigidBody(_physicsRigidBody);
 		}
 
+		/// <summary>객체의 생성자입니다. 단 한 번만 호출됩니다.</summary>
+		public virtual void Constructor() { }
+
 		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
 		public virtual void OnFixedUpdate(float stepTime) {}
 

@@ -10,14 +10,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		private bool _isPredefined = false;
 		private bool _isBidirectionSync = false;
 
-		public string GetTypeName(SyncDirection direction)
+		public string GetTypeName(CodeGenDirection genDirection)
 		{
 #pragma warning disable CA1416
 			if (MainProcess.IsDebug)
 #pragma warning restore CA1416
 			{
-				if (NameTable.IsDuplicatedNamespace(_typeName) && 
-					direction == SyncDirection.FromMaster)
+				if (NameTable.IsSyncObjCollectionType(_typeName) &&
+					genDirection == CodeGenDirection.Master)
 				{
 					return $"Synchronizations.{_typeName}";
 				}
@@ -51,10 +51,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName, dirStr);
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, direction);
-			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, GetTypeName(direction),
+			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, GetTypeName(genDirection),
 								 _privateMemberName, _privateAccessModifier);
 		}
 
@@ -84,7 +84,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 									 SyncGroupFormat.EntireFunctionSuffix);
 			}
 
-			if (direction == SyncDirection.FromRemote)
+			if (direction == SyncDirection.FromRemote || 
+				NameTable.IsValueCollectionType(_typeName))
 			{
 				return string.Format(MemberFormat.WriteSyncObject, _privateMemberName, syncType);
 			}
@@ -122,7 +123,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(MemberFormat.InitializeSyncObjectProperty, _privateMemberName, dirStr);
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(CodeGenDirection genDirection, SyncDirection direction)
 		{
 			string format;
 
@@ -131,12 +132,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 				if (IsPublic)
 				{
 					return string.Format(MemberFormat.RemoteReadonlyDeclarationAsPublic_NoDef,
-										 GetTypeName(direction), _publicMemberName, _privateAccessModifier);
+										 GetTypeName(genDirection), _publicMemberName, _privateAccessModifier);
 				}
 				else
 				{
 					return string.Format(MemberFormat.RemoteReadonlyDeclaration_NoDef,
-										 GetTypeName(direction), _publicMemberName, _privateAccessModifier);
+										 GetTypeName(genDirection), _publicMemberName, _privateAccessModifier);
 				}
 			}
 
@@ -144,7 +145,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			format = IsPublic ?
 				MemberFormat.RemoteReadonlyDeclarationAsPublic :
 				MemberFormat.RemoteReadonlyDeclaration;
-			return string.Format(format, attribute, GetTypeName(direction), _privateMemberName,
+			return string.Format(format, attribute, GetTypeName(genDirection), _privateMemberName,
 								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier, _privateAccessModifier);
 		}
 

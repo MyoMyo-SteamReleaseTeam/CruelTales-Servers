@@ -51,6 +51,9 @@ namespace CTS.Instance.SyncObjects
 		private float _animationTime;
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
+		public TestCube()
+		{
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{

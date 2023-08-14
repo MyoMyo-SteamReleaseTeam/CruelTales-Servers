@@ -59,6 +59,9 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
+		public PlayerCharacter()
+		{
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public override bool IsDirtyReliable
 		{

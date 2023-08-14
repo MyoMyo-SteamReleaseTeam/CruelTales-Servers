@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using CT.Common.Synchronizations;
@@ -132,28 +133,29 @@ using CTS.Instance.SyncObjects;";
 		public static string NetworkPlayerParameter => $"{NetworkPlayerTypeName} {NetworkPlayerParameterName}";
 		public static string SerializeTargetName => "Target";
 
-		private static Dictionary<PredefinedType, string> _genericTypeName = new()
+		private static Dictionary<PredefinedType, string> _genericTypeNames = new()
 		{
 			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
 			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
 		};
 
-		private static Dictionary<PredefinedType, string> _duplicatedNamespaceTypeNames = new()
+		private static Dictionary<PredefinedType, string> _syncObjCollectionNames = new()
 		{
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
 		};
 
-		public static bool IsDuplicatedNamespace(string typeName)
+		private static Dictionary<PredefinedType, string> _valueCollectionNames = new()
 		{
-			foreach (var gt in _duplicatedNamespaceTypeNames.Keys)
-			{
-				if (typeName.Contains(_genericTypeName[gt]))
-				{
-					return true;
-				}
-			}
+			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
+			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
+		};
 
+		public static bool IsSyncObjCollectionType(string typeName)
+		{
+			foreach (var gt in _syncObjCollectionNames.Keys)
+				if (typeName.Contains(_genericTypeNames[gt]))
+					return true;
 			return false;
 		}
 
@@ -162,11 +164,19 @@ using CTS.Instance.SyncObjects;";
 			return GetPredefinedType(typeName) != PredefinedType.None;
 		}
 
+		public static bool IsValueCollectionType(string typeName)
+		{
+			foreach (var gt in _valueCollectionNames.Keys)
+				if (typeName.Contains(_genericTypeNames[gt]))
+					return true;
+			return false;
+		}
+
 		public static PredefinedType GetPredefinedType(string typeName)
 		{
-			foreach (var gt in _genericTypeName.Keys)
+			foreach (var gt in _genericTypeNames.Keys)
 			{
-				if (typeName.Contains(_genericTypeName[gt]))
+				if (typeName.Contains(_genericTypeNames[gt]))
 				{
 					return gt;
 				}

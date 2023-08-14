@@ -17,6 +17,8 @@ namespace CTS.Instance.SyncObjects
 		private float _showTime;
 		private float _lifeTime;
 
+		public override void Constructor() {}
+
 		public override void OnCreated()
 		{
 			//Console.WriteLine($"{Identity}:{Transform} OnCREATED");

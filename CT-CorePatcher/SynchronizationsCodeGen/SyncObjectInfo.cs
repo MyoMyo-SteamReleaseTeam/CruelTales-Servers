@@ -113,6 +113,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string genCode = gnerateCode(UsingTable.MasterUsingStatements,
 										 CommonFormat.MasterNamespace,
 										 SyncDirection.FromMaster,
+										 CodeGenDirection.Master,
 										 _masterSideMembers,
 										 _remoteSideMembers,
 										 _masterSerializeGroup,
@@ -132,6 +133,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string genCode = gnerateCode(usingStatements,
 										 CommonFormat.RemoteNamespace,
 										 SyncDirection.FromRemote,
+										 CodeGenDirection.Remote,
 										 _remoteSideMembers,
 										 _masterSideMembers,
 										 _remoteSerializeGroup,
@@ -157,6 +159,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private string gnerateCode(string usingStatements,
 								   string namespaceName,
 								   SyncDirection direction,
+								   CodeGenDirection codeGenDirection,
 								   List<MemberToken> forwardMember,
 								   List<MemberToken> backwardMember,
 								   SerializeDirectionGroup forward,
@@ -171,13 +174,13 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (m.InheritType == InheritType.Child)
 					continue;
-				sb.AppendLine(m.Member.Master_Declaration(direction));
+				sb.AppendLine(m.Member.Master_Declaration(codeGenDirection, direction));
 			}
 			foreach (var m in backwardMember)
 			{
 				if (m.InheritType == InheritType.Child)
 					continue;
-				sb.AppendLine(m.Member.Remote_Declaration(direction.Reverse()));
+				sb.AppendLine(m.Member.Remote_Declaration(codeGenDirection, direction.Reverse()));
 			}
 
 			// Constructor
