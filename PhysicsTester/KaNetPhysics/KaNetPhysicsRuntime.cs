@@ -680,13 +680,13 @@ namespace KaNet.Physics
 			{
 				KaEntity? entity = null;
 				bool isStatic = i >= dynamicObjectCount;
-				Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
+				Vector2 randPos = RandomHelper.NextVector2(viewRT, viewLB);
 				float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float weith = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float rotation = RandomHelper.NextSingle(0, MathF.PI * 2);
 
-				switch (RandomHelper.NextInteger(0, 3))
+				switch (RandomHelper.NextInt(0, 3))
 				{
 					case 0:
 						entity = createCircleEntity(radius, isStatic, layerMask, randPos);
@@ -718,7 +718,7 @@ namespace KaNet.Physics
 			{
 				KaEntity? entity = null;
 				bool isStatic = i >= dynamicObjectCount;
-				Vector2 randPos = RandomHelper.NextVectorBetween(viewRT, viewLB);
+				Vector2 randPos = RandomHelper.NextVector2(viewRT, viewLB);
 				float radius = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float weith = RandomHelper.NextSingle(sizeMin, sizeMax);
 				float height = RandomHelper.NextSingle(sizeMin, sizeMax);
