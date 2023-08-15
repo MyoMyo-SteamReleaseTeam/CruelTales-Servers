@@ -39,8 +39,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	[Serializable]
 	public partial class ZTest_InnerTestNoTarget : IRemoteSynchronizable
 	{
-		[SyncVar(dir: SyncDirection.FromRemote)]
-		private float _b;
 		[SyncVar]
 		private int _a;
 		public int A => _a;
@@ -56,7 +54,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			_owner = owner;
 		}
-		private BitmaskByte _dirtyReliable_0 = new();
 		protected bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
 		public void MarkDirtyReliable()
@@ -71,36 +68,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_isDirtyUnreliable = true;
 			_owner.MarkDirtyUnreliable();
 		}
-		public float B
-		{
-			get => _b;
-			set
-			{
-				if (_b == value) return;
-				_b = value;
-				_dirtyReliable_0[0] = true;
-				MarkDirtyReliable();
-			}
-		}
-		public void ClearDirtyReliable()
-		{
-			_isDirtyReliable = false;
-			_dirtyReliable_0.Clear();
-		}
+		public void ClearDirtyReliable() { }
 		public void ClearDirtyUnreliable() { }
-		public void SerializeSyncReliable(IPacketWriter writer)
-		{
-			_dirtyReliable_0.Serialize(writer);
-			if (_dirtyReliable_0[0])
-			{
-				writer.Put(_b);
-			}
-		}
+		public void SerializeSyncReliable(IPacketWriter writer) { }
 		public void SerializeSyncUnreliable(IPacketWriter writer) { }
-		public void InitializeMasterProperties()
-		{
-			_b = 0;
-		}
+		public void InitializeMasterProperties() { }
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();

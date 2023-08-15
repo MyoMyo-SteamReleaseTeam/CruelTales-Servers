@@ -39,7 +39,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	[Serializable]
 	public partial class ZTest_OutterTest
 	{
-		[SyncObject(dir: SyncDirection.FromRemote)]
+		[SyncObject(dir: SyncDirection.Bidirection)]
+		private readonly SyncObjectList<ZTest_InnerTest> _innerList;
+		[SyncObject(dir: SyncDirection.Bidirection)]
+		private readonly SyncObjectDictionary<NetworkIdentity, ZTest_InnerTest> _objectDictionary;
+		[SyncObject(dir: SyncDirection.Bidirection)]
 		private readonly ZTest_InnerTest _inner;
 		[SyncObject]
 		private readonly SyncDictionary<NetInt32, NetInt32> _dictionary;
@@ -50,9 +54,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			add => _onDictionaryChanged += value;
 			remove => _onDictionaryChanged -= value;
 		}
-		[SyncObject]
-		private readonly SyncObjectList<ZTest_InnerTest> _innerList;
-		public SyncObjectList<ZTest_InnerTest> InnerList => _innerList;
 		private Action<SyncObjectList<ZTest_InnerTest>>? _onInnerListChanged;
 		public event Action<SyncObjectList<ZTest_InnerTest>> OnInnerListChanged
 		{
@@ -67,6 +68,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			add => _onNoTargetListChanged += value;
 			remove => _onNoTargetListChanged -= value;
+		}
+		private Action<SyncObjectDictionary<NetworkIdentity, ZTest_InnerTest>>? _onObjectDictionaryChanged;
+		public event Action<SyncObjectDictionary<NetworkIdentity, ZTest_InnerTest>> OnObjectDictionaryChanged
+		{
+			add => _onObjectDictionaryChanged += value;
+			remove => _onObjectDictionaryChanged -= value;
 		}
 		private Action<ZTest_InnerTest>? _onInnerChanged;
 		public event Action<ZTest_InnerTest> OnInnerChanged
@@ -85,9 +92,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public ZTest_OutterTest()
 		{
+			_innerList = new(this, 8);
+			_objectDictionary = new(this);
 			_inner = new(this);
 			_dictionary = new(this);
-			_innerList = new(this, 8);
 			_noTargetList = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
@@ -96,15 +104,27 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
+			_innerList.ClearDirtyReliable();
+			_objectDictionary.ClearDirtyReliable();
 			_inner.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer)
 		{
-			_dirtyReliable_0[0] = _inner.IsDirtyReliable;
+			_dirtyReliable_0[0] = _innerList.IsDirtyReliable;
+			_dirtyReliable_0[1] = _objectDictionary.IsDirtyReliable;
+			_dirtyReliable_0[2] = _inner.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
+			{
+				_innerList.SerializeSyncReliable(writer);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				_objectDictionary.SerializeSyncReliable(writer);
+			}
+			if (_dirtyReliable_0[2])
 			{
 				_inner.SerializeSyncReliable(writer);
 			}
@@ -120,6 +140,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override void SerializeSyncUnreliable(IPacketWriter writer) { }
 		public override void InitializeMasterProperties()
 		{
+			_innerList.InitializeRemoteProperties();
+			_objectDictionary.InitializeRemoteProperties();
 			_inner.InitializeRemoteProperties();
 		}
 		public override bool TryDeserializeSyncReliable(IPacketReader reader)
@@ -142,10 +164,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
+				if (!_objectDictionary.TryDeserializeSyncReliable(reader)) return false;
+				_onObjectDictionaryChanged?.Invoke(_objectDictionary);
+			}
+			if (dirtyReliable_0[4])
+			{
 				if (!_inner.TryDeserializeSyncReliable(reader)) return false;
 				_onInnerChanged?.Invoke(_inner);
 			}
-			if (dirtyReliable_0[4])
+			if (dirtyReliable_0[5])
 			{
 				if (!reader.TryReadInt32(out _testInt)) return false;
 				_onTestIntChanged?.Invoke(_testInt);
@@ -161,6 +188,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onInnerListChanged?.Invoke(_innerList);
 			if (!_noTargetList.TryDeserializeEveryProperty(reader)) return false;
 			_onNoTargetListChanged?.Invoke(_noTargetList);
+			if (!_objectDictionary.TryDeserializeEveryProperty(reader)) return false;
+			_onObjectDictionaryChanged?.Invoke(_objectDictionary);
 			if (!_inner.TryDeserializeEveryProperty(reader)) return false;
 			_onInnerChanged?.Invoke(_inner);
 			if (!reader.TryReadInt32(out _testInt)) return false;
@@ -172,6 +201,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_dictionary.InitializeRemoteProperties();
 			_innerList.InitializeRemoteProperties();
 			_noTargetList.InitializeRemoteProperties();
+			_objectDictionary.InitializeRemoteProperties();
 			_inner.InitializeRemoteProperties();
 			_testInt = 0;
 		}
@@ -189,9 +219,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				_inner.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[4])
+			{
+				_inner.IgnoreSyncReliable(reader);
+			}
+			if (dirtyReliable_0[5])
 			{
 				reader.Ignore(4);
 			}
@@ -210,9 +243,12 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				ZTest_InnerTest.IgnoreSyncStaticReliable(reader);
 			}
 			if (dirtyReliable_0[4])
+			{
+				ZTest_InnerTest.IgnoreSyncStaticReliable(reader);
+			}
+			if (dirtyReliable_0[5])
 			{
 				reader.Ignore(4);
 			}

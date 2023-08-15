@@ -52,6 +52,9 @@ namespace CT.CorePatcher.Exceptions
 	{
 		internal WrongSyncSetting(Type type, string memberName, string content)
 			: base($"Wrong sync setting error!\nType:{type.Name}\nMember:{memberName}!\n{content}") {}
+
+		internal WrongSyncSetting(string message)
+			: base($"Wrong sync setting error!\n{message}") { }
 	}
 
 	#endregion

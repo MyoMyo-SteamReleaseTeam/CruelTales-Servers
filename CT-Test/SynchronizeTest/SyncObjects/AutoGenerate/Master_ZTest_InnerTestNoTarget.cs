@@ -43,15 +43,6 @@ namespace CTS.Instance.SyncObjects
 	{
 		[SyncVar]
 		private int _a;
-		[SyncVar(dir: SyncDirection.FromRemote)]
-		private float _b;
-		public float B => _b;
-		private Action<float>? _onBChanged;
-		public event Action<float> OnBChanged
-		{
-			add => _onBChanged += value;
-			remove => _onBChanged -= value;
-		}
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
 		public ZTest_InnerTestNoTarget(IDirtyable owner)
@@ -107,37 +98,11 @@ namespace CTS.Instance.SyncObjects
 		{
 			_a = 0;
 		}
-		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
-		{
-			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
-			{
-				if (!reader.TryReadSingle(out _b)) return false;
-				_onBChanged?.Invoke(_b);
-			}
-			return true;
-		}
+		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
-		public void InitializeRemoteProperties()
-		{
-			_b = 0;
-		}
-		public void IgnoreSyncReliable(IPacketReader reader)
-		{
-			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
-			{
-				reader.Ignore(4);
-			}
-		}
-		public static void IgnoreSyncStaticReliable(IPacketReader reader)
-		{
-			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
-			if (dirtyReliable_0[0])
-			{
-				reader.Ignore(4);
-			}
-		}
+		public void InitializeRemoteProperties() { }
+		public void IgnoreSyncReliable(IPacketReader reader) { }
+		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
 		public void IgnoreSyncUnreliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}

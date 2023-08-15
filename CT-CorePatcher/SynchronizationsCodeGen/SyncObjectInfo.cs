@@ -17,6 +17,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
 		public bool IsDebugObject { get; private set; } = false;
+
+		public bool IsBidirection => HasMaster && HasRemote;
+		public bool HasMaster => _masterSideMembers.Count > 0;
+		public bool HasRemote => _remoteSideMembers.Count > 0;
+
 		private InheritType _inheritType = InheritType.None;
 
 		[AllowNull] private SerializeDirectionGroup _masterSerializeGroup;

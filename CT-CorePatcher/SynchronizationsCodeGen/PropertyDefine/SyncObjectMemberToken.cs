@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using CT.Common.Synchronizations;
+using CT.CorePatcher.Exceptions;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
@@ -8,7 +10,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		public override bool ShouldRollBackMask => false;
 		private string _constructorContent;
 		private bool _isPredefined = false;
-		private bool _isBidirectionSync = false;
+		public bool IsBidirectionSync => _attributeSyncDirection == SyncDirection.Bidirection;
+		private SyncDirection _attributeSyncDirection;
+		private Type _ownerType;
 
 		public string GetTypeName(CodeGenDirection genDirection)
 		{
@@ -28,7 +32,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public SyncObjectMemberToken(SyncType syncType, InheritType inheritType,
 									 string typeName, string memberName, string constructorContent,
-									 bool isPublic, bool isPredefined, bool isBidirectionSync)
+									 bool isPublic, bool isPredefined,
+									 SyncDirection attributeSyncDirection,
+									 Type ownerType)
 			: base(syncType, inheritType, typeName, memberName, isPublic)
 		{
 			_constructorContent = constructorContent;
@@ -37,15 +43,30 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 				_constructorContent = ", " + _constructorContent;
 			}
 			_isPredefined = isPredefined;
-			_isBidirectionSync = isBidirectionSync;
 			_syncType = syncType;
 			_typeName = typeName;
 			_privateMemberName = MemberFormat.GetPrivateName(memberName);
 			_publicMemberName = MemberFormat.GetPublicName(memberName);
+			_attributeSyncDirection = attributeSyncDirection;
+			_ownerType = ownerType;
+		}
+
+		private void checkSyncDirectionValidation()
+		{
+			if (SynchronizerGenerator.TryGetGenericObjSyncDirection(_typeName, out SyncDirection correctDir))
+			{
+				if (_attributeSyncDirection != correctDir)
+				{
+					throw new WrongSyncSetting($"Wrong sync direction in {_ownerType.Name}. \"{_typeName}\" " +
+						$"should be {correctDir} but current is {_attributeSyncDirection}!");
+				}
+			}
+
 		}
 
 		public string Master_Constructor()
 		{
+			checkSyncDirectionValidation();
 			return string.Format(MemberFormat.ConstructorWithOwner, _privateMemberName, _constructorContent);
 		}
 
@@ -57,7 +78,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Master_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, option.Direction);
+			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, _attributeSyncDirection);
 			return string.Format(MemberFormat.MasterReadonlyDeclaration, attribute, GetTypeName(option.GenDirection),
 								 _privateMemberName, _privateAccessModifier);
 		}
@@ -123,7 +144,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public string Remote_Constructor()
 		{
-			if (_isBidirectionSync)
+			checkSyncDirectionValidation();
+			if (IsBidirectionSync)
 				return string.Empty;
 
 			return string.Format(MemberFormat.ConstructorWithOwner, _privateMemberName, _constructorContent);
@@ -139,7 +161,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			string format;
 
-			if (_isBidirectionSync)
+			if (IsBidirectionSync)
 			{
 				if (IsPublic)
 				{
@@ -153,7 +175,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 				}
 			}
 
-			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, option.Direction);
+			string attribute = MemberFormat.GetSyncObjectAttribute(_syncType, _attributeSyncDirection);
 			format = IsPublic ?
 				MemberFormat.RemoteReadonlyDeclarationAsPublic :
 				MemberFormat.RemoteReadonlyDeclaration;

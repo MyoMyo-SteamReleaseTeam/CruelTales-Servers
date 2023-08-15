@@ -43,7 +43,7 @@ namespace CT.CorePatcher
 		{
 			try
 			{
-				Console.SetWindowSize(100, 70);
+				Console.SetWindowSize(200, 50);
 			}
 			catch
 			{

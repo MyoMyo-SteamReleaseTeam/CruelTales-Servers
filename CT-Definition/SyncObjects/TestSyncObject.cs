@@ -16,11 +16,14 @@ namespace CT.Definitions.SyncObjects
 		[SyncObject]
 		public SyncDictionary<NetInt32, NetInt32> Dictionary = new();
 
-		[SyncObject(cc: "8")]
+		[SyncObject(dir: SyncDirection.Bidirection, cc: "8")]
 		public SyncObjectList<ZTest_InnerTest> InnerList = new();
 
-		[SyncObject]
+		[SyncObject(dir: SyncDirection.FromMaster)]
 		public SyncObjectList<ZTest_InnerTestNoTarget> NoTargetList = new();
+
+		[SyncObject(dir: SyncDirection.Bidirection)]
+		public SyncObjectDictionary<NetworkIdentity, ZTest_InnerTest> ObjectDictionary = new();
 
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		public ZTest_InnerTest Inner = new();
@@ -35,8 +38,8 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int A;
 
-		[SyncVar(dir: SyncDirection.FromRemote)]
-		public float B;
+		//[SyncVar(dir: SyncDirection.FromRemote)]
+		//public float B;
 	}
 
 	[SyncObjectDefinition(IsDebugOnly = true)]
