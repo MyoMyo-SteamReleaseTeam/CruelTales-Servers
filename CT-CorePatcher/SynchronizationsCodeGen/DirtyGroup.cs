@@ -36,15 +36,21 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string GetName() => $"_dirty{_syncType}_{_dirtyIndex}";
 		public string GetTempName() => $"dirty{_syncType}_{_dirtyIndex}";
 
-		public string Master_MemberCheckDirtys()
+		public string Master_MemberCheckDirtys(CodeGenDirection codeGenDirection)
 		{
 			StringBuilder sb = new();
+
+			GenOption genOption = new GenOption()
+			{
+				GenDirection = codeGenDirection,
+				SyncType = _syncType
+			};
 			foreach (var m in _members)
-				sb.AppendLine(m.Master_CheckDirty(_syncType));
+				sb.AppendLine(m.Master_CheckDirty(genOption));
 			return sb.ToString();
 		}
 
-		public string Master_MarkObjectDirtyBit(string dirtyBitName)
+		public string Master_MarkObjectDirtyBit(GenOption option, string dirtyBitName)
 		{
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < _members.Count; i++)
@@ -52,19 +58,21 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				if (_members[i] is not SyncObjectMemberToken token)
 					continue;
 
-				sb.AppendLine(string.Format(SyncGroupFormat.SetDirtyBit, dirtyBitName, i, token.Master_IsDirty(_syncType)));
+				sb.AppendLine(string.Format(SyncGroupFormat.SetDirtyBit, dirtyBitName, i, token.Master_IsDirty(option)));
 			}
 
 			return sb.ToString();
 		}
 
-		public string Master_MemberSerializeIfDirtys(SyncDirection direction, string dirtyBitName, string tempDirtyBitName)
+		public string Master_MemberSerializeIfDirtys(GenOption option,
+													 string dirtyBitName,
+													 string tempDirtyBitName)
 		{
 			StringBuilder sb = new();
 			int index = 0;
 			foreach (var m in _members)
 			{
-				string serialize = m.Master_SerializeByWriter(_syncType, direction, tempDirtyBitName, index);
+				string serialize = m.Master_SerializeByWriter(option, tempDirtyBitName, index);
 				CodeFormat.AddIndent(ref serialize);
 				string content = string.Format(CommonFormat.IfDirty, dirtyBitName, index, serialize);
 				index++;
@@ -73,10 +81,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_MemberSetterSetters()
+		public string Master_MemberSetterSetters(GenOption option)
 		{
 			StringBuilder sb = new();
 			int index = 0;
+
 			foreach (var m in _members)
 			{
 				if (m.InheritType == InheritType.Child)
@@ -84,21 +93,22 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 					index++;
 					continue;
 				}
-				sb.AppendLine(m.Master_GetterSetter(_syncType, GetName(), index++));
+				sb.AppendLine(m.Master_GetterSetter(option, GetName(), index++));
 			}
 			return sb.ToString();
 		}
 
-		public string Master_ClearDirtys()
+		public string Master_ClearDirtys(GenOption genOption)
 		{
 			StringBuilder sb = new();
 			sb.AppendLine($"{GetName()}.Clear();");
+
 			foreach (var m in _members)
-				sb.AppendLine(m.Master_ClearDirty(_syncType));
+				sb.AppendLine(m.Master_ClearDirty(genOption));
 			return sb.ToString();
 		}
 
-		public string Remote_MemberDeserializeIfDirtys(SyncDirection direction, bool readDirtyBit = true)
+		public string Remote_MemberDeserializeIfDirtys(GenOption option, bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -106,16 +116,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetTempName()));
 			}
+
 			foreach (var m in _members)
 			{
-				string content = m.Remote_DeserializeByReader(_syncType, direction);
+				string content = m.Remote_DeserializeByReader(option);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetTempName(), index++, content));
 			}
 			return sb.ToString();
 		}
 
-		public string Remote_IgnoreMembers(SyncType syncType, bool isStatic, bool readDirtyBit = true)
+		public string Remote_IgnoreMembers(GenOption option, bool isStatic, bool readDirtyBit = true)
 		{
 			StringBuilder sb = new();
 			int index = 0;
@@ -123,9 +134,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				sb.AppendLine(string.Format(SyncGroupFormat.DirtyBitDeserialize, GetTempName()));
 			}
+
 			foreach (var m in _members)
 			{
-				string content = m.Remote_IgnoreDeserialize(syncType, isStatic);
+				string content = m.Remote_IgnoreDeserialize(option, isStatic);
 				CodeFormat.AddIndent(ref content);
 				sb.AppendLine(string.Format(CommonFormat.IfDirty, GetTempName(), index++, content));
 			}

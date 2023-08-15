@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -46,31 +47,27 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void Server_FromServerVoid();
 		[SyncRpc]
 		public partial void Server_FromServerArg(int a, int b);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public ZTest_FunctionDirection()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public partial void Client_FromClientVoid()
 		{
 			Client_FromClientVoidCallstackCount++;
 			_dirtyReliable_0[0] = true;
+			MarkDirtyReliable();
 		}
 		private byte Client_FromClientVoidCallstackCount = 0;
 		public partial void Client_FromServerArg(int a, int b)
 		{
 			Client_FromServerArgiiCallstack.Add((a, b));
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private List<(int a, int b)> Client_FromServerArgiiCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Client_FromClientVoidCallstackCount = 0;
 			Client_FromServerArgiiCallstack.Clear();

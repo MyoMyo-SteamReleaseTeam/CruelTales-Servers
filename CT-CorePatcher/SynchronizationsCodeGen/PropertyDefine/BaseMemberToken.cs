@@ -1,5 +1,4 @@
-﻿using System;
-using CT.Common.Synchronizations;
+﻿using CT.Common.Synchronizations;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 {
@@ -50,17 +49,17 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		}
 
 		// Master Side
-		public abstract string Master_InitializeProperty(SyncDirection direction);
-		public abstract string Master_Declaration(SyncDirection direction);
-		public abstract string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex);
-		public abstract string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int index);
-		public abstract string Master_CheckDirty(SyncType syncType); // Object Only
-		public abstract string Master_ClearDirty(SyncType syncType); // Object Only
+		public abstract string Master_InitializeProperty(GenOption option);
+		public abstract string Master_Declaration(GenOption option);
+		public abstract string Master_GetterSetter(GenOption option, string dirtyBitname, int memberIndex);
+		public abstract string Master_SerializeByWriter(GenOption option, string dirtyBitname, int index);
+		public abstract string Master_CheckDirty(GenOption option); // Object Only
+		public abstract string Master_ClearDirty(GenOption option); // Object Only
 
 		// Remote Side
-		public abstract string Remote_InitializeProperty(SyncDirection direction);
-		public abstract string Remote_Declaration(SyncDirection direction);
-		public abstract string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction);
-		public abstract string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic);
+		public abstract string Remote_InitializeProperty(GenOption option);
+		public abstract string Remote_Declaration(GenOption option);
+		public abstract string Remote_DeserializeByReader(GenOption option);
+		public abstract string Remote_IgnoreDeserialize(GenOption option, bool isStatic);
 	}
 }

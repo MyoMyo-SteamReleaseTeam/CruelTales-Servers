@@ -49,7 +49,7 @@ namespace CT.CorePatcher
 			{
 				PatcherConsole.PrintError("Set Window Size Failed!");
 			}
-			
+
 			try
 			{
 

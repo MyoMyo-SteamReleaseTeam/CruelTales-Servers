@@ -404,6 +404,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public int ServerTest = 0;
 		public int ServerTestTarget = 0;
 
+		public ZTest_InnerTest()
+		{
+			
+		}
+
 		public partial void Server_Test()
 		{
 			ServerTest++;
@@ -412,6 +417,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void Server_TestTarget()
 		{ 
 			ServerTestTarget++;
+		}
+	}
+	public partial class ZTest_InnerTestNoTarget
+	{
+		public ZTest_InnerTestNoTarget()
+		{
+
 		}
 	}
 }

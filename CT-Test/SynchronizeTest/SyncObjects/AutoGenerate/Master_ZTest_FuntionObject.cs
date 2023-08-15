@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -66,99 +67,122 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1);
 		[SyncRpc]
 		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2);
+		[AllowNull] public IDirtyable _owner;
+		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_FuntionObject(IDirtyable owner)
+		{
+			_owner = owner;
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
-		public bool IsDirtyReliable
+		protected bool _isDirtyReliable;
+		public bool IsDirtyReliable => _isDirtyReliable;
+		public void MarkDirtyReliable()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				isDirty |= _dirtyReliable_1.AnyTrue();
-				return isDirty;
-			}
+			_isDirtyReliable = true;
+			_owner.MarkDirtyReliable();
 		}
-		public bool IsDirtyUnreliable => false;
+		protected bool _isDirtyUnreliable;
+		public bool IsDirtyUnreliable => _isDirtyUnreliable;
+		public void MarkDirtyUnreliable()
+		{
+			_isDirtyUnreliable = true;
+			_owner.MarkDirtyUnreliable();
+		}
 		public partial void Server_VoidArg()
 		{
 			Server_VoidArgCallstackCount++;
 			_dirtyReliable_0[0] = true;
+			MarkDirtyReliable();
 		}
 		private byte Server_VoidArgCallstackCount = 0;
 		public partial void Server_PrimitiveArg_1(float v0)
 		{
 			Server_PrimitiveArg_1fCallstack.Add(v0);
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private List<float> Server_PrimitiveArg_1fCallstack = new(4);
 		public partial void Server_PrimitiveArg_2(float v0, int v1)
 		{
 			Server_PrimitiveArg_2fiCallstack.Add((v0, v1));
 			_dirtyReliable_0[2] = true;
+			MarkDirtyReliable();
 		}
 		private List<(float v0, int v1)> Server_PrimitiveArg_2fiCallstack = new(4);
 		public partial void Server_PrimitiveArg_3(float v0, int v1, double v2)
 		{
 			Server_PrimitiveArg_3fidCallstack.Add((v0, v1, v2));
 			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
 		}
 		private List<(float v0, int v1, double v2)> Server_PrimitiveArg_3fidCallstack = new(4);
 		public partial void Server_ValueTypeArg_1(Vector2 v0)
 		{
 			Server_ValueTypeArg_1VCallstack.Add(v0);
 			_dirtyReliable_0[4] = true;
+			MarkDirtyReliable();
 		}
 		private List<Vector2> Server_ValueTypeArg_1VCallstack = new(4);
 		public partial void Server_ValueTypeArg_2(Vector2 v0, NetString v1)
 		{
 			Server_ValueTypeArg_2VNCallstack.Add((v0, v1));
 			_dirtyReliable_0[5] = true;
+			MarkDirtyReliable();
 		}
 		private List<(Vector2 v0, NetString v1)> Server_ValueTypeArg_2VNCallstack = new(4);
 		public partial void Server_ValueTypeArg_3(UserId v0, Vector2 v1, NetString v2)
 		{
 			Server_ValueTypeArg_3UVNCallstack.Add((v0, v1, v2));
 			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
 		}
 		private List<(UserId v0, Vector2 v1, NetString v2)> Server_ValueTypeArg_3UVNCallstack = new(4);
 		public partial void Server_EnumTypeArg_1(TestEnumType v0, AckJoinMatch v1)
 		{
 			Server_EnumTypeArg_1TACallstack.Add((v0, v1));
 			_dirtyReliable_0[7] = true;
+			MarkDirtyReliable();
 		}
 		private List<(TestEnumType v0, AckJoinMatch v1)> Server_EnumTypeArg_1TACallstack = new(4);
 		public partial void Server_EnumTypeArg_2(AckJoinMatch v0, TestEnumType v1)
 		{
 			Server_EnumTypeArg_2ATCallstack.Add((v0, v1));
 			_dirtyReliable_1[0] = true;
+			MarkDirtyReliable();
 		}
 		private List<(AckJoinMatch v0, TestEnumType v1)> Server_EnumTypeArg_2ATCallstack = new(4);
 		public partial void Server_EnumTypeArg_3(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2)
 		{
 			Server_EnumTypeArg_3ATACallstack.Add((v0, v1, v2));
 			_dirtyReliable_1[1] = true;
+			MarkDirtyReliable();
 		}
 		private List<(AckJoinMatch v0, TestEnumType v1, AckJoinMatch v2)> Server_EnumTypeArg_3ATACallstack = new(4);
 		public partial void Server_CompositeArg_2_1(int v0, TestEnumType v1)
 		{
 			Server_CompositeArg_2_1iTCallstack.Add((v0, v1));
 			_dirtyReliable_1[2] = true;
+			MarkDirtyReliable();
 		}
 		private List<(int v0, TestEnumType v1)> Server_CompositeArg_2_1iTCallstack = new(4);
 		public partial void Server_CompositeArg_2_2(Vector2 v0, TestEnumType v1)
 		{
 			Server_CompositeArg_2_2VTCallstack.Add((v0, v1));
 			_dirtyReliable_1[3] = true;
+			MarkDirtyReliable();
 		}
 		private List<(Vector2 v0, TestEnumType v1)> Server_CompositeArg_2_2VTCallstack = new(4);
 		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2)
 		{
 			Server_CompositeArg_3VTfCallstack.Add((v0, v1, v2));
 			_dirtyReliable_1[4] = true;
+			MarkDirtyReliable();
 		}
 		private List<(Vector2 v0, TestEnumType v1, float v2)> Server_CompositeArg_3VTfCallstack = new(4);
 		public void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_VoidArgCallstackCount = 0;
 			Server_PrimitiveArg_1fCallstack.Clear();

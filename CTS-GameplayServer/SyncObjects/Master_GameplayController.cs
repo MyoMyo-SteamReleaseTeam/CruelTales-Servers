@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -42,7 +43,7 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
 		[SyncObject]
-		private readonly RoomSessionManager _sessionManager = new();
+		private readonly RoomSessionManager _sessionManager;
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
 		private Action<RoomSessionManager>? _onSessionManagerChanged;
@@ -55,27 +56,22 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_ReadyToSync(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_OnMapLoaded(NetworkPlayer player);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public GameplayController()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _sessionManager.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_sessionManager = new(this);
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public RoomSessionManager SessionManager => _sessionManager;
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
 		{
 			Server_LoadGameGCallstack.Add(player, mapType);
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameGCallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_sessionManager.ClearDirtyReliable();
 			Server_LoadGameGCallstack.Clear();

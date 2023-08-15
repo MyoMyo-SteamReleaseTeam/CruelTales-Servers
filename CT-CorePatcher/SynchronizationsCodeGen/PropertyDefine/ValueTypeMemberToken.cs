@@ -20,47 +20,47 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			IsNativeStruct = ReflectionHelper.IsNativeStruct(_typeName);
 		}
 
-		public override string Master_InitializeProperty(SyncDirection direction)
+		public override string Master_InitializeProperty(GenOption option)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, option.Direction);
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
 								 _privateMemberName, MemberFormat.NewInitializer, _privateAccessModifier);
 		}
 
-		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
+		public override string Master_GetterSetter(GenOption option, string dirtyBitname, int memberIndex)
 		{
 			return string.Format(MemberFormat.GetterSetter, AccessModifier, _typeName, _publicMemberName,
-								 _privateMemberName, dirtyBitname, memberIndex);
+								 _privateMemberName, dirtyBitname, memberIndex, option.SyncType);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(GenOption option, string dirtyBitname, int dirtyBitIndex)
 		{
 			string format = IsNativeStruct ? MemberFormat.WritePut : MemberFormat.WriteSerialize;
 			return string.Format(format, _privateMemberName);
 		}
 
-		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
-		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
+		public override string Master_CheckDirty(GenOption option) => string.Empty;
+		public override string Master_ClearDirty(GenOption option) => string.Empty;
 
-		public override string Remote_InitializeProperty(SyncDirection direction)
+		public override string Remote_InitializeProperty(GenOption option)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, @"new()");
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, option.Direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
 								 _publicMemberName, MemberFormat.NewInitializer, AccessModifier, _privateAccessModifier);
 		}
 
-		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
+		public override string Remote_DeserializeByReader(GenOption option)
 		{
 			StringBuilder sb = new StringBuilder();
 			if (IsNativeStruct)
@@ -75,7 +75,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return sb.ToString();
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
+		public override string Remote_IgnoreDeserialize(GenOption option, bool isStatic)
 		{
 			string dataTypeName = IsNativeStruct ? _typeName + "Extension" : _typeName;
 			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);

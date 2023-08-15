@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -75,7 +76,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV3Changed -= value;
 		}
 		[SyncObject]
-		private readonly SyncList<UserId> _v4 = new();
+		private readonly SyncList<UserId> _v4;
 		public SyncList<UserId> V4 => _v4;
 		private Action<SyncList<UserId>>? _onV4Changed;
 		public event Action<SyncList<UserId>> OnV4Changed
@@ -84,7 +85,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV4Changed -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _v5 = new();
+		private readonly ZTest_InnerObjectTarget _v5;
 		public ZTest_InnerObjectTarget V5 => _v5;
 		private Action<ZTest_InnerObjectTarget>? _onV5Changed;
 		public event Action<ZTest_InnerObjectTarget> OnV5Changed
@@ -138,8 +139,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void uf1(int a, double b);
 		[SyncRpc(SyncType.UnreliableTarget)]
 		public partial void uft2();
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public ZTest_Value8Target()
+		{
+			_v4 = new(this);
+			_v5 = new(this);
+		}
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
@@ -321,7 +325,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[4])
 			{
-				_v4.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[5])
 			{
@@ -364,7 +367,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[4])
 			{
-				SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 			}
 			if (dirtyReliable_0[5])
 			{

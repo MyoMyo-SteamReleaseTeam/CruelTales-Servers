@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -102,7 +103,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV6Changed -= value;
 		}
 		[SyncObject]
-		private readonly SyncList<UserId> _v7 = new();
+		private readonly SyncList<UserId> _v7;
 		public SyncList<UserId> V7 => _v7;
 		private Action<SyncList<UserId>>? _onV7Changed;
 		public event Action<SyncList<UserId>> OnV7Changed
@@ -195,7 +196,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV18Changed -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _v19 = new();
+		private readonly ZTest_InnerObjectTarget _v19;
 		public ZTest_InnerObjectTarget V19 => _v19;
 		private Action<ZTest_InnerObjectTarget>? _onV19Changed;
 		public event Action<ZTest_InnerObjectTarget> OnV19Changed
@@ -204,7 +205,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV19Changed -= value;
 		}
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObject _v20 = new();
+		private readonly ZTest_InnerObject _v20;
 		public ZTest_InnerObject V20 => _v20;
 		private Action<ZTest_InnerObject>? _onV20Changed;
 		public event Action<ZTest_InnerObject> OnV20Changed
@@ -222,7 +223,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onV21Changed -= value;
 		}
 		[SyncObject]
-		private readonly SyncList<UserId> _v23 = new();
+		private readonly SyncList<UserId> _v23;
 		public SyncList<UserId> V23 => _v23;
 		private Action<SyncList<UserId>>? _onV23Changed;
 		public event Action<SyncList<UserId>> OnV23Changed
@@ -289,8 +290,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void f24(int a);
 		[SyncRpc]
 		public partial void f28(int a);
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public ZTest_Value32Target()
+		{
+			_v7 = new(this);
+			_v19 = new(this);
+			_v20 = new(this);
+			_v23 = new(this);
+		}
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }
@@ -633,7 +639,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[7])
 				{
-					_v7.IgnoreSyncReliable(reader);
 				}
 			}
 			if (masterDirty[1])
@@ -697,7 +702,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_2[5])
 				{
-					_v23.IgnoreSyncReliable(reader);
 				}
 				if (dirtyReliable_2[6])
 				{
@@ -789,7 +793,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_0[7])
 				{
-					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 			}
 			if (masterDirty[1])
@@ -853,7 +856,6 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				}
 				if (dirtyReliable_2[5])
 				{
-					SyncList<UserId>.IgnoreSyncStaticReliable(reader);
 				}
 				if (dirtyReliable_2[6])
 				{

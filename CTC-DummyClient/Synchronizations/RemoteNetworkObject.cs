@@ -58,5 +58,20 @@ namespace CTC.Networks.Synchronizations
 		public abstract void ClearDirtyUnreliable();
 		public abstract void IgnoreSyncReliable(IPacketReader reader);
 		public abstract void IgnoreSyncUnreliable(IPacketReader reader);
+
+		public void BindOwner(IDirtyable owner)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public void MarkDirtyReliable()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public void MarkDirtyUnreliable()
+		{
+			throw new System.NotImplementedException();
+		}
 	}
 }

@@ -2,7 +2,7 @@
 
 using CT.Common.Synchronizations;
 
-namespace CT.Common.Definitions.SyncObjects
+namespace CT.Definitions.SyncObjects
 {
 	//[SyncNetworkObjectDefinition(20)]
 	//public class InteractBeacon

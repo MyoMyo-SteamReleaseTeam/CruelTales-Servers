@@ -19,46 +19,46 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_clrEnumSizeTypeName = clrEnumSizeTypeName;
 		}
 
-		public override string Master_InitializeProperty(SyncDirection direction)
+		public override string Master_InitializeProperty(GenOption option)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, option.Direction);
 			return string.Format(MemberFormat.MasterDeclaration, attribute, _typeName,
 								 _privateMemberName, MemberFormat.NewInitializer, _privateAccessModifier);
 		}
 
-		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
+		public override string Master_GetterSetter(GenOption option, string dirtyBitname, int memberIndex)
 		{
 			return string.Format(MemberFormat.GetterSetter, AccessModifier, _typeName, _publicMemberName,
-								 _privateMemberName, dirtyBitname, memberIndex);
+								 _privateMemberName, dirtyBitname, memberIndex, option.SyncType);
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(GenOption option, string dirtyBitname, int dirtyBitIndex)
 		{
 			return string.Format(MemberFormat.WriteEnum, _enumSizeTypeName, _privateMemberName);
 		}
 
-		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
-		public override string Master_ClearDirty(SyncType syncType) => string.Empty;
+		public override string Master_CheckDirty(GenOption option) => string.Empty;
+		public override string Master_ClearDirty(GenOption option) => string.Empty;
 
-		public override string Remote_InitializeProperty(SyncDirection direction)
+		public override string Remote_InitializeProperty(GenOption option)
 		{
 			return string.Format(MemberFormat.InitializeProperty, _privateMemberName, $"({_typeName})0");
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncVarAttribute(_syncType, option.Direction);
 			string format = IsPublic ? MemberFormat.RemoteDeclarationAsPublic : MemberFormat.RemoteDeclaration;
 			return string.Format(format, attribute, _typeName, _privateMemberName,
 								 _publicMemberName, string.Empty, AccessModifier, _privateAccessModifier);
 		}
 
-		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
+		public override string Remote_DeserializeByReader(GenOption option)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _typeName, _clrEnumSizeTypeName));
@@ -66,7 +66,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return sb.ToString();
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
+		public override string Remote_IgnoreDeserialize(GenOption option, bool isStatic)
 		{
 			return string.Format(MemberFormat.IgnorePrimitive,
 								 ReflectionHelper.GetByteSizeByTypeName(_enumSizeTypeName));

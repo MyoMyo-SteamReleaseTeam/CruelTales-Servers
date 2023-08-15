@@ -8,7 +8,7 @@ setlocal
 REM Run core patcher
  dotnet run -c Release ^
  --programName "programXml" "programFilePatch" ^
- --xmlPath "../CT-Common/Definitions/Packets/" ^
+ --xmlPath "../CT-Definition/Packets/" ^
  --packetTypePath "../CT-Common/Packets/" ^
  --outputServer "../CT-NetworkCore/Packets/" ^
  -baseNamespace "CT.Packets" ^

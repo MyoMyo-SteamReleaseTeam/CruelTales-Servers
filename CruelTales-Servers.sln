@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaNetPhysics", "KaNetPhysic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KaNetTool", "KaNetTool\KaNetTool.csproj", "{53C753E9-83E5-48A8-BF0F-34BF7134B02E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CT-Definition", "CT-Definition\CT-Definition.csproj", "{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{53C753E9-83E5-48A8-BF0F-34BF7134B02E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53C753E9-83E5-48A8-BF0F-34BF7134B02E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53C753E9-83E5-48A8-BF0F-34BF7134B02E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +111,7 @@ Global
 		{B035F5F7-1B27-4345-912D-5EF6D8332478} = {A88AA86F-146F-44EB-A283-28DF25A670B6}
 		{5ECB6A19-9132-43B0-BC05-B1D32AAB3F82} = {76070E9E-6D6C-474C-AF8F-6D8D5267FF9C}
 		{53C753E9-83E5-48A8-BF0F-34BF7134B02E} = {76070E9E-6D6C-474C-AF8F-6D8D5267FF9C}
+		{E87F6C88-C1D9-4115-A4F1-0C6B1F9EBFE9} = {6A2B8EA8-42E9-4476-90FC-73516807EC5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FACAAD2D-A975-498F-97B8-D8A75C94F89A}

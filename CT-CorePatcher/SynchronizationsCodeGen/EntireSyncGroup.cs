@@ -27,8 +27,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return _members.Where(m => m is not FunctionMemberToken).Any();
 		}
 
-		public string Master_SerializeSyncAll()
+		public string Master_SerializeSyncAll(GenOption option)
 		{
+			option.SyncType = _syncType;
+			option.Direction = _direction;
+
 			StringBuilder sb = new StringBuilder();
 			sb.Append(string.Format(SyncGroupFormat.EntireSerializeFunctionDeclaration, _modifier,
 									SyncGroupFormat.EntireFunctionSuffix));
@@ -38,11 +41,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 			StringBuilder contents = new();
 			int index = 0;
+
 			foreach (var m in _members)
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Master_SerializeByWriter(_syncType, _direction, dirtyBitname: string.Empty, index++));
+				contents.AppendLine(m.Master_SerializeByWriter(option, dirtyBitname: string.Empty, index++));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -54,8 +58,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Master_InitilaizeProperties()
+		public string Master_InitilaizeProperties(GenOption option)
 		{
+			option.SyncType = _syncType;
+			option.Direction = _direction;
+
 			StringBuilder sb = new();
 			sb.Append(string.Format(SyncGroupFormat.InitializeMasterProperties, _modifier));
 
@@ -67,7 +74,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Master_InitializeProperty(_direction));
+				contents.AppendLine(m.Master_InitializeProperty(option));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -101,8 +108,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return _members.Where(m => m is not FunctionMemberToken).Any();
 		}
 
-		public string Remote_DeserializeSyncAll()
+		public string Remote_DeserializeSyncAll(GenOption option)
 		{
+			option.SyncType = _syncType;
+			option.Direction = _direction;
+
 			if (_direction == SyncDirection.FromMaster)
 			{
 				return string.Empty;
@@ -116,11 +126,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				return sb.AppendLine(SyncGroupFormat.EmptyDeserializeImplementation).ToString();
 
 			StringBuilder contents = new();
+
 			foreach (var m in _members)
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Remote_DeserializeByReader(_syncType, _direction));
+				contents.AppendLine(m.Remote_DeserializeByReader(option));
 			}
 			CodeFormat.AddIndent(contents);
 
@@ -133,8 +144,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			return sb.ToString();
 		}
 
-		public string Remote_InitilaizeProperties()
+		public string Remote_InitilaizeProperties(GenOption option)
 		{
+			option.SyncType = _syncType;
+			option.Direction = _direction;
+
 			StringBuilder sb = new();
 			sb.Append(string.Format(SyncGroupFormat.InitializeRemoteProperties, _modifier));
 
@@ -142,11 +156,12 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				return sb.AppendLine(" { }").ToString();
 
 			StringBuilder contents = new();
+
 			foreach (var m in _members)
 			{
 				if (SyncRule.CanSyncEntire(m))
 					continue;
-				contents.AppendLine(m.Remote_InitializeProperty(_direction));
+				contents.AppendLine(m.Remote_InitializeProperty(option));
 			}
 			CodeFormat.AddIndent(contents);
 

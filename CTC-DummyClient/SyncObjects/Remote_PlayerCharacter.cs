@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -92,26 +93,21 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction);
 		[SyncRpc]
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
-		private BitmaskByte _dirtyUnreliable_0 = new();
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable
+		public PlayerCharacter()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
 		}
+		private BitmaskByte _dirtyUnreliable_0 = new();
 		public partial void Client_RequestInput(InputData inputData)
 		{
 			Client_RequestInputICallstack.Add(inputData);
 			_dirtyUnreliable_0[0] = true;
+			MarkDirtyUnreliable();
 		}
 		private List<InputData> Client_RequestInputICallstack = new(4);
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable()
 		{
+			_isDirtyUnreliable = false;
 			_dirtyUnreliable_0.Clear();
 			Client_RequestInputICallstack.Clear();
 		}

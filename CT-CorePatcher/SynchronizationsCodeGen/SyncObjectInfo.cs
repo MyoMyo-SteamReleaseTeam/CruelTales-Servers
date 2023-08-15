@@ -12,7 +12,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		public string ObjectName => _objectName;
 		private string _objectName;
 		private string _modifier;
-		public  bool IsNetworkObject { get; private set; } = false;
+		private string _parentTypeName;
+		public SyncObjectType SyncObjectType { get; private set; }
 		public int Capacity { get; private set; } = 0;
 		public bool MultiplyByMaxUser { get; private set; } = false;
 		public bool IsDebugObject { get; private set; } = false;
@@ -38,23 +39,25 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 							  InheritType inheritType,
 							  List<MemberToken> masterSideMembers,
 							  List<MemberToken> remoteSideMembers,
-							  bool isNetworkObject,
+							  SyncObjectType objectType,
 							  int capacity,
 							  bool multiplyByMaxUser,
-							  bool isDebugObject)
+							  bool isDebugObject,
+							  string parent)
 		{
 			_objectName = objectName;
 			_inheritType = inheritType;
-			IsNetworkObject = isNetworkObject;
+			SyncObjectType = objectType;
 			Capacity = capacity;
-			this.IsDebugObject = isDebugObject;
+			IsDebugObject = isDebugObject;
 			MultiplyByMaxUser = multiplyByMaxUser;
-			_modifier = IsNetworkObject ? "override " : string.Empty;
+			_modifier = SyncObjectType == SyncObjectType.NetworkObject ? "override " : string.Empty;
+			_parentTypeName = parent;
 
 			_masterSideMembers = masterSideMembers;
 			_remoteSideMembers = remoteSideMembers;
 
-			if (IsNetworkObject)
+			if (SyncObjectType == SyncObjectType.NetworkObject)
 			{
 				_masterInheritName = string.Empty; //CommonFormat.MasterNetworkObjectTypeName;
 				_remoteInheritName = string.Empty; //CommonFormat.RemoteNetworkObjectTypeName;
@@ -110,6 +113,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string genCode = gnerateCode(UsingTable.MasterUsingStatements,
 										 CommonFormat.MasterNamespace,
 										 SyncDirection.FromMaster,
+										 CodeGenDirection.Master,
 										 _masterSideMembers,
 										 _remoteSideMembers,
 										 _masterSerializeGroup,
@@ -129,6 +133,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			string genCode = gnerateCode(usingStatements,
 										 CommonFormat.RemoteNamespace,
 										 SyncDirection.FromRemote,
+										 CodeGenDirection.Remote,
 										 _remoteSideMembers,
 										 _masterSideMembers,
 										 _remoteSerializeGroup,
@@ -144,7 +149,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			if (IsDebugObject)
 				return string.Empty;
 
-			if (!IsNetworkObject)
+			if (SyncObjectType != SyncObjectType.NetworkObject)
 				return string.Empty;
 
 			return string.Format(CommonFormat.NetworkTypeDeclaration,
@@ -154,6 +159,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		private string gnerateCode(string usingStatements,
 								   string namespaceName,
 								   SyncDirection direction,
+								   CodeGenDirection codeGenDirection,
 								   List<MemberToken> forwardMember,
 								   List<MemberToken> backwardMember,
 								   SerializeDirectionGroup forward,
@@ -163,22 +169,75 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			StringBuilder sb = new();
 			sb.AppendLine(getNetworkTypeDefinition());
 
+			// Declarations
+			GenOption genForward = new GenOption()
+			{
+				GenDirection = codeGenDirection,
+				Direction = direction,
+				ObjectType = SyncObjectType,
+				InheritType = _inheritType
+			};
 			foreach (var m in forwardMember)
 			{
 				if (m.InheritType == InheritType.Child)
 					continue;
-				sb.AppendLine(m.Member.Master_Declaration(direction));
+				sb.AppendLine(m.Member.Master_Declaration(genForward));
+			}
+
+			GenOption genBackward = new GenOption() 
+			{ 
+				GenDirection = codeGenDirection, 
+				Direction = direction.Reverse(),
+				ObjectType = SyncObjectType,
+				InheritType = _inheritType
+			};
+			foreach (var m in backwardMember)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
+				sb.AppendLine(m.Member.Remote_Declaration(genBackward));
+			}
+
+			// Owner declaration
+			if (SyncObjectType == SyncObjectType.SyncObject)
+			{
+				sb.AppendLine(CommonFormat.OwnerDeclaration);
+				sb.AppendLine(CommonFormat.BindOwner);
+			}
+
+			// Constructor
+			StringBuilder csb = new();
+			foreach (var m in forwardMember)
+			{
+				if (m.InheritType == InheritType.Child)
+					continue;
+
+				if (m.Member is SyncObjectMemberToken token)
+				{
+					csb.AppendLine(token.Master_Constructor());
+				}
 			}
 			foreach (var m in backwardMember)
 			{
 				if (m.InheritType == InheritType.Child)
 					continue;
-				sb.AppendLine(m.Member.Remote_Declaration(direction.Reverse()));
+
+				if (m.Member is SyncObjectMemberToken token)
+				{
+					csb.AppendLine(token.Remote_Constructor());
+				}
 			}
 
-			sb.AppendLine(forward.Gen_SynchronizerProperties());
-			sb.AppendLine(forward.Gen_SerializeSyncFuntions());
-			sb.AppendLine(backward.Gen_SerializeSyncFuntions());
+			CodeFormat.AddIndent(csb);
+			string constructorFormat = SyncObjectType == SyncObjectType.NetworkObject ?
+				CommonFormat.Constructor : CommonFormat.ConstructorWithOwner;
+
+			sb.AppendLine(string.Format(constructorFormat, ObjectName, csb.ToString()));
+
+			// Synchronizations
+			sb.AppendLine(forward.Gen_SynchronizerProperties(genForward));
+			sb.AppendLine(forward.Gen_SerializeSyncFuntions(genForward));
+			sb.AppendLine(backward.Gen_SerializeSyncFuntions(genBackward));
 			CodeFormat.AddIndent(sb);
 
 			string content;

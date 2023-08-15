@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
 using CT.Common.Gameplay.PlayerCharacterStates;
@@ -22,8 +23,8 @@ namespace CTS.Instance.SyncObjects
 		public NetworkPlayer? NetworkPlayer { get; private set; }
 
 		// States
-		private PlayerCharacterModel PlayerModel;
-		private PlayerCharacterStateMachine StateMachine;
+		[AllowNull] private PlayerCharacterModel PlayerModel;
+		[AllowNull] private PlayerCharacterStateMachine StateMachine;
 
 		#region Getter Setter
 
@@ -53,7 +54,7 @@ namespace CTS.Instance.SyncObjects
 
 		#endregion
 
-		public PlayerCharacter() : base()
+		public override void Constructor()
 		{
 			PlayerModel = new(this);
 			StateMachine = new(PlayerModel);

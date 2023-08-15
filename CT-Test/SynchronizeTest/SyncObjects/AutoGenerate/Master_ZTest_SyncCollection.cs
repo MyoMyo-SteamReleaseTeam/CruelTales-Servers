@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -41,42 +42,27 @@ namespace CTS.Instance.SyncObjects
 	public partial class ZTest_SyncCollection
 	{
 		[SyncObject]
-		private readonly SyncList<UserId> _userIdList = new();
+		private readonly SyncList<UserId> _userIdList;
 		[SyncObject(SyncType.ReliableOrUnreliable)]
-		private readonly ZTest_InnerObjectTarget _syncObj = new();
+		private readonly ZTest_InnerObjectTarget _syncObj;
+		public ZTest_SyncCollection()
+		{
+			_userIdList = new(this);
+			_syncObj = new(this);
+		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyUnreliable_0 = new();
-		public override bool IsDirtyReliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _userIdList.IsDirtyReliable;
-				isDirty |= _syncObj.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
-		public override bool IsDirtyUnreliable
-		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _syncObj.IsDirtyUnreliable;
-				isDirty |= _dirtyUnreliable_0.AnyTrue();
-				return isDirty;
-			}
-		}
-		public SyncList<UserId> UserIdList => _userIdList;
 		public ZTest_InnerObjectTarget SyncObj => _syncObj;
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_userIdList.ClearDirtyReliable();
 			_syncObj.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable()
 		{
+			_isDirtyUnreliable = false;
 			_dirtyUnreliable_0.Clear();
 			_syncObj.ClearDirtyUnreliable();
 		}

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CT-Common\CT-Common.csproj" />
+    <ProjectReference Include="..\CT-Definition\CT-Definition.csproj" />
   </ItemGroup>
 
 </Project>

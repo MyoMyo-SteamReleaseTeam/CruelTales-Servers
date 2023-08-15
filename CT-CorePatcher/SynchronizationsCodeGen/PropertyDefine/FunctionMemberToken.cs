@@ -27,43 +27,51 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			_argGroup = new SyncArgumentGroup(args);
 		}
 
-		public override string Master_InitializeProperty(SyncDirection direction)
+		public override string Master_InitializeProperty(GenOption option)
 		{
 			return string.Empty;
 		}
 
-		public override string Master_Declaration(SyncDirection direction)
+		public override string Master_Declaration(GenOption option)
 		{
-			if (direction == SyncDirection.FromMaster)
+			if (option.Direction == SyncDirection.FromMaster)
 			{
 			}
-			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, option.Direction);
 			return string.Format(FuncMemberFormat.Declaration,
 								 attribute, AccessModifier, _functionName,
 								 _argGroup.GetParameterDeclaration(), string.Empty);
 		}
 
-		public override string Master_GetterSetter(SyncType syncType, string dirtyBitname, int memberIndex)
+		public override string Master_GetterSetter(GenOption option, string dirtyBitname, int memberIndex)
 		{
 			if (_argGroup.Count == 0)
 			{
-				return string.Format(FuncMemberFormat.CallWithStackVoid, AccessModifier,
-									 _functionName, dirtyBitname, memberIndex,
-									 _privateAccessModifier, _callstackName);
+				return string.Format(FuncMemberFormat.CallWithStackVoid,
+									 AccessModifier,
+									 _functionName,
+									 dirtyBitname,
+									 memberIndex,
+									 _privateAccessModifier,
+									 _callstackName,
+									 option.SyncType);
 			}
-
-			return string.Format(FuncMemberFormat.CallWithStack,
-								 AccessModifier,
-								 _functionName,
-								 _argGroup.GetParameterDeclaration(),
-								 _argGroup.GetTupleEnqueueValue(),
-								 _argGroup.GetTupleDeclaration(),
-								 dirtyBitname, memberIndex,
-								 _privateAccessModifier,
-								 _callstackName);
+			else
+			{
+				return string.Format(FuncMemberFormat.CallWithStack,
+									 AccessModifier,
+									 _functionName,
+									 _argGroup.GetParameterDeclaration(),
+									 _argGroup.GetTupleEnqueueValue(),
+									 _argGroup.GetTupleDeclaration(),
+									 dirtyBitname, memberIndex,
+									 _privateAccessModifier,
+									 _callstackName,
+									 option.SyncType);
+			}
 		}
 
-		public override string Master_SerializeByWriter(SyncType syncType, SyncDirection direction, string dirtyBitname, int dirtyBitIndex)
+		public override string Master_SerializeByWriter(GenOption option, string dirtyBitname, int dirtyBitIndex)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.SerializeIfDirtyVoid, _callstackName);
@@ -73,9 +81,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(FuncMemberFormat.SerializeIfDirty, _callstackName, content);
 		}
 
-		public override string Master_CheckDirty(SyncType syncType) => string.Empty;
+		public override string Master_CheckDirty(GenOption option) => string.Empty;
 
-		public override string Master_ClearDirty(SyncType syncType)
+		public override string Master_ClearDirty(GenOption option)
 		{
 			if (_argGroup.Count == 0)
 				return string.Format(FuncMemberFormat.ClearCallCount, _callstackName);
@@ -83,23 +91,23 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			return string.Format(FuncMemberFormat.ClearCallStack, _callstackName);
 		}
 
-		public override string Remote_InitializeProperty(SyncDirection direction)
+		public override string Remote_InitializeProperty(GenOption option)
 		{
 			return string.Empty;
 		}
 
-		public override string Remote_Declaration(SyncDirection direction)
+		public override string Remote_Declaration(GenOption option)
 		{
-			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, direction);
+			string attribute = MemberFormat.GetSyncRpcAttribute(_syncType, option.Direction);
 			string format = string.Empty;
 
-			if (direction == SyncDirection.FromRemote)
+			if (option.Direction == SyncDirection.FromRemote)
 			{
 				format = _argGroup.Count == 0 ?
 					FuncMemberFormat.TargetDeclarationVoid :
 					FuncMemberFormat.DeclarationFromRemote;
 			}
-			else if (direction == SyncDirection.FromMaster)
+			else if (option.Direction == SyncDirection.FromMaster)
 			{
 				format = FuncMemberFormat.Declaration;
 			}
@@ -108,15 +116,15 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _argGroup.GetParameterDeclaration(), _inheritKeyword);
 		}
 
-		public override string Remote_DeserializeByReader(SyncType syncType, SyncDirection direction)
+		public override string Remote_DeserializeByReader(GenOption option)
 		{
 			if (_argGroup.Count == 0)
 			{
 				string format = string.Empty;
 
-				if (direction == SyncDirection.FromRemote)
+				if (option.Direction == SyncDirection.FromRemote)
 					format = FuncMemberFormat.DeserializeIfDirtyVoid;
-				else if (direction == SyncDirection.FromMaster)
+				else if (option.Direction == SyncDirection.FromMaster)
 					format = FuncMemberFormat.TargetDeserializeIfDirtyVoid;
 
 				return string.Format(format, _functionName);
@@ -125,7 +133,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			string paramContent = _argGroup.GetReadParameterContent();
 			CodeFormat.AddIndent(ref paramContent);
 			string callParameters = _argGroup.GetCallParameters();
-			if (direction == SyncDirection.FromMaster)
+			if (option.Direction == SyncDirection.FromMaster)
 			{
 				callParameters = NameTable.NetworkPlayerParameterName + ", " + callParameters;
 			}
@@ -134,7 +142,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 								 _functionName, paramContent, callParameters);
 		}
 
-		public override string Remote_IgnoreDeserialize(SyncType syncType, bool isStatic)
+		public override string Remote_IgnoreDeserialize(GenOption option, bool isStatic)
 		{
 			if (_argGroup.Count == 0)
 				return FuncMemberFormat.IgnoreVoid;

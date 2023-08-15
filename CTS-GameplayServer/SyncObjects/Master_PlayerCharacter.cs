@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -59,17 +60,10 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public PlayerCharacter()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public UserId UserId
 		{
 			get => _userId;
@@ -78,6 +72,7 @@ namespace CTS.Instance.SyncObjects
 				if (_userId == value) return;
 				_userId = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public NetStringShort Username
@@ -88,28 +83,33 @@ namespace CTS.Instance.SyncObjects
 				if (_username == value) return;
 				_username = value;
 				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state)
 		{
 			Server_OnAnimationChangedDCallstack.Add(state);
 			_dirtyReliable_0[2] = true;
+			MarkDirtyReliable();
 		}
 		private List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
 		{
 			Server_OnAnimationChangedDPCallstack.Add((state, direction));
 			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
 		}
 		private List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction)
 		{
 			Server_OnProxyDirectionChangedPCallstack.Add(direction);
 			_dirtyReliable_0[4] = true;
+			MarkDirtyReliable();
 		}
 		private List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_OnAnimationChangedDCallstack.Clear();
 			Server_OnAnimationChangedDPCallstack.Clear();

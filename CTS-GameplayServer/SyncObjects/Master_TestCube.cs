@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -51,17 +52,10 @@ namespace CTS.Instance.SyncObjects
 		private float _animationTime;
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public TestCube()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public float R
 		{
 			get => _r;
@@ -70,6 +64,7 @@ namespace CTS.Instance.SyncObjects
 				if (_r == value) return;
 				_r = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public float G
@@ -80,6 +75,7 @@ namespace CTS.Instance.SyncObjects
 				if (_g == value) return;
 				_g = value;
 				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public float B
@@ -90,16 +86,19 @@ namespace CTS.Instance.SyncObjects
 				if (_b == value) return;
 				_b = value;
 				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public partial void TestRPC(long someMessage)
 		{
 			TestRPClCallstack.Add(someMessage);
 			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
 		}
 		private List<long> TestRPClCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			TestRPClCallstack.Clear();
 		}

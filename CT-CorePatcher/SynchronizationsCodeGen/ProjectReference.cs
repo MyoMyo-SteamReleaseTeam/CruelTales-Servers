@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using CT.Common.Definitions;
+using CT.Common;
 using CT.CorePatcher.Helper;
+using CT.Definitions;
 
 namespace CT.CorePatcher.SynchronizationsCodeGen
 {
@@ -23,7 +24,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 
 		private ProjectReference()
 		{
-			_referenceTypes = new() { typeof(CommonDefinition) };
+			_referenceTypes = new()
+			{
+				//typeof(DefinitionAssemblyReferenceClass),
+				typeof(CommonAssemblyReferenceClass),
+			};
 			List<Assembly> referenceAssemblys = new();
 
 			// Add references

@@ -16,28 +16,42 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			IPacketWriter pw = data;
 			IPacketReader pr = data;
 
-			SyncList<NetInt32> src = new()
+			DirtyableMockup dsrc = new DirtyableMockup();
+			DirtyableMockup ddes = new DirtyableMockup();
+
+			SyncList<NetInt32> src = new(dsrc)
 			{
 				0,
 				1,
 				2,
 				3,
 			};
-			SyncList<NetInt32> des = new();
+			SyncList<NetInt32> des = new(ddes);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			dsrc.ClearDirtyReliable();
 
 			src.Add(100);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 			src.Add(123);
+			dsrc.ClearDirtyReliable();
 			src.Insert(1, 99);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 			src.Add(55);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 
 			src.Remove(123);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 			src.RemoveAt(0);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 
 			src.Clear();
 

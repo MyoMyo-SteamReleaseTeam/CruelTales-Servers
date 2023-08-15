@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -40,7 +41,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
 		[SyncObject(dir: SyncDirection.FromRemote)]
-		private readonly RoomSessionManager _sessionManager = new();
+		private readonly RoomSessionManager _sessionManager;
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync();
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -53,33 +54,29 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(GameMapType mapType);
-		private BitmaskByte _dirtyReliable_0 = new();
-		public override bool IsDirtyReliable
+		public GameplayController()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _sessionManager.IsDirtyReliable;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				return isDirty;
-			}
+			_sessionManager = new(this);
 		}
-		public override bool IsDirtyUnreliable => false;
+		private BitmaskByte _dirtyReliable_0 = new();
 		public RoomSessionManager SessionManager => _sessionManager;
 		public partial void Client_ReadyToSync()
 		{
 			Client_ReadyToSyncCallstackCount++;
 			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
 		}
 		private byte Client_ReadyToSyncCallstackCount = 0;
 		public partial void Client_OnMapLoaded()
 		{
 			Client_OnMapLoadedCallstackCount++;
 			_dirtyReliable_0[2] = true;
+			MarkDirtyReliable();
 		}
 		private byte Client_OnMapLoadedCallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_sessionManager.ClearDirtyReliable();
 			Client_ReadyToSyncCallstackCount = 0;

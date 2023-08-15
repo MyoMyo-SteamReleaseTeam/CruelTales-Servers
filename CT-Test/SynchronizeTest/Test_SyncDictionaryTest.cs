@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
@@ -18,7 +17,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			IPacketWriter pw = data;
 			IPacketReader pr = data;
 
-			SyncDictionary<NetworkIdentity, NetInt32> src = new()
+			DirtyableMockup dsrc = new DirtyableMockup();
+			DirtyableMockup ddes = new DirtyableMockup();
+
+			SyncDictionary<NetworkIdentity, NetInt32> src = new(dsrc)
 			{
 				{ new(0), 25 },
 				{ new(1), 50 },
@@ -27,25 +29,36 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 				{ new(4), 125 },
 				{ new(5), 150 },
 			};
-			SyncDictionary<NetworkIdentity, NetInt32> des = new();
+			SyncDictionary<NetworkIdentity, NetInt32> des = new(ddes);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			dsrc.ClearDirtyReliable();
 
 			src.Add(new(6), 175);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 			src.Add(new(7), 200);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 
 			src.Remove(new NetworkIdentity(2));
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 			src.Add(new(8), 200);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 
 			src[new(1)] = 100;
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			checkWithBuffercheck(src, des, pw, pr);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
 
 			src.Clear();
+			Assert.IsTrue(dsrc.IsDirtyReliable);
 
 			checkWithBuffercheck(src, des, pw, pr);
 

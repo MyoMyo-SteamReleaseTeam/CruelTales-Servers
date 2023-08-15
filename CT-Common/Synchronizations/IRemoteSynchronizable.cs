@@ -5,20 +5,8 @@ namespace CT.Common.Synchronizations
 	/// <summary>
 	/// 동기화 객체를 정의합니다.
 	/// </summary>
-	public interface IRemoteSynchronizable
+	public interface IRemoteSynchronizable : IDirtyable
 	{
-		/// <summary>
-		/// 동기화가 필요한 신뢰성 요소가 존재하는지 여부입니다.
-		/// 일반적으로 내부 프로퍼티나 원격 함수가 호출되었을 때 true로 전환됩니다.
-		/// </summary>
-		public bool IsDirtyReliable { get; }
-
-		/// <summary>
-		/// 동기화가 필요한 비신뢰성 요소가 존재하는지 여부입니다.
-		/// 일반적으로 내부 프로퍼티나 원격 함수가 호출되었을 때 true로 전환됩니다.
-		/// </summary>
-		public bool IsDirtyUnreliable { get; }
-
 		/// <summary>
 		/// 신뢰성 속성을 가진 동기화 요소를 직렬화합니다.
 		/// </summary>
@@ -57,15 +45,5 @@ namespace CT.Common.Synchronizations
 		/// Remote 프로퍼티를 초기화합니다.
 		/// </summary>
 		public void InitializeRemoteProperties();
-
-		/// <summary>
-		/// 신뢰성 Dirty Bits를 초기화합니다.
-		/// </summary>
-		public void ClearDirtyReliable();
-
-		/// <summary>
-		/// 비신뢰성 Dirty Bits를 초기화합니다.
-		/// </summary>
-		public void ClearDirtyUnreliable();
 	}
 }

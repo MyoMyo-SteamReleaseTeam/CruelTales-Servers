@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -77,8 +78,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[SyncRpc]
 		public partial void TestRPC(long someMessage);
-		public override bool IsDirtyReliable => false;
-		public override bool IsDirtyUnreliable => false;
+		public TestCube()
+		{
+		}
 		public override void ClearDirtyReliable() { }
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(IPacketWriter writer) { }

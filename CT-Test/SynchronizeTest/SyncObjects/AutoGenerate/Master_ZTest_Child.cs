@@ -11,6 +11,7 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common;
 using CT.Common.DataType;
 using CT.Common.Exceptions;
@@ -73,18 +74,10 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_C3(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		protected partial void Client_c4(NetworkPlayer player);
-		protected BitmaskByte _dirtyReliable_1 = new();
-		public override bool IsDirtyReliable
+		public ZTest_Child()
 		{
-			get
-			{
-				bool isDirty = false;
-				isDirty |= _dirtyReliable_0.AnyTrue();
-				isDirty |= _dirtyReliable_1.AnyTrue();
-				return isDirty;
-			}
 		}
-		public override bool IsDirtyUnreliable => false;
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public int Field_Server_C3
 		{
 			get => _field_Server_C3;
@@ -93,6 +86,7 @@ namespace CTS.Instance.SyncObjects
 				if (_field_Server_C3 == value) return;
 				_field_Server_C3 = value;
 				_dirtyReliable_0[5] = true;
+				MarkDirtyReliable();
 			}
 		}
 		protected int Field_Server_C4
@@ -103,6 +97,7 @@ namespace CTS.Instance.SyncObjects
 				if (_field_Server_C4 == value) return;
 				_field_Server_C4 = value;
 				_dirtyReliable_0[6] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int Space_2
@@ -113,6 +108,7 @@ namespace CTS.Instance.SyncObjects
 				if (_space_2 == value) return;
 				_space_2 = value;
 				_dirtyReliable_0[7] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public int Space_3
@@ -123,22 +119,26 @@ namespace CTS.Instance.SyncObjects
 				if (_space_3 == value) return;
 				_space_3 = value;
 				_dirtyReliable_1[0] = true;
+				MarkDirtyReliable();
 			}
 		}
 		public partial void Server_C3()
 		{
 			Server_C3CallstackCount++;
 			_dirtyReliable_1[1] = true;
+			MarkDirtyReliable();
 		}
 		protected byte Server_C3CallstackCount = 0;
 		protected partial void Server_c4(NetworkPlayer player)
 		{
 			Server_c4Callstack.Add(player);
 			_dirtyReliable_1[2] = true;
+			MarkDirtyReliable();
 		}
 		protected TargetVoidCallstack<NetworkPlayer> Server_c4Callstack = new(8);
 		public override void ClearDirtyReliable()
 		{
+			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_P1CallstackCount = 0;
 			Server_p2iiCallstack.Clear();
