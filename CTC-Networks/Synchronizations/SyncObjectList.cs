@@ -97,13 +97,12 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 #if CT_SERVER
-		public void Add()
+		public T Add()
 		{
 			T item = _list[Count];
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
 			item.ClearDirtyReliable();
-			item.ClearDirtyUnreliable();
 
 			Count++;
 			MarkDirtyReliable();
@@ -112,16 +111,17 @@ namespace CT.Common.DataType.Synchronizations
 				Data = item,
 				Operation = CollectionSyncType.Add
 			});
+
+			return item;
 		}
 
-		public void Add(Action<T> onCreated)
+		public T Add(Action<T> onCreated)
 		{
 			T item = _list[Count];
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
 			onCreated(item);
 			item.ClearDirtyReliable();
-			item.ClearDirtyUnreliable();
 
 			Count++;
 			MarkDirtyReliable();
@@ -130,6 +130,8 @@ namespace CT.Common.DataType.Synchronizations
 				Data = item,
 				Operation = CollectionSyncType.Add
 			});
+
+			return item;
 		}
 
 		public void Remove(T item)

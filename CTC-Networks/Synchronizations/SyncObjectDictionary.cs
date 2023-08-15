@@ -102,11 +102,13 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 #if CT_SERVER
-		public void Add(TKey key)
+
+		public TValue Add(TKey key)
 		{
 			TValue item = _objectPool.Pop();
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
+			item.ClearDirtyReliable();
 
 			_dictionary.Add(key, item);
 			MarkDirtyReliable();
@@ -116,16 +118,17 @@ namespace CT.Common.DataType.Synchronizations
 				Value = item,
 				Operation = CollectionSyncType.Add
 			});
+
+			return item;
 		}
 
-		public void Add(TKey key, Action<TValue> onCreated)
+		public TValue Add(TKey key, Action<TValue> onCreated)
 		{
 			TValue item = _objectPool.Pop();
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
 			onCreated(item);
 			item.ClearDirtyReliable();
-			item.ClearDirtyUnreliable();
 
 			_dictionary.Add(key, item);
 			MarkDirtyReliable();
@@ -135,6 +138,8 @@ namespace CT.Common.DataType.Synchronizations
 				Value = item,
 				Operation = CollectionSyncType.Add
 			});
+
+			return item;
 		}
 
 		public void Remove(TKey key)
