@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using CT.Common.Synchronizations;
 using CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine;
 
@@ -15,6 +12,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		SyncList,
 		SyncDictionary,
 		SyncObjectList,
+		SyncObjectDictionary,
 	}
 
 	public static class SyncRule
@@ -139,11 +137,13 @@ using CTS.Instance.SyncObjects;";
 			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
 			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
+			{ PredefinedType.SyncObjectDictionary, PredefinedType.SyncObjectDictionary.ToString() },
 		};
 
 		private static Dictionary<PredefinedType, string> _syncObjCollectionNames = new()
 		{
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
+			{ PredefinedType.SyncObjectDictionary, PredefinedType.SyncObjectDictionary.ToString() },
 		};
 
 		private static Dictionary<PredefinedType, string> _valueCollectionNames = new()

@@ -82,6 +82,14 @@ namespace CT.Common.Serialization
 			serializeObject.Serialize(this);
 		}
 
+		public void PutTo<T>(T serializeObject, int position) where T : IPacketSerializable
+		{
+			int curSize = Size;
+			Size = position;
+			serializeObject.Serialize(this);
+			Size = curSize;
+		}
+
 		public void CopyFromReader(IPacketReader reader)
 		{
 			Size += reader.CopyToWriter(this);

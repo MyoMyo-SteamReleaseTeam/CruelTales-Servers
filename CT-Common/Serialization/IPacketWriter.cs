@@ -19,6 +19,7 @@ namespace CT.Common.Serialization
 		public bool CanPut(int putSize);
 		public bool CanPut<T>(T serializeObject) where T : IPacketSerializable;
 		public void Put<T>(T serializeObject) where T : IPacketSerializable;
+		public void PutTo<T>(T serializeObject, int position) where T : IPacketSerializable;
 		public void CopyFromReader(IPacketReader reader);
 		public void PutTo(byte value, int position);
 		public void Put(bool value);
