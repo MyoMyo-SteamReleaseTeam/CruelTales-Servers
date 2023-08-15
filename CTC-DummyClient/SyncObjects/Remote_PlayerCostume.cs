@@ -68,6 +68,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerCostume()
+		{
+		}
 		public PlayerCostume(IDirtyable owner)
 		{
 			_owner = owner;

@@ -6,12 +6,7 @@ using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.ComponentModel;
-using CT.Common.Tools;
-using System.Collections;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using Newtonsoft.Json.Linq;
 
 #if CT_SERVER
 using CTS.Instance.Gameplay;
@@ -59,6 +54,9 @@ namespace CT.Common.DataType.Synchronizations
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
 		public int KeySerializeSize;
+
+		public Dictionary<TKey, TValue>.KeyCollection Keys => _dictionary.Keys;
+		public Dictionary<TKey, TValue>.ValueCollection Values => _dictionary.Values;
 
 		public TValue this[TKey key] => _dictionary[key];
 

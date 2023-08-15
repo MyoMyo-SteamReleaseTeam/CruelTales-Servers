@@ -42,11 +42,17 @@ namespace CTS.Instance.SyncObjects
 	public partial class PlayerState : IMasterSynchronizable
 	{
 		[SyncVar]
+		private UserId _userId = new();
+		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncObject]
 		private readonly PlayerCostume _costume;
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerState()
+		{
+			_costume = new(this);
+		}
 		public PlayerState(IDirtyable owner)
 		{
 			_owner = owner;
@@ -67,6 +73,17 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyUnreliable = true;
 			_owner.MarkDirtyUnreliable();
 		}
+		public UserId UserId
+		{
+			get => _userId;
+			set
+			{
+				if (_userId == value) return;
+				_userId = value;
+				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public NetStringShort Username
 		{
 			get => _username;
@@ -74,7 +91,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_username == value) return;
 				_username = value;
-				_dirtyReliable_0[0] = true;
+				_dirtyReliable_0[1] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -88,13 +105,17 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[1] = _costume.IsDirtyReliable;
+			_dirtyReliable_0[2] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
-				_username.Serialize(writer);
+				_userId.Serialize(writer);
 			}
 			if (_dirtyReliable_0[1])
+			{
+				_username.Serialize(writer);
+			}
+			if (_dirtyReliable_0[2])
 			{
 				_costume.SerializeSyncReliable(player, writer);
 			}
@@ -102,11 +123,13 @@ namespace CTS.Instance.SyncObjects
 		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public void SerializeEveryProperty(IPacketWriter writer)
 		{
+			_userId.Serialize(writer);
 			_username.Serialize(writer);
 			_costume.SerializeEveryProperty(writer);
 		}
 		public void InitializeMasterProperties()
 		{
+			_userId = new();
 			_username = new();
 			_costume.InitializeMasterProperties();
 		}

@@ -49,6 +49,9 @@ namespace CTS.Instance.SyncObjects
 		private int _body;
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerCostume()
+		{
+		}
 		public PlayerCostume(IDirtyable owner)
 		{
 			_owner = owner;

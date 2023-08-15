@@ -15,6 +15,21 @@ namespace CTS.Instance.SyncObjects
 			GameplayManager = gameplayController.GameplayManager;
 		}
 
+		public void OnPlayerEnter(NetworkPlayer player)
+		{
+			PlayerState state = PlayerStateTable.Add(player.UserId);
+			state.UserId = player.UserId;
+			state.Username = new(player.Username);
+			state.Costume.Head = RandomHelper.NextInt(20);
+			state.Costume.Body = RandomHelper.NextInt(20);
+			state.ClearDirtyReliable();
+		}
+
+		public void OnPlayerLeave(NetworkPlayer player)
+		{
+			PlayerStateTable.Remove(player.UserId);
+		}
+
 		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)
 		{
 			if (checkAuthOrDisconnect(player))

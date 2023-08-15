@@ -371,13 +371,6 @@ namespace CTS.Instance.Gameplay
 				writer.Put(spawnObj.Identity);
 				spawnObj.RigidBody.SerializeInitialSyncData(writer);
 				spawnObj.SerializeEveryProperty(writer);
-
-				// TODO : remove
-				// DEBUG
-				if (packetType == PacketType.SC_Sync_MasterSpawn)
-				{
-					Console.WriteLine($"{spawnObj.Identity}:{spawnObj.RigidBody.Position} SPAWN");
-				}
 			}
 		}
 

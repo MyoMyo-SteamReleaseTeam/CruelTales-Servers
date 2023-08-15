@@ -40,6 +40,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 	public partial class PlayerState : IRemoteSynchronizable
 	{
 		[SyncVar]
+		private UserId _userId = new();
+		public UserId UserId => _userId;
+		private Action<UserId>? _onUserIdChanged;
+		public event Action<UserId> OnUserIdChanged
+		{
+			add => _onUserIdChanged += value;
+			remove => _onUserIdChanged -= value;
+		}
+		[SyncVar]
 		private NetStringShort _username = new();
 		public NetStringShort Username => _username;
 		private Action<NetStringShort>? _onUsernameChanged;
@@ -59,6 +68,10 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public PlayerState()
+		{
+			_costume = new(this);
+		}
 		public PlayerState(IDirtyable owner)
 		{
 			_owner = owner;
@@ -88,10 +101,15 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
+				if (!_userId.TryDeserialize(reader)) return false;
+				_onUserIdChanged?.Invoke(_userId);
+			}
+			if (dirtyReliable_0[1])
+			{
 				if (!_username.TryDeserialize(reader)) return false;
 				_onUsernameChanged?.Invoke(_username);
 			}
-			if (dirtyReliable_0[1])
+			if (dirtyReliable_0[2])
 			{
 				if (!_costume.TryDeserializeSyncReliable(reader)) return false;
 				_onCostumeChanged?.Invoke(_costume);
@@ -101,6 +119,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => true;
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
+			if (!_userId.TryDeserialize(reader)) return false;
+			_onUserIdChanged?.Invoke(_userId);
 			if (!_username.TryDeserialize(reader)) return false;
 			_onUsernameChanged?.Invoke(_username);
 			if (!_costume.TryDeserializeEveryProperty(reader)) return false;
@@ -109,6 +129,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		}
 		public void InitializeRemoteProperties()
 		{
+			_userId = new();
 			_username = new();
 			_costume.InitializeRemoteProperties();
 		}
@@ -117,9 +138,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				NetStringShort.IgnoreStatic(reader);
+				UserId.IgnoreStatic(reader);
 			}
 			if (dirtyReliable_0[1])
+			{
+				NetStringShort.IgnoreStatic(reader);
+			}
+			if (dirtyReliable_0[2])
 			{
 				_costume.IgnoreSyncReliable(reader);
 			}
@@ -129,9 +154,13 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				NetStringShort.IgnoreStatic(reader);
+				UserId.IgnoreStatic(reader);
 			}
 			if (dirtyReliable_0[1])
+			{
+				NetStringShort.IgnoreStatic(reader);
+			}
+			if (dirtyReliable_0[2])
 			{
 				PlayerCostume.IgnoreSyncStaticReliable(reader);
 			}

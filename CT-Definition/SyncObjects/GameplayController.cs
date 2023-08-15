@@ -9,7 +9,7 @@ namespace CT.Definitions.SyncObjects
 	public class GameplayController
 	{
 		[SyncObject(dir: SyncDirection.Bidirection)]
-		public RoomSessionManager SessionManager = new();
+		public RoomSessionManager RoomSessionManager = new();
 
 		[SyncRpc(SyncType.ReliableTarget)]
 		public void Server_LoadGame(GameMapType mapType) { }

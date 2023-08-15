@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
 using CTS.Instance.Gameplay;
@@ -20,6 +19,7 @@ namespace CTS.Instance.SyncObjects
 		public MiniGameController? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
+
 		public override void OnUpdate(float deltaTime)
 		{
 			// Update minigame controller
@@ -28,7 +28,7 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
-			SessionManager.Initialize(this);
+			RoomSessionManager.Initialize(this);
 
 			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);
 			MiniGameController.OnGameStart();
@@ -49,6 +49,7 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			MiniGameController?.OnPlayerEnter(player);
+			RoomSessionManager.OnPlayerEnter(player);
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
@@ -70,6 +71,7 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			MiniGameController?.OnPlayerLeave(player);
+			RoomSessionManager.OnPlayerLeave(player);
 		}
 
 		public partial void Client_ReadyToSync(NetworkPlayer player)

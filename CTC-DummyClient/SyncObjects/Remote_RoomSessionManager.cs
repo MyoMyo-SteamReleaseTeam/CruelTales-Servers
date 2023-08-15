@@ -75,22 +75,26 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			remove => _onPasswordChanged -= value;
 		}
 		[SyncObject]
-		private readonly SyncObjectList<PlayerState> _playerStates;
-		public SyncObjectList<PlayerState> PlayerStates => _playerStates;
-		private Action<SyncObjectList<PlayerState>>? _onPlayerStatesChanged;
-		public event Action<SyncObjectList<PlayerState>> OnPlayerStatesChanged
+		private readonly SyncObjectDictionary<UserId, PlayerState> _playerStateTable;
+		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable => _playerStateTable;
+		private Action<SyncObjectDictionary<UserId, PlayerState>>? _onPlayerStateTableChanged;
+		public event Action<SyncObjectDictionary<UserId, PlayerState>> OnPlayerStateTableChanged
 		{
-			add => _onPlayerStatesChanged += value;
-			remove => _onPlayerStatesChanged -= value;
+			add => _onPlayerStateTableChanged += value;
+			remove => _onPlayerStateTableChanged -= value;
 		}
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void ServerRoomSetAck_Callback(RoomSettingResult callback);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public RoomSessionManager()
+		{
+			_playerStateTable = new(this);
+		}
 		public RoomSessionManager(IDirtyable owner)
 		{
 			_owner = owner;
-			_playerStates = new(this);
+			_playerStateTable = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		protected bool _isDirtyReliable;
@@ -211,8 +215,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				if (!_playerStates.TryDeserializeSyncReliable(reader)) return false;
-				_onPlayerStatesChanged?.Invoke(_playerStates);
+				if (!_playerStateTable.TryDeserializeSyncReliable(reader)) return false;
+				_onPlayerStateTableChanged?.Invoke(_playerStateTable);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -235,8 +239,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_onRoomDiscriptionChanged?.Invoke(_roomDiscription);
 			if (!reader.TryReadInt32(out _password)) return false;
 			_onPasswordChanged?.Invoke(_password);
-			if (!_playerStates.TryDeserializeEveryProperty(reader)) return false;
-			_onPlayerStatesChanged?.Invoke(_playerStates);
+			if (!_playerStateTable.TryDeserializeEveryProperty(reader)) return false;
+			_onPlayerStateTableChanged?.Invoke(_playerStateTable);
 			return true;
 		}
 		public void InitializeRemoteProperties()
@@ -244,7 +248,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			_roomName = new();
 			_roomDiscription = new();
 			_password = 0;
-			_playerStates.InitializeRemoteProperties();
+			_playerStateTable.InitializeRemoteProperties();
 		}
 		public void IgnoreSyncReliable(IPacketReader reader)
 		{
@@ -263,7 +267,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				_playerStates.IgnoreSyncReliable(reader);
+				_playerStateTable.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[4])
 			{
@@ -291,7 +295,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			}
 			if (dirtyReliable_0[3])
 			{
-				SyncObjectList<PlayerState>.IgnoreSyncStaticReliable(reader);
+				SyncObjectDictionary<UserId, PlayerState>.IgnoreSyncStaticReliable(reader);
 			}
 			if (dirtyReliable_0[4])
 			{

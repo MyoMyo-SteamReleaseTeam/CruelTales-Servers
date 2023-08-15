@@ -18,7 +18,7 @@ namespace CT.Definitions.SyncObjects
 		public int Password;
 
 		[SyncObject]
-		public SyncObjectList<PlayerState> PlayerStates = new();
+		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
 		[SyncRpc(SyncType.ReliableTarget)]
 		public void ServerRoomSetAck_Callback(RoomSettingResult callback) { }

@@ -9,6 +9,9 @@ namespace CT.Definitions.SyncObjects
 	public class PlayerState
 	{
 		[SyncVar]
+		public UserId UserId;
+
+		[SyncVar]
 		public NetStringShort Username;
 
 		[SyncObject]

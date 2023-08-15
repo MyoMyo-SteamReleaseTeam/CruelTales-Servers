@@ -42,15 +42,15 @@ namespace CTS.Instance.SyncObjects
 	public partial class GameplayController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
-		[SyncObject]
-		private readonly RoomSessionManager _sessionManager;
+		[SyncObject(dir: SyncDirection.Bidirection)]
+		private readonly RoomSessionManager _roomSessionManager;
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
-		private Action<RoomSessionManager>? _onSessionManagerChanged;
-		public event Action<RoomSessionManager> OnSessionManagerChanged
+		private Action<RoomSessionManager>? _onRoomSessionManagerChanged;
+		public event Action<RoomSessionManager> OnRoomSessionManagerChanged
 		{
-			add => _onSessionManagerChanged += value;
-			remove => _onSessionManagerChanged -= value;
+			add => _onRoomSessionManagerChanged += value;
+			remove => _onRoomSessionManagerChanged -= value;
 		}
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync(NetworkPlayer player);
@@ -58,10 +58,10 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_OnMapLoaded(NetworkPlayer player);
 		public GameplayController()
 		{
-			_sessionManager = new(this);
+			_roomSessionManager = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public RoomSessionManager SessionManager => _sessionManager;
+		public RoomSessionManager RoomSessionManager => _roomSessionManager;
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
 		{
 			Server_LoadGameGCallstack.Add(player, mapType);
@@ -73,19 +73,19 @@ namespace CTS.Instance.SyncObjects
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
-			_sessionManager.ClearDirtyReliable();
+			_roomSessionManager.ClearDirtyReliable();
 			Server_LoadGameGCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[0] = _sessionManager.IsDirtyReliable;
+			_dirtyReliable_0[0] = _roomSessionManager.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				int curSize = writer.Size;
-				_sessionManager.SerializeSyncReliable(player, writer);
+				_roomSessionManager.SerializeSyncReliable(player, writer);
 				if (writer.Size == curSize)
 				{
 					dirtyReliable_0[0] = false;
@@ -121,19 +121,19 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
-			_sessionManager.SerializeEveryProperty(writer);
+			_roomSessionManager.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
-			_sessionManager.InitializeMasterProperties();
+			_roomSessionManager.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				if (!_sessionManager.TryDeserializeSyncReliable(player, reader)) return false;
-				_onSessionManagerChanged?.Invoke(_sessionManager);
+				if (!_roomSessionManager.TryDeserializeSyncReliable(player, reader)) return false;
+				_onRoomSessionManagerChanged?.Invoke(_roomSessionManager);
 			}
 			if (dirtyReliable_0[1])
 			{
@@ -156,14 +156,14 @@ namespace CTS.Instance.SyncObjects
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override void InitializeRemoteProperties()
 		{
-			_sessionManager.InitializeMasterProperties();
+			_roomSessionManager.InitializeMasterProperties();
 		}
 		public override void IgnoreSyncReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
 			{
-				_sessionManager.IgnoreSyncReliable(reader);
+				_roomSessionManager.IgnoreSyncReliable(reader);
 			}
 			if (dirtyReliable_0[1])
 			{

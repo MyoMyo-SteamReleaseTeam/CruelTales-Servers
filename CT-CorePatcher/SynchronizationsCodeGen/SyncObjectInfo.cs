@@ -234,10 +234,11 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			}
 
 			CodeFormat.AddIndent(csb);
-			string constructorFormat = SyncObjectType == SyncObjectType.NetworkObject ?
-				CommonFormat.Constructor : CommonFormat.ConstructorWithOwner;
-
-			sb.AppendLine(string.Format(constructorFormat, ObjectName, csb.ToString()));
+			sb.AppendLine(string.Format(CommonFormat.Constructor, ObjectName, csb.ToString()));
+			if (SyncObjectType != SyncObjectType.NetworkObject)
+			{
+				sb.AppendLine(string.Format(CommonFormat.ConstructorWithOwner, ObjectName, csb.ToString()));
+			}
 
 			// Synchronizations
 			sb.AppendLine(forward.Gen_SynchronizerProperties(genForward));
