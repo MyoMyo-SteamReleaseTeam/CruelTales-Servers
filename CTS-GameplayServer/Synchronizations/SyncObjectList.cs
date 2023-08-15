@@ -8,7 +8,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
 
-
 #if CT_SERVER
 using CTS.Instance.Gameplay;
 using CT.Common.DataType.Synchronizations;
@@ -65,9 +64,16 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
-		public SyncObjectList(int capacity = 8, int operationCapacity = 4)
+		public SyncObjectList(int maxCapacity = 8, int operationCapacity = 4)
 		{
-			_list = new(capacity);
+			MaxCapacity = maxCapacity;
+			_list = new(MaxCapacity);
+			for (int i = 0; i < MaxCapacity; i++)
+			{
+				var netObj = new T();
+				netObj.BindOwner(this);
+				_list.Add(netObj);
+			}
 			_syncOperations = new(operationCapacity);
 		}
 
@@ -97,6 +103,8 @@ namespace CT.Common.DataType.Synchronizations
 			T item = _list[Count];
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
+			item.ClearDirtyReliable();
+			item.ClearDirtyUnreliable();
 			onCreated(item);
 
 			Count++;
