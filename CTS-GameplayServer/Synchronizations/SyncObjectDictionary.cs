@@ -102,13 +102,30 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 #if CT_SERVER
-		/// <summary>객체를 추가합니다.</summary>
+		public void Add(TKey key)
+		{
+			TValue item = _objectPool.Pop();
+			item.InitializeMasterProperties();
+			item.InitializeRemoteProperties();
+
+			_dictionary.Add(key, item);
+			MarkDirtyReliable();
+			_syncOperations.Add(new SyncToken()
+			{
+				Key = key,
+				Value = item,
+				Operation = CollectionSyncType.Add
+			});
+		}
+
 		public void Add(TKey key, Action<TValue> onCreated)
 		{
 			TValue item = _objectPool.Pop();
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
 			onCreated(item);
+			item.ClearDirtyReliable();
+			item.ClearDirtyUnreliable();
 
 			_dictionary.Add(key, item);
 			MarkDirtyReliable();

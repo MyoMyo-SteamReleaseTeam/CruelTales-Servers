@@ -97,15 +97,31 @@ namespace CT.Common.DataType.Synchronizations
 		}
 
 #if CT_SERVER
-		/// <summary>객체를 추가합니다.</summary>
-		public void Add(Action<T> onCreated)
+		public void Add()
 		{
 			T item = _list[Count];
 			item.InitializeMasterProperties();
 			item.InitializeRemoteProperties();
 			item.ClearDirtyReliable();
 			item.ClearDirtyUnreliable();
+
+			Count++;
+			MarkDirtyReliable();
+			_syncOperations.Add(new SyncToken()
+			{
+				Data = item,
+				Operation = CollectionSyncType.Add
+			});
+		}
+
+		public void Add(Action<T> onCreated)
+		{
+			T item = _list[Count];
+			item.InitializeMasterProperties();
+			item.InitializeRemoteProperties();
 			onCreated(item);
+			item.ClearDirtyReliable();
+			item.ClearDirtyUnreliable();
 
 			Count++;
 			MarkDirtyReliable();
