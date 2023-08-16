@@ -10,29 +10,29 @@ using CT.Common.Synchronizations;
 namespace CT.Common.DataType.Synchronizations
 {
 	/// <summary>구조체 배열을 동기화하는 Collection 입니다.</summary>
-	public class SyncDictionary<Key, Value> : IRemoteSynchronizable, IDictionary<Key, Value>
-		where Key : struct, IEquatable<Key>, IPacketSerializable
-		where Value : struct, IEquatable<Value>, IPacketSerializable
+	public class SyncDictionary<TKey, TValue> : IRemoteSynchronizable, IDictionary<TKey, TValue>
+		where TKey : struct, IEquatable<TKey>, IPacketSerializable
+		where TValue : struct, IEquatable<TValue>, IPacketSerializable
 	{
 		private struct SyncToken
 		{
 			public CollectionSyncType Operation;
-			public Key Key;
-			public Value Value;
+			public TKey Key;
+			public TValue Value;
 		}
 
 		[AllowNull]
 		private IDirtyable _owner;
-		private Dictionary<Key, Value> _dictionary;
+		private Dictionary<TKey, TValue> _dictionary;
 		private List<SyncToken> _syncOperations;
 
-		public event Action<Key>? OnRemoved;
-		public event Action<Key>? OnChanged;
-		public event Action<Key, Value>? OnAdded;
+		public event Action<TKey>? OnRemoved;
+		public event Action<TKey, TValue>? OnChanged;
+		public event Action<TKey, TValue>? OnAdded;
 		public event Action? OnCleared;
 
-		public ICollection<Key> Keys => _dictionary.Keys;
-		public ICollection<Value> Values => _dictionary.Values;
+		public ICollection<TKey> Keys => _dictionary.Keys;
+		public ICollection<TValue> Values => _dictionary.Values;
 
 		public int Count => _dictionary.Count;
 		private bool _isDirtyReliable;
@@ -52,7 +52,7 @@ namespace CT.Common.DataType.Synchronizations
 			_syncOperations = new(operationCapacity);
 		}
 
-		public Value this[Key key]
+		public TValue this[TKey key]
 		{
 			get
 			{
@@ -82,7 +82,7 @@ namespace CT.Common.DataType.Synchronizations
 			_owner = owner;
 		}
 
-		public void Add(Key key, Value value)
+		public void Add(TKey key, TValue value)
 		{
 			_dictionary.Add(key, value);
 			MarkDirtyReliable();
@@ -94,14 +94,14 @@ namespace CT.Common.DataType.Synchronizations
 			});
 		}
 
-		public bool ContainsKey(Key key)
+		public bool ContainsKey(TKey key)
 		{
 			return _dictionary.ContainsKey(key);
 		}
 
-		public bool Contains(KeyValuePair<Key, Value> item)
+		public bool Contains(KeyValuePair<TKey, TValue> item)
 		{
-			Key key = item.Key;
+			TKey key = item.Key;
 
 			if (_dictionary.TryGetValue(key, out var value))
 			{
@@ -114,7 +114,7 @@ namespace CT.Common.DataType.Synchronizations
 			return false;
 		}
 
-		public bool Remove(Key key)
+		public bool Remove(TKey key)
 		{
 			if (!_dictionary.Remove(key))
 				return false;
@@ -129,9 +129,9 @@ namespace CT.Common.DataType.Synchronizations
 			return true;
 		}
 
-		public bool Remove(KeyValuePair<Key, Value> item)
+		public bool Remove(KeyValuePair<TKey, TValue> item)
 		{
-			Key key = item.Key;
+			TKey key = item.Key;
 
 			if (_dictionary.TryGetValue(key, out var value))
 			{
@@ -152,12 +152,12 @@ namespace CT.Common.DataType.Synchronizations
 			return false;
 		}
 
-		public bool TryGetValue(Key key, [MaybeNullWhen(false)] out Value value)
+		public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
 		{
 			return _dictionary.TryGetValue(key, out value);
 		}
 
-		public void Add(KeyValuePair<Key, Value> item)
+		public void Add(KeyValuePair<TKey, TValue> item)
 		{
 			_dictionary.Add(item.Key, item.Value);
 			MarkDirtyReliable();
@@ -179,7 +179,7 @@ namespace CT.Common.DataType.Synchronizations
 			});
 		}
 
-		public IEnumerator<KeyValuePair<Key, Value>> GetEnumerator()
+		public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
 		{
 			return _dictionary.GetEnumerator();
 		}
@@ -217,7 +217,7 @@ namespace CT.Common.DataType.Synchronizations
 		{
 			byte count = (byte)_dictionary.Count;
 			writer.Put(count);
-			foreach (Key key in _dictionary.Keys)
+			foreach (TKey key in _dictionary.Keys)
 			{
 				key.Serialize(writer);
 				_dictionary[key].Serialize(writer);
@@ -267,8 +267,8 @@ namespace CT.Common.DataType.Synchronizations
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
-				Key key = new();
-				Value value = new();
+				TKey key = new();
+				TValue value = new();
 				if (!key.TryDeserialize(reader)) return false;
 				if (!value.TryDeserialize(reader)) return false;
 				_dictionary.Add(key, value);
@@ -291,8 +291,8 @@ namespace CT.Common.DataType.Synchronizations
 
 					case CollectionSyncType.Add:
 						{
-							Key key = new();
-							Value value = new();
+							TKey key = new();
+							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
 							_dictionary.Add(key, value);
@@ -302,7 +302,7 @@ namespace CT.Common.DataType.Synchronizations
 
 					case CollectionSyncType.Remove:
 						{
-							Key key = new();
+							TKey key = new();
 							if (!key.TryDeserialize(reader)) return false;
 							_dictionary.Remove(key);
 							OnRemoved?.Invoke(key);
@@ -311,12 +311,12 @@ namespace CT.Common.DataType.Synchronizations
 
 					case CollectionSyncType.Change:
 						{
-							Key key = new();
-							Value value = new();
+							TKey key = new();
+							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
 							_dictionary[key] = value;
-							OnChanged?.Invoke(key);
+							OnChanged?.Invoke(key, _dictionary[key]);
 						}
 						break;
 
@@ -331,7 +331,7 @@ namespace CT.Common.DataType.Synchronizations
 		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new NotImplementedException();
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 
-		public void CopyTo(KeyValuePair<Key, Value>[] array, int arrayIndex) => throw new NotImplementedException();
+		public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) => throw new NotImplementedException();
 		public bool IsReadOnly => throw new NotImplementedException();
 		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
 		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);

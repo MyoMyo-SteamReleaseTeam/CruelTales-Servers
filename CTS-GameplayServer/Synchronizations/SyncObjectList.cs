@@ -44,6 +44,12 @@ namespace CT.Common.DataType.Synchronizations
 		private List<T> _list;
 		private List<SyncToken> _syncOperations;
 
+		public event Action<int>? OnRemoved;
+		public event Action<int, T>? OnChanged;
+		public event Action<T>? OnAdded;
+		public event Action<int, T>? OnInserted;
+		public event Action? OnCleared;
+
 		public readonly int MaxCapacity;
 		public int Count { get; private set; } = 0;
 
@@ -367,6 +373,7 @@ namespace CT.Common.DataType.Synchronizations
 					{
 						case CollectionSyncType.Clear:
 							Count = 0;
+							OnCleared?.Invoke();
 							break;
 
 						case CollectionSyncType.Add:
@@ -375,6 +382,7 @@ namespace CT.Common.DataType.Synchronizations
 								return false;
 							}
 							Count++;
+							OnAdded?.Invoke(_list[Count]);
 							break;
 
 						case CollectionSyncType.Remove:
@@ -386,6 +394,7 @@ namespace CT.Common.DataType.Synchronizations
 								_list[r] = _list[r + 1];
 							}
 							_list[Count] = temp;
+							OnRemoved?.Invoke(index);
 							break;
 
 						default:
@@ -404,14 +413,13 @@ namespace CT.Common.DataType.Synchronizations
 				{
 					if (!reader.TryReadByte(out byte index)) return false;
 
+					T item = _list[index];
 #if CT_SERVER
-					if (!_list[index].TryDeserializeSyncReliable(player, reader))
+					if (!item.TryDeserializeSyncReliable(player, reader)) return false;
 #elif CT_CLIENT
-					if (!_list[index].TryDeserializeSyncReliable(reader))
+					if (!item.TryDeserializeSyncReliable(reader)) return false;
 #endif
-					{
-						return false;
-					}
+					OnChanged?.Invoke(index, item);
 				}
 			}
 

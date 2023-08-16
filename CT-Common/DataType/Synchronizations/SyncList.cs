@@ -26,7 +26,7 @@ namespace CT.Common.DataType.Synchronizations
 		private List<SyncToken> _syncOperations;
 
 		public event Action<int>? OnRemoved;
-		public event Action<int>? OnChanged;
+		public event Action<int, T>? OnChanged;
 		public event Action<T>? OnAdded;
 		public event Action<int, T>? OnInserted;
 		public event Action? OnCleared;
@@ -263,7 +263,7 @@ namespace CT.Common.DataType.Synchronizations
 					case CollectionSyncType.Change:
 						byte changeIndex = reader.ReadByte();
 						if (!_list[i].TryDeserialize(reader)) return false;
-						OnChanged?.Invoke(changeIndex);
+						OnChanged?.Invoke(changeIndex, _list[i]);
 						break;
 
 					case CollectionSyncType.Insert:

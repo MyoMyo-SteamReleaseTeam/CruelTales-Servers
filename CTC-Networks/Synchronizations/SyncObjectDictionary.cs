@@ -48,6 +48,11 @@ namespace CT.Common.DataType.Synchronizations
 		private Dictionary<TKey, TValue> _dictionary;
 		private List<SyncToken> _syncOperations;
 
+		public event Action<TKey>? OnRemoved;
+		public event Action<TKey, TValue>? OnChanged;
+		public event Action<TKey, TValue>? OnAdded;
+		public event Action? OnCleared;
+
 		public readonly int MaxCapacity;
 		public int Count => _dictionary.Count;
 
@@ -369,6 +374,7 @@ namespace CT.Common.DataType.Synchronizations
 					{
 						case CollectionSyncType.Clear:
 							internalClear();
+							OnCleared?.Invoke();
 							break;
 
 						case CollectionSyncType.Add:
@@ -382,6 +388,7 @@ namespace CT.Common.DataType.Synchronizations
 								item.ClearDirtyUnreliable();
 								if (!item.TryDeserializeEveryProperty(reader)) return false;
 								_dictionary.Add(key, item);
+								OnAdded?.Invoke(key, item);
 							}
 							break;
 
@@ -392,6 +399,7 @@ namespace CT.Common.DataType.Synchronizations
 								TValue item = _dictionary[key];
 								_dictionary.Remove(key);
 								_objectPool.Push(item);
+								OnRemoved?.Invoke(key);
 							}
 							break;
 
@@ -411,11 +419,15 @@ namespace CT.Common.DataType.Synchronizations
 				{
 					TKey key = new();
 					if (!key.TryDeserialize(reader)) return false;
+
+					TValue item = _dictionary[key];
+
 #if CT_SERVER
-					if (!_dictionary[key].TryDeserializeSyncReliable(player, reader)) return false;
+					if (!item.TryDeserializeSyncReliable(player, reader)) return false;
 #elif CT_CLIENT
-					if (!_dictionary[key].TryDeserializeSyncReliable(reader)) return false;
+					if (!item.TryDeserializeSyncReliable(reader)) return false;
 #endif
+					OnChanged?.Invoke(key, item);
 				}
 			}
 
