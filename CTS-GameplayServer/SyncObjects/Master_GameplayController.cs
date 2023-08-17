@@ -56,6 +56,8 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_ReadyToSync(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_OnMapLoaded(NetworkPlayer player);
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady);
 		public GameplayController()
 		{
 			_roomSessionManager = new(this);
@@ -151,6 +153,15 @@ namespace CTS.Instance.SyncObjects
 					Client_OnMapLoaded(player);
 				}
 			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadBoolean(out bool isReady)) return false;
+					Client_ReadyGame(player, isReady);
+				}
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
@@ -173,6 +184,14 @@ namespace CTS.Instance.SyncObjects
 			{
 				reader.Ignore(1);
 			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(1);
+				}
+			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -188,6 +207,14 @@ namespace CTS.Instance.SyncObjects
 			if (dirtyReliable_0[2])
 			{
 				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(1);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

@@ -14,6 +14,12 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public NetStringShort Username;
 
+		[SyncVar]
+		public bool IsHost;
+
+		[SyncVar]
+		public bool IsReady;
+
 		[SyncObject]
 		public PlayerCostume Costume = new();
 	}

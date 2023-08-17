@@ -19,7 +19,6 @@ namespace CTS.Instance.SyncObjects
 		public MiniGameController? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
-
 		public override void OnUpdate(float deltaTime)
 		{
 			// Update minigame controller
@@ -83,6 +82,11 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_OnMapLoaded(NetworkPlayer player)
 		{
 			player.CanSeeViewObject = true;
+		}
+
+		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
+		{
+			player.IsReady = isReady;
 		}
 	}
 }

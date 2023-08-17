@@ -26,7 +26,7 @@ namespace CTS.Instance.Gameplay
 		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
 		public IList<NetworkPlayer> NetworkPlayers { get; private set; }
 		[AllowNull] private ObjectPool<NetworkPlayer> _networkPlayerPool;
-		public int CurrentPlayerCount => _networkPlayerPool.Count;
+		public int CurrentPlayerCount => _networkPlayerByUserId.Count;
 
 		// Objects
 		public GameplayController? GameplayController { get; private set; }

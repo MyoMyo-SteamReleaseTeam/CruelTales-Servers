@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CT.Common.DataType
+﻿namespace CT.Common.DataType
 {
 	public enum RoomSettingResult : byte
 	{
 		None = 0,
+
+		Success,
+
+		/// <summary>현재 방장이 아님</summary>
+		YouAreNotHost,
 
 		/// <summary>시스템 한계보다 더 적은 최소 유저 설정 불가</summary>
 		MinimumUsersRequired,

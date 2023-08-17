@@ -45,6 +45,10 @@ namespace CTS.Instance.SyncObjects
 		private UserId _userId = new();
 		[SyncVar]
 		private NetStringShort _username = new();
+		[SyncVar]
+		private bool _isHost;
+		[SyncVar]
+		private bool _isReady;
 		[SyncObject]
 		private readonly PlayerCostume _costume;
 		[AllowNull] public IDirtyable _owner;
@@ -95,6 +99,28 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public bool IsHost
+		{
+			get => _isHost;
+			set
+			{
+				if (_isHost == value) return;
+				_isHost = value;
+				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
+		public bool IsReady
+		{
+			get => _isReady;
+			set
+			{
+				if (_isReady == value) return;
+				_isReady = value;
+				_dirtyReliable_0[3] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public PlayerCostume Costume => _costume;
 		public void ClearDirtyReliable()
 		{
@@ -105,7 +131,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[2] = _costume.IsDirtyReliable;
+			_dirtyReliable_0[4] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
@@ -117,6 +143,14 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
+				writer.Put(_isHost);
+			}
+			if (_dirtyReliable_0[3])
+			{
+				writer.Put(_isReady);
+			}
+			if (_dirtyReliable_0[4])
+			{
 				_costume.SerializeSyncReliable(player, writer);
 			}
 		}
@@ -125,12 +159,16 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
+			writer.Put(_isHost);
+			writer.Put(_isReady);
 			_costume.SerializeEveryProperty(writer);
 		}
 		public void InitializeMasterProperties()
 		{
 			_userId = new();
 			_username = new();
+			_isHost = false;
+			_isReady = false;
 			_costume.InitializeMasterProperties();
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;

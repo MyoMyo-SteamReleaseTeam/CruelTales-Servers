@@ -19,6 +19,9 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_OnMapLoaded() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_ReadyGame(bool isReady) { }
 	}
 }
 #pragma warning restore IDE0051

@@ -17,6 +17,9 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int Password;
 
+		[SyncVar]
+		public int MaxPlayerCount;
+
 		[SyncObject]
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
@@ -33,7 +36,7 @@ namespace CT.Definitions.SyncObjects
 		public void ClientRoomSetReq_SetRoomDiscription(NetStringShort roomDiscription) { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void ClientRoomSetReq_SetRoomMaxUser(int maxUser) { }
+		public void ClientRoomSetReq_SetRoomMaxUser(int maxUserCount) { }
 	}
 }
 #pragma warning restore IDE0051

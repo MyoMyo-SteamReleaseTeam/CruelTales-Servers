@@ -18,76 +18,75 @@ namespace CTS.Instance.SyncObjects
 		public void OnPlayerEnter(NetworkPlayer player)
 		{
 			PlayerState state = PlayerStateTable.Add(player.UserId);
-			state.UserId = player.UserId;
-			state.Username = new(player.Username);
-			state.Costume.Head = RandomHelper.NextInt(20);
-			state.Costume.Body = RandomHelper.NextInt(20);
 			state.ClearDirtyReliable();
+			player.BindPlayerState(state);
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
 		{
+			player.ReleasePlayerState();
 			PlayerStateTable.Remove(player.UserId);
 		}
 
 		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)
 		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Password = password;
-				Password = GameplayManager.RoomOption.Password;
-			}
+			if (!checkAuthOrDisconnect(player)) return;
+
+			GameplayManager.RoomOption.Password = password;
+			Password = password;
+			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
 		public partial void ClientRoomSetReq_SetRoomName(NetworkPlayer player, NetStringShort roomName)
 		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Name = roomName;
-				RoomName = roomName;
-			}
+			if (!checkAuthOrDisconnect(player)) return;
+
+			GameplayManager.RoomOption.Name = roomName;
+			RoomName = roomName;
+			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetworkPlayer player, NetStringShort roomDiscription)
 		{
-			if (checkAuthOrDisconnect(player))
-			{
-				GameplayManager.RoomOption.Discription = roomDiscription;
-				RoomDiscription = roomDiscription;
-			}
+			if (!checkAuthOrDisconnect(player)) return;
+
+			GameplayManager.RoomOption.Discription = roomDiscription;
+			RoomDiscription = roomDiscription;
+			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
-		public partial void ClientRoomSetReq_SetRoomMaxUser(NetworkPlayer player, int maxUser)
+		public partial void ClientRoomSetReq_SetRoomMaxUser(NetworkPlayer player, int maxUserCount)
 		{
-			if (checkAuthOrDisconnect(player))
+			if (!checkAuthOrDisconnect(player)) return;
+
+			if (GameplayManager.CurrentPlayerCount > maxUserCount)
 			{
-				if (GameplayManager.CurrentPlayerCount > maxUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.MaximumUsersReached);
-					return;
-				}
-
-				if (GameplayManager.CurrentPlayerCount < GameplayManager.Option.SystemMinUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.MinimumUsersRequired);
-					return;
-				}
-
-				if (maxUser > GameplayManager.Option.SystemMaxUser)
-				{
-					ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMaxUserUnderConnections);
-					return;
-				}
-
-				GameplayManager.RoomOption.MaxUser = maxUser;
+				ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMaxUserUnderConnections);
+				return;
 			}
+
+			if (maxUserCount < GameplayManager.Option.SystemMinUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.MinimumUsersRequired);
+				return;
+			}
+
+			if (maxUserCount > GameplayManager.Option.SystemMaxUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.MaximumUsersReached);
+				return;
+			}
+
+			GameplayManager.RoomOption.MaxUser = maxUserCount;
+			MaxPlayerCount = maxUserCount;
+			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
 		private bool checkAuthOrDisconnect(NetworkPlayer player)
 		{
 			if (!player.IsHost)
 			{
-				player.Session?.Disconnect(DisconnectReasonType.ServerError_YouAreNotHost);
+				ServerRoomSetAck_Callback(player, RoomSettingResult.YouAreNotHost);
 			}
 
 			return player.IsHost;

@@ -170,6 +170,11 @@ namespace CT.Common.DataType.Synchronizations
 		}
 #endif
 
+		public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+		{
+			return _dictionary.TryGetValue(key, out value);
+		}
+
 		public bool ContainsKey(TKey key)
 		{
 			return _dictionary.ContainsKey(key);

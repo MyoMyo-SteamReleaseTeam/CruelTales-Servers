@@ -127,7 +127,9 @@ namespace CTS.Instance.Gameplay
 
 		private Dictionary<NetworkIdentity, MasterNetworkObject> _outObjectSet = new(16);
 
+#if DEBUG
 		string DEBUG_output = "";
+#endif
 
 		public void UpdateVisibilityAndSendData()
 		{

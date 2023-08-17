@@ -3,6 +3,7 @@ using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Networks;
 using CTS.Instance.Synchronizations;
+using CTS.Instance.SyncObjects;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -15,15 +16,59 @@ namespace CTS.Instance.Gameplay
 		// Referenece
 		public GameplayManager GameManager { get; private set; }
 		public WorldManager WorldManager { get; private set; }
+		public PlayerState? PlayerState { get; private set; }
 
 		// Session Info
 		public UserSession? Session { get; private set; }
-		public UserId UserId { get; private set; }
-		public NetStringShort Username { get; private set; }
+		private UserId _userId;
+		private NetStringShort _username;
+
+		public UserId UserId
+		{ 
+			get => _userId;
+			private set
+			{
+				_userId = value;
+				if (PlayerState != null)
+					PlayerState.UserId = _userId;
+			}
+		}
+		public NetStringShort Username
+		{
+			get => _username;
+			private set
+			{
+				_username = value;
+				if (PlayerState != null)
+					PlayerState.Username = _username;
+			}
+		}
+
 		public int Costume { get; private set; }
 		
 		// Matchmaking
-		public bool IsHost { get; set; } = false;
+		public bool _isHost = false;
+		public bool IsHost
+		{
+			get => _isHost;
+			set
+			{
+				_isHost = value;
+				if (PlayerState != null)
+					PlayerState.IsHost = _isHost;
+			}
+		}
+		public bool _isReady = false;
+		public bool IsReady
+		{
+			get => _isReady;
+			set
+			{
+				_isReady = value;
+				if (PlayerState != null)
+					PlayerState.IsReady= _isReady;
+			}
+		}
 
 		// Gameplay
 		public NetRigidBody? TargetRigidBody { get; private set; }
@@ -101,6 +146,24 @@ namespace CTS.Instance.Gameplay
 		public void ReleaseViewTarget()
 		{
 			TargetRigidBody = null;
+		}
+
+		public void BindPlayerState(PlayerState state)
+		{
+			PlayerState = state;
+			state.UserId = UserId;
+			state.Username = new(Username);
+
+			state.IsHost = IsHost;
+			state.IsReady = IsReady;
+
+			state.Costume.Head = RandomHelper.NextInt(20);
+			state.Costume.Body = RandomHelper.NextInt(20);
+		}
+
+		public void ReleasePlayerState()
+		{
+			PlayerState = null;
 		}
 
 		public override string ToString() => Username;
