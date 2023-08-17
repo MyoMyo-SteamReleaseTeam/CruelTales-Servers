@@ -1,5 +1,6 @@
 ﻿#define CHECK_PACKET_SIZE
 
+using System;
 using CT.Common.Serialization;
 using log4net;
 
@@ -60,6 +61,21 @@ namespace CTC.Networks
 			_log.Info($"{nameof(Handle_SC_Sync_MasterUnreliable)} [Size:{receivedPacket.Size}]");
 #endif
 			networkManager.GameSynchronizer.OnMasterUnreliable(receivedPacket);
+		}
+
+		internal static void Handle_SC_Sync_MasterPhysics(IPacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_Sync_MasterEnter(IPacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal static void Handle_SC_Sync_MasterLeave(IPacketReader receivedPacket, NetworkManager networkManager)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

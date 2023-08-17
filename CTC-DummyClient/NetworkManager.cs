@@ -98,9 +98,15 @@ namespace CTC.Networks
 					}
 					else
 					{
-						var packet = _packetPool.ReadPacket(packetType, _receivedPacket);
-						PacketDispatcher.Dispatch(packet, this);
-						_packetPool.Return(packet);
+						if (_packetPool.TryReadPacket(packetType, _receivedPacket, out var readPacket))
+						{
+							PacketDispatcher.Dispatch(readPacket, this);
+							_packetPool.Return(readPacket);
+						}
+						else
+						{
+							// TODO : Handle error
+						}
 					}
 				}
 			}

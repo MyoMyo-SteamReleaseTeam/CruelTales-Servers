@@ -8,8 +8,6 @@ namespace CTC.Networks.Gameplay.ObjectManagements
 	{
 		Dictionary<NetworkObjectType, INetworkObjectPool> _netObjectPoolByType = new()
 		{
-			{ NetworkObjectType.PlayerCharacter, new NetworkObjectPool<PlayerCharacter>(7) },
-			{ NetworkObjectType.TestCube, new NetworkObjectPool<TestCube>(120) },
 		};
 
 		public RemoteNetworkObject Create(NetworkObjectType type)

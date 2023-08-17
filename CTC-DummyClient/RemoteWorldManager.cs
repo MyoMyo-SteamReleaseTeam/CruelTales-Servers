@@ -54,11 +54,11 @@ namespace CTC.Networks
 				NetworkIdentity id = new(reader);
 				if (_worldObjectById.TryGetValue(id, out var syncObj))
 				{
-					syncObj.Transform.Deserialize(reader);
+					//syncObj.Transform.Deserialize(reader);
 				}
 				else
 				{
-					NetworkTransform.Ignore(reader);
+					//NetworkTransform.Ignore(reader);
 				}
 			}
 		}
@@ -72,8 +72,8 @@ namespace CTC.Networks
 				NetworkIdentity id = new(reader);
 				var netObj = _poolManager.Create(type);
 				netObj.Created(id);
-				netObj.Transform.DeserializeSpawnData(reader);
-				netObj.DeserializeEveryProperty(reader);
+				//netObj.Transform.DeserializeSpawnData(reader);
+				//netObj.DeserializeEveryProperty(reader);
 				if (_worldObjectById.ContainsKey(id))
 				{
 					_poolManager.Return(netObj);
@@ -95,8 +95,8 @@ namespace CTC.Networks
 				NetworkIdentity id = new(reader);
 				var netObj = _poolManager.Create(type);
 				netObj.Created(id);
-				netObj.Transform.DeserializeSpawnData(reader);
-				netObj.DeserializeEveryProperty(reader);
+				//netObj.Transform.DeserializeSpawnData(reader);
+				//netObj.DeserializeEveryProperty(reader);
 				if (_worldObjectById.ContainsKey(id))
 				{
 					_poolManager.Return(netObj);
@@ -141,7 +141,7 @@ namespace CTC.Networks
 					_networkManager.Disconnect();
 					return;
 				}
-				netObj.DeserializeSyncReliable(reader);
+				//netObj.DeserializeSyncReliable(reader);
 			}
 		}
 
@@ -159,7 +159,7 @@ namespace CTC.Networks
 					_networkManager.Disconnect();
 					return;
 				}
-				netObj.DeserializeSyncUnreliable(reader);
+				//netObj.DeserializeSyncUnreliable(reader);
 			}
 		}
 	}
