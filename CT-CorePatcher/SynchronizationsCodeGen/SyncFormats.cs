@@ -278,7 +278,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 	public static class CommonFormat
 	{
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
-		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
+		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.SyncObjects";
 
 		public static string MasterNetworkObjectTypeName => "MasterNetworkObject";
 		public static string RemoteNetworkObjectTypeName => "RemoteNetworkObject";
