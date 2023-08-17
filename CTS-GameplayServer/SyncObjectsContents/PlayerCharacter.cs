@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
@@ -125,6 +126,32 @@ namespace CTS.Instance.SyncObjects
 			StateMachine.OnInputEvent(inputData);
 		}
 
+		public void OrderTest(NetworkPlayer player, int fromServer)
+		{
+			this.Server_OrderTest(player, fromServer);
+		}
+
+		public void BroadcastOrderTest(int userId, int fromServer)
+		{
+			this.Server_BroadcastOrderTest(userId, fromServer);
+		}
+
+		public partial void Client_RequestTest(NetworkPlayer player, int fromClient)
+		{
+			switch (fromClient)
+			{
+				case 0:
+					Console.WriteLine("Skin change request from " + player.UserId + " to " + fromClient);
+					BroadcastOrderTest((int)player.UserId.Id, fromClient);
+					break;
+				
+				case 1:
+					Console.WriteLine("Skin change request from " + player.UserId+ " to " + fromClient);
+					BroadcastOrderTest((int)player.UserId.Id, fromClient);
+					break;
+			}
+		}
+		
 		#endregion
 	}
 }

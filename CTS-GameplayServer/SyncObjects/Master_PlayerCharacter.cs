@@ -58,8 +58,14 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction);
 		[SyncRpc]
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction);
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_OrderTest(NetworkPlayer player, int fromServer);
+		[SyncRpc]
+		public partial void Server_BroadcastOrderTest(int userId, int fromSever);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_RequestTest(NetworkPlayer player, int fromClient);
 		public PlayerCharacter()
 		{
 		}
@@ -107,6 +113,20 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		private List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
+		public partial void Server_OrderTest(NetworkPlayer player, int fromServer)
+		{
+			Server_OrderTestiCallstack.Add(player, fromServer);
+			_dirtyReliable_0[5] = true;
+			MarkDirtyReliable();
+		}
+		private TargetCallstack<NetworkPlayer, int> Server_OrderTestiCallstack = new(8);
+		public partial void Server_BroadcastOrderTest(int userId, int fromSever)
+		{
+			Server_BroadcastOrderTestiiCallstack.Add((userId, fromSever));
+			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
+		}
+		private List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
@@ -114,11 +134,14 @@ namespace CTS.Instance.SyncObjects
 			Server_OnAnimationChangedDCallstack.Clear();
 			Server_OnAnimationChangedDPCallstack.Clear();
 			Server_OnProxyDirectionChangedPCallstack.Clear();
+			Server_OrderTestiCallstack.Clear();
+			Server_BroadcastOrderTestiiCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				_userId.Serialize(writer);
@@ -158,6 +181,43 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
+			if (_dirtyReliable_0[5])
+			{
+				int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
+				if (Server_OrderTestiCount > 0)
+				{
+					var Server_OrderTesticallList = Server_OrderTestiCallstack.GetCallList(player);
+					writer.Put((byte)Server_OrderTestiCount);
+					for (int i = 0; i < Server_OrderTestiCount; i++)
+					{
+						var arg = Server_OrderTesticallList[i];
+						writer.Put(arg);
+					}
+				}
+				else
+				{
+					dirtyReliable_0[5] = false;
+				}
+			}
+			if (_dirtyReliable_0[6])
+			{
+				byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_BroadcastOrderTestiiCallstack[i];
+					writer.Put(arg.userId);
+					writer.Put(arg.fromSever);
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
+			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
@@ -176,7 +236,20 @@ namespace CTS.Instance.SyncObjects
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;
 		}
-		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadInt32(out int fromClient)) return false;
+					Client_RequestTest(player, fromClient);
+				}
+			}
+			return true;
+		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
 		{
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
@@ -193,8 +266,30 @@ namespace CTS.Instance.SyncObjects
 			return true;
 		}
 		public override void InitializeRemoteProperties() { }
-		public override void IgnoreSyncReliable(IPacketReader reader) { }
-		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
+		public override void IgnoreSyncReliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+				}
+			}
+		}
+		public static void IgnoreSyncStaticReliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+				}
+			}
+		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyUnreliable_0 = reader.ReadBitmaskByte();
