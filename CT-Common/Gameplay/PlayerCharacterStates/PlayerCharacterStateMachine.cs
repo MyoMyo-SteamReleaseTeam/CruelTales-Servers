@@ -264,13 +264,15 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnEnter()
 		{
 			_timer = 0f;
+			Reference.Player.Stop();
+			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushedPower, _pushedFriction);
 			Reference.UpdateProxyDirectionToFront();
 			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
-			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushedPower,  _pushedFriction);
 		}
 
 		public override void OnExit()
 		{
+			Reference.Player.ResetImpluse();
 		}
 
 		public override void OnStateUpdate(float deltaTime)

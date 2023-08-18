@@ -22,7 +22,7 @@ namespace CTS.Instance.SyncObjects
 		public float Speed = 5.0f;
 
 		public NetworkPlayer? NetworkPlayer { get; private set; }
-		public const float ActionRadius = 2;
+		public const float ActionRadius = 1;
 
 		// States
 		[AllowNull] private PlayerCharacterModel PlayerModel;
@@ -116,22 +116,26 @@ namespace CTS.Instance.SyncObjects
 
 		public void OnDuringAction()
 		{
-			return;
-
 			if (PhysicsWorld.Raycast(RigidBody.Position,
 									 ActionRadius, out var hits,
 									 PhysicsLayerMask.Player))
 			{
 				foreach (var id in hits)
 				{
+					if (Identity.Id == id )
+						continue;
+
 					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
 						continue;
 
 					if (netObj is not PlayerCharacter player)
 						continue;
 
-					Vector2 direction = Vector2.Normalize(player.Position - Position);
-					player.OnReactionBy(direction);
+					if (player.StateMachine.CurrentState != player.StateMachine.PushedState)
+					{
+						Vector2 direction = Vector2.Normalize(player.Position - Position);
+						player.OnReactionBy(direction);
+					}
 
 					break;
 				}
