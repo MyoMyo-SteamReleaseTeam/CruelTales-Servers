@@ -48,6 +48,9 @@ namespace CT.Definitions.SyncObjects
 		
 		[SyncRpc]
 		public void Server_BroadcastOrderTest(int userId, int fromSever) { }
+
+		[SyncRpc]
+		public void Server_TestPositionTickByTick(Vector2 curPosition) { }
 		
 		//[SyncRpc(SyncType.Unreliable, SyncDirection.FromRemote)]
 		//public void Client_InputInteraction(NetworkIdentity target, Input_InteractType interactType) { }

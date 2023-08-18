@@ -62,6 +62,8 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_OrderTest(NetworkPlayer player, int fromServer);
 		[SyncRpc]
 		public partial void Server_BroadcastOrderTest(int userId, int fromSever);
+		[SyncRpc]
+		public partial void Server_TestPositionTickByTick(Vector2 curPosition);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
 		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -127,6 +129,13 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		private List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
+		public partial void Server_TestPositionTickByTick(Vector2 curPosition)
+		{
+			Server_TestPositionTickByTickVCallstack.Add(curPosition);
+			_dirtyReliable_0[7] = true;
+			MarkDirtyReliable();
+		}
+		private List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
@@ -136,6 +145,7 @@ namespace CTS.Instance.SyncObjects
 			Server_OnProxyDirectionChangedPCallstack.Clear();
 			Server_OrderTestiCallstack.Clear();
 			Server_BroadcastOrderTestiiCallstack.Clear();
+			Server_TestPositionTickByTickVCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -208,6 +218,16 @@ namespace CTS.Instance.SyncObjects
 					var arg = Server_BroadcastOrderTestiiCallstack[i];
 					writer.Put(arg.userId);
 					writer.Put(arg.fromSever);
+				}
+			}
+			if (_dirtyReliable_0[7])
+			{
+				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_TestPositionTickByTickVCallstack[i];
+					arg.Serialize(writer);
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())

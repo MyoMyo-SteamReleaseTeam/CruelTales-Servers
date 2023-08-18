@@ -81,6 +81,7 @@ namespace CTS.Instance.SyncObjects
 		public override void OnUpdate(float deltaTime)
 		{
 			StateMachine.UpdateState(deltaTime);
+			Server_TestPositionTickByTick(Position);
 		}
 
 		public void Move(Vector2 moveDirection, bool isWalk)
