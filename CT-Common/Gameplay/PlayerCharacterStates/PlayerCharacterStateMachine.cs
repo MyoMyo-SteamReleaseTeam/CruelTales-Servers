@@ -245,11 +245,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	
 	public class PlayerCharacter_Pushed : BasePlayerCharacterState
 	{
+		private const float _pushedMoveMultiplier = 0.8f;
+		private const float _animationLength = 1f;
+		private float _timer = 0f;
+		
 		public override void OnEnter()
 		{
-			Reference.UpdateProxyDirectionByMoveDirection();
-			Reference.UpdateAnimation(DokzaAnimationState.Walk, Reference.Player.ProxyDirection);
-			Reference.Player.Move(Reference.Player.MoveDirection, isWalk: true);
+			_timer = 0f;
+			Reference.UpdateProxyDirectionToFront();
+			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
+			Reference.Player.Move(Reference.Player.MoveDirection, _pushedMoveMultiplier);
 		}
 
 		public override void OnExit()
@@ -258,39 +263,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 		public override void OnStateUpdate(float deltaTime)
 		{
-
+			_timer += deltaTime;
+			if (_timer >= _animationLength)
+			{
+				StateMachine.ChangeState(StateMachine.IdleState);
+			}
 		}
 
 		public override void OnInputEvent(InputData inputData)
 		{
-			InputType inputType = inputData.Type;
-
-			if (inputType == InputType.Movement)
-			{
-				MovementInputData moveInput = inputData.MovementInput;
-				Reference.UpdateMoveDirectionOnly(moveInput.MoveDirectionVector);
-
-				MovementType moveType = moveInput.MoveInputType;
-
-				if (moveType == MovementType.Stop)
-				{
-					StateMachine.ChangeState(StateMachine.IdleState);
-				}
-				else if (moveType == MovementType.Walk)
-				{
-					if (Reference.UpdateProxyDirectionByMoveDirection())
-					{
-						Reference.UpdateAnimation(DokzaAnimationState.Walk, 
-							Reference.Player.ProxyDirection);
-					}
-
-					Reference.Player.Move(Reference.Player.MoveDirection, isWalk: true);
-				}
-				else if (moveType == MovementType.Run)
-				{
-					StateMachine.ChangeState(StateMachine.RunState);
-				}
-			}
+			
 		}
 	}
 }
