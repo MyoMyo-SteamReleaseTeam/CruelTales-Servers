@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Numerics;
 using CT.Common.DataType.Input;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.FSM;
@@ -222,15 +223,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		private float _pushFriction = 2.0f;
 		private const float _pushLimitTime = 1f;
 		private float _timer = 0f;
+		private bool _isWalk = false;
 		
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.UpdateProxyDirectionToFront();
-			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
-
 			Reference.Player.Stop();
 			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushPower, _pushFriction);
+			Reference.UpdateProxyDirectionByMoveDirection();
+			Reference.UpdateProxyDirectionToFront();
+			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
 		}
 
 		public override void OnExit()
@@ -243,15 +245,40 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Reference.OnDuringAction();
 
 			_timer += deltaTime;
-			if (_timer >= _pushLimitTime)
+			if (_timer < _pushLimitTime)
+				return;
+
+			if (Reference.Player.MoveDirection == Vector2.Zero)
 			{
 				StateMachine.ChangeState(StateMachine.IdleState);
+			}
+			else
+			{
+				StateMachine.ChangeState(_isWalk ? StateMachine.WalkState : StateMachine.RunState);
 			}
 		}
 
 		public override void OnInputEvent(InputData inputData)
 		{
+			if (inputData.Type != InputType.Movement)
+				return;
 			
+			switch (inputData.MovementInput.MoveInputType)
+			{
+				case MovementType.Stop:
+					Reference.Player.MoveDirection = Vector2.Zero;
+					break;
+				
+				case MovementType.Walk:
+					_isWalk = true;
+					Reference.Player.MoveDirection = inputData.MovementInput.MoveDirectionVector;
+					break;
+				
+				case MovementType.Run:
+					_isWalk = false;
+					Reference.Player.MoveDirection = inputData.MovementInput.MoveDirectionVector;
+					break;
+			}
 		}
 	}
 	
@@ -261,6 +288,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		private const float _pushedFriction = 2.0f;
 		private const float _animationLength = 1f;
 		private float _timer = 0f;
+		private bool _isWalk = false;
 		
 		public override void OnEnter()
 		{
@@ -280,15 +308,40 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnStateUpdate(float deltaTime)
 		{
 			_timer += deltaTime;
-			if (_timer >= _animationLength)
+			if (!(_timer >= _animationLength))
+				return;
+
+			if (Reference.Player.MoveDirection == Vector2.Zero)
 			{
 				StateMachine.ChangeState(StateMachine.IdleState);
+			}
+			else
+			{
+				StateMachine.ChangeState(_isWalk ? StateMachine.WalkState : StateMachine.RunState);
 			}
 		}
 
 		public override void OnInputEvent(InputData inputData)
 		{
+			if (inputData.Type != InputType.Movement)
+				return;
 			
+			switch (inputData.MovementInput.MoveInputType)
+			{
+				case MovementType.Stop:
+					Reference.Player.MoveDirection = Vector2.Zero;
+					break;
+				
+				case MovementType.Walk:
+					_isWalk = true;
+					Reference.Player.MoveDirection = inputData.MovementInput.MoveDirectionVector;
+					break;
+				
+				case MovementType.Run:
+					_isWalk = false;
+					Reference.Player.MoveDirection = inputData.MovementInput.MoveDirectionVector;
+					break;
+			}
 		}
 	}
 }
