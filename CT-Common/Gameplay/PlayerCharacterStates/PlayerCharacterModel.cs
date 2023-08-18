@@ -45,15 +45,6 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		}
 
 		/// <summary>
-		/// 서버의 MoveDirection만을 수정합니다.
-		/// </summary>
-		/// <param name="moveDirection"></param>
-		public void UpdateMoveDirectionOnly(Vector2 moveDirection)
-		{
-			Player.MoveDirection = moveDirection;
-		}
-		
-		/// <summary>
 		/// Player.MoveDirection을 기반으로 서버의 ProxyDirection만을 변경합니다.
 		/// </summary>
 		/// <returns>ProxyDirection의 변경 여부를 전달합니다.</returns>
@@ -135,6 +126,11 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public void Update(float deltaTime)
 		{
 			Player.AnimationTime += deltaTime;
+		}
+
+		public void OnDuringAction()
+		{
+			Player.OnDuringAction();
 		}
 	}
 }

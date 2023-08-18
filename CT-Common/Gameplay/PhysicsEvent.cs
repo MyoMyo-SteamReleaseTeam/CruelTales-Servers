@@ -12,7 +12,8 @@ namespace CT.Common.Gameplay
 		Position = 1,
 		LinearVelocity = 1 << 1,
 		ForceVelocity = 1 << 2,
-		Rotation = 1 << 3,
+		ResetForce = 1 << 3,
+		Rotation = 1 << 4,
 	}
 
 	public static class PhysicsEventFlagExtension
@@ -45,6 +46,9 @@ namespace CT.Common.Gameplay
 		// Rotate, RotateTo
 		public float Rotation;
 
+		// Friction
+		public float ForceFriction;
+
 		public int SerializeSize => throw new System.NotImplementedException();
 
 		public void Ignore(IPacketReader reader)
@@ -63,7 +67,7 @@ namespace CT.Common.Gameplay
 				reader.Ignore(8);
 
 			if (eventFlags.HasFlag(PhysicsEventFlag.ForceVelocity))
-				reader.Ignore(8);
+				reader.Ignore(12);
 
 			if (eventFlags.HasFlag(PhysicsEventFlag.Rotation))
 				reader.Ignore(sizeof(float));
@@ -80,7 +84,10 @@ namespace CT.Common.Gameplay
 				writer.Put(LinearVelocity);
 
 			if (EventFlags.HasFlag(PhysicsEventFlag.ForceVelocity))
+			{
 				writer.Put(ForceVelocity);
+				writer.Put(ForceFriction);
+			}
 
 			if (EventFlags.HasFlag(PhysicsEventFlag.Rotation))
 				writer.Put(Rotation);
@@ -104,6 +111,7 @@ namespace CT.Common.Gameplay
 			if (EventFlags.HasFlag(PhysicsEventFlag.ForceVelocity))
 			{
 				if (!reader.TryReadVector2(out ForceVelocity)) return false;
+				if (!reader.TryReadSingle(out ForceFriction)) return false;
 			}
 
 			if (EventFlags.HasFlag(PhysicsEventFlag.Rotation))

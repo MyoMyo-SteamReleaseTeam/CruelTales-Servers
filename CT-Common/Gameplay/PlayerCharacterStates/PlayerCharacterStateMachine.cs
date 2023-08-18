@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Diagnostics;
 using CT.Common.DataType.Input;
 using CT.Common.Gameplay.Players;
@@ -62,7 +63,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			//Reference.UpdateProxyDirectionByMoveDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Idle, Reference.Player.ProxyDirection);
-			Reference.Player.StopMove();
+			Reference.Player.Stop();
 		}
 
 		public override void OnExit()
@@ -84,18 +85,18 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 				if (moveInput.MoveInputType == MovementType.Walk)
 				{
-					Reference.UpdateMoveDirectionOnly(moveInput.MoveDirectionVector);
+					Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
 					StateMachine.ChangeState(StateMachine.WalkState);
 				}
 				else if (moveInput.MoveInputType == MovementType.Run)
 				{
-					Reference.UpdateMoveDirectionOnly(moveInput.MoveDirectionVector);
+					Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
 					StateMachine.ChangeState(StateMachine.RunState);
 				}
 			}
 			else if (inputType == InputType.Action)
 			{
-				Reference.UpdateMoveDirectionOnly(inputData.ActionDirection.GetDirection());
+				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
 				StateMachine.ChangeState(StateMachine.PushState);
 			}
 		}
@@ -127,7 +128,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			if (inputType == InputType.Movement)
 			{
 				MovementInputData moveInput = inputData.MovementInput;
-				Reference.UpdateMoveDirectionOnly(moveInput.MoveDirectionVector);
+				Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
 
 				MovementType moveType = moveInput.MoveInputType;
 
@@ -153,7 +154,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			}
 			else if (inputType == InputType.Action)
 			{
-				Reference.UpdateMoveDirectionOnly(inputData.ActionDirection.GetDirection());
+				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
 				StateMachine.ChangeState(StateMachine.PushState);
 			}
 		}
@@ -184,7 +185,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			if (inputType == InputType.Movement)
 			{
 				MovementInputData moveInput = inputData.MovementInput;
-				Reference.UpdateMoveDirectionOnly(moveInput.MoveDirectionVector);
+				Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
 
 				MovementType moveType = moveInput.MoveInputType;
 
@@ -207,29 +208,39 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 					StateMachine.ChangeState(StateMachine.RunState);
 				}
 			}
+			else if (inputType == InputType.Action)
+			{
+				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
+				StateMachine.ChangeState(StateMachine.PushState);
+			}
 		}
 	}
 	
 	public class PlayerCharacter_Push : BasePlayerCharacterState
 	{
-		private float _pushMultiplier = 1.5f;
+		private float _pushPower = 12f;
+		private float _pushFriction = 2.0f;
 		private const float _pushLimitTime = 1f;
 		private float _timer = 0f;
 		
 		public override void OnEnter()
 		{
 			_timer = 0f;
+			Reference.Player.Stop();
 			Reference.UpdateProxyDirectionToFront();
 			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
-			Reference.Player.Move(Reference.Player.MoveDirection, _pushMultiplier);
+			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushPower, _pushFriction);
 		}
 
 		public override void OnExit()
 		{
+			Reference.Player.ResetImpluse();
 		}
 
 		public override void OnStateUpdate(float deltaTime)
 		{
+			Reference.OnDuringAction();
+
 			_timer += deltaTime;
 			if (_timer >= _pushLimitTime)
 			{
@@ -245,7 +256,8 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	
 	public class PlayerCharacter_Pushed : BasePlayerCharacterState
 	{
-		private const float _pushedMoveMultiplier = 0.8f;
+		private const float _pushedPower = 9f;
+		private const float _pushedFriction = 2.0f;
 		private const float _animationLength = 1f;
 		private float _timer = 0f;
 		
@@ -254,7 +266,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			_timer = 0f;
 			Reference.UpdateProxyDirectionToFront();
 			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
-			Reference.Player.Move(Reference.Player.MoveDirection, _pushedMoveMultiplier);
+			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushedPower,  _pushedFriction);
 		}
 
 		public override void OnExit()

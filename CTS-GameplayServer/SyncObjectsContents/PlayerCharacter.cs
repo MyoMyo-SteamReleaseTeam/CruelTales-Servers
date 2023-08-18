@@ -20,8 +20,9 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		public float Speed = 5.0f;
-		
+
 		public NetworkPlayer? NetworkPlayer { get; private set; }
+		public const float ActionRadius = 2;
 
 		// States
 		[AllowNull] private PlayerCharacterModel PlayerModel;
@@ -41,11 +42,7 @@ namespace CTS.Instance.SyncObjects
 			set => _proxyDirection = value;
 		}
 
-		public Vector2 MoveDirection
-		{
-			get;
-			set;
-		}
+		public Vector2 MoveDirection { get; set; }
 
 		public float AnimationTime
 		{
@@ -59,6 +56,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			PlayerModel = new(this);
 			StateMachine = new(PlayerModel);
+			_physicsRigidBody.SetLayerMask(PhysicsLayerMask.Player);
 		}
 
 		public override void OnCreated()
@@ -84,7 +82,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			StateMachine.UpdateState(deltaTime);
 		}
-		
+
 		public void Move(Vector2 moveDirection, bool isWalk)
 		{
 			if (KaPhysics.NearlyEqual(moveDirection.Length(), 0))
@@ -98,14 +96,52 @@ namespace CTS.Instance.SyncObjects
 			RigidBody.ChangeVelocity(velocity);
 		}
 
-		public void Move(Vector2 moveDirection, float multiplier)
+		public void Impluse(Vector2 direction, float power, float forceFriction)
 		{
-			RigidBody.ChangeVelocity(Vector2.Normalize(moveDirection) * Speed * multiplier);
+			Console.WriteLine($"dir : {direction} / power : {power}");
+
+			RigidBody.Impulse(direction, power, forceFriction);
+			Console.WriteLine($"LinearVelocity : {RigidBody.LinearVelocity}\nForceVelocity : {RigidBody.ForceVelocity}");
 		}
 
-		public void StopMove()
+		public void Stop()
 		{
 			RigidBody.ChangeVelocity(Vector2.Zero);
+		}
+
+		public void ResetImpluse()
+		{
+			RigidBody.ResetImpluse();
+		}
+
+		public void OnDuringAction()
+		{
+			return;
+
+			if (PhysicsWorld.Raycast(RigidBody.Position,
+									 ActionRadius, out var hits,
+									 PhysicsLayerMask.Player))
+			{
+				foreach (var id in hits)
+				{
+					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
+						continue;
+
+					if (netObj is not PlayerCharacter player)
+						continue;
+
+					Vector2 direction = Vector2.Normalize(player.Position - Position);
+					player.OnReactionBy(direction);
+
+					break;
+				}
+			}
+		}
+
+		public void OnReactionBy(Vector2 direction)
+		{
+			MoveDirection = direction;
+			StateMachine.ChangeState(StateMachine.PushedState);
 		}
 
 		#region Sync
@@ -154,14 +190,14 @@ namespace CTS.Instance.SyncObjects
 					Console.WriteLine("Skin change request from " + player.UserId + " to " + fromClient);
 					BroadcastOrderTest((int)player.UserId.Id, fromClient);
 					break;
-				
+
 				case 1:
-					Console.WriteLine("Skin change request from " + player.UserId+ " to " + fromClient);
+					Console.WriteLine("Skin change request from " + player.UserId + " to " + fromClient);
 					BroadcastOrderTest((int)player.UserId.Id, fromClient);
 					break;
 			}
 		}
-		
+
 		#endregion
 	}
 }

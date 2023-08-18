@@ -43,7 +43,7 @@ namespace KaNet.Physics.RigidBodies
 
 		/// <summary>힘 마찰력</summary>
 		[field: UnityEngine.SerializeField]
-		public float ForceFriction { get; set; } = 3.0f;
+		public float ForceFriction { get; set; }
 
 		/// <summary>정적 객체 여부</summary>
 		[field: UnityEngine.SerializeField]
@@ -81,6 +81,21 @@ namespace KaNet.Physics.RigidBodies
 		{
 			ID = id;
 			OnCollisionWith = onCollisionWith;
+		}
+
+		public void Initialize(int id)
+		{
+			ID = id;
+		}
+
+		public void BindAction(Action<int> onCollisionWith)
+		{
+			OnCollisionWith = onCollisionWith;
+		}
+
+		public void SetLayerMask(PhysicsLayerMask layerMask)
+		{
+			LayerMask = LayerMaskHelper.GetLayerMask(layerMask);
 		}
 
 		public abstract void CalcurateProperties();

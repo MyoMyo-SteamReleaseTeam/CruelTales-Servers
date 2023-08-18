@@ -24,6 +24,9 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 가시성 매니져입니다.</summary>
 		[AllowNull] private WorldVisibilityManager _worldVisibilityManager;
 
+		/// <summary>물리 계산 월드입니다.</summary>
+		[AllowNull] public KaPhysicsWorld PhysicsWorld { get; private set; }
+
 		/// <summary>네트워크 객체의 식별자입니다.</summary>
 		public NetworkIdentity Identity { get; protected set; } = new NetworkIdentity();
 
@@ -35,10 +38,7 @@ namespace CTS.Instance.Synchronizations
 
 		/// <summary>물리 강체 입니다.</summary>
 		public readonly NetRigidBody RigidBody;
-		private readonly KaRigidBody _physicsRigidBody;
-
-		/// <summary>물리 계산 월드입니다.</summary>
-		private KaPhysicsWorld? _physicsWorld;
+		protected readonly KaRigidBody _physicsRigidBody;
 
 		/// <summary>네트워크 객체의 오브젝트 타입입니다.</summary>
 		public abstract NetworkObjectType Type { get; }
@@ -53,41 +53,17 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
 
+		/// <summary>객체의 위치입니다.</summary>
+		public Vector2 Position => RigidBody.Position;
+
 		public Vector2Int CurrentCellPos { get; private set; }
 
 		public MasterNetworkObject()
 		{
 			_physicsRigidBody = EntityRigidBodyDB.CreateRigidBodyBy(Type);
+			_physicsRigidBody.BindAction(onCollisionWith);
 			RigidBody = new NetRigidBody(_physicsRigidBody);
 		}
-
-		/// <summary>객체의 사용자 정의 생성자입니다. 단 한 번만 호출됩니다.</summary>
-		public virtual void Constructor() { }
-
-		public void BindOwner(IDirtyable owner) => throw new System.NotImplementedException();
-
-		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
-		public virtual void OnFixedUpdate(float stepTime) {}
-
-		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>
-		public void UpdateWorldCell()
-		{
-			if (Visibility == VisibilityType.View)
-			{
-				Vector2Int previousPos = CurrentCellPos;
-				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
-				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
-			}
-		}
-
-		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
-		public virtual void OnDestroyed() { }
-
-		/// <summary>객체가 생성되었을 때 호출됩니다.</summary>
-		public virtual void OnCreated() { }
-
-		/// <summary>객체가 갱신되었을 때 호출됩니다.</summary>
-		public virtual void OnUpdate(float deltaTime) { }
 
 		/// <summary>생성된 객체를 초기화합니다.</summary>
 		public void Initialize(WorldManager worldManager,
@@ -102,7 +78,7 @@ namespace CTS.Instance.Synchronizations
 			WorldManager = worldManager;
 			_worldVisibilityManager = worldPartitioner;
 			GameplayManager = gameManager;
-			_physicsWorld = physicsWorld;
+			PhysicsWorld = physicsWorld;
 
 			// Initialize
 			Identity = id;
@@ -111,10 +87,11 @@ namespace CTS.Instance.Synchronizations
 			VisibilityAuthority = InitialVisibilityAuthority;
 
 			// Initialize physics
+			_physicsRigidBody.Initialize(Identity);
 			RigidBody.Reset();
 			RigidBody.MoveTo(position);
 			RigidBody.RotateTo(rotation);
-			_physicsWorld.AddRigidBody(_physicsRigidBody);
+			PhysicsWorld.AddRigidBody(_physicsRigidBody);
 		}
 
 		public void InitializeAfterFrame()
@@ -132,8 +109,8 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 해제합니다.</summary>
 		public void Dispose()
 		{
-			Debug.Assert(_physicsWorld != null);
-			_physicsWorld.RemoveRigidBody(_physicsRigidBody);
+			Debug.Assert(PhysicsWorld != null);
+			PhysicsWorld.RemoveRigidBody(_physicsRigidBody);
 		}
 
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
@@ -145,6 +122,43 @@ namespace CTS.Instance.Synchronizations
 			if (Visibility == VisibilityType.View)
 			{
 				_worldVisibilityManager.OnDestroy(this);
+			}
+		}
+
+		private void onCollisionWith(int id)
+		{
+			if (WorldManager.TryGetNetworkObject(new(id), out var networkObject))
+			{
+				OnCollisionWith(networkObject);
+			}
+		}
+
+		/// <summary>특정 객체와 충돌했을 때 발생합니다.</summary>
+		public virtual void OnCollisionWith(MasterNetworkObject collideObject) {}
+
+		/// <summary>객체의 사용자 정의 생성자입니다. 단 한 번만 호출됩니다.</summary>
+		public virtual void Constructor() { }
+
+		/// <summary>물리를 갱신합니다. 게임 로직에서 호출해서는 안됩니다.</summary>
+		public virtual void OnFixedUpdate(float stepTime) {}
+
+		/// <summary>객체가 삭제되었을 때 호출됩니다.</summary>
+		public virtual void OnDestroyed() { }
+
+		/// <summary>객체가 생성되었을 때 호출됩니다.</summary>
+		public virtual void OnCreated() { }
+
+		/// <summary>객체가 갱신되었을 때 호출됩니다.</summary>
+		public virtual void OnUpdate(float deltaTime) { }
+
+		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>
+		public void UpdateWorldCell()
+		{
+			if (Visibility == VisibilityType.View)
+			{
+				Vector2Int previousPos = CurrentCellPos;
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
+				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
 			}
 		}
 
@@ -203,5 +217,6 @@ namespace CTS.Instance.Synchronizations
 		public abstract void IgnoreSyncReliable(IPacketReader reader);
 		public abstract void IgnoreSyncUnreliable(IPacketReader reader);
 		public override string ToString() => $"Type:{Type}/Id:{Identity}";
+		public void BindOwner(IDirtyable owner) => throw new System.NotImplementedException();
 	}
 }

@@ -16,6 +16,7 @@ namespace CT.Common.Gameplay
 		public Vector2 Position => _rigidBody.Position;
 		public Vector2 LinearVelocity => _rigidBody.LinearVelocity;
 		public Vector2 ForceVelocity => _rigidBody.ForceVelocity;
+		public float ForceFriction => _rigidBody.ForceFriction;
 		public float Rotation => _rigidBody.Rotation;
 		public bool IsStatic => _rigidBody.IsStatic;
 
@@ -32,6 +33,7 @@ namespace CT.Common.Gameplay
 			writer.Put(_rigidBody.Position);
 			writer.Put(_rigidBody.LinearVelocity);
 			writer.Put(_rigidBody.ForceVelocity);
+			writer.Put(_rigidBody.ForceFriction);
 		}
 #endif
 
@@ -40,10 +42,12 @@ namespace CT.Common.Gameplay
 			if (!reader.TryReadVector2(out var position)) return false;
 			if (!reader.TryReadVector2(out var linearVelocity)) return false;
 			if (!reader.TryReadVector2(out var forceVelocity)) return false;
+			if (!reader.TryReadSingle(out var forceFriction)) return false;
 
 			_rigidBody.MoveTo(position);
 			_rigidBody.LinearVelocity = linearVelocity;
 			_rigidBody.ForceVelocity = forceVelocity;
+			_rigidBody.ForceFriction = forceFriction;
 
 			return true;
 		}
@@ -76,6 +80,7 @@ namespace CT.Common.Gameplay
 			_rigidBody.RotateTo(0);
 			_rigidBody.LinearVelocity = Vector2.Zero;
 			_rigidBody.ForceVelocity = Vector2.Zero;
+			_rigidBody.ForceFriction = 0;
 		}
 
 		public void ClearDirty()
@@ -98,6 +103,13 @@ namespace CT.Common.Gameplay
 			if (evt.EventFlags.HasFlag(PhysicsEventFlag.ForceVelocity))
 			{
 				_rigidBody.ForceVelocity = evt.ForceVelocity;
+				_rigidBody.ForceFriction = evt.ForceFriction;
+			}
+
+			if (evt.EventFlags.HasFlag(PhysicsEventFlag.ResetForce))
+			{
+				_rigidBody.ForceVelocity = Vector2.Zero;
+				_rigidBody.ForceFriction = 0;
 			}
 
 			if (evt.EventFlags.HasFlag(PhysicsEventFlag.Rotation))
@@ -128,20 +140,31 @@ namespace CT.Common.Gameplay
 
 		/// <summary>순간적인 힘을 가합니다.</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Impulse(Vector2 direction, float power)
+		public void Impulse(Vector2 direction, float power, float forceFriction = 1)
 		{
-			Impulse(direction * power);
+			Impulse(direction * power, forceFriction);
 		}
 
 		/// <summary>순간적인 힘을 가합니다.</summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Impulse(Vector2 impluseVelocity)
+		public void Impulse(Vector2 impluseVelocity, float forceFriction = 1)
 		{
 			_rigidBody.ForceVelocity = impluseVelocity;
+			_rigidBody.ForceFriction = forceFriction;
 
 			Event.EventFlags |= PhysicsEventFlag.ForceVelocity | PhysicsEventFlag.Position;
 			Event.Position = _rigidBody.Position;
 			Event.ForceVelocity = _rigidBody.ForceVelocity;
+			Event.ForceFriction = _rigidBody.ForceFriction;
+		}
+
+		/// <summary>순간 힘을 초기화합니다.</summary>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void ResetImpluse()
+		{
+			_rigidBody.ForceVelocity = Vector2.Zero;
+			_rigidBody.ForceFriction = 0;
+			Event.EventFlags |= PhysicsEventFlag.ResetForce;
 		}
 
 		/// <summary>가속도를 바꿉니다.</summary>

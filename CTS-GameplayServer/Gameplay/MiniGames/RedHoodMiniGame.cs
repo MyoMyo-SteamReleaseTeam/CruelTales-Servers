@@ -58,13 +58,10 @@ namespace CTS.Instance.Gameplay.MiniGames
 			_worldManager.SetMiniGameMapData(_miniGameData);
 
 			_spawnIndex = 0;
-			var spawnPositions = _miniGameData.SpawnPositions;
-			int spawnPosCount = spawnPositions.Count;
+
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
 			{
-				Vector2 spawnPos = spawnPositions[_spawnIndex];
-				createPlayerBy(player, spawnPos);
-				_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
+				OnPlayerEnter(player);
 			}
 		}
 
