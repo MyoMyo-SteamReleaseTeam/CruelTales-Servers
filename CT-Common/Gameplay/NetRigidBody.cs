@@ -105,8 +105,7 @@ namespace CT.Common.Gameplay
 				_rigidBody.ForceVelocity = evt.ForceVelocity;
 				_rigidBody.ForceFriction = evt.ForceFriction;
 			}
-
-			if (evt.EventFlags.HasFlag(PhysicsEventFlag.ResetForce))
+			else if (evt.EventFlags.HasFlag(PhysicsEventFlag.ResetForce))
 			{
 				_rigidBody.ForceVelocity = Vector2.Zero;
 				_rigidBody.ForceFriction = 0;
