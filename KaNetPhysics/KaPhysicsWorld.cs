@@ -108,6 +108,9 @@ namespace KaNet.Physics
 					if (!bodyA.IsCollideWith(bodyB, out Vector2 normal, out float depth))
 						continue;
 
+					if (bodyA.IsStatic && bodyB.IsStatic)
+						continue;
+
 					if (!bodyA.IsStatic && !bodyB.IsStatic)
 					{
 						bodyA.OnCollided(bodyB.ID);
@@ -133,7 +136,7 @@ namespace KaNet.Physics
 			{
 				float depthAmount = bodyA.IsStatic ? depth : depth * 0.5f;
 				bodyB.Move(normal, depthAmount);
-				bodyB.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
+				bodyB.ForceVelocity = Vector2.Reflect(bodyB.ForceVelocity, normal);
 			}
 		}
 
