@@ -219,10 +219,10 @@ namespace KaNet.Physics
 
 			foreach (var rigid in _rigidBodies)
 			{
-				if ((mask & rigid.LayerMask.Flags) != mask)
+				if (rigid.IsStatic)
 					continue;
 
-				if (rigid.IsStatic)
+				if ((mask ^ rigid.LayerMask.Mask) != 0)
 					continue;
 
 				bool isCollide = false;
