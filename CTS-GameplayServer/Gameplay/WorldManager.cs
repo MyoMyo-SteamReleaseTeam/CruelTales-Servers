@@ -42,7 +42,7 @@ namespace CTS.Instance.Gameplay
 
 		// Physics World
 		private KaPhysicsWorld _physicsWorld;
-		private float _deltaTimeStack = 0;
+		private float _deltaAccumulator = 0;
 
 		// Getter
 		public int Count => _networkObjectById.Count;
@@ -91,15 +91,18 @@ namespace CTS.Instance.Gameplay
 
 		public void FixedUpdate(float deltaTime)
 		{
-			_deltaTimeStack += deltaTime;
+			_deltaAccumulator += deltaTime;
 			int iterCount = 0;
-			float stepTime = 0.03f;
-			while (_deltaTimeStack > stepTime)
+			float stepTime = 0.015f;
+			while (_deltaAccumulator > stepTime)
 			{
-				_deltaTimeStack -= stepTime;
+				_deltaAccumulator -= stepTime;
 				_physicsWorld.Step(stepTime);
 				if (++iterCount >= 5)
+				{
+					_deltaAccumulator = 0;
 					break;
+				}
 
 				foreach (var netObj in _networkObjectById.ForwardValues)
 				{

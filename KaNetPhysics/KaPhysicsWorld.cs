@@ -129,14 +129,14 @@ namespace KaNet.Physics
 			{
 				float depthAmount = bodyB.IsStatic ? depth : depth * 0.5f;
 				bodyA.Move(-normal, depthAmount);
-				bodyA.ForceVelocity = Vector2.Reflect(bodyA.ForceVelocity, normal);
+				bodyA.SolveForceVelocity(normal);
 			}
 
 			if (!bodyB.IsStatic)
 			{
 				float depthAmount = bodyA.IsStatic ? depth : depth * 0.5f;
 				bodyB.Move(normal, depthAmount);
-				bodyB.ForceVelocity = Vector2.Reflect(bodyB.ForceVelocity, normal);
+				bodyB.SolveForceVelocity(normal);
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace KaNet.Physics
 			if (!collideByStatic.IsStatic)
 			{
 				collideByStatic.Move(normal, depth * 0.5f);
-				collideByStatic.ForceVelocity = Vector2.Reflect(collideByStatic.ForceVelocity, normal);
+				collideByStatic.SolveForceVelocity(normal);
 			}
 		}
 

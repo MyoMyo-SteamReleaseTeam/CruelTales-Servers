@@ -36,6 +36,7 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>힘<summary>
 		[ShowInInspector]
 		public Vector2 ForceVelocity { get; set; }
+		private bool _isForceVelocitySovled = false;
 
 		/// <summary>각도</summary>
 		[field: UnityEngine.SerializeField]
@@ -115,6 +116,16 @@ namespace KaNet.Physics.RigidBodies
 
 			_isTransformDirty = true;
 			_isBoundingBoxDirty = true;
+			_isForceVelocitySovled = false;
+		}
+
+		/// <summary>순간 힘을 Normal에 대해서 반사시킵니다. 한 Step당 한 번만 진행합니다.</summary>
+		public void SolveForceVelocity(Vector2 normal)
+		{
+			if (_isForceVelocitySovled)
+				return;
+			_isForceVelocitySovled = true;
+			ForceVelocity = Vector2.Reflect(ForceVelocity, normal);
 		}
 
 		/// <summary>해당 위치로 이동합니다.</summary>
