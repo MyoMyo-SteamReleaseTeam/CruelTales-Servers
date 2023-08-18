@@ -28,5 +28,27 @@ namespace CT.Test.Tool
 				Assert.AreEqual(i, dequeueValue);
 			}
 		}
+
+		[TestMethod]
+		public void Boundary_Test()
+		{
+			CircularQueue<int> queue = new(4);
+
+			queue.Enqueue(10);
+			queue.Enqueue(20);
+			queue.Enqueue(30);
+			queue.Enqueue(40);
+
+			Assert.AreEqual(10, queue.Dequeue());
+			Assert.AreEqual(20, queue.Dequeue());
+			Assert.AreEqual(30, queue.Dequeue());
+			Assert.AreEqual(40, queue.Dequeue());
+
+			queue.Enqueue(50);
+			queue.Enqueue(60);
+
+			Assert.AreEqual(50, queue.Dequeue());
+			Assert.AreEqual(60, queue.Dequeue());
+		}
 	}
 }

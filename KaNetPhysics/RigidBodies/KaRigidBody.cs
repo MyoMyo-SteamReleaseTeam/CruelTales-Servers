@@ -144,6 +144,14 @@ namespace KaNet.Physics.RigidBodies
 			_isBoundingBoxDirty = true;
 		}
 
+		/// <summary>거리만큼 상대적으로 이동합니다.</summary>
+		public void Move(Vector2 delta)
+		{
+			Position += delta;
+			_isTransformDirty = true;
+			_isBoundingBoxDirty = true;
+		}
+
 		/// <summary>해당 각도로 회전합니다.</summary>
 		public void RotateTo(float rotation)
 		{

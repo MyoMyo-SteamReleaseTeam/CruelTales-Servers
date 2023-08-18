@@ -121,6 +121,9 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void MoveTo(Vector2 position)
 		{
+			if (KaPhysics.NearlyEqual(_rigidBody.Position, position))
+				return;
+
 			_rigidBody.MoveTo(position);
 
 			Event.EventFlags |= PhysicsEventFlag.Position;
@@ -131,7 +134,11 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Move(Vector2 direction, float distance)
 		{
-			_rigidBody.Move(direction, distance);
+			Vector2 delta = direction * distance;
+			if (KaPhysics.NearlyEqual(Vector2.Zero, delta))
+				return;
+
+			_rigidBody.Move(delta);
 
 			Event.EventFlags |= PhysicsEventFlag.Position;
 			Event.Position = _rigidBody.Position;
@@ -148,6 +155,10 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Impulse(Vector2 impluseVelocity, float forceFriction = 1)
 		{
+			if (KaPhysics.NearlyEqual(_rigidBody.ForceVelocity, impluseVelocity) && 
+				KaPhysics.NearlyEqual(_rigidBody.ForceFriction, forceFriction))
+				return;
+
 			_rigidBody.ForceVelocity = impluseVelocity;
 			_rigidBody.ForceFriction = forceFriction;
 
@@ -161,6 +172,10 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void ResetImpluse()
 		{
+			if (KaPhysics.NearlyEqual(_rigidBody.ForceVelocity, Vector2.Zero) &&
+				KaPhysics.NearlyEqual(_rigidBody.ForceFriction, 0))
+				return;
+
 			_rigidBody.ForceVelocity = Vector2.Zero;
 			_rigidBody.ForceFriction = 0;
 			Event.EventFlags |= PhysicsEventFlag.ResetForce;
@@ -170,6 +185,9 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void ChangeVelocity(Vector2 linearVelocity)
 		{
+			if (KaPhysics.NearlyEqual(_rigidBody.LinearVelocity, linearVelocity))
+				return;
+
 			_rigidBody.LinearVelocity = linearVelocity;
 
 			Event.EventFlags |= PhysicsEventFlag.LinearVelocity | PhysicsEventFlag.Position;
@@ -181,6 +199,9 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void RotateTo(float rotation)
 		{
+			if (KaPhysics.NearlyEqual(_rigidBody.Rotation, rotation))
+				return;
+
 			_rigidBody.RotateTo(rotation);
 
 			Event.EventFlags |= PhysicsEventFlag.Rotation;
@@ -191,6 +212,9 @@ namespace CT.Common.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Rotate(float rotation)
 		{
+			if (KaPhysics.NearlyEqual(rotation, 0))
+				return;
+
 			_rigidBody.Rotate(rotation);
 
 			Event.EventFlags |= PhysicsEventFlag.Rotation;

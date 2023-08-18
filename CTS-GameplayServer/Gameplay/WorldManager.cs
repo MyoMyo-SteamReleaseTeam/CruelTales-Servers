@@ -91,18 +91,16 @@ namespace CTS.Instance.Gameplay
 
 		public void FixedUpdate(float deltaTime)
 		{
+			const float STEP_TIME = 0.015f;
+
 			_deltaAccumulator += deltaTime;
-			int iterCount = 0;
-			float stepTime = 0.015f;
-			while (_deltaAccumulator > stepTime)
+			if (_deltaAccumulator > 0.2f)
+				_deltaAccumulator = 0.2f;
+
+			while (_deltaAccumulator > STEP_TIME)
 			{
-				_deltaAccumulator -= stepTime;
-				_physicsWorld.Step(stepTime);
-				if (++iterCount >= 5)
-				{
-					_deltaAccumulator = 0;
-					break;
-				}
+				_deltaAccumulator -= STEP_TIME;
+				_physicsWorld.Step(STEP_TIME);
 
 				foreach (var netObj in _networkObjectById.ForwardValues)
 				{
