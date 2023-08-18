@@ -226,9 +226,10 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.Player.Stop();
 			Reference.UpdateProxyDirectionToFront();
 			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
+
+			Reference.Player.Stop();
 			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushPower, _pushFriction);
 		}
 
@@ -264,9 +265,10 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.Player.Stop();
 			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushedPower, _pushedFriction);
 			Reference.UpdateProxyDirectionToFront();
+
+			Reference.Player.Stop();
 			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
 		}
 

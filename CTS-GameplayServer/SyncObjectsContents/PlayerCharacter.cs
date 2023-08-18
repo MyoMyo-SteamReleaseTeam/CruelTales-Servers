@@ -128,13 +128,20 @@ namespace CTS.Instance.SyncObjects
 					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
 						continue;
 
-					if (netObj is not PlayerCharacter player)
+					if (netObj is not PlayerCharacter other)
 						continue;
 
-					if (player.StateMachine.CurrentState != player.StateMachine.PushedState)
+					var curState = other.StateMachine.CurrentState;
+					Vector2 direction = Vector2.Normalize(other.Position - Position);
+
+					if (curState == other.StateMachine.PushState)
 					{
-						Vector2 direction = Vector2.Normalize(player.Position - Position);
-						player.OnReactionBy(direction);
+						other.OnReactionBy(direction);
+						this.OnReactionBy(-direction);
+					}
+					else if (curState != other.StateMachine.PushedState)
+					{
+						other.OnReactionBy(direction);
 					}
 
 					break;
