@@ -129,6 +129,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 				if (moveType == MovementType.Stop)
 				{
+					Reference.Player.MoveDirection = Vector2.Zero;
 					Reference.Player.ProxyDirection = Reference.Player.ProxyDirection;
 					StateMachine.ChangeState(StateMachine.IdleState);
 				}
@@ -186,6 +187,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 				if (moveType == MovementType.Stop)
 				{
+					Reference.Player.MoveDirection = Vector2.Zero;
 					StateMachine.ChangeState(StateMachine.IdleState);
 				}
 				else if (moveType == MovementType.Walk)
