@@ -42,14 +42,16 @@ namespace CT.Common.Gameplay.Players
 		public static readonly DokzaAnimationInfo Idle = new(DokzaAnimationState.Idle, isLoop: true, 1.0f);
 		public static readonly DokzaAnimationInfo Run = new(DokzaAnimationState.Run, isLoop: true, 1.0f);
 		public static readonly DokzaAnimationInfo Walk = new(DokzaAnimationState.Walk, isLoop: true, 1.0f);
-		public static readonly DokzaAnimationInfo Action = new(DokzaAnimationState.Action, isLoop: false, 1.0f);
+		public static readonly DokzaAnimationInfo Push = new(DokzaAnimationState.Push, isLoop: false, 1.0f);
+		public static readonly DokzaAnimationInfo Pushed = new(DokzaAnimationState.Pushed, isLoop: false, 1.0f);
 
 		private readonly static Dictionary<DokzaAnimationState, DokzaAnimationInfo> _animationTable = new()
 		{
 			{ DokzaAnimationState.Idle , Idle },
 			{ DokzaAnimationState.Run , Run },
 			{ DokzaAnimationState.Walk , Walk },
-			{ DokzaAnimationState.Action , Action },
+			{ DokzaAnimationState.Push , Push },
+			{ DokzaAnimationState.Pushed , Pushed }
 		};
 
 		public static bool TryGetAnimationInfo(DokzaAnimationState state, out DokzaAnimationInfo info)

@@ -14,13 +14,20 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Player = player;
 		}
 
+		/*
 		public void UpdateAnimation(DokzaAnimationState animationState)
 		{
 			Player.AnimationState = animationState;
 			Player.AnimationTime = 0.0f;
 			Player.OnAnimationChanged(Player.AnimationState);
 		}
+		*/
 
+		/// <summary>
+		/// Dokza의 Animation을 업데이트하고, 클라이언트에게 요청합니다.
+		/// </summary>
+		/// <param name="animationState"></param>
+		/// <param name="proxyDirection"></param>
 		public void UpdateAnimation(DokzaAnimationState animationState, ProxyDirection proxyDirection)
 		{
 			Player.AnimationState = animationState;
@@ -28,19 +35,26 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Player.OnAnimationChanged(animationState, proxyDirection);
 		}
 		
-
+		/// <summary>
+		/// 서버의 ProxyDirection만을 수정합니다.
+		/// </summary>
+		/// <param name="direction"></param>
 		public void UpdateProxyDirectionOnly(ProxyDirection direction)
 		{
 			Player.ProxyDirection = direction;
 		}
 
+		/// <summary>
+		/// 서버의 MoveDirection만을 수정합니다.
+		/// </summary>
+		/// <param name="moveDirection"></param>
 		public void UpdateMoveDirectionOnly(Vector2 moveDirection)
 		{
 			Player.MoveDirection = moveDirection;
 		}
 		
 		/// <summary>
-		/// Player.MoveDirection을 기반으로 ProxyDirection을 변경합니다.
+		/// Player.MoveDirection을 기반으로 서버의 ProxyDirection만을 변경합니다.
 		/// </summary>
 		/// <returns>ProxyDirection의 변경 여부를 전달합니다.</returns>
 		public bool UpdateProxyDirectionByMoveDirection()
@@ -86,11 +100,29 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			return true;
 		}
 
+		/// <summary>
+		/// 서버의 현재 ProxyDirection을 강제로 앞을 보게 설정합니다.
+		/// </summary>
+		public void UpdateProxyDirectionToFront()
+		{
+			if (Player.ProxyDirection == ProxyDirection.LeftUp)
+				Player.ProxyDirection = ProxyDirection.LeftDown;
+			else if (Player.ProxyDirection == ProxyDirection.RightUp)
+				Player.ProxyDirection = ProxyDirection.RightDown;
+		}
+		
+		/// <summary>
+		/// 클라이언트에게 현재 서버의 ProxyDirection을 적용시킵니다.
+		/// </summary>
 		public void SendProxyDirection()
 		{
 			Player.OnProxyDirectionChanged(Player.ProxyDirection);
 		}
 		
+		/// <summary>
+		/// MoveDirection을 기반으로 서버의 ProxyDirection만을 변경합니다.
+		/// </summary>
+		/// <param name="moveDirection"></param>
 		public void UpdateMoveDirectionWithProxy(Vector2 moveDirection)
 		{
 			if (moveDirection == Player.MoveDirection)

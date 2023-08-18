@@ -20,7 +20,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		public float Speed = 5.0f;
-
+		
 		public NetworkPlayer? NetworkPlayer { get; private set; }
 
 		// States
@@ -80,6 +80,11 @@ namespace CTS.Instance.SyncObjects
 			NetworkPlayer?.ReleaseViewTarget();
 		}
 
+		public override void OnUpdate(float deltaTime)
+		{
+			StateMachine.UpdateState(deltaTime);
+		}
+		
 		public void Move(Vector2 moveDirection, bool isWalk)
 		{
 			if (KaPhysics.NearlyEqual(moveDirection.Length(), 0))
@@ -91,6 +96,11 @@ namespace CTS.Instance.SyncObjects
 			float speed = isWalk ? Speed * 0.5f : Speed;
 			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
 			RigidBody.ChangeVelocity(velocity);
+		}
+
+		public void Move(Vector2 moveDirection, float multiplier)
+		{
+			RigidBody.ChangeVelocity(Vector2.Normalize(moveDirection) * Speed * multiplier);
 		}
 
 		public void StopMove()
