@@ -82,22 +82,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 
 			if (inputType == InputType.Movement)
 			{
-				MovementInputData moveInput = inputData.MovementInput;
-
-				if (moveInput.MoveInputType == MovementType.Walk)
+				if (inputData.MovementInput.MoveInputType is MovementType.Walk or MovementType.Run)
 				{
-					Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
-					StateMachine.ChangeState(StateMachine.WalkState);
-				}
-				else if (moveInput.MoveInputType == MovementType.Run)
-				{
-					Reference.Player.MoveDirection = moveInput.MoveDirectionVector;
-					StateMachine.ChangeState(StateMachine.RunState);
+					Reference.Player.MoveDirection = inputData.MovementInput.MoveDirectionVector;
+					StateMachine.ChangeState(inputData.MovementInput.MoveInputType == MovementType.Walk ? 
+						StateMachine.WalkState : StateMachine.RunState);
 				}
 			}
 			else if (inputType == InputType.Action)
 			{
-				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
+				Reference.Player.ActionDirection = inputData.ActionDirection.GetDirection();
 				StateMachine.ChangeState(StateMachine.PushState);
 			}
 		}
@@ -155,7 +149,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			}
 			else if (inputType == InputType.Action)
 			{
-				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
+				Reference.Player.ActionDirection = inputData.ActionDirection.GetDirection();
 				StateMachine.ChangeState(StateMachine.PushState);
 			}
 		}
@@ -211,7 +205,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			}
 			else if (inputType == InputType.Action)
 			{
-				Reference.Player.MoveDirection = inputData.ActionDirection.GetDirection();
+				Reference.Player.ActionDirection = inputData.ActionDirection.GetDirection();
 				StateMachine.ChangeState(StateMachine.PushState);
 			}
 		}
@@ -229,8 +223,8 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			_timer = 0f;
 			Reference.Player.Stop();
-			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushPower, _pushFriction);
-			Reference.UpdateProxyDirectionByMoveDirection();
+			Reference.Player.Impluse(Reference.Player.ActionDirection, _pushPower, _pushFriction);
+			Reference.UpdateProxyDirectionByActionDirection();
 			Reference.UpdateProxyDirectionToFront();
 			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
 		}
@@ -293,7 +287,8 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.Player.Impluse(Reference.Player.MoveDirection, _pushedPower, _pushedFriction);
+			Reference.Player.Impluse(Reference.Player.ActionDirection, _pushedPower, _pushedFriction);
+			Reference.UpdateProxyDirectionByActionDirection();
 			Reference.UpdateProxyDirectionToFront();
 
 			Reference.Player.Stop();

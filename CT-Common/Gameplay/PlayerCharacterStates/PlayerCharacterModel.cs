@@ -7,7 +7,6 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	public class PlayerCharacterModel
 	{
 		public IPlayerBehaviour Player { get; private set; }
-		public Vector2 ActionAxis { get; set; } = Vector2.Zero;
 
 		public PlayerCharacterModel(IPlayerBehaviour player)
 		{
@@ -71,6 +70,53 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 				direction |= ProxyDirection.Up;
 			}
 			else if (Player.MoveDirection.Y < 0f)
+			{
+				direction |= ProxyDirection.Down;
+			}
+			else
+			{
+				direction |= Player.ProxyDirection.IsUp() ?
+					ProxyDirection.Up : ProxyDirection.Down;
+			}
+
+			Debug.Assert(!direction.IsAxisAligned());
+
+			if (direction == Player.ProxyDirection)
+			{
+				return false;
+			}
+			
+			Player.ProxyDirection = direction;
+			return true;
+		}
+		
+		/// <summary>
+		/// Player.ActionDirection을 기반으로 서버의 ProxyDirection만을 변경합니다.
+		/// </summary>
+		/// <returns>변경 여부</returns>
+		public bool UpdateProxyDirectionByActionDirection()
+		{
+			ProxyDirection direction = ProxyDirection.None;
+
+			if (Player.ActionDirection.X < 0f)
+			{
+				direction |= ProxyDirection.Left;
+			}
+			else if (Player.ActionDirection.X > 0f)
+			{
+				direction |= ProxyDirection.Right;
+			}
+			else
+			{
+				direction |= Player.ProxyDirection.IsRight() ?
+					ProxyDirection.Right : ProxyDirection.Left;
+			}
+
+			if (Player.ActionDirection.Y > 0f)
+			{
+				direction |= ProxyDirection.Up;
+			}
+			else if (Player.ActionDirection.Y < 0f)
 			{
 				direction |= ProxyDirection.Down;
 			}

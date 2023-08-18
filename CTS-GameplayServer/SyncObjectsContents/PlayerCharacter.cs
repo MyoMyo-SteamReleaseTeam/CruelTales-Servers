@@ -44,6 +44,8 @@ namespace CTS.Instance.SyncObjects
 
 		public Vector2 MoveDirection { get; set; }
 
+		public Vector2 ActionDirection { get; set; }
+
 		public float AnimationTime
 		{
 			get => _animationTime;
@@ -152,7 +154,7 @@ namespace CTS.Instance.SyncObjects
 
 		public void OnReactionBy(Vector2 direction)
 		{
-			MoveDirection = direction;
+			ActionDirection = direction;
 			StateMachine.ChangeState(StateMachine.PushedState);
 		}
 
