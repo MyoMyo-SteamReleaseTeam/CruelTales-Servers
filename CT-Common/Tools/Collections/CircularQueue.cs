@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace CT.Common.Tools.Collections
 {
 	/// <summary>원형 큐입니다.</summary>
 	public class CircularQueue<T> : IEnumerable<T>
+		where T : struct
 	{
-		private T[] _queue;
+		private List<T> _data;
 
 		public int Count { get; private set; }
 		public int Capacity { get; private set; }
+
+		public bool IsEmpty => Count == 0;
+		public bool IsFull => Count == Capacity;
 
 		private int _frontIndex;
 		private int _tailIndex;
@@ -18,7 +21,11 @@ namespace CT.Common.Tools.Collections
 		public CircularQueue(int capacity = 8)
 		{
 			Capacity = capacity;
-			_queue = new T[capacity];
+			_data = new List<T>(capacity);
+			for (int i = 0; i < capacity; i++)
+			{
+				_data.Add(default);
+			}
 
 			Clear();
 		}
@@ -30,59 +37,61 @@ namespace CT.Common.Tools.Collections
 			_tailIndex = 0;
 		}
 
-		public void Reserve(int capacity)
-		{
-			if (Capacity >= capacity)
-			{
-				return;
-			}
-
-			Capacity = capacity;
-
-			T[] allocate = new T[Capacity];
-			Array.Copy(_queue, 0, allocate, 0, _queue.Length);
-			_queue = allocate;
-		}
-
 		public bool TryEnqueue(T value)
 		{
-			if (IsFull())
-			{
+			if (IsFull)
 				return false;
-			}
 
-			Count++;
-			_queue[_tailIndex] = value;
+			_data[_tailIndex] = value;
 			_tailIndex = (_tailIndex + 1) % Capacity;
+			Count++;
 			return true;
 		}
 
-		public bool TryDequeue(out T? value)
+		public void Enqueue(T value)
 		{
-			if (IsEmpty())
+			_data[_tailIndex] = value;
+			_tailIndex = (_tailIndex + 1) % Capacity;
+
+			if (IsFull)
+			{
+				_frontIndex = _tailIndex;
+				return;
+			}
+
+			Count++;
+		}
+
+		public bool TryDequeue(out T value)
+		{
+			if (IsEmpty)
 			{
 				value = default;
 				return false;
 			}
 
-			Count--;
-			value = _queue[_frontIndex];
+			value = _data[_frontIndex];
 			_frontIndex = (_frontIndex + 1) % Capacity;
+			Count--;
 			return true;
 		}
 
-		public bool IsEmpty() => Count == 0;
-
-		public bool IsFull() => Count == Capacity;
+		public T Dequeue()
+		{
+			T value = _data[_frontIndex];
+			_frontIndex = (_frontIndex + 1) % Capacity;
+			Count--;
+			return value;
+		}
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return (IEnumerator<T>)_queue.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return _queue.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 	}
 }
