@@ -5,8 +5,9 @@ namespace CT.Common.Tools.Collections
 {
 	/// <summary>원형 큐입니다.</summary>
 	public class CircularQueue<T> : IEnumerable<T>
+		where T : struct
 	{
-		private List<T> _queue;
+		private List<T> _data;
 
 		public int Count { get; private set; }
 		public int Capacity { get; private set; }
@@ -20,7 +21,11 @@ namespace CT.Common.Tools.Collections
 		public CircularQueue(int capacity = 8)
 		{
 			Capacity = capacity;
-			_queue = new List<T>(capacity);
+			_data = new List<T>(capacity);
+			for (int i = 0; i < capacity; i++)
+			{
+				_data.Add(default);
+			}
 
 			Clear();
 		}
@@ -37,7 +42,7 @@ namespace CT.Common.Tools.Collections
 			if (IsFull)
 				return false;
 
-			_queue[_tailIndex] = value;
+			_data[_tailIndex] = value;
 			_tailIndex = (_tailIndex + 1) % Capacity;
 			Count++;
 			return true;
@@ -45,7 +50,7 @@ namespace CT.Common.Tools.Collections
 
 		public void Enqueue(T value)
 		{
-			_queue[_tailIndex] = value;
+			_data[_tailIndex] = value;
 			_tailIndex = (_tailIndex + 1) % Capacity;
 
 			if (IsFull)
@@ -57,7 +62,7 @@ namespace CT.Common.Tools.Collections
 			Count++;
 		}
 
-		public bool TryDequeue(out T? value)
+		public bool TryDequeue(out T value)
 		{
 			if (IsEmpty)
 			{
@@ -65,7 +70,7 @@ namespace CT.Common.Tools.Collections
 				return false;
 			}
 
-			value = _queue[_frontIndex];
+			value = _data[_frontIndex];
 			_frontIndex = (_frontIndex + 1) % Capacity;
 			Count--;
 			return true;
@@ -73,7 +78,7 @@ namespace CT.Common.Tools.Collections
 
 		public T Dequeue()
 		{
-			T value = _queue[_frontIndex];
+			T value = _data[_frontIndex];
 			_frontIndex = (_frontIndex + 1) % Capacity;
 			Count--;
 			return value;
@@ -81,12 +86,12 @@ namespace CT.Common.Tools.Collections
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return _queue.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return _queue.GetEnumerator();
+			return _data.GetEnumerator();
 		}
 	}
 }
