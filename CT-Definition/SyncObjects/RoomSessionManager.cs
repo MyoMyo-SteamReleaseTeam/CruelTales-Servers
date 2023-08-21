@@ -20,6 +20,9 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int MaxPlayerCount;
 
+		[SyncVar]
+		public bool IsAllReady;
+
 		[SyncObject]
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
