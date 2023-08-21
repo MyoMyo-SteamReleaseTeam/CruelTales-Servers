@@ -22,6 +22,12 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyGame(bool isReady) { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_TryStartGame() { }
+
+		[SyncRpc]
+		public void Server_GameStartCountdown(float second) { }
 	}
 }
 #pragma warning restore IDE0051

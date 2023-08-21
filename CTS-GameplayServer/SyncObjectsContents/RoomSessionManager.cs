@@ -20,12 +20,28 @@ namespace CTS.Instance.SyncObjects
 			PlayerState state = PlayerStateTable.Add(player.UserId);
 			state.ClearDirtyReliable();
 			player.BindPlayerState(state);
+			CheckAllReady();
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
 		{
 			player.ReleasePlayerState();
 			PlayerStateTable.Remove(player.UserId);
+			CheckAllReady();
+		}
+
+		public void CheckAllReady()
+		{
+			foreach (var player in PlayerStateTable.Values)
+			{
+				if (!player.IsReady)
+				{
+					IsAllReady = false;
+					return;
+				}
+			}
+
+			IsAllReady = true;
 		}
 
 		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)

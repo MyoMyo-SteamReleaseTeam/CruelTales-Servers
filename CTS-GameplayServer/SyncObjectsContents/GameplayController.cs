@@ -19,6 +19,8 @@ namespace CTS.Instance.SyncObjects
 		public MiniGameController? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
+		public const float GAME_START_COUNTDOWN = 3.0f;
+
 		public override void OnUpdate(float deltaTime)
 		{
 			// Update minigame controller
@@ -46,6 +48,7 @@ namespace CTS.Instance.SyncObjects
 			if (PlayerSet.Count == 1)
 			{
 				player.IsHost = true;
+				player.IsReady = true;
 			}
 
 			MiniGameController?.OnPlayerEnter(player);
@@ -66,6 +69,7 @@ namespace CTS.Instance.SyncObjects
 				foreach (var p in PlayerSet)
 				{
 					p.IsHost = true;
+					p.IsReady = true;
 					break;
 				}
 			}
@@ -89,6 +93,18 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
 		{
 			player.IsReady = isReady;
+			RoomSessionManager.CheckAllReady();
+		}
+
+		public partial void Client_TryStartGame(NetworkPlayer player)
+		{
+			if (!player.IsHost)
+				return;
+
+			if (!RoomSessionManager.IsAllReady)
+				return;
+
+			Server_GameStartCountdown(GAME_START_COUNTDOWN);
 		}
 	}
 }
