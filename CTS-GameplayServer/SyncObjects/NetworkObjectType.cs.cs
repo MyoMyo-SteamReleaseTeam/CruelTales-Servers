@@ -13,5 +13,6 @@ namespace CTS.Instance.SyncObjects
 		GameplayController,
 		PlayerCharacter,
 		TestCube,
+		WolfCharacter,
 	}
 }
