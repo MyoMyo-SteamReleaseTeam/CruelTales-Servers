@@ -8,6 +8,7 @@ namespace CT.Common.Tools.Collections
 		where T : struct
 	{
 		private List<T> _data;
+		public IList<T> Data => _data;
 
 		public int Count { get; private set; }
 		public int Capacity { get; private set; }
@@ -73,6 +74,18 @@ namespace CT.Common.Tools.Collections
 			value = _data[_frontIndex];
 			_frontIndex = (_frontIndex + 1) % Capacity;
 			Count--;
+			return true;
+		}
+
+		public bool TryPeek(out T value)
+		{
+			if (IsEmpty)
+			{
+				value = default;
+				return false;
+			}
+
+			value = _data[_frontIndex];
 			return true;
 		}
 
