@@ -43,15 +43,15 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
 		[SyncVar]
-		private UserId _userId = new();
+		protected UserId _userId = new();
 		[SyncVar]
-		private NetStringShort _username = new();
+		protected NetStringShort _username = new();
 		[SyncVar(SyncType.ColdData)]
-		private DokzaAnimationState _animationState = new();
+		protected DokzaAnimationState _animationState = new();
 		[SyncVar(SyncType.ColdData)]
-		private ProxyDirection _proxyDirection = new();
+		protected ProxyDirection _proxyDirection = new();
 		[SyncVar(SyncType.ColdData)]
-		private float _animationTime;
+		protected float _animationTime;
 		[SyncRpc]
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state);
 		[SyncRpc]
@@ -65,13 +65,13 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc]
 		public partial void Server_TestPositionTickByTick(Vector2 curPosition);
 		[SyncRpc(dir: SyncDirection.FromRemote, sync: SyncType.Unreliable)]
-		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
+		public virtual partial void Client_RequestInput(NetworkPlayer player, InputData inputData);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_RequestTest(NetworkPlayer player, int fromClient);
+		public virtual partial void Client_RequestTest(NetworkPlayer player, int fromClient);
 		public PlayerCharacter()
 		{
 		}
-		private BitmaskByte _dirtyReliable_0 = new();
+		protected BitmaskByte _dirtyReliable_0 = new();
 		public UserId UserId
 		{
 			get => _userId;
@@ -100,42 +100,42 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0[2] = true;
 			MarkDirtyReliable();
 		}
-		private List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
+		protected List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
 		{
 			Server_OnAnimationChangedDPCallstack.Add((state, direction));
 			_dirtyReliable_0[3] = true;
 			MarkDirtyReliable();
 		}
-		private List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
+		protected List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction)
 		{
 			Server_OnProxyDirectionChangedPCallstack.Add(direction);
 			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
-		private List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
+		protected List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
 		public partial void Server_OrderTest(NetworkPlayer player, int fromServer)
 		{
 			Server_OrderTestiCallstack.Add(player, fromServer);
 			_dirtyReliable_0[5] = true;
 			MarkDirtyReliable();
 		}
-		private TargetCallstack<NetworkPlayer, int> Server_OrderTestiCallstack = new(8);
+		protected TargetCallstack<NetworkPlayer, int> Server_OrderTestiCallstack = new(8);
 		public partial void Server_BroadcastOrderTest(int userId, int fromSever)
 		{
 			Server_BroadcastOrderTestiiCallstack.Add((userId, fromSever));
 			_dirtyReliable_0[6] = true;
 			MarkDirtyReliable();
 		}
-		private List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
+		protected List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
 		public partial void Server_TestPositionTickByTick(Vector2 curPosition)
 		{
 			Server_TestPositionTickByTickVCallstack.Add(curPosition);
 			_dirtyReliable_0[7] = true;
 			MarkDirtyReliable();
 		}
-		private List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
+		protected List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;

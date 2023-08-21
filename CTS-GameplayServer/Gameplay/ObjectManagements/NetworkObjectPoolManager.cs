@@ -13,6 +13,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 			{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1) },
 			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
 			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
+			{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
 			
 		};
 

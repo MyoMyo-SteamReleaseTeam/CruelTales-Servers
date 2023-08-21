@@ -175,7 +175,7 @@ namespace CTS.Instance.SyncObjects
 			this.Server_OnProxyDirectionChanged(direction);
 		}
 
-		public partial void Client_RequestInput(NetworkPlayer player, InputData inputData)
+		public virtual partial void Client_RequestInput(NetworkPlayer player, InputData inputData)
 		{
 			if (_userId != player.UserId)
 			{
@@ -196,7 +196,7 @@ namespace CTS.Instance.SyncObjects
 			this.Server_BroadcastOrderTest(userId, fromServer);
 		}
 
-		public partial void Client_RequestTest(NetworkPlayer player, int fromClient)
+		public virtual partial void Client_RequestTest(NetworkPlayer player, int fromClient)
 		{
 			switch (fromClient)
 			{
