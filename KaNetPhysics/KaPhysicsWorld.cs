@@ -145,7 +145,7 @@ namespace KaNet.Physics
 		{
 			if (!collideByStatic.IsStatic)
 			{
-				collideByStatic.Move(normal, depth * 0.5f);
+				collideByStatic.Move(normal, depth);
 				collideByStatic.SolveForceVelocity(normal);
 			}
 		}
