@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CT.Networks
+﻿namespace CT.Networks
 {
 	public static class GlobalNetwork
 	{
@@ -20,5 +14,7 @@ namespace CT.Networks
 
 		public const int SYSTEM_MAX_USER = 7;
 		public const int SYSTEM_MIN_USER = 2;
+
+		public const float DEFAULT_PHYSICS_STEP_TIME = 0.03f;
 	}
 }

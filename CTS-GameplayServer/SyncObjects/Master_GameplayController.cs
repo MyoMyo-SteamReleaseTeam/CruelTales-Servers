@@ -42,6 +42,8 @@ namespace CTS.Instance.SyncObjects
 	public partial class GameplayController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
+		[SyncVar]
+		private ServerRuntimeOption _serverRuntimeOption = new();
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		private readonly RoomSessionManager _roomSessionManager;
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -67,18 +69,29 @@ namespace CTS.Instance.SyncObjects
 			_roomSessionManager = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
+		public ServerRuntimeOption ServerRuntimeOption
+		{
+			get => _serverRuntimeOption;
+			set
+			{
+				if (_serverRuntimeOption == value) return;
+				_serverRuntimeOption = value;
+				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public RoomSessionManager RoomSessionManager => _roomSessionManager;
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
 		{
 			Server_LoadGameGCallstack.Add(player, mapType);
-			_dirtyReliable_0[1] = true;
+			_dirtyReliable_0[2] = true;
 			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameGCallstack = new(8);
 		public partial void Server_GameStartCountdown(float second)
 		{
 			Server_GameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[3] = true;
 			MarkDirtyReliable();
 		}
 		private List<float> Server_GameStartCountdownfCallstack = new(4);
@@ -93,19 +106,23 @@ namespace CTS.Instance.SyncObjects
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[0] = _roomSessionManager.IsDirtyReliable;
+			_dirtyReliable_0[1] = _roomSessionManager.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
+			{
+				_serverRuntimeOption.Serialize(writer);
+			}
+			if (_dirtyReliable_0[1])
 			{
 				int curSize = writer.Size;
 				_roomSessionManager.SerializeSyncReliable(player, writer);
 				if (writer.Size == curSize)
 				{
-					dirtyReliable_0[0] = false;
+					dirtyReliable_0[1] = false;
 				}
 			}
-			if (_dirtyReliable_0[1])
+			if (_dirtyReliable_0[2])
 			{
 				int Server_LoadGameGCount = Server_LoadGameGCallstack.GetCallCount(player);
 				if (Server_LoadGameGCount > 0)
@@ -120,10 +137,10 @@ namespace CTS.Instance.SyncObjects
 				}
 				else
 				{
-					dirtyReliable_0[1] = false;
+					dirtyReliable_0[2] = false;
 				}
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[3])
 			{
 				byte count = (byte)Server_GameStartCountdownfCallstack.Count;
 				writer.Put(count);
@@ -145,10 +162,12 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
+			_serverRuntimeOption.Serialize(writer);
 			_roomSessionManager.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
+			_serverRuntimeOption = new();
 			_roomSessionManager.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)

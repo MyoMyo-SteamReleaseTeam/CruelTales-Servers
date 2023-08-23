@@ -30,8 +30,9 @@ namespace CTS.Instance.Gameplay
 		[AllowNull] public readonly static ILog _log = LogManager.GetLogger(typeof(GameplayInstance));
 
 		// Reference
+		public ServerOption ServerOption { get; private set; }
 		public TickTimer ServerTimer { get; private set; }
-		public InstanceInitializeOption Option { get; private set; }
+		public InstanceInitializeOption InitializeOption { get; private set; }
 
 		// Instance property
 		public GameInstanceGuid Guid { get; private set; }
@@ -47,24 +48,27 @@ namespace CTS.Instance.Gameplay
 		private JobQueue<SynchronizeJob> _syncJobQueue;
 		private ConcurrentByteBufferPool _syncPacketPool;
 
-		public GameplayInstance(TickTimer serverTimer, InstanceInitializeOption option)
+		public GameplayInstance(ServerOption serverOption,
+								TickTimer serverTimer,
+								InstanceInitializeOption option)
 		{
+			ServerOption = serverOption;
 			ServerTimer = serverTimer;
-			Option = option;
-			RoomOption.Initialize(Option);
-			SessionHandler = new UserSessionHandler(this, Option, RoomOption);
+			InitializeOption = option;
+			RoomOption.Initialize(InitializeOption);
+			SessionHandler = new UserSessionHandler(this, InitializeOption, RoomOption);
 
-			GameplayManager = new GameplayManager(this, Option);
+			GameplayManager = new GameplayManager(this, ServerOption, InitializeOption);
 			GameplayManager.Initialize();
 
-			_syncJobQueue = new(onSyncJobExecute, Option.SyncJobCapacity);
-			_syncPacketPool = new ConcurrentByteBufferPool(1024 * 8, Option.RemotePacketPoolCount);
+			_syncJobQueue = new(onSyncJobExecute, InitializeOption.SyncJobCapacity);
+			_syncPacketPool = new(1024 * 8, InitializeOption.RemotePacketPoolCount);
 		}
 
 		public void Initialize(GameInstanceGuid guid)
 		{
 			Guid = guid;
-			RoomOption.Initialize(Option);
+			RoomOption.Initialize(InitializeOption);
 
 			// TODO : Start game properly
 			GameplayManager.StartGame();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
 using CTS.Instance.Gameplay;
@@ -29,6 +30,12 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
+			// Initialize server option
+			ServerRuntimeOption runtimeOption = new();
+			runtimeOption.PhysicsStepTime = GameplayManager.ServerOption.PhysicsStepTime;
+			this.ServerRuntimeOption = runtimeOption;
+
+			// Initialize managers
 			RoomSessionManager.Initialize(this);
 
 			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);

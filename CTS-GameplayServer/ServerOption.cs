@@ -1,8 +1,4 @@
-﻿#if !DEBUG
-using CT.Common.Tools.Data;
-#endif
-
-namespace CTS.Instance
+﻿namespace CTS.Instance
 {
 	public class ServerOption
 	{
@@ -11,6 +7,7 @@ namespace CTS.Instance
 		//public int FramePerMs = 1000;
 		public int AlarmTickMs = 40;
 		public int GameCount = 1;
+		public float PhysicsStepTime = 1.0f / 60.0f;
 
 		public ServerOption() {}
 	}

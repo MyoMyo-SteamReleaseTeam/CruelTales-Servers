@@ -43,6 +43,7 @@ namespace CTS.Instance.Gameplay
 		// Physics World
 		private KaPhysicsWorld _physicsWorld;
 		private float _deltaAccumulator = 0;
+		private float _stepTime = 0.03f;
 
 		// Getter
 		public int Count => _networkObjectById.Count;
@@ -66,6 +67,7 @@ namespace CTS.Instance.Gameplay
 
 			// Physics world
 			_physicsWorld = new KaPhysicsWorld();
+			_stepTime = _gameplayManager.ServerOption.PhysicsStepTime;
 		}
 
 		public void SetMiniGameMapData(MiniGameMapData mapData)
@@ -91,16 +93,14 @@ namespace CTS.Instance.Gameplay
 
 		public void FixedUpdate(float deltaTime)
 		{
-			const float STEP_TIME = 0.015f;
-
 			_deltaAccumulator += deltaTime;
-			if (_deltaAccumulator > 0.2f)
-				_deltaAccumulator = 0.2f;
+			if (_deltaAccumulator > _stepTime * 5)
+				_deltaAccumulator = _stepTime * 5;
 
-			while (_deltaAccumulator > STEP_TIME)
+			while (_deltaAccumulator >= _stepTime)
 			{
-				_deltaAccumulator -= STEP_TIME;
-				_physicsWorld.Step(STEP_TIME);
+				_deltaAccumulator -= _stepTime;
+				_physicsWorld.Step(_stepTime);
 
 				foreach (var netObj in _networkObjectById.ForwardValues)
 				{

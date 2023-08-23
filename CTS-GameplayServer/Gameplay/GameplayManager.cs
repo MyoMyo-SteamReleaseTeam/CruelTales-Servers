@@ -15,6 +15,7 @@ namespace CTS.Instance.Gameplay
 		private readonly static ILog _log = LogManager.GetLogger(typeof(GameplayManager));
 
 		// Reference
+		public ServerOption ServerOption { get; private set; }
 		private GameplayInstance _gameplayInstance;
 		public RoomOption RoomOption { get; private set; }
 		public WorldManager WorldManager { get; private set; }
@@ -32,9 +33,11 @@ namespace CTS.Instance.Gameplay
 		public GameplayController? GameplayController { get; private set; }
 
 		public GameplayManager(GameplayInstance gameplayInstance,
+							   ServerOption serverOption,
 							   InstanceInitializeOption option)
 		{
 			// Reference
+			ServerOption = serverOption;
 			_gameplayInstance = gameplayInstance;
 			RoomOption = _gameplayInstance.RoomOption;
 			Option = option;
