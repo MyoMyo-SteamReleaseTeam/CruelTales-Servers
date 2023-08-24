@@ -180,6 +180,11 @@ namespace CT.Common.DataType.Synchronizations
 		}
 #endif
 
+		public void InternalClear()
+		{
+			Count = 0;
+		}
+
 		public bool Contains(T item)
 		{
 			return _list.Contains(item);

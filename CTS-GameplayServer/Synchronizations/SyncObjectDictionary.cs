@@ -161,13 +161,14 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void Clear()
 		{
-			internalClear();
+			InternalClear();
 			MarkDirtyReliable();
 			_syncOperations.Add(new SyncToken()
 			{
 				Operation = CollectionSyncType.Clear,
 			});
 		}
+
 #endif
 
 		public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
@@ -182,16 +183,15 @@ namespace CT.Common.DataType.Synchronizations
 
 		public void InitializeMasterProperties()
 		{
-			internalClear();
+			InternalClear();
 		}
 
 		public void InitializeRemoteProperties()
 		{
-			internalClear();
+			InternalClear();
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void internalClear()
+		public void InternalClear()
 		{
 			foreach (TKey key in _dictionary.Keys)
 				_objectPool.Push(_dictionary[key]);
