@@ -378,7 +378,7 @@ namespace CT.Common.DataType.Synchronizations
 					switch (operation)
 					{
 						case CollectionSyncType.Clear:
-							internalClear();
+							InternalClear();
 							OnCleared?.Invoke();
 							break;
 
