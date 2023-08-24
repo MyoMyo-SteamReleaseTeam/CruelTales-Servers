@@ -58,6 +58,8 @@ namespace CTS.Instance.Synchronizations
 
 		public Vector2Int CurrentCellPos { get; private set; }
 
+		public bool IsSystemObject { get; private set; }
+
 		public MasterNetworkObject()
 		{
 			_physicsRigidBody = EntityRigidBodyDB.CreateRigidBodyBy(Type);

@@ -231,12 +231,30 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
+		public void ClearWithoutSystemObject()
+		{
+			_idCounter = new NetworkIdentity(0);
+			_destroyObjectStack.Clear();
+			var ids = _networkObjectById.ForwardKeys;
+			int removeCount = _networkObjectById.Count;
+			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
+			for (int i = 0; i < removeCount; i++)
+			{
+				var netObj = _networkObjectById.GetValue(removeIds[i]);
+				if (!netObj.IsSystemObject)
+				{
+					destroyObject(netObj);
+				}
+			}
+		}
+
 		private void destroyObject(MasterNetworkObject netObject)
 		{
 			_objectPoolManager.Return(netObject);
 			if (!_networkObjectById.TryRemove(netObject))
 			{
-				_log.Error($"There is no network object to remove. Object : [{netObject.Identity}]");
+				_log.Error($"There is no network object to remove. " +
+					$"Object : [{netObject.GetType().Name}: {netObject.Identity}]");
 				Debug.Assert(false);
 				return;
 			}
