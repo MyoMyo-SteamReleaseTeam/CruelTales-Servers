@@ -31,6 +31,9 @@ namespace CT.Definitions.SyncObjects
 		public void Client_TryStartGame() { }
 
 		[SyncRpc]
+		public void Server_TryStartGameCallback(StartGameResultType result) { }
+
+		[SyncRpc]
 		public void Server_GameStartCountdown(float second) { }
 	}
 }

@@ -49,6 +49,8 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc(SyncType.ReliableTarget)]
 		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
 		[SyncRpc]
+		public partial void Server_TryStartGameCallback(StartGameResultType result);
+		[SyncRpc]
 		public partial void Server_GameStartCountdown(float second);
 		private Action<RoomSessionManager>? _onRoomSessionManagerChanged;
 		public event Action<RoomSessionManager> OnRoomSessionManagerChanged
@@ -88,10 +90,17 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameGCallstack = new(8);
+		public partial void Server_TryStartGameCallback(StartGameResultType result)
+		{
+			Server_TryStartGameCallbackSCallstack.Add(result);
+			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
+		}
+		private List<StartGameResultType> Server_TryStartGameCallbackSCallstack = new(4);
 		public partial void Server_GameStartCountdown(float second)
 		{
 			Server_GameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
 		private List<float> Server_GameStartCountdownfCallstack = new(4);
@@ -101,6 +110,7 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Clear();
 			_roomSessionManager.ClearDirtyReliable();
 			Server_LoadGameGCallstack.Clear();
+			Server_TryStartGameCallbackSCallstack.Clear();
 			Server_GameStartCountdownfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
@@ -141,6 +151,16 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 			if (_dirtyReliable_0[3])
+			{
+				byte count = (byte)Server_TryStartGameCallbackSCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_TryStartGameCallbackSCallstack[i];
+					writer.Put((byte)arg);
+				}
+			}
+			if (_dirtyReliable_0[4])
 			{
 				byte count = (byte)Server_GameStartCountdownfCallstack.Count;
 				writer.Put(count);

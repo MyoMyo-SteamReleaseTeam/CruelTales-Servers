@@ -55,22 +55,22 @@ namespace CTS.Instance.Gameplay
 			ServerOption = serverOption;
 			ServerTimer = serverTimer;
 			InitializeOption = option;
-			RoomOption.Initialize(InitializeOption);
+			RoomOption.Reset(InitializeOption);
 			SessionHandler = new UserSessionHandler(this, InitializeOption, RoomOption);
 
 			GameplayManager = new GameplayManager(this, ServerOption, InitializeOption);
-			GameplayManager.Initialize();
 
 			_syncJobQueue = new(onSyncJobExecute, InitializeOption.SyncJobCapacity);
 			_syncPacketPool = new(1024 * 8, InitializeOption.RemotePacketPoolCount);
 		}
 
-		public void Initialize(GameInstanceGuid guid)
+		public void Reset(GameInstanceGuid guid)
 		{
 			Guid = guid;
-			RoomOption.Initialize(InitializeOption);
+			RoomOption.Reset(InitializeOption);
 
 			// TODO : Start game properly
+			GameplayManager.Reset();
 			GameplayManager.StartGame();
 		}
 

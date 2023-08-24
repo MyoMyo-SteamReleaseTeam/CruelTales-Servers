@@ -54,9 +54,20 @@ namespace CTS.Instance.Gameplay
 									 Option.SystemMaxUser);
 		}
 
-		public void Initialize()
+		public void Reset()
 		{
 			WorldManager.Clear();
+		}
+
+		public void StartGame()
+		{
+			GameplayController = WorldManager.CreateObject<GameplayController>();
+		}
+
+		public void EndGame()
+		{
+			GameplayController?.Destroy();
+			GameplayController = null;
 		}
 
 		public void Update(float deltaTime)
@@ -84,17 +95,6 @@ namespace CTS.Instance.Gameplay
 
 			// Update objects life cycle
 			WorldManager.UpdateObjectLifeCycle();
-		}
-
-		public void StartGame()
-		{
-			GameplayController = WorldManager.CreateObject<GameplayController>();
-		}
-
-		public void EndGame()
-		{
-			GameplayController?.Destroy();
-			GameplayController = null;
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

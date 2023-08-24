@@ -48,7 +48,7 @@ namespace CTS.Instance.Gameplay
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
 				var instance = new GameplayInstance(_serverOption, _serverTimer, option);
-				instance.Initialize(new GameInstanceGuid((ulong)i));
+				instance.Reset(new GameInstanceGuid((ulong)i));
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);
 			}

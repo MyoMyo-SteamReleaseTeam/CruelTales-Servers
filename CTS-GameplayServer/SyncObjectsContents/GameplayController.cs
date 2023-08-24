@@ -20,7 +20,7 @@ namespace CTS.Instance.SyncObjects
 		public MiniGameController? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
-		public const float GAME_START_COUNTDOWN = 3.0f;
+		public const float GAME_START_COUNTDOWN = 3.95f;
 
 		public override void OnUpdate(float deltaTime)
 		{
@@ -31,12 +31,14 @@ namespace CTS.Instance.SyncObjects
 		public override void OnCreated()
 		{
 			// Initialize server option
-			ServerRuntimeOption runtimeOption = new();
-			runtimeOption.PhysicsStepTime = GameplayManager.ServerOption.PhysicsStepTime;
-			this.ServerRuntimeOption = runtimeOption;
+			ServerRuntimeOption runtimeOption = new()
+			{
+				PhysicsStepTime = GameplayManager.ServerOption.PhysicsStepTime
+			};
+			ServerRuntimeOption = runtimeOption;
 
 			// Initialize managers
-			RoomSessionManager.Initialize(this);
+			RoomSessionManager.OnCreated(this);
 
 			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);
 			//MiniGameController = new MiniGameController(this, GameMapType.MiniGame_Dueoksini_0);
@@ -105,12 +107,27 @@ namespace CTS.Instance.SyncObjects
 
 		public partial void Client_TryStartGame(NetworkPlayer player)
 		{
+			StartGameResultType result = StartGameResultType.Success;
+
 			if (!player.IsHost)
-				return;
+				result = StartGameResultType.YouAreNotHost;
+
+			if (RoomSessionManager.PlayerCount < GameplayManager.Option.SystemMinUser)
+				result = StartGameResultType.NoEnoughPlayer;
+
+			if (RoomSessionManager.PlayerCount > GameplayManager.Option.SystemMaxUser)
+				result = StartGameResultType.TooManyPlayer;
 
 			if (!RoomSessionManager.IsAllReady)
-				return;
+				result = StartGameResultType.SomePlayerNotReady;
 
+			if (result != StartGameResultType.Success)
+			{
+				Server_TryStartGameCallback(result);
+				return;
+			}
+
+			Server_TryStartGameCallback(StartGameResultType.Success);
 			Server_GameStartCountdown(GAME_START_COUNTDOWN);
 		}
 	}

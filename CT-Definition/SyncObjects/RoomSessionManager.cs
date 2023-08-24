@@ -21,6 +21,9 @@ namespace CT.Definitions.SyncObjects
 		public int MaxPlayerCount;
 
 		[SyncVar]
+		public int MinPlayerCount;
+
+		[SyncVar]
 		public bool IsAllReady;
 
 		[SyncObject]

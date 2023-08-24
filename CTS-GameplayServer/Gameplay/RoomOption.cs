@@ -17,7 +17,7 @@ namespace CTS.Instance.Gameplay
 
 		public bool HasPassword => Password >= 0;
 
-		public void Initialize(InstanceInitializeOption option)
+		public void Reset(InstanceInitializeOption option)
 		{
 			_password = -1;
 			Name = "CruelTales game room!";

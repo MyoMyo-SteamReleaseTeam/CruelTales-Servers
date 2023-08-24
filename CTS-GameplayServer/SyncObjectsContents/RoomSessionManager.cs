@@ -9,10 +9,20 @@ namespace CTS.Instance.SyncObjects
 		[AllowNull] public GameplayManager GameplayManager { get; private set; }
 		[AllowNull] public GameplayController GameplayController { get; private set; }
 
-		public void Initialize(GameplayController gameplayController)
+		public int PlayerCount => PlayerStateTable.Count;
+
+		public void OnCreated(GameplayController gameplayController)
 		{
 			GameplayController = gameplayController;
 			GameplayManager = gameplayController.GameplayManager;
+
+			RoomName = "Cruel Tales official test server";
+			RoomDiscription = "Play to fun";
+			MaxPlayerCount = GameplayManager.Option.SystemMaxUser;
+			MinPlayerCount = GameplayManager.Option.SystemMinUser;
+			Password = -1;
+			IsAllReady = false;
+			PlayerStateTable.InternalClear();
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)
@@ -32,6 +42,12 @@ namespace CTS.Instance.SyncObjects
 
 		public void CheckAllReady()
 		{
+			if (PlayerCount < GameplayManager.Option.SystemMinUser)
+			{
+				IsAllReady = false;
+				return;
+			}
+
 			foreach (var player in PlayerStateTable.Values)
 			{
 				if (!player.IsReady)
