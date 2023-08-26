@@ -15,12 +15,12 @@ namespace CTS.Instance.SyncObjects
 		{
 			GameplayController = gameplayController;
 			GameplayManager = gameplayController.GameplayManager;
-
-			RoomName = "Cruel Tales official test server";
-			RoomDiscription = "Play to fun";
 			MaxPlayerCount = GameplayManager.Option.SystemMaxUser;
 			MinPlayerCount = GameplayManager.Option.SystemMinUser;
-			Password = -1;
+			SetRoomName("Cruel Tales official test server");
+			SetRoomDiscription("Play to fun");
+			SetRoomMaxUser(MaxPlayerCount);
+			SetPassword(-1);
 			IsAllReady = false;
 			PlayerStateTable.InternalClear();
 		}
@@ -60,30 +60,48 @@ namespace CTS.Instance.SyncObjects
 			IsAllReady = true;
 		}
 
+		public void SetPassword(int password)
+		{
+			GameplayManager.RoomOption.Password = password;
+			Password = password;
+		}
+
+		public void SetRoomName(NetStringShort roomName)
+		{
+			GameplayManager.RoomOption.Name = roomName;
+			RoomName = roomName;
+		}
+
+		public void SetRoomDiscription(NetStringShort roomDiscription)
+		{
+			GameplayManager.RoomOption.Discription = roomDiscription;
+			RoomDiscription = roomDiscription;
+		}
+
+		public void SetRoomMaxUser(int maxUserCount)
+		{
+			GameplayManager.RoomOption.MaxUser = maxUserCount;
+			MaxPlayerCount = maxUserCount;
+		}
+
 		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)
 		{
 			if (!checkAuthOrDisconnect(player)) return;
-
-			GameplayManager.RoomOption.Password = password;
-			Password = password;
+			SetPassword(password);
 			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
 		public partial void ClientRoomSetReq_SetRoomName(NetworkPlayer player, NetStringShort roomName)
 		{
 			if (!checkAuthOrDisconnect(player)) return;
-
-			GameplayManager.RoomOption.Name = roomName;
-			RoomName = roomName;
+			SetRoomName(roomName);
 			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetworkPlayer player, NetStringShort roomDiscription)
 		{
 			if (!checkAuthOrDisconnect(player)) return;
-
-			GameplayManager.RoomOption.Discription = roomDiscription;
-			RoomDiscription = roomDiscription;
+			SetRoomDiscription(roomDiscription);
 			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
@@ -109,8 +127,7 @@ namespace CTS.Instance.SyncObjects
 				return;
 			}
 
-			GameplayManager.RoomOption.MaxUser = maxUserCount;
-			MaxPlayerCount = maxUserCount;
+			SetRoomMaxUser(maxUserCount);
 			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 
