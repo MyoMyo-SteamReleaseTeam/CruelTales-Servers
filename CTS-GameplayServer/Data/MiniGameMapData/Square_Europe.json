@@ -1,0 +1,235 @@
+{
+  "MapType": 50,
+  "Theme": 101,
+  "SpawnPositions": [
+    {
+      "X": -5.45,
+      "Y": -2.05
+    },
+    {
+      "X": -3.95,
+      "Y": -3.75
+    },
+    {
+      "X": -1.95,
+      "Y": -4.25
+    },
+    {
+      "X": 0.0499999523,
+      "Y": -3.75
+    },
+    {
+      "X": 1.55,
+      "Y": -2.05
+    },
+    {
+      "X": -3.15,
+      "Y": -1.75
+    },
+    {
+      "X": -0.75,
+      "Y": -1.75
+    },
+    {
+      "X": -1.95,
+      "Y": -2.95
+    }
+  ],
+  "EnvironmentColliders": [
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": -2.32,
+        "Y": 1.96
+      },
+      "Rotation": 0.0,
+      "Radius": 11.395,
+      "Width": 22.79,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": -9.29,
+        "Y": -8.43
+      },
+      "Rotation": 0.0,
+      "Radius": 4.26475,
+      "Width": 8.5295,
+      "Height": 2.33,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": 3.29,
+        "Y": -8.43
+      },
+      "Rotation": 0.0,
+      "Radius": 5.97064972,
+      "Width": 11.9412994,
+      "Height": 2.33,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": -3.95,
+        "Y": -9.21
+      },
+      "Rotation": 0.0,
+      "Radius": 2.15,
+      "Width": 4.3,
+      "Height": 2.33,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": -12.16,
+        "Y": -3.48
+      },
+      "Rotation": 0.0,
+      "Radius": 0.9283915,
+      "Width": 1.856783,
+      "Height": 11.5290728,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": 6.36,
+        "Y": -3.45
+      },
+      "Rotation": 0.0,
+      "Radius": 2.99363256,
+      "Width": 5.987265,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": 3.36636758,
+        "Y": -3.45
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": -4.32,
+        "Y": 0.92
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": -10.92,
+        "Y": 1.29
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": -8.861,
+        "Y": -1.91
+      },
+      "Rotation": 0.0,
+      "Radius": 1.0,
+      "Width": 2.0,
+      "Height": 2.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": -5.986,
+        "Y": -4.917
+      },
+      "Rotation": 0.0,
+      "Radius": 1.0,
+      "Width": 2.0,
+      "Height": 2.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": 8.24,
+        "Y": -3.08
+      },
+      "Rotation": 0.0,
+      "Radius": 1.72593582,
+      "Width": 3.45187163,
+      "Height": 9.698857,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": 6.33,
+        "Y": -5.64
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 0.54,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 2,
+      "Position": {
+        "X": 6.72,
+        "Y": -6.07
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 2,
+      "Position": {
+        "X": 3.757,
+        "Y": -5.596
+      },
+      "Rotation": 0.0,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
+      "IsStatic": true
+    }
+  ]
+}

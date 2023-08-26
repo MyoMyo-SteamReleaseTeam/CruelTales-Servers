@@ -13,6 +13,7 @@ namespace CTS.Instance.Data
 
 		public static bool TryLoad()
 		{
+			if (!tryLoadByType(GameMapType.Square_Europe)) return false;
 			if (!tryLoadByType(GameMapType.MiniGame_RedHood_0)) return false;
 			if (!tryLoadByType(GameMapType.MiniGame_Dueoksini_0)) return false;
 
