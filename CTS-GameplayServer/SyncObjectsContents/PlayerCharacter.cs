@@ -101,10 +101,7 @@ namespace CTS.Instance.SyncObjects
 
 		public void Impluse(Vector2 direction, float power, float forceFriction)
 		{
-			Console.WriteLine($"dir : {direction} / power : {power}");
-
 			RigidBody.Impulse(direction, power, forceFriction);
-			Console.WriteLine($"LinearVelocity : {RigidBody.LinearVelocity}\nForceVelocity : {RigidBody.ForceVelocity}");
 		}
 
 		public void Stop()
