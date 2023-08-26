@@ -33,6 +33,8 @@ namespace CTS.Instance.Gameplay
 		public int SessionJobCapacity => (int)(SystemMaxUser * 1.5f);
 		public int RemotePacketPoolCount => SystemMaxUser * 5;
 
+		public int CoroutineCapacity = 16;
+
 		public InstanceInitializeOption() {}
 	}
 }

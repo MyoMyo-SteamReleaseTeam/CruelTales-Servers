@@ -17,10 +17,11 @@ namespace CT.Benchmark
 			//sb.SBToByteArrayByIter();
 			//InheritReflectionTest.Test();
 
-			Child a = new Child();
-			Console.WriteLine(a.A);
-			Console.WriteLine(a.B);
+			//Child a = new Child();
+			//Console.WriteLine(a.A);
+			//Console.WriteLine(a.B);
 
+			BenchmarkRunner.Run<CoroutineActionBenchmark>();
 		}
 	}
 

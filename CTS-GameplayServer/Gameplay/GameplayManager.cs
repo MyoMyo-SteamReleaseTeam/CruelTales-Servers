@@ -56,7 +56,7 @@ namespace CTS.Instance.Gameplay
 
 		public void Reset()
 		{
-			WorldManager.Clear();
+			WorldManager.Reset();
 		}
 
 		public void StartGame()
@@ -74,6 +74,9 @@ namespace CTS.Instance.Gameplay
 		{
 			// Update world network logic of objects
 			WorldManager.UpdateNetworkObjects(deltaTime);
+
+			// Update coroutines
+			WorldManager.UpdateCoroutine(deltaTime);
 
 			// Update network player
 			foreach (var player in _networkPlayerByUserId.ForwardValues)

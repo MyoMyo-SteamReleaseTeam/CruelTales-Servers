@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Tools.Collections;
 using CT.Networks;
 using CT.Packets;
+using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay.ObjectManagements;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
@@ -33,6 +35,7 @@ namespace CTS.Instance.Gameplay
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
 		private Queue<MasterNetworkObject> _destroyObjectStack;
 
+		/// <summary>프레임이 끝나면 생성될 객체 목록입니다.</summary>
 		private Queue<MasterNetworkObject> _createObjectQueue;
 
 		private NetworkIdentity _idCounter;
@@ -44,6 +47,9 @@ namespace CTS.Instance.Gameplay
 		private KaPhysicsWorld _physicsWorld;
 		private float _deltaAccumulator = 0;
 		private float _stepTime = 0.03f;
+		
+		// Coroutine
+		private CoroutineRunner _coroutineRunner;
 
 		// Getter
 		public int Count => _networkObjectById.Count;
@@ -68,6 +74,15 @@ namespace CTS.Instance.Gameplay
 			// Physics world
 			_physicsWorld = new KaPhysicsWorld();
 			_stepTime = _gameplayManager.ServerOption.PhysicsStepTime;
+
+			// Coroutine
+			_coroutineRunner = new(option.CoroutineCapacity);
+		}
+
+		public void Reset()
+		{
+			_coroutineRunner.Reset();
+			Clear();
 		}
 
 		public void SetMiniGameMapData(MiniGameMapData mapData)
@@ -78,82 +93,6 @@ namespace CTS.Instance.Gameplay
 		public void ReleaseMiniGameMapData()
 		{
 			_physicsWorld.ReleaseStaticRigidBodies();
-		}
-
-		public void UpdateNetworkObjects(float deltaTime)
-		{
-			foreach (var netObj in _networkObjectById.ForwardValues)
-			{
-				if (!netObj.IsAlive)
-					continue;
-
-				netObj.OnUpdate(deltaTime);
-			}
-		}
-
-		public void FixedUpdate(float deltaTime)
-		{
-			_deltaAccumulator += deltaTime;
-			if (_deltaAccumulator > _stepTime * 5)
-				_deltaAccumulator = _stepTime * 5;
-
-			while (_deltaAccumulator >= _stepTime)
-			{
-				_deltaAccumulator -= _stepTime;
-				_physicsWorld.Step(_stepTime);
-
-				foreach (var netObj in _networkObjectById.ForwardValues)
-				{
-					if (!netObj.IsAlive)
-						continue;
-
-					netObj.OnFixedUpdate(deltaTime);
-				}
-			}
-		}
-
-		public void UpdateWorldPartitions()
-		{
-			// Update every objects
-			foreach (var netObj in _networkObjectById.ForwardValues)
-			{
-				if (!netObj.IsAlive)
-					continue;
-
-				// Update positions and logic
-				netObj.UpdateWorldCell();
-			}
-		}
-
-		public void UpdateObjectLifeCycle()
-		{
-			while (_createObjectQueue.Count > 0)
-			{
-				var createdObj = _createObjectQueue.Dequeue();
-				createdObj.InitializeAfterFrame();
-				_networkObjectById.Add(createdObj.Identity, createdObj);
-			}
-
-			// Remove objects
-			while (_destroyObjectStack.Count > 0)
-			{
-				destroyObject(_destroyObjectStack.Dequeue());
-			}
-		}
-
-		public void UpdateVisibilityAndSendData()
-		{
-			this._visibilityManager.UpdateVisibilityAndSendData();
-		}
-
-		public void ClearDirtys()
-		{
-			foreach (var netObj in _networkObjectById.ForwardValues)
-			{
-				netObj.ClearDirtyReliable();
-				netObj.ClearDirtyUnreliable();
-				netObj.RigidBody.ClearDirty();
-			}
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)
@@ -178,6 +117,126 @@ namespace CTS.Instance.Gameplay
 			Debug.Assert(false);
 			return false;
 		}
+
+		#region Update funtions
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void UpdateNetworkObjects(float deltaTime)
+		{
+			foreach (var netObj in _networkObjectById.ForwardValues)
+			{
+				if (!netObj.IsAlive)
+					continue;
+
+				netObj.OnUpdate(deltaTime);
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void UpdateCoroutine(float deltaTime)
+		{
+			_coroutineRunner.Flush(deltaTime);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void UpdateVisibilityAndSendData()
+		{
+			this._visibilityManager.UpdateVisibilityAndSendData();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void FixedUpdate(float deltaTime)
+		{
+			_deltaAccumulator += deltaTime;
+			if (_deltaAccumulator > _stepTime * 5)
+				_deltaAccumulator = _stepTime * 5;
+
+			while (_deltaAccumulator >= _stepTime)
+			{
+				_deltaAccumulator -= _stepTime;
+				_physicsWorld.Step(_stepTime);
+
+				foreach (var netObj in _networkObjectById.ForwardValues)
+				{
+					if (!netObj.IsAlive)
+						continue;
+
+					netObj.OnFixedUpdate(deltaTime);
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void UpdateWorldPartitions()
+		{
+			// Update every objects
+			foreach (var netObj in _networkObjectById.ForwardValues)
+			{
+				if (!netObj.IsAlive)
+					continue;
+
+				// Update positions and logic
+				netObj.UpdateWorldCell();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void ClearDirtys()
+		{
+			foreach (var netObj in _networkObjectById.ForwardValues)
+			{
+				netObj.ClearDirtyReliable();
+				netObj.ClearDirtyUnreliable();
+				netObj.RigidBody.ClearDirty();
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void UpdateObjectLifeCycle()
+		{
+			while (_createObjectQueue.Count > 0)
+			{
+				var createdObj = _createObjectQueue.Dequeue();
+				createdObj.InitializeAfterFrame();
+				_networkObjectById.Add(createdObj.Identity, createdObj);
+			}
+
+			// Remove objects
+			while (_destroyObjectStack.Count > 0)
+			{
+				destroyObject(_destroyObjectStack.Dequeue());
+			}
+		}
+
+		#endregion
+
+		#region Coroutine
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionVoid coroutineAction)
+		{
+			_coroutineRunner.Start(coroutineAction);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionArg coroutineAction)
+		{
+			_coroutineRunner.Start(coroutineAction);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionArgs2 coroutineAction)
+		{
+			_coroutineRunner.Start(coroutineAction);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionArgs3 coroutineAction)
+		{
+			_coroutineRunner.Start(coroutineAction);
+		}
+
+		#endregion
 
 		#region Life Cycle
 

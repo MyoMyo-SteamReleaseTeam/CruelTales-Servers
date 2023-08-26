@@ -1,7 +1,11 @@
-﻿using System;
+﻿#define MULTITHREADING
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+#if MULTITHREADING
 using System.Threading.Tasks;
+#endif
 using CT.Common.DataType;
 using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
@@ -76,7 +80,22 @@ namespace CTS.Instance.Gameplay
 
 			// Process
 			_globalDeltaTime = deltaTime;
-			Parallel.ForEach(_gameInstanceList, processUpdate);
+
+			try
+			{
+#if MULTITHREADING
+				Parallel.ForEach(_gameInstanceList, processUpdate);
+#else
+				foreach (var instance in _gameInstanceList)
+				{
+					instance.Update(deltaTime);
+				}
+#endif
+			}
+			catch (Exception e)
+			{
+				_log.Fatal(e);
+			}
 
 			// Alarm high CPU load
 			_currentTick++;
