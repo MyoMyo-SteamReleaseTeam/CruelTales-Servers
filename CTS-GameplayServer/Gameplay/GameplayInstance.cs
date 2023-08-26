@@ -64,14 +64,13 @@ namespace CTS.Instance.Gameplay
 			_syncPacketPool = new(1024 * 8, InitializeOption.RemotePacketPoolCount);
 		}
 
-		public void Reset(GameInstanceGuid guid)
+		public void Initialize(GameInstanceGuid guid)
 		{
 			Guid = guid;
 			RoomOption.Reset(InitializeOption);
 
 			// TODO : Start game properly
 			GameplayManager.Reset();
-			GameplayManager.StartGame();
 		}
 
 		/// <summary>Update logic</summary>

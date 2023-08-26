@@ -91,7 +91,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (!checkAuthOrDisconnect(player)) return;
 
-			if (GameplayManager.CurrentPlayerCount > maxUserCount)
+			if (GameplayManager.PlayerCount > maxUserCount)
 			{
 				ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMaxUserUnderConnections);
 				return;

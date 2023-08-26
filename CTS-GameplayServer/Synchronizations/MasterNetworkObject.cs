@@ -99,9 +99,11 @@ namespace CTS.Instance.Synchronizations
 
 			// Initialize physics
 			_physicsRigidBody.Initialize(Identity);
-			RigidBody.Reset();
-			RigidBody.MoveTo(position);
-			RigidBody.RotateTo(rotation);
+			_physicsRigidBody.MoveTo(position);
+			_physicsRigidBody.RotateTo(0);
+			_physicsRigidBody.LinearVelocity = Vector2.Zero;
+			_physicsRigidBody.ForceVelocity = Vector2.Zero;
+			_physicsRigidBody.ForceFriction = 0;
 			PhysicsWorld.AddRigidBody(_physicsRigidBody);
 		}
 
@@ -112,7 +114,7 @@ namespace CTS.Instance.Synchronizations
 			// Add to trace visibility
 			if (Visibility == VisibilityType.View)
 			{
-				CurrentCellPos = WorldVisibilityManager.GetWorldCell(RigidBody.Position);
+				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
 			}
 			_worldVisibilityManager.OnCreated(this);
 		}

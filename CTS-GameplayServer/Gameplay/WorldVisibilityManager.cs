@@ -77,6 +77,29 @@ namespace CTS.Instance.Gameplay
 			_playerVisibleBySession = new(option.SystemMaxUser);
 		}
 
+		public void Reset()
+		{
+			_tempSpawnList.Clear();
+			_tempDespawnList.Clear();
+
+			for (int z = 0; z < CELL_HEIGHT; z++)
+			{
+				for (int x = 0; x < CELL_WIDTH; x++)
+				{
+					_networkObjectByCell[z, x].Clear();
+				}
+			}
+
+			_globalObjectSet.Clear();
+
+			foreach (PlayerVisibleTable ptable in _playerVisibleBySession.Values)
+			{
+				_playerVisibleTablePool.Return(ptable);
+			}
+
+			_playerVisibleBySession.Clear();
+		}
+
 		[Obsolete("가능하면 이미 계산된 Cell 좌표를 사용해야합니다.")]
 		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(Vector3 pos)
 		{

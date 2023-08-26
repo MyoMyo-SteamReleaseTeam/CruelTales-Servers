@@ -74,15 +74,6 @@ namespace CT.Common.Gameplay
 			PhysicsEvent.IgnoreStatic(reader);
 		}
 
-		public void Reset()
-		{
-			_rigidBody.MoveTo(Vector2.Zero);
-			_rigidBody.RotateTo(0);
-			_rigidBody.LinearVelocity = Vector2.Zero;
-			_rigidBody.ForceVelocity = Vector2.Zero;
-			_rigidBody.ForceFriction = 0;
-		}
-
 		public void ClearDirty()
 		{
 			Event.EventFlags = PhysicsEventFlag.None;

@@ -1,4 +1,4 @@
-﻿#define MULTITHREADING
+﻿//#define MULTITHREADING
 
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace CTS.Instance.Gameplay
 			for (int i = 1; i <= MaxGameCount; i++)
 			{
 				var instance = new GameplayInstance(_serverOption, _serverTimer, option);
-				instance.Reset(new GameInstanceGuid((ulong)i));
+				instance.Initialize(new GameInstanceGuid((ulong)i));
 				_gameInstanceList.Add(instance);
 				_gameInstanceById.Add(instance.Guid, instance);
 			}
@@ -81,22 +81,21 @@ namespace CTS.Instance.Gameplay
 			// Process
 			_globalDeltaTime = deltaTime;
 
+#if MULTITHREADING
 			try
 			{
-#if MULTITHREADING
 				Parallel.ForEach(_gameInstanceList, processUpdate);
-#else
-				foreach (var instance in _gameInstanceList)
-				{
-					instance.Update(deltaTime);
-				}
-#endif
 			}
 			catch (Exception e)
 			{
 				_log.Fatal(e);
 			}
-
+#else
+			foreach (var instance in _gameInstanceList)
+			{
+				instance.Update(deltaTime);
+			}
+#endif
 			// Alarm high CPU load
 			_currentTick++;
 			long tickElapsed = _serverTimer.CurrentMs - _current;

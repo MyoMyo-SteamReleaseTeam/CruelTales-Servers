@@ -27,7 +27,7 @@ namespace CTS.Instance.Gameplay
 		private BidirectionalMap<UserId, NetworkPlayer> _networkPlayerByUserId;
 		public IList<NetworkPlayer> NetworkPlayers { get; private set; }
 		[AllowNull] private ObjectPool<NetworkPlayer> _networkPlayerPool;
-		public int CurrentPlayerCount => _networkPlayerByUserId.Count;
+		public int PlayerCount => _networkPlayerByUserId.Count;
 
 		// Objects
 		public GameplayController? GameplayController { get; private set; }
@@ -57,17 +57,7 @@ namespace CTS.Instance.Gameplay
 		public void Reset()
 		{
 			WorldManager.Reset();
-		}
-
-		public void StartGame()
-		{
 			GameplayController = WorldManager.CreateObject<GameplayController>();
-		}
-
-		public void EndGame()
-		{
-			GameplayController?.Destroy();
-			GameplayController = null;
 		}
 
 		public void Update(float deltaTime)
@@ -124,6 +114,11 @@ namespace CTS.Instance.Gameplay
 			_networkPlayerByUserId.TryRemove(player);
 			player.OnDestroyed();
 			_log.Debug($"[{_gameplayInstance}] Session {userSession} leave the game");
+
+			if (PlayerCount <= 0)
+			{
+				Reset();
+			}
 		}
 
 		public bool TryGetNetworkPlayer(UserId user, [MaybeNullWhen(false)] out NetworkPlayer player)

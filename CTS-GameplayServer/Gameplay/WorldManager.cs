@@ -82,6 +82,7 @@ namespace CTS.Instance.Gameplay
 		public void Reset()
 		{
 			_coroutineRunner.Reset();
+			_visibilityManager.Reset();
 			Clear();
 		}
 
@@ -284,6 +285,11 @@ namespace CTS.Instance.Gameplay
 			var ids = _networkObjectById.ForwardKeys;
 			int removeCount = _networkObjectById.Count;
 			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
+			int removeIndex = 0;
+			foreach (NetworkIdentity id in ids)
+			{
+				removeIds[removeIndex++] = id;
+			}
 			for (int i = 0; i < removeCount; i++)
 			{
 				destroyObject(_networkObjectById.GetValue(removeIds[i]));
@@ -297,6 +303,11 @@ namespace CTS.Instance.Gameplay
 			var ids = _networkObjectById.ForwardKeys;
 			int removeCount = _networkObjectById.Count;
 			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
+			int removeIndex = 0;
+			foreach (NetworkIdentity id in ids)
+			{
+				removeIds[removeIndex++] = id;
+			}
 			for (int i = 0; i < removeCount; i++)
 			{
 				var netObj = _networkObjectById.GetValue(removeIds[i]);
