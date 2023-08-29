@@ -11,6 +11,8 @@ namespace CTS.Instance.SyncObjects
 	{
 		None = 0,
 		GameplayController,
+		MiniGameControllerBase,
+		RedHood_MiniGameController,
 		PlayerCharacter,
 		TestCube,
 		WolfCharacter,

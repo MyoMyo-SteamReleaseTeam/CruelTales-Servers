@@ -62,10 +62,10 @@ namespace CTS.Instance.SyncObjects
 		}
 
 		// Test
-		private MiniGameController? _controller;
+		private MiniGameControllerBase? _controller;
 
 		// Test
-		public void BindMiniGame(MiniGameController controller)
+		public void BindMiniGame(MiniGameControllerBase controller)
 		{
 			_controller = controller;
 		}

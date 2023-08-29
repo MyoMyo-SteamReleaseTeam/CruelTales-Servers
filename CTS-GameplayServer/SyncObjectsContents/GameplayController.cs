@@ -17,7 +17,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		// Reference
-		public MiniGameController? MiniGameController { get; private set; }
+		public MiniGameControllerBase? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
 		public const float GAME_START_COUNTDOWN = 3.95f;
@@ -40,8 +40,9 @@ namespace CTS.Instance.SyncObjects
 			// Initialize managers
 			RoomSessionManager.OnCreated(this);
 
-			MiniGameController = new MiniGameController(this, GameMapType.MiniGame_RedHood_0);
-			//MiniGameController = new MiniGameController(this, GameMapType.MiniGame_Dueoksini_0);
+			MiniGameController = WorldManager.CreateObject<MiniGameControllerBase>();
+			
+			MiniGameController.Initialize(this, GameMapType.Square_Europe);
 			MiniGameController.OnGameStart();
 		}
 
@@ -89,9 +90,14 @@ namespace CTS.Instance.SyncObjects
 
 		public partial void Client_ReadyToSync(NetworkPlayer player)
 		{
+			if (MiniGameController == null)
+			{
+				_log.Fatal($"There is no minigame controller");
+				return;
+			}
+
 			_log.Debug($"Client {player} ready to controll");
-			Server_LoadGame(player, GameMapType.MiniGame_RedHood_0);
-			//Server_LoadGame(player, GameMapType.MiniGame_Dueoksini_0);
+			Server_LoadGame(player, MiniGameController.GameMapType);
 		}
 
 		public partial void Client_OnMapLoaded(NetworkPlayer player)

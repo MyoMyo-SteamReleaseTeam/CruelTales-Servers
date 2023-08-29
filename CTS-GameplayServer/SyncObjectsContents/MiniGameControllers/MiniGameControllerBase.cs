@@ -3,12 +3,16 @@ using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
-using CTS.Instance.SyncObjects;
+using CTS.Instance.Gameplay;
+using CTS.Instance.Synchronizations;
 
-namespace CTS.Instance.Gameplay.MiniGames
+namespace CTS.Instance.SyncObjects
 {
-	public class MiniGameController
+	public partial class MiniGameControllerBase : MasterNetworkObject
 	{
+		public override VisibilityType Visibility => VisibilityType.Global;
+		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
+
 		// Reference
 		public GameplayController GameplayController { get; private set; }
 		private GameplayManager _gameplayManager;
@@ -19,13 +23,14 @@ namespace CTS.Instance.Gameplay.MiniGames
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		private int _spawnIndex = 0;
 
-		public MiniGameController(GameplayController gameplayController, GameMapType mapType)
+		public void Initialize(GameplayController gameplayController, GameMapType mapType)
 		{
+			GameMapType = mapType;
 			GameplayController = gameplayController;
 			_gameplayManager = gameplayController.GameplayManager;
 			_worldManager = _gameplayManager.WorldManager;
 			_playerCharacterByPlayer = new(_gameplayManager.Option.SystemMaxUser);
-			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(mapType);
+			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(GameMapType);
 		}
 
 		private List<TestCube> _testCubeList = new();
@@ -40,10 +45,10 @@ namespace CTS.Instance.Gameplay.MiniGames
 				Vector2 rt = new Vector2(30, 30);
 				//Vector2 lb = new Vector2(0, 0);
 				//Vector2 rt = new Vector2(0, 0);
-				//var createPos = RandomHelper.NextVectorBetween(lb, rt);
-				var createPos = Vector2.Zero;
+				var createPos = RandomHelper.NextVector2(lb, rt);
+				//var createPos = Vector2.Zero;
 				var testCube = _worldManager.CreateObject<TestCube>(createPos);
-				//testCube.BindMiniGame(this);
+				testCube.BindMiniGame(this);
 				_testCubeList.Add(testCube);
 			}
 		}
@@ -56,7 +61,6 @@ namespace CTS.Instance.Gameplay.MiniGames
 		public void OnGameStart()
 		{
 			_worldManager.SetMiniGameMapData(_miniGameData);
-
 			_spawnIndex = 0;
 
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
@@ -102,7 +106,7 @@ namespace CTS.Instance.Gameplay.MiniGames
 			_playerCharacterByPlayer.Add(player, playerCharacter);
 		}
 
-		public void CheckGameOverCondition()
+		private void CheckGameOverCondition()
 		{
 
 		}

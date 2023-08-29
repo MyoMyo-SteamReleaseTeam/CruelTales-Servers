@@ -11,6 +11,8 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
 		{
 			{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1) },
+			{ typeof(MiniGameControllerBase), new NetworkObjectPool<MiniGameControllerBase>(1) },
+			{ typeof(RedHood_MiniGameController), new NetworkObjectPool<RedHood_MiniGameController>(1) },
 			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
 			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
 			{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
