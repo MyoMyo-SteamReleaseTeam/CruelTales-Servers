@@ -49,7 +49,7 @@ namespace CTS.Instance.Gameplay
 		private float _stepTime = 0.03f;
 		
 		// Coroutine
-		private CoroutineRunner _coroutineRunner;
+		private CoroutineRuntime _coroutineRuntime;
 
 		// Getter
 		public int Count => _networkObjectById.Count;
@@ -76,12 +76,12 @@ namespace CTS.Instance.Gameplay
 			_stepTime = _gameplayManager.ServerOption.PhysicsStepTime;
 
 			// Coroutine
-			_coroutineRunner = new(option.CoroutineCapacity);
+			_coroutineRuntime = new(option.CoroutineCapacity);
 		}
 
 		public void Reset()
 		{
-			_coroutineRunner.Reset();
+			_coroutineRuntime.Reset();
 			_visibilityManager.Reset();
 			Clear();
 		}
@@ -136,7 +136,7 @@ namespace CTS.Instance.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void UpdateCoroutine(float deltaTime)
 		{
-			_coroutineRunner.Flush(deltaTime);
+			_coroutineRuntime.Flush(deltaTime);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -216,25 +216,25 @@ namespace CTS.Instance.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void StartCoroutine(CoroutineActionVoid coroutineAction)
 		{
-			_coroutineRunner.Start(coroutineAction);
+			_coroutineRuntime.Start(coroutineAction);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void StartCoroutine(CoroutineActionArg coroutineAction)
 		{
-			_coroutineRunner.Start(coroutineAction);
+			_coroutineRuntime.Start(coroutineAction);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void StartCoroutine(CoroutineActionArgs2 coroutineAction)
 		{
-			_coroutineRunner.Start(coroutineAction);
+			_coroutineRuntime.Start(coroutineAction);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void StartCoroutine(CoroutineActionArgs3 coroutineAction)
 		{
-			_coroutineRunner.Start(coroutineAction);
+			_coroutineRuntime.Start(coroutineAction);
 		}
 
 		#endregion

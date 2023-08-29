@@ -1,100 +1,93 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using CTS.Instance.Synchronizations;
 
 namespace CTS.Instance.Coroutines
 {
-	public class CoroutineRunner
+	public class CoroutineRunnerBase
 	{
-		private PriorityQueue<CoroutineActionVoid, float> _coroutineVoidQueue;
-		private PriorityQueue<CoroutineActionArg, float> _coroutineArgQueue;
-		private PriorityQueue<CoroutineActionArgs2, float> _coroutineArgs2Queue;
-		private PriorityQueue<CoroutineActionArgs3, float> _coroutineArgs3Queue;
-		private float _currentTime;
+		protected MasterNetworkObject _networkObject;
+		protected CoroutineIdentity? _identity;
 
-		public CoroutineRunner(int capacity)
+		public CoroutineRunnerBase(MasterNetworkObject netObject)
 		{
-			_coroutineVoidQueue = new(capacity);
-			_coroutineArgQueue = new(capacity);
-			_coroutineArgs2Queue = new(capacity);
-			_coroutineArgs3Queue = new(capacity);
+			_networkObject = netObject;
 		}
 
-		public void Start(CoroutineActionVoid action)
+		public void StopCoroutine()
 		{
-			_coroutineVoidQueue.Enqueue(action, action.Delay + _currentTime);
+			if (_identity == null)
+				return;
+			_networkObject.CancelCoroutine(_identity.Value);
+			_identity = null;
+		}
+	}
+
+	public class CoroutineRunner : CoroutineRunnerBase
+	{
+		private Action _cachedAction;
+
+		public CoroutineRunner(MasterNetworkObject netObject, Action cachedAction)
+			: base(netObject)
+		{
+			_cachedAction = cachedAction;
 		}
 
-		public void Start(CoroutineActionArg action)
+		public void StartCoroutine(float delay)
 		{
-			_coroutineArgQueue.Enqueue(action, action.Delay + _currentTime);
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, delay);
+		}
+	}
+
+	public class CoroutineRunnerArg : CoroutineRunnerBase
+	{
+		private Action<Arg> _cachedAction;
+
+		public CoroutineRunnerArg(MasterNetworkObject netObject, Action<Arg> cachedAction)
+			: base(netObject)
+		{
+			_cachedAction = cachedAction;
 		}
 
-		public void Start(CoroutineActionArgs2 action)
+		public void StartCoroutine(Arg argument, float delay)
 		{
-			_coroutineArgs2Queue.Enqueue(action, action.Delay + _currentTime);
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, argument, delay);
+		}
+	}
+
+	public class CoroutineRunnerArgs2 : CoroutineRunnerBase
+	{
+		private Action<Arg, Arg> _cachedAction;
+
+		public CoroutineRunnerArgs2(MasterNetworkObject netObject, Action<Arg, Arg> cachedAction)
+			: base(netObject)
+		{
+			_cachedAction = cachedAction;
 		}
 
-		public void Start(CoroutineActionArgs3 action)
+		public void StartCoroutine(Arg argument0, Arg argument1, float delay)
 		{
-			_coroutineArgs3Queue.Enqueue(action, action.Delay + _currentTime);
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, argument0, argument1, delay);
+		}
+	}
+
+	public class CoroutineRunnerArgs3 : CoroutineRunnerBase
+	{
+		private Action<Arg, Arg, Arg> _cachedAction;
+
+		public CoroutineRunnerArgs3(MasterNetworkObject netObject, Action<Arg, Arg, Arg> cachedAction)
+			: base(netObject)
+		{
+			_networkObject = netObject;
+			_cachedAction = cachedAction;
 		}
 
-		public void CancelCoroutine(CoroutineIdentity coroutineIdentity)
+		public void StartCoroutine(Arg argument0, Arg argument1, Arg argument2, float delay)
 		{
-
-		}
-
-		public void Reset()
-		{
-			_coroutineVoidQueue.Clear();
-			_coroutineArgQueue.Clear();
-			_coroutineArgs2Queue.Clear();
-			_coroutineArgs3Queue.Clear();
-			_currentTime = 0;
-		}
-
-		public void Flush(float deltaTime)
-		{
-			_currentTime += deltaTime;
-
-			while (_coroutineVoidQueue.TryPeek(out CoroutineActionVoid curAction,
-											   out float delayTime))
-			{
-				if (delayTime > _currentTime)
-					break;
-
-				curAction.Execute();
-				_coroutineVoidQueue.Dequeue();
-			}
-
-			while (_coroutineArgQueue.TryPeek(out CoroutineActionArg curAction,
-											  out float delayTime))
-			{
-				if (delayTime > _currentTime)
-					break;
-
-				curAction.Execute();
-				_coroutineArgQueue.Dequeue();
-			}
-
-			while (_coroutineArgs2Queue.TryPeek(out CoroutineActionArgs2 curAction,
-												out float delayTime))
-			{
-				if (delayTime > _currentTime)
-					break;
-
-				curAction.Execute();
-				_coroutineArgs2Queue.Dequeue();
-			}
-
-			while (_coroutineArgs3Queue.TryPeek(out CoroutineActionArgs3 curAction,
-												out float delayTime))
-			{
-				if (delayTime > _currentTime)
-					break;
-
-				curAction.Execute();
-				_coroutineArgs3Queue.Dequeue();
-			}
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, argument0, argument1, argument2, delay);
 		}
 	}
 }
