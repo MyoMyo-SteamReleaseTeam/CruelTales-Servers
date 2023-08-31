@@ -7,6 +7,7 @@ using CT.Common.Serialization;
 using CT.Common.Tools.Collections;
 using CT.Networks.Runtimes;
 using CTS.Instance.Networks;
+using CTS.Instance.SyncObjects;
 using log4net;
 
 namespace CTS.Instance.Gameplay
@@ -172,9 +173,23 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
+			GameplayController? gameplayController = _gameplayInstance.GameplayManager.GameplayController;
+			if (gameplayController == null )
+			{
+				_log.Fatal($"The server was not initialized! GUID:{_gameplayInstance.Guid}");
+				userSession.Disconnect(DisconnectReasonType.ServerError_NotInitialized);
+				return;
+			}
+
+			if (gameplayController.CheckIfCanJoin(out DisconnectReasonType reason))
+			{
+				userSession.Disconnect(reason);
+				return;
+			}
+
 			_log.Debug($"[Instance:{_gameplayInstance.Guid}] Session {userSession} enter the game");
 			userSession.OnEnterGame(this);
-			this._gameplayInstance.GameplayManager.OnUserEnterGame(userSession);
+			_gameplayInstance.GameplayManager.OnUserEnterGame(userSession);
 
 			if (!_waitingTable.TryRemove(userSession.UserId))
 			{

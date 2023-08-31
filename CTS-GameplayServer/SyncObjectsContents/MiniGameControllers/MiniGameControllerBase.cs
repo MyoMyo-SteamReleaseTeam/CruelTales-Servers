@@ -23,14 +23,14 @@ namespace CTS.Instance.SyncObjects
 		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		private int _spawnIndex = 0;
 
-		public void Initialize(GameplayController gameplayController, GameMapType mapType)
+		public virtual void Initialize(GameplayController gameplayController, MiniGameIdentity identity)
 		{
-			GameMapType = mapType;
+			MiniGameIdentity = identity;
 			GameplayController = gameplayController;
 			_gameplayManager = gameplayController.GameplayManager;
 			_worldManager = _gameplayManager.WorldManager;
 			_playerCharacterByPlayer = new(_gameplayManager.Option.SystemMaxUser);
-			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(GameMapType);
+			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(identity);
 		}
 
 		private List<TestCube> _testCubeList = new();
@@ -79,7 +79,7 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public void OnPlayerEnter(NetworkPlayer player)
+		public virtual void OnPlayerEnter(NetworkPlayer player)
 		{
 			var spawnPositions = _miniGameData.SpawnPositions;
 			int spawnPosCount = spawnPositions.Count;
@@ -88,7 +88,7 @@ namespace CTS.Instance.SyncObjects
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
 		}
 
-		public void OnPlayerLeave(NetworkPlayer player)
+		public virtual void OnPlayerLeave(NetworkPlayer player)
 		{
 			if (_playerCharacterByPlayer.TryGetValue(player, out var pc))
 			{
@@ -109,6 +109,11 @@ namespace CTS.Instance.SyncObjects
 		private void CheckGameOverCondition()
 		{
 
+		}
+
+		public partial void Client_OnMiniGameLoaded(NetworkPlayer player)
+		{
+			player.CanSeeViewObject = true;
 		}
 	}
 }

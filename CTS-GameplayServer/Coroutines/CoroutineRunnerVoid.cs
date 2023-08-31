@@ -22,11 +22,11 @@ namespace CTS.Instance.Coroutines
 		}
 	}
 
-	public class CoroutineRunner : CoroutineRunnerBase
+	public class CoroutineRunnerVoid : CoroutineRunnerBase
 	{
 		private Action _cachedAction;
 
-		public CoroutineRunner(MasterNetworkObject netObject, Action cachedAction)
+		public CoroutineRunnerVoid(MasterNetworkObject netObject, Action cachedAction)
 			: base(netObject)
 		{
 			_cachedAction = cachedAction;

@@ -10,6 +10,8 @@ namespace CT.Common.DataType
 		TooManyPlayer,
 		SomePlayerNotReady,
 		YouAreNotHost,
+		AlreadyStarting,
+		NotInLobby,
 		FatalError,
 	}
 

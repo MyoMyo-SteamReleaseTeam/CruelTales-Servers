@@ -2,8 +2,8 @@
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
+using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
-using CTS.Instance.Gameplay.MiniGames;
 using CTS.Instance.Synchronizations;
 using log4net;
 
@@ -19,8 +19,6 @@ namespace CTS.Instance.SyncObjects
 		// Reference
 		public MiniGameControllerBase? MiniGameController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
-
-		public const float GAME_START_COUNTDOWN = 3.95f;
 
 		public override void OnUpdate(float deltaTime)
 		{
@@ -40,10 +38,31 @@ namespace CTS.Instance.SyncObjects
 			// Initialize managers
 			RoomSessionManager.OnCreated(this);
 
-			MiniGameController = WorldManager.CreateObject<MiniGameControllerBase>();
-			
-			MiniGameController.Initialize(this, GameMapType.Square_Europe);
+			MiniGameIdentity lobbyGameId = MiniGameMapDataDB.Square;
+			MiniGameController = WorldManager.CreateMiniGameControllerBy(lobbyGameId);
+			MiniGameController.Initialize(this, lobbyGameId);
 			MiniGameController.OnGameStart();
+		}
+
+		public override void OnDestroyed()
+		{
+			if (MiniGameController != null)
+			{
+				MiniGameController.Destroy();
+				MiniGameController = null;
+			}
+		}
+
+		public bool CheckIfCanJoin(out DisconnectReasonType reason)
+		{
+			if (GameSystemState != GameSystemState.Lobby)
+			{
+				reason = DisconnectReasonType.Reject_GameCurrentlyPlaying;
+				return false;
+			}
+
+			reason = DisconnectReasonType.None;
+			return true;
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)
@@ -97,12 +116,6 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			_log.Debug($"Client {player} ready to controll");
-			Server_LoadGame(player, MiniGameController.GameMapType);
-		}
-
-		public partial void Client_OnMapLoaded(NetworkPlayer player)
-		{
-			player.CanSeeViewObject = true;
 		}
 
 		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
@@ -111,30 +124,11 @@ namespace CTS.Instance.SyncObjects
 			RoomSessionManager.CheckAllReady();
 		}
 
-		public partial void Client_TryStartGame(NetworkPlayer player)
+		public void ChangeMiniGameTo(MiniGameIdentity gameId)
 		{
-			StartGameResultType result = StartGameResultType.Success;
-
-			if (!player.IsHost)
-				result = StartGameResultType.YouAreNotHost;
-
-			if (RoomSessionManager.PlayerCount < GameplayManager.Option.SystemMinUser)
-				result = StartGameResultType.NoEnoughPlayer;
-
-			if (RoomSessionManager.PlayerCount > GameplayManager.Option.SystemMaxUser)
-				result = StartGameResultType.TooManyPlayer;
-
-			if (!RoomSessionManager.IsAllReady)
-				result = StartGameResultType.SomePlayerNotReady;
-
-			if (result != StartGameResultType.Success)
-			{
-				Server_TryStartGameCallback(result);
-				return;
-			}
-
-			Server_TryStartGameCallback(StartGameResultType.Success);
-			Server_GameStartCountdown(GAME_START_COUNTDOWN);
+			MiniGameController?.Destroy();
+			MiniGameController = WorldManager.CreateMiniGameControllerBy(gameId);
+			MiniGameController.Initialize(this, gameId);
 		}
 	}
 }

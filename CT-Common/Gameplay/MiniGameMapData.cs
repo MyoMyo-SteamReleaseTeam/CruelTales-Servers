@@ -8,8 +8,7 @@ namespace CT.Common.Gameplay
 {
 	public class MiniGameMapData
 	{
-		public GameMapType MapType;
-		public GameMapTheme Theme;
+		public MiniGameIdentity MiniGameIdentity;
 		public List<Vector2> SpawnPositions = new();
 		public List<ColliderInfo> EnvironmentColliders = new();
 

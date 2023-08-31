@@ -12,29 +12,18 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public ServerRuntimeOption ServerRuntimeOption;
 
+		[SyncVar]
+		public GameSystemState GameSystemState;
+
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		public RoomSessionManager RoomSessionManager = new();
-
-		[SyncRpc(SyncType.ReliableTarget)]
-		public void Server_LoadGame(GameMapType mapType) { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyToSync() { }
 
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_OnMapLoaded() { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyGame(bool isReady) { }
-
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_TryStartGame() { }
-
-		[SyncRpc]
-		public void Server_TryStartGameCallback(StartGameResultType result) { }
-
-		[SyncRpc]
-		public void Server_GameStartCountdown(float second) { }
 	}
 }
 #pragma warning restore IDE0051

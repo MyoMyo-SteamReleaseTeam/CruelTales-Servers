@@ -2,9 +2,18 @@
 
 namespace CT.Common.Gameplay
 {
+	public enum GameModeType : ushort
+	{
+		None = 0,
+		Lobby,
+		RedHood,
+		Dueoksini,
+	}
+
 	public enum GameMapTheme : ushort
 	{
 		None = 0,
+
 		Europe = 100,
 		Europe_France = 101,
 
@@ -22,7 +31,6 @@ namespace CT.Common.Gameplay
 		None = 0,
 
 		Square_Loading = 20,
-
 		Square_Europe = 50,
 
 		MiniGame_RedHood_0 = 110,
@@ -35,14 +43,38 @@ namespace CT.Common.Gameplay
 
 	public static class GameMapTypesExtension
 	{
+		public static void Put(this IPacketWriter writer, GameModeType value)
+		{
+			writer.Put((ushort)value);
+		}
+
+		public static bool TryReadGameModeType(this IPacketReader reader, out GameModeType value)
+		{
+			if (!reader.TryReadUInt16(out ushort read))
+			{
+				value = GameModeType.None;
+				return false;
+			}
+
+			value = (GameModeType)read;
+			return true;
+		}
+
 		public static void Put(this IPacketWriter writer, GameMapTheme value)
 		{
 			writer.Put((ushort)value);
 		}
 
-		public static GameMapTheme ReadGameMapTheme(this IPacketReader reader)
+		public static bool TryReadGameMapTheme(this IPacketReader reader, out GameMapTheme value)
 		{
-			return (GameMapTheme)reader.ReadUInt16();
+			if (!reader.TryReadUInt16(out ushort read))
+			{
+				value = GameMapTheme.None;
+				return false;
+			}
+
+			value = (GameMapTheme)read;
+			return true;
 		}
 
 		public static void Put(this IPacketWriter writer, GameMapType value)
@@ -50,9 +82,16 @@ namespace CT.Common.Gameplay
 			writer.Put((ushort)value);
 		}
 
-		public static GameMapType ReadGameMapType(this IPacketReader reader)
+		public static bool TryReadGameMapType(this IPacketReader reader, out GameMapType value)
 		{
-			return (GameMapType)reader.ReadUInt16();
+			if (!reader.TryReadUInt16(out ushort read))
+			{
+				value = GameMapType.None;
+				return false;
+			}
+
+			value = (GameMapType)read;
+			return true;
 		}
 	}
 }

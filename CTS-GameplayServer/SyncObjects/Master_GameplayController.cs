@@ -44,14 +44,10 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.GameplayController;
 		[SyncVar]
 		private ServerRuntimeOption _serverRuntimeOption = new();
+		[SyncVar]
+		private GameSystemState _gameSystemState = new();
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		private readonly RoomSessionManager _roomSessionManager;
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType);
-		[SyncRpc]
-		public partial void Server_TryStartGameCallback(StartGameResultType result);
-		[SyncRpc]
-		public partial void Server_GameStartCountdown(float second);
 		private Action<RoomSessionManager>? _onRoomSessionManagerChanged;
 		public event Action<RoomSessionManager> OnRoomSessionManagerChanged
 		{
@@ -61,11 +57,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyToSync(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_OnMapLoaded(NetworkPlayer player);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_TryStartGame(NetworkPlayer player);
 		public GameplayController()
 		{
 			_roomSessionManager = new(this);
@@ -82,41 +74,28 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public GameSystemState GameSystemState
+		{
+			get => _gameSystemState;
+			set
+			{
+				if (_gameSystemState == value) return;
+				_gameSystemState = value;
+				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public RoomSessionManager RoomSessionManager => _roomSessionManager;
-		public partial void Server_LoadGame(NetworkPlayer player, GameMapType mapType)
-		{
-			Server_LoadGameGCallstack.Add(player, mapType);
-			_dirtyReliable_0[2] = true;
-			MarkDirtyReliable();
-		}
-		private TargetCallstack<NetworkPlayer, GameMapType> Server_LoadGameGCallstack = new(8);
-		public partial void Server_TryStartGameCallback(StartGameResultType result)
-		{
-			Server_TryStartGameCallbackSCallstack.Add(result);
-			_dirtyReliable_0[3] = true;
-			MarkDirtyReliable();
-		}
-		private List<StartGameResultType> Server_TryStartGameCallbackSCallstack = new(4);
-		public partial void Server_GameStartCountdown(float second)
-		{
-			Server_GameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[4] = true;
-			MarkDirtyReliable();
-		}
-		private List<float> Server_GameStartCountdownfCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_roomSessionManager.ClearDirtyReliable();
-			Server_LoadGameGCallstack.Clear();
-			Server_TryStartGameCallbackSCallstack.Clear();
-			Server_GameStartCountdownfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[1] = _roomSessionManager.IsDirtyReliable;
+			_dirtyReliable_0[2] = _roomSessionManager.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
@@ -125,49 +104,15 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
+				writer.Put((byte)_gameSystemState);
+			}
+			if (_dirtyReliable_0[2])
+			{
 				int curSize = writer.Size;
 				_roomSessionManager.SerializeSyncReliable(player, writer);
 				if (writer.Size == curSize)
 				{
-					dirtyReliable_0[1] = false;
-				}
-			}
-			if (_dirtyReliable_0[2])
-			{
-				int Server_LoadGameGCount = Server_LoadGameGCallstack.GetCallCount(player);
-				if (Server_LoadGameGCount > 0)
-				{
-					var Server_LoadGameGcallList = Server_LoadGameGCallstack.GetCallList(player);
-					writer.Put((byte)Server_LoadGameGCount);
-					for (int i = 0; i < Server_LoadGameGCount; i++)
-					{
-						var arg = Server_LoadGameGcallList[i];
-						writer.Put((ushort)arg);
-					}
-				}
-				else
-				{
 					dirtyReliable_0[2] = false;
-				}
-			}
-			if (_dirtyReliable_0[3])
-			{
-				byte count = (byte)Server_TryStartGameCallbackSCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_TryStartGameCallbackSCallstack[i];
-					writer.Put((byte)arg);
-				}
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_GameStartCountdownfCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_GameStartCountdownfCallstack[i];
-					writer.Put(arg);
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())
@@ -183,11 +128,13 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_serverRuntimeOption.Serialize(writer);
+			writer.Put((byte)_gameSystemState);
 			_roomSessionManager.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_serverRuntimeOption = new();
+			_gameSystemState = (GameSystemState)0;
 			_roomSessionManager.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
@@ -211,24 +158,8 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					Client_OnMapLoaded(player);
-				}
-			}
-			if (dirtyReliable_0[3])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
 					if (!reader.TryReadBoolean(out bool isReady)) return false;
 					Client_ReadyGame(player, isReady);
-				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					Client_TryStartGame(player);
 				}
 			}
 			return true;
@@ -251,19 +182,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[3])
-			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(1);
 				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				reader.Ignore(1);
 			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -279,19 +202,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[2])
 			{
-				reader.Ignore(1);
-			}
-			if (dirtyReliable_0[3])
-			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
 					reader.Ignore(1);
 				}
-			}
-			if (dirtyReliable_0[4])
-			{
-				reader.Ignore(1);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

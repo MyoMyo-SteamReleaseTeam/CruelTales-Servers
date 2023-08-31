@@ -13,6 +13,7 @@ namespace CTS.Instance.SyncObjects
 		GameplayController,
 		MiniGameControllerBase,
 		RedHood_MiniGameController,
+		Lobby_MiniGameController,
 		PlayerCharacter,
 		TestCube,
 		WolfCharacter,

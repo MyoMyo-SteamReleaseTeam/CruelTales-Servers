@@ -36,6 +36,7 @@ namespace CT.Common.DataType
 		ClientError_WrongClientData,
 
 		// Server error
+		ServerError_NotInitialized,
 		ServerError_CannotHandlePacket,
 		ServerError_WrongOperation,
 		ServerError_YouTryRejoin,
@@ -48,6 +49,7 @@ namespace CT.Common.DataType
 		Reject_GameInstanceIsAlreadyFull,
 		Reject_WrongPassword,
 		Reject_PermissionDenied,
+		Reject_GameCurrentlyPlaying,
 
 		// Gameplay
 		Client_GameEnd,

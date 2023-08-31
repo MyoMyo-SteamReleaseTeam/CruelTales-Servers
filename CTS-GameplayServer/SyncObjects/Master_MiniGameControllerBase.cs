@@ -43,50 +43,109 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.MiniGameControllerBase;
 		[SyncVar]
-		protected GameMapType _gameMapType = new();
+		protected MiniGameIdentity _miniGameIdentity = new();
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_LoadMiniGame(NetworkPlayer player);
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void Client_OnMiniGameLoaded(NetworkPlayer player);
 		public MiniGameControllerBase()
 		{
 		}
 		protected BitmaskByte _dirtyReliable_0 = new();
-		public GameMapType GameMapType
+		public MiniGameIdentity MiniGameIdentity
 		{
-			get => _gameMapType;
+			get => _miniGameIdentity;
 			set
 			{
-				if (_gameMapType == value) return;
-				_gameMapType = value;
+				if (_miniGameIdentity == value) return;
+				_miniGameIdentity = value;
 				_dirtyReliable_0[0] = true;
 				MarkDirtyReliable();
 			}
 		}
+		public partial void Server_LoadMiniGame(NetworkPlayer player)
+		{
+			Server_LoadMiniGameCallstack.Add(player);
+			_dirtyReliable_0[1] = true;
+			MarkDirtyReliable();
+		}
+		protected TargetVoidCallstack<NetworkPlayer> Server_LoadMiniGameCallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
+			Server_LoadMiniGameCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				writer.Put((ushort)_gameMapType);
+				_miniGameIdentity.Serialize(writer);
+			}
+			if (_dirtyReliable_0[1])
+			{
+				int Server_LoadMiniGameCount = Server_LoadMiniGameCallstack.GetCallCount(player);
+				if (Server_LoadMiniGameCount > 0)
+				{
+					writer.Put((byte)Server_LoadMiniGameCount);
+				}
+				else
+				{
+					dirtyReliable_0[1] = false;
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
-			writer.Put((ushort)_gameMapType);
+			_miniGameIdentity.Serialize(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
-			_gameMapType = (GameMapType)0;
+			_miniGameIdentity = new();
 		}
-		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
+		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					Client_OnMiniGameLoaded(player);
+				}
+			}
+			return true;
+		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
 		public override void InitializeRemoteProperties() { }
-		public override void IgnoreSyncReliable(IPacketReader reader) { }
-		public static void IgnoreSyncStaticReliable(IPacketReader reader) { }
+		public override void IgnoreSyncReliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				reader.Ignore(1);
+			}
+		}
+		public static void IgnoreSyncStaticReliable(IPacketReader reader)
+		{
+			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
+			if (dirtyReliable_0[0])
+			{
+				reader.Ignore(1);
+			}
+		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
