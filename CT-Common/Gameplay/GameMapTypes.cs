@@ -10,7 +10,7 @@ namespace CT.Common.Gameplay
 		Dueoksini,
 	}
 
-	public enum GameMapTheme : ushort
+	public enum GameMapThemeType : ushort
 	{
 		None = 0,
 
@@ -30,15 +30,14 @@ namespace CT.Common.Gameplay
 	{
 		None = 0,
 
-		Square_Loading = 20,
 		Square_Europe = 50,
 
-		MiniGame_RedHood_0 = 110,
-		MiniGame_RedHood_1 = 111,
-		MiniGame_RedHood_2 = 112,
-		MiniGame_RedHood_3 = 113,
+		RedHood_0 = 110,
+		RedHood_1 = 111,
+		RedHood_2 = 112,
+		RedHood_3 = 113,
 
-		MiniGame_Dueoksini_0 = 200,
+		Dueoksini_0 = 200,
 	}
 
 	public static class GameMapTypesExtension
@@ -60,20 +59,20 @@ namespace CT.Common.Gameplay
 			return true;
 		}
 
-		public static void Put(this IPacketWriter writer, GameMapTheme value)
+		public static void Put(this IPacketWriter writer, GameMapThemeType value)
 		{
 			writer.Put((ushort)value);
 		}
 
-		public static bool TryReadGameMapTheme(this IPacketReader reader, out GameMapTheme value)
+		public static bool TryReadGameMapTheme(this IPacketReader reader, out GameMapThemeType value)
 		{
 			if (!reader.TryReadUInt16(out ushort read))
 			{
-				value = GameMapTheme.None;
+				value = GameMapThemeType.None;
 				return false;
 			}
 
-			value = (GameMapTheme)read;
+			value = (GameMapThemeType)read;
 			return true;
 		}
 

@@ -16,8 +16,8 @@ namespace CTS.Instance.Data
 		public static bool TryLoad()
 		{
 			if (!tryLoadByType(GameMapType.Square_Europe)) return false;
-			if (!tryLoadByType(GameMapType.MiniGame_RedHood_0)) return false;
-			if (!tryLoadByType(GameMapType.MiniGame_Dueoksini_0)) return false;
+			if (!tryLoadByType(GameMapType.RedHood_0)) return false;
+			if (!tryLoadByType(GameMapType.Dueoksini_0)) return false;
 
 			return true;
 
@@ -46,7 +46,7 @@ namespace CTS.Instance.Data
 
 		public static MiniGameControllerBase CreateMiniGameControllerBy(this WorldManager worldManager, MiniGameIdentity gameId)
 		{
-			return gameId.ModeType switch
+			return gameId.Mode switch
 			{
 				GameModeType.Lobby => worldManager.CreateObject<Lobby_MiniGameController>(),
 				GameModeType.RedHood => worldManager.CreateObject<RedHood_MiniGameController>(),
@@ -56,23 +56,23 @@ namespace CTS.Instance.Data
 
 		public static MiniGameIdentity Square = new MiniGameIdentity()
 		{
-			ModeType = GameModeType.Lobby,
-			MapType = GameMapType.Square_Europe,
-			Theme = GameMapTheme.Europe_France
+			Mode = GameModeType.Lobby,
+			Map = GameMapType.Square_Europe,
+			Theme = GameMapThemeType.Europe_France
 		};
 
 		public static MiniGameIdentity RedHood = new MiniGameIdentity()
 		{
-			ModeType = GameModeType.RedHood,
-			MapType = GameMapType.MiniGame_RedHood_0,
-			Theme = GameMapTheme.Europe_France
+			Mode = GameModeType.RedHood,
+			Map = GameMapType.RedHood_0,
+			Theme = GameMapThemeType.Europe_France
 		};
 
 		public static MiniGameIdentity Dueoksini = new MiniGameIdentity()
 		{
-			ModeType = GameModeType.Dueoksini,
-			MapType = GameMapType.MiniGame_Dueoksini_0,
-			Theme = GameMapTheme.EastAsia_Korea
+			Mode = GameModeType.Dueoksini,
+			Map = GameMapType.Dueoksini_0,
+			Theme = GameMapThemeType.EastAsia_Korea
 		};
 	}
 }
