@@ -181,7 +181,7 @@ namespace CTS.Instance.Gameplay
 				return;
 			}
 
-			if (gameplayController.CheckIfCanJoin(out DisconnectReasonType reason))
+			if (!gameplayController.CheckIfCanJoin(out DisconnectReasonType reason))
 			{
 				userSession.Disconnect(reason);
 				return;
