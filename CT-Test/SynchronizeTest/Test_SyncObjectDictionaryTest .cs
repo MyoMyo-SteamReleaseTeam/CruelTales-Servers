@@ -190,6 +190,66 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			Clear(src, desp2);
 		}
 
+		[TestMethod]
+		public void SyncObjectDictionaryInitialTest()
+		{
+			NetworkPlayer p1 = new NetworkPlayer(new UserId(1));
+			NetworkPlayer p2 = new NetworkPlayer(new UserId(2));
+
+			ByteBuffer data = new(1000);
+			IPacketWriter pw = data;
+			IPacketReader pr = data;
+
+			int count = 10;
+			NetworkIdentity[] id = new NetworkIdentity[count];
+			for (int i = 0; i < count; i++)
+			{
+				id[i] = new NetworkIdentity(i);
+			}
+
+			DirtyableMockup dsrc = new DirtyableMockup();
+			DirtyableMockup ddes1 = new DirtyableMockup();
+			DirtyableMockup ddes2 = new DirtyableMockup();
+
+			CTS.Instance.Synchronizations.SyncObjectDictionary
+				<NetworkIdentity, CTS.Instance.SyncObjects.ZTest_InnerTest> src = new(dsrc);
+			CT.Common.DataType.Synchronizations.SyncObjectDictionary
+				<NetworkIdentity, CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp1 = new(ddes1);
+			CT.Common.DataType.Synchronizations.SyncObjectDictionary
+				<NetworkIdentity, CTC.Networks.SyncObjects.TestSyncObjects.ZTest_InnerTest> desp2 = new(ddes2);
+
+			Assert.IsFalse(dsrc.IsDirtyReliable);
+			src.Add(id[1], createSyncObj);
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			dsrc.ClearDirtyReliable();
+			src[id[1]].B = 20;
+			Assert.IsTrue(dsrc.IsDirtyReliable);
+			src.Add(id[2], createSyncObj);
+			src[id[2]].B = 30;
+
+			// Sync
+			SyncInitial(data,  src, desp1);
+
+			Assert.AreEqual(src.Count, 2);
+			Assert.AreEqual(src.Count, desp1.Count);
+			Assert.AreEqual(20, desp1[id[1]].B);
+			Assert.AreEqual(30, desp1[id[2]].B);
+		}
+
+		public void SyncInitial(ByteBuffer buffer,
+								IMasterSynchronizable master,
+								IRemoteSynchronizable remote)
+		{
+			// Master -> Remote
+			buffer.Reset();
+			master.SerializeEveryProperty(buffer);
+			if (buffer.Size > 0)
+			{
+				Assert.IsTrue(remote.TryDeserializeEveryProperty(buffer));
+				Assert.IsFalse(buffer.CanRead(1));
+			}
+		}
+
 		public void Sync(ByteBuffer buffer,
 						 NetworkPlayer player,
 						 IMasterSynchronizable master,
@@ -201,6 +261,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (buffer.Size > 0)
 			{
 				Assert.IsTrue(remote.TryDeserializeSyncReliable(buffer));
+				Assert.IsFalse(buffer.CanRead(1));
 			}
 
 			// Remote -> Master
@@ -209,6 +270,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			if (buffer.Size > 0)
 			{
 				Assert.IsTrue(master.TryDeserializeSyncReliable(player, buffer));
+				Assert.IsFalse(buffer.CanRead(1));
 			}
 		}
 
