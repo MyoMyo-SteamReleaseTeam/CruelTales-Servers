@@ -47,11 +47,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\MiniGameMapData\Dueoksini_0.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data\MiniGameMapData\MiniGame_Dueoksini_0.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\MiniGameMapData\MiniGame_RedHood_0.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\MiniGameMapData\RedHood_0.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Data\MiniGameMapData\Square_Europe.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

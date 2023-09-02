@@ -1,6 +1,10 @@
 {
-  "MapType": 50,
-  "Theme": 101,
+  "MiniGameIdentity": {
+    "Mode": 1,
+    "Map": 50,
+    "Theme": 101,
+    "SerializeSize": 6
+  },
   "SpawnPositions": [
     {
       "X": -5.45,
