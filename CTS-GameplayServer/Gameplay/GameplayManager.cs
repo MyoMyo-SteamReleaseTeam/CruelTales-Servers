@@ -55,17 +55,20 @@ namespace CTS.Instance.Gameplay
 									 Option.SystemMaxUser);
 		}
 
-		public void Reset()
+		public void Start()
+		{
+			GameplayController = WorldManager.CreateObject<GameplayController>();
+		}
+
+		public void Stop()
 		{
 			RoomOption.Reset();
 			WorldManager.Reset();
-			GameplayController = WorldManager.CreateObject<GameplayController>();
+			_gameplayInstance.Stop();
 		}
 
 		public void Update(float deltaTime)
 		{
-			Console.WriteLine($"World object count : {WorldManager.Count}");
-
 			// Update world network logic of objects
 			WorldManager.UpdateNetworkObjects(deltaTime);
 
@@ -121,7 +124,7 @@ namespace CTS.Instance.Gameplay
 
 			if (PlayerCount <= 0)
 			{
-				Reset();
+				Stop();
 			}
 		}
 

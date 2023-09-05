@@ -379,6 +379,10 @@ namespace CTS.Instance.Gameplay
 				SerializeCreationData(_reliableBuffer,
 									  visibleTable.SpawnObjects,
 									  PacketType.SC_Sync_MasterSpawn);
+				// Reliable data
+				SerializeReliableData(player, _reliableBuffer,
+									  visibleTable.SpawnObjects,
+									  PacketType.SC_Sync_MasterReliable);
 			}
 
 			// Serialize first global spawn data
@@ -387,6 +391,10 @@ namespace CTS.Instance.Gameplay
 				SerializeCreationData(_reliableBuffer,
 									  visibleTable.GlobalSpawnObjects,
 									  PacketType.SC_Sync_MasterSpawn);
+				// Reliable data
+				SerializeReliableData(player, _reliableBuffer,
+									  visibleTable.GlobalSpawnObjects,
+									  PacketType.SC_Sync_MasterReliable);
 			}
 
 			// Serialize enter data
@@ -412,7 +420,6 @@ namespace CTS.Instance.Gameplay
 				SerializePhysicsEventData(_mtuBuffer,
 										  visibleTable.TraceObjects,
 										  PacketType.SC_Sync_MasterPhysics);
-
 				// Unreliable data
 				SerializeUnreliableData(player, _mtuBuffer,
 										visibleTable.TraceObjects,
@@ -426,7 +433,6 @@ namespace CTS.Instance.Gameplay
 				SerializeReliableData(player, _reliableBuffer,
 									  visibleTable.GlobalTraceObjects,
 									  PacketType.SC_Sync_MasterReliable);
-
 				// Unreliable data
 				SerializeUnreliableData(player, _mtuBuffer,
 										visibleTable.GlobalTraceObjects,

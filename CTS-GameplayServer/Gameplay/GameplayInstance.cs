@@ -48,6 +48,10 @@ namespace CTS.Instance.Gameplay
 		private JobQueue<SynchronizeJob> _syncJobQueue;
 		private ConcurrentByteBufferPool _syncPacketPool;
 
+		// State
+		public bool IsAlive { get; private set; }
+		private bool _shouldReset;
+
 		public GameplayInstance(ServerOption serverOption,
 								TickTimer serverTimer,
 								InstanceInitializeOption option)
@@ -64,12 +68,11 @@ namespace CTS.Instance.Gameplay
 			_syncPacketPool = new(1024 * 8, InitializeOption.RemotePacketPoolCount);
 		}
 
-		public void Initialize(GameInstanceGuid guid)
+		public void Start(GameInstanceGuid guid)
 		{
 			Guid = guid;
-
-			// TODO : Start game properly
-			GameplayManager.Reset();
+			IsAlive = true;
+			GameplayManager.Start();
 		}
 
 		/// <summary>Update logic</summary>
@@ -84,6 +87,19 @@ namespace CTS.Instance.Gameplay
 
 			// Update game manager logic
 			GameplayManager.Update(deltaTime);
+
+			if (_shouldReset)
+			{
+				_shouldReset = false;
+
+				// TODO : Bind new GUID
+				Start(Guid);
+			}
+		}
+
+		public void Stop()
+		{
+			_shouldReset = true;
 		}
 
 		public void Shutdown(DisconnectReasonType reason)

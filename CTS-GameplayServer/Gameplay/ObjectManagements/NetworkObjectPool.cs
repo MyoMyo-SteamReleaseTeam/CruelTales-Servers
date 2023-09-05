@@ -65,6 +65,8 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 				T netObj = (T)_objectStack.Pop();
 				netObj.InitializeMasterProperties();
 				netObj.InitializeRemoteProperties();
+				netObj.ClearDirtyReliable();
+				netObj.ClearDirtyUnreliable();
 				return netObj;
 			}
 		}
