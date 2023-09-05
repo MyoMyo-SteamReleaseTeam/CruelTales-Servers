@@ -132,6 +132,9 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
 		public void Destroy()
 		{
+			if (!IsAlive)
+				return;
+
 			IsAlive = false;
 			WorldManager.AddDestroyEqueue(this);
 
