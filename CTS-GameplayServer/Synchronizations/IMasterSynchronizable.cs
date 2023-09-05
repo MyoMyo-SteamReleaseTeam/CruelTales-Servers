@@ -45,5 +45,15 @@ namespace CTS.Instance.Synchronizations
 		/// Remote 프로퍼티를 초기화합니다.
 		/// </summary>
 		public void InitializeRemoteProperties();
+
+		/// <summary>
+		/// 신뢰성 동기화를 무시합니다.
+		/// </summary>
+		public void IgnoreSyncReliable(IPacketReader reader);
+
+		/// <summary>
+		/// 비신뢰성 동기화를 무시합니다.
+		/// </summary>
+		public void IgnoreSyncUnreliable(IPacketReader reader);
 	}
 }
