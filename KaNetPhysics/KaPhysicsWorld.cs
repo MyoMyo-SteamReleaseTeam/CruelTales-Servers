@@ -88,12 +88,12 @@ namespace KaNet.Physics
 						if (!bodyS.IsCollideWith(bodyR, out Vector2 normal, out float depth))
 							continue;
 
-						solveIfCollideWithStatic(bodyR, normal, depth);
+						onCollisionWithStaticObject(bodyR, normal, depth);
 					}
 				}
 			}
 
-			// Solve in physics world
+			// Calculate collision
 			for (int a = 0; a < bodyCount - 1; a++)
 			{
 				KaRigidBody bodyA = _rigidBodies[a];
@@ -117,36 +117,39 @@ namespace KaNet.Physics
 						bodyB.OnCollided(bodyA.ID);
 					}
 
-					solve(bodyA, bodyB, normal, depth);
+					onCollision(bodyA, bodyB, normal, depth);
 				}
+			}
+
+			// Solve
+			for (int i = 0; i < bodyCount; i++)
+			{
+				_rigidBodies[i].Solve();
 			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void solve(KaRigidBody bodyA, KaRigidBody bodyB, Vector2 normal, float depth)
+		private void onCollision(KaRigidBody bodyA, KaRigidBody bodyB, Vector2 normal, float depth)
 		{
 			if (!bodyA.IsStatic)
 			{
 				float depthAmount = bodyB.IsStatic ? depth : depth * 0.5f;
-				bodyA.Move(-normal, depthAmount);
-				bodyA.SolveForceVelocity(normal);
+				bodyA.OnPhysicsCollision(-normal, depthAmount);
 			}
 
 			if (!bodyB.IsStatic)
 			{
 				float depthAmount = bodyA.IsStatic ? depth : depth * 0.5f;
-				bodyB.Move(normal, depthAmount);
-				bodyB.SolveForceVelocity(normal);
+				bodyB.OnPhysicsCollision(normal, depthAmount);
 			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void solveIfCollideWithStatic(KaRigidBody collideByStatic, Vector2 normal, float depth)
+		private void onCollisionWithStaticObject(KaRigidBody collideByStatic, Vector2 normal, float depth)
 		{
 			if (!collideByStatic.IsStatic)
 			{
-				collideByStatic.Move(normal, depth);
-				collideByStatic.SolveForceVelocity(normal);
+				collideByStatic.OnPhysicsCollision(normal, depth);
 			}
 		}
 

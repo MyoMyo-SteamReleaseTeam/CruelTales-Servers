@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Sirenix.OdinInspector;
 
@@ -36,7 +37,6 @@ namespace KaNet.Physics.RigidBodies
 		/// <summary>힘<summary>
 		[ShowInInspector]
 		public Vector2 ForceVelocity { get; set; }
-		private bool _isForceVelocitySovled = false;
 
 		/// <summary>각도</summary>
 		[field: UnityEngine.SerializeField]
@@ -58,6 +58,8 @@ namespace KaNet.Physics.RigidBodies
 
 		/// <summary>AABB 볼륨입니다.</summary>
 		protected BoundingBox _boundingBox;
+
+		private Vector2 _solveVector;
 
 		public KaRigidBody(KaPhysicsShapeType shapeType,
 						   PhysicsLayerMask layerMask,
@@ -116,16 +118,22 @@ namespace KaNet.Physics.RigidBodies
 
 			_isTransformDirty = true;
 			_isBoundingBoxDirty = true;
-			_isForceVelocitySovled = false;
+			_solveVector = Vector2.Zero;
 		}
 
-		/// <summary>순간 힘을 Normal에 대해서 반사시킵니다. 한 Step당 한 번만 진행합니다.</summary>
-		public void SolveForceVelocity(Vector2 normal)
+		public void OnPhysicsCollision(Vector2 normal, float depth)
 		{
-			if (_isForceVelocitySovled)
-				return;
-			_isForceVelocitySovled = true;
-			ForceVelocity = Vector2.Reflect(ForceVelocity, normal);
+			_solveVector += normal * depth;
+		}
+
+		public void Solve()
+		{
+			Move(_solveVector);
+			if (_solveVector != Vector2.Zero)
+			{
+				Vector2 avgNormal = Vector2.Normalize(_solveVector);
+				ForceVelocity = Vector2.Reflect(ForceVelocity, avgNormal);
+			}
 		}
 
 		/// <summary>해당 위치로 이동합니다.</summary>
