@@ -61,12 +61,12 @@ namespace CTS.Instance.SyncObjects
 		}
 
 		// Test
-		private MiniGameControllerBase? _controller;
+		private Action<TestCube>? _onDestroyed;
 
 		// Test
-		public void BindMiniGame(MiniGameControllerBase controller)
+		public void BindMiniGame(Action<TestCube> onDestroyed)
 		{
-			_controller = controller;
+			_onDestroyed = onDestroyed;
 		}
 
 		public override void OnDestroyed()
@@ -75,7 +75,7 @@ namespace CTS.Instance.SyncObjects
 			_pool = null;
 
 			// Test
-			_controller?.OnTestCubeDestroyed(this);
+			_onDestroyed?.Invoke(this);
 		}
 
 		private IList? _pool;

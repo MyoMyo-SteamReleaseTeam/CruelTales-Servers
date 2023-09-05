@@ -36,7 +36,7 @@ namespace CTS.Instance.Gameplay
 
 		// Instance property
 		public GameInstanceGuid Guid { get; private set; }
-		public RoomOption RoomOption { get; private set; } = new();
+		public RoomOption RoomOption { get; private set; }
 
 		// Handlers
 		public UserSessionHandler SessionHandler { get; private set; }
@@ -55,7 +55,7 @@ namespace CTS.Instance.Gameplay
 			ServerOption = serverOption;
 			ServerTimer = serverTimer;
 			InitializeOption = option;
-			RoomOption.Reset(InitializeOption);
+			RoomOption = new RoomOption(InitializeOption);
 			SessionHandler = new UserSessionHandler(this, InitializeOption, RoomOption);
 
 			GameplayManager = new GameplayManager(this, ServerOption, InitializeOption);
@@ -67,7 +67,6 @@ namespace CTS.Instance.Gameplay
 		public void Initialize(GameInstanceGuid guid)
 		{
 			Guid = guid;
-			RoomOption.Reset(InitializeOption);
 
 			// TODO : Start game properly
 			GameplayManager.Reset();

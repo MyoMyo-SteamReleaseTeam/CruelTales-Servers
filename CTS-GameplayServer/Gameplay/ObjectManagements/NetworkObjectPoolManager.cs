@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using CT.Networks;
 using CTS.Instance.Synchronizations;
 using CTS.Instance.SyncObjects;
+using KaNet.Physics;
 
 namespace CTS.Instance.Gameplay.ObjectManagements
 {
 	public class NetworkObjectPoolManager
 	{
-		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType = new()
+		Dictionary<Type, INetworkObjectPool> _netObjectPoolByType;
+
+		public NetworkObjectPoolManager(WorldManager worldManager,
+										WorldVisibilityManager visibilityManager,
+										GameplayManager gameManager,
+										KaPhysicsWorld physicsWorld)
 		{
-			{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1) },
-			{ typeof(MiniGameControllerBase), new NetworkObjectPool<MiniGameControllerBase>(1) },
-			{ typeof(RedHood_MiniGameController), new NetworkObjectPool<RedHood_MiniGameController>(1) },
-			{ typeof(Lobby_MiniGameController), new NetworkObjectPool<Lobby_MiniGameController>(1) },
-			{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
-			{ typeof(TestCube), new NetworkObjectPool<TestCube>(120) },
-			{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER) },
-			
-		};
+			_netObjectPoolByType = new()
+			{
+				{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(MiniGameControllerBase), new NetworkObjectPool<MiniGameControllerBase>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(RedHood_MiniGameController), new NetworkObjectPool<RedHood_MiniGameController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(Lobby_MiniGameController), new NetworkObjectPool<Lobby_MiniGameController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(TestCube), new NetworkObjectPool<TestCube>(120, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
+				
+			};
+		}
 
 		public T Create<T>() where T : MasterNetworkObject, new()
 		{

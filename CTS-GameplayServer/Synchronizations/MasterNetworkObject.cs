@@ -77,21 +77,22 @@ namespace CTS.Instance.Synchronizations
 			_wattingCoroutines = new HashSet<CoroutineIdentity>(16);
 		}
 
-		/// <summary>생성된 객체를 초기화합니다.</summary>
-		public void Initialize(WorldManager worldManager,
-							   WorldVisibilityManager worldPartitioner,
-							   GameplayManager gameManager,
-							   KaPhysicsWorld physicsWorld,
-							   NetworkIdentity id,
-							   Vector2 position,
-							   float rotation)
+		public void BindReferences(WorldManager worldManager,
+								   WorldVisibilityManager worldPartitioner,
+								   GameplayManager gameManager,
+								   KaPhysicsWorld physicsWorld)
 		{
-			// Bind reference
 			WorldManager = worldManager;
 			_worldVisibilityManager = worldPartitioner;
 			GameplayManager = gameManager;
 			PhysicsWorld = physicsWorld;
+		}
 
+		/// <summary>생성된 객체를 초기화합니다.</summary>
+		public void Initialize(NetworkIdentity id,
+							   Vector2 position,
+							   float rotation)
+		{
 			// Initialize
 			Identity = id;
 			IsAlive = true;
@@ -100,7 +101,7 @@ namespace CTS.Instance.Synchronizations
 			// Initialize physics
 			_physicsRigidBody.Initialize(Identity);
 			_physicsRigidBody.MoveTo(position);
-			_physicsRigidBody.RotateTo(0);
+			_physicsRigidBody.RotateTo(rotation);
 			_physicsRigidBody.LinearVelocity = Vector2.Zero;
 			_physicsRigidBody.ForceVelocity = Vector2.Zero;
 			_physicsRigidBody.ForceFriction = 0;

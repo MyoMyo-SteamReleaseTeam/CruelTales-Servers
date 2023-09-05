@@ -49,6 +49,8 @@ namespace CTS.Instance.SyncObjects
 		private bool _isHost;
 		[SyncVar]
 		private bool _isReady;
+		[SyncVar]
+		private bool _isMapLoaded;
 		[SyncObject]
 		private readonly PlayerCostume _costume;
 		[AllowNull] public IDirtyable _owner;
@@ -121,6 +123,17 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public bool IsMapLoaded
+		{
+			get => _isMapLoaded;
+			set
+			{
+				if (_isMapLoaded == value) return;
+				_isMapLoaded = value;
+				_dirtyReliable_0[4] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public PlayerCostume Costume => _costume;
 		public void ClearDirtyReliable()
 		{
@@ -131,7 +144,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[4] = _costume.IsDirtyReliable;
+			_dirtyReliable_0[5] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
@@ -151,6 +164,10 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[4])
 			{
+				writer.Put(_isMapLoaded);
+			}
+			if (_dirtyReliable_0[5])
+			{
 				_costume.SerializeSyncReliable(player, writer);
 			}
 		}
@@ -161,6 +178,7 @@ namespace CTS.Instance.SyncObjects
 			_username.Serialize(writer);
 			writer.Put(_isHost);
 			writer.Put(_isReady);
+			writer.Put(_isMapLoaded);
 			_costume.SerializeEveryProperty(writer);
 		}
 		public void InitializeMasterProperties()
@@ -169,6 +187,7 @@ namespace CTS.Instance.SyncObjects
 			_username = new();
 			_isHost = false;
 			_isReady = false;
+			_isMapLoaded = false;
 			_costume.InitializeMasterProperties();
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;

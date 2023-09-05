@@ -1,66 +1,71 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using log4net;
 
 namespace CTS.Instance.SyncObjects
 {
 	public partial class MiniGameControllerBase : MasterNetworkObject
 	{
+		private static readonly ILog _log = LogManager.GetLogger(typeof(MiniGameControllerBase));
+
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		// Reference
 		public GameplayController GameplayController { get; private set; }
-		private GameplayManager _gameplayManager;
-		private WorldManager _worldManager;
-		private MiniGameMapData _miniGameData;
+		protected MiniGameMapData _miniGameData;
 
 		// Player Management
-		private BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
-		private int _spawnIndex = 0;
+		public BidirectionalMap<NetworkPlayer, PlayerCharacter> PlayerCharacterByPlayer { get; private set; }
+		protected int _spawnIndex;
 
-		public virtual void Initialize(GameplayController gameplayController, MiniGameIdentity identity)
+		public override void Constructor()
 		{
-			MiniGameIdentity = identity;
-			GameplayController = gameplayController;
-			_gameplayManager = gameplayController.GameplayManager;
-			_worldManager = _gameplayManager.WorldManager;
-			_playerCharacterByPlayer = new(_gameplayManager.Option.SystemMaxUser);
-			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(identity);
+			PlayerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
 		}
 
-		private List<TestCube> _testCubeList = new();
-
-		public void Update()
+		public virtual void Initialize(GameplayController gameplayController,
+									   MiniGameIdentity identity)
 		{
-			CheckGameOverCondition();
+			GameplayController = gameplayController;
+			MiniGameIdentity = identity;
+			_miniGameData = MiniGameMapDataDB.GetMiniGameMapData(identity);
+			_spawnIndex = 0;
+		}
 
-			if (_testCubeList.Count < 0)
+		public override void OnCreated()
+		{
+			foreach (NetworkPlayer player in PlayerCharacterByPlayer)
 			{
-				Vector2 lb = new Vector2(-30, -30);
-				Vector2 rt = new Vector2(30, 30);
-				//Vector2 lb = new Vector2(0, 0);
-				//Vector2 rt = new Vector2(0, 0);
-				var createPos = RandomHelper.NextVector2(lb, rt);
-				//var createPos = Vector2.Zero;
-				var testCube = _worldManager.CreateObject<TestCube>(createPos);
-				testCube.BindMiniGame(this);
-				_testCubeList.Add(testCube);
+				player.IsMapLoaded = false;
+				player.IsReady = false;
+
+				Server_LoadMiniGame(player, MiniGameIdentity);
 			}
 		}
 
-		public void OnTestCubeDestroyed(TestCube testCube)
+		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
 		{
-			_testCubeList.Remove(testCube);
+			player.IsReady = isReady;
+			if (GameplayController.RoomSessionManager.CheckAllReady())
+			{
+				OnAllReady();
+			}
+		}
+
+		public virtual void OnAllReady()
+		{
+			_log.Info("All ready!");
 		}
 
 		public void OnGameStart()
 		{
-			_worldManager.SetMiniGameMapData(_miniGameData);
+			WorldManager.SetMiniGameMapData(_miniGameData);
 			_spawnIndex = 0;
 
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
@@ -71,9 +76,9 @@ namespace CTS.Instance.SyncObjects
 
 		public void OnGameEnd()
 		{
-			_worldManager.ReleaseMiniGameMapData();
+			WorldManager.ReleaseMiniGameMapData();
 
-			foreach (var pc in _playerCharacterByPlayer.ForwardValues)
+			foreach (var pc in PlayerCharacterByPlayer.ForwardValues)
 			{
 				pc.Destroy();
 			}
@@ -81,38 +86,40 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual void OnPlayerEnter(NetworkPlayer player)
 		{
-			var spawnPositions = _miniGameData.SpawnPositions;
-			int spawnPosCount = spawnPositions.Count;
-			Vector2 spawnPos = spawnPositions[_spawnIndex];
-			createPlayerBy(player, spawnPos);
-			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
+
 		}
 
 		public virtual void OnPlayerLeave(NetworkPlayer player)
 		{
-			if (_playerCharacterByPlayer.TryGetValue(player, out var pc))
+			if (PlayerCharacterByPlayer.TryGetValue(player, out var pc))
 			{
 				pc.Destroy();
-				_playerCharacterByPlayer.TryRemove(player);
+				PlayerCharacterByPlayer.TryRemove(player);
 			}
 
-			CheckGameOverCondition();
+			checkGameOverCondition();
 		}
 
-		private void createPlayerBy(NetworkPlayer player, Vector2 spawnPos)
+		protected void createPlayerBy(NetworkPlayer player)
 		{
-			var playerCharacter = _worldManager.CreateObject<PlayerCharacter>(spawnPos);
+			var spawnPositions = _miniGameData.SpawnPositions;
+			int spawnPosCount = spawnPositions.Count;
+			Vector2 spawnPos = spawnPositions[_spawnIndex];
+			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
+
+			var playerCharacter = WorldManager.CreateObject<PlayerCharacter>(spawnPos);
 			playerCharacter.BindNetworkPlayer(player);
-			_playerCharacterByPlayer.Add(player, playerCharacter);
+			PlayerCharacterByPlayer.Add(player, playerCharacter);
 		}
 
-		private void CheckGameOverCondition()
+		protected virtual void checkGameOverCondition()
 		{
 
 		}
 
 		public partial void Client_OnMiniGameLoaded(NetworkPlayer player)
 		{
+			player.IsMapLoaded = true;
 			player.CanSeeViewObject = true;
 		}
 	}

@@ -40,12 +40,13 @@ namespace CTS.Instance.SyncObjects
 			CheckAllReady();
 		}
 
-		public void CheckAllReady()
+		public bool CheckAllReady()
 		{
-			if (PlayerCount < GameplayManager.Option.SystemMinUser)
+			if (PlayerCount < MinPlayerCount ||
+				PlayerCount < GameplayManager.Option.SystemMinUser)
 			{
 				IsAllReady = false;
-				return;
+				return IsAllReady;
 			}
 
 			foreach (var player in PlayerStateTable.Values)
@@ -53,11 +54,12 @@ namespace CTS.Instance.SyncObjects
 				if (!player.IsReady)
 				{
 					IsAllReady = false;
-					return;
+					return IsAllReady;
 				}
 			}
 
 			IsAllReady = true;
+			return IsAllReady;
 		}
 
 		public void SetPassword(int password)

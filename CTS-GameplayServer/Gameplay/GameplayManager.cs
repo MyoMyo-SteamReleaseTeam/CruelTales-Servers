@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CT.Common.Tools;
@@ -56,12 +57,15 @@ namespace CTS.Instance.Gameplay
 
 		public void Reset()
 		{
+			RoomOption.Reset();
 			WorldManager.Reset();
 			GameplayController = WorldManager.CreateObject<GameplayController>();
 		}
 
 		public void Update(float deltaTime)
 		{
+			Console.WriteLine($"World object count : {WorldManager.Count}");
+
 			// Update world network logic of objects
 			WorldManager.UpdateNetworkObjects(deltaTime);
 
@@ -121,7 +125,9 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public bool TryGetNetworkPlayer(UserId user, [MaybeNullWhen(false)] out NetworkPlayer player)
+		public bool TryGetNetworkPlayer(UserId user,
+										[MaybeNullWhen(false)]
+										out NetworkPlayer player)
 		{
 			return _networkPlayerByUserId.TryGetForward(user, out player);
 		}

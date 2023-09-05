@@ -49,7 +49,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
-			Server_LoadMiniGameCallstack.Clear();
+			Server_LoadMiniGameMCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -62,10 +62,16 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				int Server_LoadMiniGameCount = Server_LoadMiniGameCallstack.GetCallCount(player);
-				if (Server_LoadMiniGameCount > 0)
+				int Server_LoadMiniGameMCount = Server_LoadMiniGameMCallstack.GetCallCount(player);
+				if (Server_LoadMiniGameMCount > 0)
 				{
-					writer.Put((byte)Server_LoadMiniGameCount);
+					var Server_LoadMiniGameMcallList = Server_LoadMiniGameMCallstack.GetCallList(player);
+					writer.Put((byte)Server_LoadMiniGameMCount);
+					for (int i = 0; i < Server_LoadMiniGameMCount; i++)
+					{
+						var arg = Server_LoadMiniGameMcallList[i];
+						arg.Serialize(writer);
+					}
 				}
 				else
 				{
@@ -101,6 +107,15 @@ namespace CTS.Instance.SyncObjects
 					Client_OnMiniGameLoaded(player);
 				}
 			}
+			if (dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadBoolean(out bool isReady)) return false;
+					Client_ReadyGame(player, isReady);
+				}
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
@@ -112,6 +127,14 @@ namespace CTS.Instance.SyncObjects
 			{
 				reader.Ignore(1);
 			}
+			if (dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(1);
+				}
+			}
 		}
 		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -119,6 +142,14 @@ namespace CTS.Instance.SyncObjects
 			if (dirtyReliable_0[0])
 			{
 				reader.Ignore(1);
+			}
+			if (dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(1);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

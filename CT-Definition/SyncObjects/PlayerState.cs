@@ -20,6 +20,9 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public bool IsReady;
 
+		[SyncVar]
+		public bool IsMapLoaded;
+
 		[SyncObject]
 		public PlayerCostume Costume = new();
 	}

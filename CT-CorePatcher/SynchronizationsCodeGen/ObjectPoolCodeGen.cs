@@ -19,7 +19,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				content.AppendLine();
 			}
 
-			CodeFormat.AddIndent(content, 3);
+			CodeFormat.AddIndent(content, 4);
 			return string.Format(ObjectPoolFormat.MasterNetworkObjectPool, content);
 		}
 	}

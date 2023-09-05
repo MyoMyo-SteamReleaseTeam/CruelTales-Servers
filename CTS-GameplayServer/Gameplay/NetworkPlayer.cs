@@ -33,6 +33,7 @@ namespace CTS.Instance.Gameplay
 					PlayerState.UserId = _userId;
 			}
 		}
+
 		public NetStringShort Username
 		{
 			get => _username;
@@ -44,9 +45,6 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public int Costume { get; private set; }
-		
-		// Matchmaking
 		public bool _isHost = false;
 		public bool IsHost
 		{
@@ -58,6 +56,7 @@ namespace CTS.Instance.Gameplay
 					PlayerState.IsHost = _isHost;
 			}
 		}
+
 		public bool _isReady = false;
 		public bool IsReady
 		{
@@ -67,6 +66,18 @@ namespace CTS.Instance.Gameplay
 				_isReady = value;
 				if (PlayerState != null)
 					PlayerState.IsReady= _isReady;
+			}
+		}
+
+		public bool _isMapLoaded = false;
+		public bool IsMapLoaded
+		{
+			get => _isMapLoaded;
+			set
+			{
+				_isMapLoaded = value;
+				if (PlayerState != null)
+					PlayerState.IsMapLoaded = _isMapLoaded;
 			}
 		}
 
@@ -107,7 +118,10 @@ namespace CTS.Instance.Gameplay
 			Session = userSession;
 			UserId = Session.UserId;
 			Username = Session.Username;
-			Costume = 119;
+
+			IsHost = false;
+			IsReady = false;
+			IsMapLoaded = false;
 
 			// Visibility
 			CanSeeViewObject = false;
@@ -119,7 +133,6 @@ namespace CTS.Instance.Gameplay
 		{
 			UserId = new UserId(0);
 			Username = string.Empty;
-			Costume = 0;
 			if (Session != null && Session.CurrentState != UserSessionState.NoConnection)
 			{
 				Session.Disconnect(DisconnectReasonType.Unknown);
@@ -156,6 +169,7 @@ namespace CTS.Instance.Gameplay
 
 			state.IsHost = IsHost;
 			state.IsReady = IsReady;
+			state.IsMapLoaded = IsMapLoaded;
 
 			state.Costume.Head = RandomHelper.NextInt(20);
 			state.Costume.Body = RandomHelper.NextInt(20);

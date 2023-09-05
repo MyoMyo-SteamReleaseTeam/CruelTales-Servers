@@ -33,7 +33,7 @@ namespace CTS.Instance.Gameplay
 		private NetworkObjectPoolManager _objectPoolManager;
 
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
-		private Queue<MasterNetworkObject> _destroyObjectStack;
+		private Queue<MasterNetworkObject> _destroyObjectQueue;
 
 		/// <summary>프레임이 끝나면 생성될 객체 목록입니다.</summary>
 		private Queue<MasterNetworkObject> _createObjectQueue;
@@ -64,8 +64,7 @@ namespace CTS.Instance.Gameplay
 			_option = option;
 
 			// Network Object Management
-			_objectPoolManager = new();
-			_destroyObjectStack = new(option.WorldMaximumObjectCount);
+			_destroyObjectQueue = new(option.WorldMaximumObjectCount);
 			_createObjectQueue = new(option.WorldMaximumObjectCount);
 
 			// Partitioner
@@ -75,15 +74,18 @@ namespace CTS.Instance.Gameplay
 			_physicsWorld = new KaPhysicsWorld();
 			_stepTime = _gameplayManager.ServerOption.PhysicsStepTime;
 
+			// Object Pool Manager
+			_objectPoolManager = new(this, _visibilityManager, gameplayManager, _physicsWorld);
+
 			// Coroutine
 			_coroutineRuntime = new(option.CoroutineCapacity);
 		}
 
 		public void Reset()
 		{
+			Clear();
 			_coroutineRuntime.Reset();
 			_visibilityManager.Reset();
-			Clear();
 		}
 
 		public void SetMiniGameMapData(MiniGameMapData mapData)
@@ -203,9 +205,9 @@ namespace CTS.Instance.Gameplay
 			}
 
 			// Remove objects
-			while (_destroyObjectStack.Count > 0)
+			while (_destroyObjectQueue.Count > 0)
 			{
-				destroyObject(_destroyObjectStack.Dequeue());
+				destroyObject(_destroyObjectQueue.Dequeue());
 			}
 		}
 
@@ -246,11 +248,7 @@ namespace CTS.Instance.Gameplay
 			var netObj = _objectPoolManager.Create<T>();
 			netObj.InitializeMasterProperties();
 			netObj.InitializeRemoteProperties();
-			netObj.Initialize(worldManager: this,
-							  _visibilityManager,
-							  _gameplayManager, 
-							  _physicsWorld,
-							  getNetworkIdentityCounter(),
+			netObj.Initialize(getNetworkIdentityCounter(),
 							  position, 
 							  rotation: 0);
 			_createObjectQueue.Enqueue(netObj);
@@ -275,31 +273,57 @@ namespace CTS.Instance.Gameplay
 
 		public void AddDestroyEqueue(MasterNetworkObject networkObject)
 		{
-			_destroyObjectStack.Enqueue(networkObject);
+			_destroyObjectQueue.Enqueue(networkObject);
 		}
 
 		public void Clear()
 		{
 			_idCounter = new NetworkIdentity(0);
-			_destroyObjectStack.Clear();
-			var ids = _networkObjectById.ForwardKeys;
-			int removeCount = _networkObjectById.Count;
-			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
-			int removeIndex = 0;
-			foreach (NetworkIdentity id in ids)
+
+			// 삭제되려는 객체 대기열을 초기화하고 다시 삭제함
+			_destroyObjectQueue.Clear();
+
+			foreach (MasterNetworkObject netObj in _networkObjectById.ForwardValues)
 			{
-				removeIds[removeIndex++] = id;
+				netObj.Destroy();
 			}
-			for (int i = 0; i < removeCount; i++)
+
+			while (_createObjectQueue.TryDequeue(out var netObj))
 			{
-				destroyObject(_networkObjectById.GetValue(removeIds[i]));
+				netObj.Destroy();
 			}
+
+			return;
+
+			//_idCounter = new NetworkIdentity(0);
+			//_destroyObjectStack.Clear();
+
+			//int removeCount = _networkObjectById.Count + _createObjectQueue.Count;
+
+			//Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
+
+			//int removeIndex = 0;
+			//foreach (NetworkIdentity id in _networkObjectById.ForwardKeys)
+			//{
+			//	removeIds[removeIndex++] = id;
+			//}
+			//while (_createObjectQueue.TryDequeue(out var netObj))
+			//{
+			//	removeIds[removeIndex++] = netObj.Identity;
+			//}
+
+			//for (int i = 0; i < removeCount; i++)
+			//{
+			//	destroyObject(_networkObjectById.GetValue(removeIds[i]));
+			//}
 		}
 
 		public void ClearWithoutSystemObject()
 		{
+			throw new NotImplementedException();
+
 			_idCounter = new NetworkIdentity(0);
-			_destroyObjectStack.Clear();
+			_destroyObjectQueue.Clear();
 			var ids = _networkObjectById.ForwardKeys;
 			int removeCount = _networkObjectById.Count;
 			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];

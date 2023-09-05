@@ -13,10 +13,13 @@ namespace CT.Definitions.SyncObjects
 		public MiniGameIdentity MiniGameIdentity;
 
 		[SyncRpc(SyncType.ReliableTarget)]
-		public void Server_LoadMiniGame() { }
+		public void Server_LoadMiniGame(MiniGameIdentity miniGameIdentity) { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_OnMiniGameLoaded() { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_ReadyGame(bool isReady) { }
 	}
 
 	[SyncNetworkObjectDefinition(capacity: 1)]

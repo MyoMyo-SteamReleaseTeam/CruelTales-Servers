@@ -22,8 +22,6 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-			// Update minigame controller
-			MiniGameController?.Update();
 		}
 
 		public override void OnCreated()
@@ -109,19 +107,7 @@ namespace CTS.Instance.SyncObjects
 
 		public partial void Client_ReadyToSync(NetworkPlayer player)
 		{
-			if (MiniGameController == null)
-			{
-				_log.Fatal($"There is no minigame controller");
-				return;
-			}
-
 			_log.Debug($"Client {player} ready to controll");
-		}
-
-		public partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
-		{
-			player.IsReady = isReady;
-			RoomSessionManager.CheckAllReady();
 		}
 
 		public void ChangeMiniGameTo(MiniGameIdentity gameId)

@@ -5,6 +5,8 @@ namespace CTS.Instance.Gameplay
 	/// <summary>게임 방의 옵션입니다.</summary>
 	public class RoomOption
 	{
+		private InstanceInitializeOption _option;
+
 		private int _password;
 		public int Password
 		{
@@ -17,12 +19,17 @@ namespace CTS.Instance.Gameplay
 
 		public bool HasPassword => Password >= 0;
 
-		public void Reset(InstanceInitializeOption option)
+		public RoomOption(InstanceInitializeOption option)
+		{
+			_option = option;
+		}
+
+		public void Reset()
 		{
 			_password = -1;
 			Name = "CruelTales game room!";
 			Discription = "This game is good for mental health!";
-			MaxUser = option.SystemMaxUser;
+			MaxUser = _option.SystemMaxUser;
 		}
 	}
 }
