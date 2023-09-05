@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using CTS.Instance.Gameplay;
 using CT.Common.DataType.Synchronizations;
 #endif
+
 #if CT_SERVER
 namespace CTS.Instance.Synchronizations
 #elif CT_CLIENT
@@ -55,6 +56,11 @@ namespace CT.Common.DataType.Synchronizations
 
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
+
+#if CT_CLIENT
+		private bool _isInitialSynchronized = false;
+		private static T _ignoreInstance = new T();
+#endif
 
 		public T this[int index]
 		{
@@ -193,11 +199,17 @@ namespace CT.Common.DataType.Synchronizations
 		public void InitializeMasterProperties()
 		{
 			Count = 0;
+#if CT_CLIENT
+			_isInitialSynchronized = false;
+#endif
 		}
 
 		public void InitializeRemoteProperties()
 		{
 			Count = 0;
+#if CT_CLIENT
+			_isInitialSynchronized = false;
+#endif
 		}
 
 		public void ClearDirtyReliable()
@@ -234,6 +246,7 @@ namespace CT.Common.DataType.Synchronizations
 #if CT_CLIENT
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
+			_isInitialSynchronized = true;
 			Count = reader.ReadByte();
 			for (int i = 0; i < Count; i++)
 			{
@@ -245,7 +258,6 @@ namespace CT.Common.DataType.Synchronizations
 			return true;
 		}
 #endif
-
 
 #if CT_SERVER
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -356,10 +368,23 @@ namespace CT.Common.DataType.Synchronizations
 
 #if CT_SERVER
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
+		{
 #elif CT_CLIENT
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
-#endif
 		{
+			/*
+			 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+			 * 중복 호출이 일어날 수 있음.
+			 * 이미 반영된 이벤트이기 때문에 무시한다.
+			 */
+			if (_isInitialSynchronized)
+			{
+				IgnoreSyncStaticReliable(reader);
+				_isInitialSynchronized = false;
+				return true;
+			}
+#endif
+
 			if (!reader.TryReadBitmaskByte(out BitmaskByte masterDirty)) return false;
 
 			// Serialize if there is even a single operation
@@ -433,16 +458,58 @@ namespace CT.Common.DataType.Synchronizations
 #if CT_SERVER
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
+		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Reliable);
 #elif CT_CLIENT
 		public bool TryDeserializeSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
+		public static void IgnoreSyncStaticReliable(IPacketReader reader)
+		{
+			if (!reader.TryReadBitmaskByte(out BitmaskByte masterDirty)) return;
+
+			if (masterDirty[0])
+			{
+				if (!reader.TryReadByte(out byte operationCount)) return;
+				for (int i = 0; i < operationCount; i++)
+				{
+					if (!reader.TryReadByte(out byte operationValue)) return;
+					var operation = (CollectionSyncType)operationValue;
+					switch (operation)
+					{
+						case CollectionSyncType.Clear:
+							break;
+
+						case CollectionSyncType.Add:
+							if (!_ignoreInstance.TryDeserializeEveryProperty(reader)) return;
+							break;
+
+						case CollectionSyncType.Remove:
+							reader.Ignore(sizeof(byte));
+							break;
+
+						default:
+							Debug.Assert(false);
+							break;
+					}
+				}
+			}
+
+			// Serialize if dirty objects
+			if (masterDirty[1])
+			{
+				if (!reader.TryReadByte(out byte changeCount)) return;
+				for (int i = 0; i < changeCount; i++)
+				{
+					reader.Ignore(sizeof(byte));
+					_ignoreInstance.IgnoreSyncReliable(reader);
+				}
+			}
+		}
 #endif
 
 		public void Constructor() => throw new NotImplementedException();
 		public bool IsDirtyUnreliable => throw new WrongSyncType(SyncType.Unreliable);
 		public void ClearDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
 		public void MarkDirtyUnreliable() => throw new WrongSyncType(SyncType.Unreliable);
-		public static void IgnoreSyncStaticReliable(IPacketReader reader) => throw new NotImplementedException();
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new NotImplementedException();
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 		public void IgnoreSyncUnreliable(IPacketReader reader) => IgnoreSyncStaticUnreliable(reader);

@@ -285,8 +285,16 @@ namespace CT.Common.DataType.Synchronizations
 				switch (operation)
 				{
 					case CollectionSyncType.Clear:
-						_dictionary.Clear();
-						OnCleared?.Invoke();
+						/*
+						 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+						 * 중복 호출이 일어날 수 있음.
+						 * 이미 반영된 이벤트이기 때문에 무시한다.
+						 */
+						if (_dictionary.Count != 0)
+						{
+							_dictionary.Clear();
+							OnCleared?.Invoke();
+						}
 						break;
 
 					case CollectionSyncType.Add:
@@ -295,8 +303,15 @@ namespace CT.Common.DataType.Synchronizations
 							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
-							_dictionary.Add(key, value);
-							OnAdded?.Invoke(key, value);
+							/*
+							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+							 * 중복 호출이 일어날 수 있음.
+							 * 이미 반영된 이벤트이기 때문에 무시한다.
+							 */
+							if (!_dictionary.TryAdd(key, value))
+							{
+								OnAdded?.Invoke(key, value);
+							}
 						}
 						break;
 
@@ -304,8 +319,16 @@ namespace CT.Common.DataType.Synchronizations
 						{
 							TKey key = new();
 							if (!key.TryDeserialize(reader)) return false;
-							_dictionary.Remove(key);
-							OnRemoved?.Invoke(key);
+							/*
+							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+							 * 중복 호출이 일어날 수 있음.
+							 * 이미 반영된 이벤트이기 때문에 무시한다.
+							 */
+							if (_dictionary.ContainsKey(key))
+							{
+								_dictionary.Remove(key);
+								OnRemoved?.Invoke(key);
+							}
 						}
 						break;
 
@@ -315,8 +338,16 @@ namespace CT.Common.DataType.Synchronizations
 							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
-							_dictionary[key] = value;
-							OnChanged?.Invoke(key, _dictionary[key]);
+							/*
+							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+							 * 중복 호출이 일어날 수 있음.
+							 * 이미 반영된 이벤트이기 때문에 무시한다.
+							 */
+							if (_dictionary.ContainsKey(key))
+							{
+								_dictionary[key] = value;
+								OnChanged?.Invoke(key, _dictionary[key]);
+							}
 						}
 						break;
 

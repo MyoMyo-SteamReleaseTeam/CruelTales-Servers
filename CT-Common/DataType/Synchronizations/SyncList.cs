@@ -34,6 +34,7 @@ namespace CT.Common.DataType.Synchronizations
 		public int Count => _list.Count;
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
+		private bool _isInitialSynchronized = false;
 
 		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
 		public SyncList(int capacity = 8, int operationCapacity = 4)
@@ -221,6 +222,7 @@ namespace CT.Common.DataType.Synchronizations
 
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
+			_isInitialSynchronized = true;
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
@@ -236,6 +238,18 @@ namespace CT.Common.DataType.Synchronizations
 
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
+			/*
+			 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+			 * 중복 호출이 일어날 수 있음.
+			 * 이미 반영된 이벤트이기 때문에 무시한다.
+			 */
+			if (_isInitialSynchronized)
+			{
+				IgnoreSyncReliable(reader);
+				_isInitialSynchronized = false;
+				return true;
+			}
+
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
 			{
@@ -282,22 +296,18 @@ namespace CT.Common.DataType.Synchronizations
 			return true;
 		}
 
-		public void InitializeProperties()
-		{
-			_list.Clear();
-			_syncOperations.Clear();
-		}
-
 		public void InitializeMasterProperties()
 		{
 			_list.Clear();
 			_syncOperations.Clear();
+			_isInitialSynchronized = false;
 		}
 
 		public void InitializeRemoteProperties()
 		{
 			_list.Clear();
 			_syncOperations.Clear();
+			_isInitialSynchronized = false;
 		}
 
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);

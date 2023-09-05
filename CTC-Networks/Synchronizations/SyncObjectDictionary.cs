@@ -69,9 +69,9 @@ namespace CT.Common.DataType.Synchronizations
 		public SyncObjectDictionary(int maxCapacity = 8, int operationCapacity = 4)
 		{
 			MaxCapacity = maxCapacity;
-			_objectPool = new(MaxCapacity);
+			_objectPool = new(MaxCapacity + 1);
 			_dictionary = new(MaxCapacity);
-			for (int i = 0; i < MaxCapacity; i++)
+			for (int i = 0; i < MaxCapacity + 1; i++)
 			{
 				var netObj = new TValue();
 				netObj.BindOwner(this);
@@ -86,9 +86,9 @@ namespace CT.Common.DataType.Synchronizations
 		{
 			BindOwner(owner);
 			MaxCapacity = maxCapacity;
-			_objectPool = new(MaxCapacity);
+			_objectPool = new(MaxCapacity + 1); // Ignore를 위해 1개의 여유를 더 준다.
 			_dictionary = new(MaxCapacity);
-			for (int i = 0; i < MaxCapacity; i++)
+			for (int i = 0; i < MaxCapacity + 1; i++)
 			{
 				var netObj = new TValue();
 				netObj.BindOwner(this);
@@ -378,8 +378,16 @@ namespace CT.Common.DataType.Synchronizations
 					switch (operation)
 					{
 						case CollectionSyncType.Clear:
-							InternalClear();
-							OnCleared?.Invoke();
+							/*
+							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+							 * 중복 호출이 일어날 수 있음.
+							 * 이미 반영된 이벤트이기 때문에 무시한다.
+							 */
+							if (_dictionary.Count != 0)
+							{
+								InternalClear();
+								OnCleared?.Invoke();
+							}
 							break;
 
 						case CollectionSyncType.Add:
@@ -392,8 +400,19 @@ namespace CT.Common.DataType.Synchronizations
 								item.ClearDirtyReliable();
 								item.ClearDirtyUnreliable();
 								if (!item.TryDeserializeEveryProperty(reader)) return false;
-								_dictionary.Add(key, item);
-								OnAdded?.Invoke(key, item);
+								/*
+								 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+								 * 중복 호출이 일어날 수 있음.
+								 * 이미 반영된 이벤트이기 때문에 무시한다.
+								 */
+								if (_dictionary.TryAdd(key, item))
+								{
+									OnAdded?.Invoke(key, item);
+								}
+								else
+								{
+									_objectPool.Push(item);
+								}
 							}
 							break;
 
@@ -401,10 +420,18 @@ namespace CT.Common.DataType.Synchronizations
 							{
 								TKey key = new();
 								if (!key.TryDeserialize(reader)) return false;
-								TValue item = _dictionary[key];
-								_dictionary.Remove(key);
-								_objectPool.Push(item);
-								OnRemoved?.Invoke(key);
+								/*
+								 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+								 * 중복 호출이 일어날 수 있음.
+								 * 이미 반영된 이벤트이기 때문에 무시한다.
+								 */
+								if (_dictionary.ContainsKey(key))
+								{
+									TValue item = _dictionary[key];
+									_dictionary.Remove(key);
+									_objectPool.Push(item);
+									OnRemoved?.Invoke(key);
+								}
 							}
 							break;
 
@@ -424,6 +451,15 @@ namespace CT.Common.DataType.Synchronizations
 				{
 					TKey key = new();
 					if (!key.TryDeserialize(reader)) return false;
+					/*
+					 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+					 * 중복 호출이 일어날 수 있음.
+					 * 이미 반영된 이벤트이기 때문에 무시한다.
+					 */
+					if (!_dictionary.ContainsKey(key))
+					{
+						continue;
+					}
 
 					TValue item = _dictionary[key];
 
