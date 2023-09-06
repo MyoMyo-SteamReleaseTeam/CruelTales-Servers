@@ -21,7 +21,8 @@ namespace CT.Benchmark
 			//Console.WriteLine(a.A);
 			//Console.WriteLine(a.B);
 
-			BenchmarkRunner.Run<CoroutineActionBenchmark>();
+			//BenchmarkRunner.Run<CoroutineActionBenchmark>();
+			BenchmarkRunner.Run<CollectionInterfaceBenchmark>();
 		}
 	}
 
