@@ -61,7 +61,8 @@ namespace CTS.Instance.Synchronizations
 
 		public Vector2Int CurrentCellPos { get; private set; }
 
-		public bool IsSystemObject { get; private set; }
+		/// <summary>미니게임이 변경되더라도 객체가 유지되는지 여부입니다.</summary>
+		public bool IsPersistent { get; set; }
 
 		/// <summary>코루틴 호출 카운터입니다.</summary>
 		private int _coroutineCallCounter = 0;

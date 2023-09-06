@@ -301,10 +301,38 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public void ClearWithoutDontDestroy()
+		public void ClearWithoutPersistentObject()
 		{
+			foreach (MasterNetworkObject netObj in _networkObjectById.ForwardValues)
+			{
+				if (!netObj.IsPersistent)
+				{
+					netObj.Destroy();
+				}
+			}
 
+			while (_createObjectQueue.TryDequeue(out var netObj))
+			{
+				if (!netObj.IsPersistent)
+				{
+					netObj.Destroy();
+				}
+			}
 		}
+
+		//public bool TryGetObjectIDsBy(Func<MasterNetworkObject, bool> selector,
+		//							  Span<NetworkIdentity> ids)
+		//{
+
+		//	foreach (var netObj in _networkObjectById.ForwardValues)
+		//	{
+		//		if (selector(netObj))
+		//		{
+
+		//		}
+		//	}
+
+		//}
 
 		#endregion
 
