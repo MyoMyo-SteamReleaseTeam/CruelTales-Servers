@@ -204,10 +204,20 @@ namespace CTS.Instance.Gameplay
 				_networkObjectById.Add(createdObj.Identity, createdObj);
 			}
 
-			// Remove objects
 			while (_destroyObjectQueue.Count > 0)
 			{
-				destroyObject(_destroyObjectQueue.Dequeue());
+				var destroyObj = _destroyObjectQueue.Dequeue();
+				_objectPoolManager.Return(destroyObj);
+				if (!_networkObjectById.TryRemove(destroyObj))
+				{
+					_log.Error($"There is no network object to remove. " +
+						$"Object : [{destroyObj.GetType().Name}: {destroyObj.Identity}]");
+					Debug.Assert(false);
+					return;
+				}
+
+				destroyObj.OnDestroyed();
+				destroyObj.Dispose();
 			}
 		}
 
@@ -280,9 +290,6 @@ namespace CTS.Instance.Gameplay
 		{
 			_idCounter = new NetworkIdentity(0);
 
-			// 삭제되려는 객체 대기열을 초기화하고 다시 삭제함
-			_destroyObjectQueue.Clear();
-
 			foreach (MasterNetworkObject netObj in _networkObjectById.ForwardValues)
 			{
 				netObj.Destroy();
@@ -292,69 +299,11 @@ namespace CTS.Instance.Gameplay
 			{
 				netObj.Destroy();
 			}
-
-			return;
-
-			//_idCounter = new NetworkIdentity(0);
-			//_destroyObjectStack.Clear();
-
-			//int removeCount = _networkObjectById.Count + _createObjectQueue.Count;
-
-			//Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
-
-			//int removeIndex = 0;
-			//foreach (NetworkIdentity id in _networkObjectById.ForwardKeys)
-			//{
-			//	removeIds[removeIndex++] = id;
-			//}
-			//while (_createObjectQueue.TryDequeue(out var netObj))
-			//{
-			//	removeIds[removeIndex++] = netObj.Identity;
-			//}
-
-			//for (int i = 0; i < removeCount; i++)
-			//{
-			//	destroyObject(_networkObjectById.GetValue(removeIds[i]));
-			//}
 		}
 
-		public void ClearWithoutSystemObject()
+		public void ClearWithoutDontDestroy()
 		{
-			throw new NotImplementedException();
 
-			_idCounter = new NetworkIdentity(0);
-			_destroyObjectQueue.Clear();
-			var ids = _networkObjectById.ForwardKeys;
-			int removeCount = _networkObjectById.Count;
-			Span<NetworkIdentity> removeIds = stackalloc NetworkIdentity[removeCount];
-			int removeIndex = 0;
-			foreach (NetworkIdentity id in ids)
-			{
-				removeIds[removeIndex++] = id;
-			}
-			for (int i = 0; i < removeCount; i++)
-			{
-				var netObj = _networkObjectById.GetValue(removeIds[i]);
-				if (!netObj.IsSystemObject)
-				{
-					destroyObject(netObj);
-				}
-			}
-		}
-
-		private void destroyObject(MasterNetworkObject netObject)
-		{
-			_objectPoolManager.Return(netObject);
-			if (!_networkObjectById.TryRemove(netObject))
-			{
-				_log.Error($"There is no network object to remove. " +
-					$"Object : [{netObject.GetType().Name}: {netObject.Identity}]");
-				Debug.Assert(false);
-				return;
-			}
-
-			netObject.OnDestroyed();
-			netObject.Dispose();
 		}
 
 		#endregion
