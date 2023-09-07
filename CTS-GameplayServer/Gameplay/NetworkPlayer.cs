@@ -144,7 +144,7 @@ namespace CTS.Instance.Gameplay
 		public void Update(float deltaTime)
 		{
 			Vector2 targetPosition = TargetRigidBody == null ?
-				Vector2.Zero : TargetRigidBody.Position;
+				ViewPosition : TargetRigidBody.Position;
 
 			ViewPosition = Vector2.Lerp(ViewPosition,
 										targetPosition,
@@ -154,6 +154,7 @@ namespace CTS.Instance.Gameplay
 		public void BindViewTarget(NetRigidBody target)
 		{
 			TargetRigidBody = target;
+			ViewPosition = TargetRigidBody.Position;
 		}
 
 		public void ReleaseViewTarget()

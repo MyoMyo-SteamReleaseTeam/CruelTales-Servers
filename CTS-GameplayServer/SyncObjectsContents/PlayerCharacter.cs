@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
@@ -25,8 +27,8 @@ namespace CTS.Instance.SyncObjects
 		public const float ActionRadius = 1;
 
 		// States
-		[AllowNull] private PlayerCharacterModel PlayerModel;
-		[AllowNull] private PlayerCharacterStateMachine StateMachine;
+		[AllowNull] protected PlayerCharacterModel _playerModel;
+		[AllowNull] public PlayerCharacterStateMachine StateMachine { get; private set; }
 
 		#region Getter Setter
 
@@ -56,8 +58,8 @@ namespace CTS.Instance.SyncObjects
 
 		public override void Constructor()
 		{
-			PlayerModel = new(this);
-			StateMachine = new(PlayerModel);
+			_playerModel = new(this);
+			StateMachine = new(_playerModel);
 			_physicsRigidBody.SetLayerMask(PhysicsLayerMask.Player);
 		}
 
@@ -65,6 +67,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_animationState = DokzaAnimationState.Idle;
 			_proxyDirection = ProxyDirection.RightDown;
+			StateMachine.ChangeState(StateMachine.IdleState);
 		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)
@@ -73,11 +76,6 @@ namespace CTS.Instance.SyncObjects
 			this.Username = player.Username;
 			NetworkPlayer = player;
 			NetworkPlayer.BindViewTarget(RigidBody);
-		}
-
-		public override void OnDestroyed()
-		{
-			NetworkPlayer?.ReleaseViewTarget();
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -114,7 +112,7 @@ namespace CTS.Instance.SyncObjects
 			RigidBody.ResetImpluse();
 		}
 
-		public void OnDuringAction()
+		public virtual void OnDuringAction()
 		{
 			if (PhysicsWorld.Raycast(RigidBody.Position,
 									 ActionRadius, out var hits,
@@ -153,6 +151,43 @@ namespace CTS.Instance.SyncObjects
 		{
 			ActionDirection = direction;
 			StateMachine.ChangeState(StateMachine.PushedState);
+		}
+		
+		/// <summary>
+		/// 플레이어의 타입을 T로 변경 시도합니다.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public virtual void ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
+		{
+			var _minigameController = GameplayManager.GameplayController.MiniGameController;
+			if (NetworkPlayer == null || 
+				GameplayManager.GameplayController == null ||
+				_minigameController == null)
+			{
+				Console.WriteLine(@"NetWorkPlayer or GameplayController is Null");
+				return;
+			}
+
+			// 리스트에서 제거
+			_minigameController.PlayerCharacterByPlayer.TryRemove(this);
+			NetworkPlayer.ReleaseViewTarget();
+
+			NetworkIdentity previousId = this.Identity;
+
+			// 우선 생성 후 바인딩
+			NetworkPlayer currentPlayer = NetworkPlayer;
+			this.NetworkPlayer = null;
+			var createdAvatar = WorldManager.CreateObject<T>(Position);
+			createdAvatar.BindNetworkPlayer(currentPlayer);
+
+			NetworkIdentity nextId = createdAvatar.Identity;
+			Console.WriteLine($"PlayerCharacter switch {previousId} to {nextId}");
+
+			// 원본 캐릭터 제거
+			Destroy();
+
+			// 현재 캐릭터 리스트에 추가
+			_minigameController.PlayerCharacterByPlayer.Add(createdAvatar.NetworkPlayer, createdAvatar);
 		}
 
 		#region Sync
@@ -198,17 +233,15 @@ namespace CTS.Instance.SyncObjects
 			switch (fromClient)
 			{
 				case 0:
-					Console.WriteLine("Skin change request from " + player.UserId + " to " + fromClient);
-					BroadcastOrderTest((int)player.UserId.Id, fromClient);
+					ChangePlayerTypeTo<PlayerCharacter>();
 					break;
-
+				
 				case 1:
-					Console.WriteLine("Skin change request from " + player.UserId + " to " + fromClient);
-					BroadcastOrderTest((int)player.UserId.Id, fromClient);
+					ChangePlayerTypeTo<WolfCharacter>();
 					break;
 			}
 		}
-
+		
 		#endregion
 	}
 }
