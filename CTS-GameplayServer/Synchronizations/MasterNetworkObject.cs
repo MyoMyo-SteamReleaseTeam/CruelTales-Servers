@@ -145,6 +145,23 @@ namespace CTS.Instance.Synchronizations
 			}
 		}
 
+		/// <summary>객체를 강제로 삭제합니다. WorldManager에서는 사라지지 않습니다.</summary>
+		public void ForceDestroy()
+		{
+			if (!IsAlive)
+				return;
+
+			IsAlive = false;
+
+			if (Visibility == VisibilityType.View)
+			{
+				_worldVisibilityManager.OnDestroy(this);
+			}
+
+			OnDestroyed();
+			Dispose();
+		}
+
 		private void onCollisionWith(int id)
 		{
 			if (WorldManager.TryGetNetworkObject(new(id), out var networkObject))
