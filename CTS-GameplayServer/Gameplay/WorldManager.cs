@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Transactions;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
@@ -33,10 +34,10 @@ namespace CTS.Instance.Gameplay
 		private NetworkObjectPoolManager _objectPoolManager;
 
 		/// <summary>프레임이 끝나면 삭제될 객체 목록입니다.</summary>
-		private Queue<MasterNetworkObject> _destroyObjectQueue;
+		private List<MasterNetworkObject> _destroyObjectList;
 
 		/// <summary>프레임이 끝나면 생성될 객체 목록입니다.</summary>
-		private Queue<MasterNetworkObject> _createObjectQueue;
+		private List<MasterNetworkObject> _createObjectList;
 
 		private NetworkIdentity _idCounter;
 
@@ -64,8 +65,8 @@ namespace CTS.Instance.Gameplay
 			_option = option;
 
 			// Network Object Management
-			_destroyObjectQueue = new(option.WorldMaximumObjectCount);
-			_createObjectQueue = new(option.WorldMaximumObjectCount);
+			_destroyObjectList = new(option.WorldMaximumObjectCount);
+			_createObjectList = new(option.WorldMaximumObjectCount);
 
 			// Partitioner
 			_visibilityManager = new(gameplayInstance, this, option);
@@ -197,27 +198,46 @@ namespace CTS.Instance.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void UpdateObjectLifeCycle()
 		{
-			while (_createObjectQueue.Count > 0)
+			foreach (var destroyObj in _destroyObjectList)
 			{
-				var createdObj = _createObjectQueue.Dequeue();
-				createdObj.InitializeAfterFrame();
-				_networkObjectById.Add(createdObj.Identity, createdObj);
-			}
-
-			while (_destroyObjectQueue.Count > 0)
-			{
-				var destroyObj = _destroyObjectQueue.Dequeue();
 				_objectPoolManager.Return(destroyObj);
 				if (!_networkObjectById.TryRemove(destroyObj))
 				{
-					_log.Error($"There is no network object to remove. " +
-						$"Object : [{destroyObj.GetType().Name}: {destroyObj.Identity}]");
-					Debug.Assert(false);
-					return;
+					bool findInCreationList = false;
+					int count = _createObjectList.Count;
+					for (int i = 0; i < count; i++)
+					{
+						/*
+						 * 생성과 동시에 삭제된 경우
+						 * 생성 로직을 완료하고 강제로 삭제합니다.
+						 */
+						if (_createObjectList[i] == destroyObj)
+						{
+							destroyObj.InitializeAfterFrame();
+							destroyObj.ForceDestroy();
+							findInCreationList = true;
+							break;
+						}
+					}
+
+					if (!findInCreationList)
+					{
+						_log.Fatal($"There is no network object to remove. " +
+							$"Object : [{destroyObj.GetType().Name}: {destroyObj.Identity}]");
+						Debug.Assert(false);
+					}
+
+					continue;
 				}
 
 				destroyObj.OnDestroyed();
 				destroyObj.Dispose();
+			}
+
+			foreach (var createdObj in _createObjectList)
+			{
+				createdObj.InitializeAfterFrame();
+				_networkObjectById.Add(createdObj.Identity, createdObj);
 			}
 		}
 
@@ -261,7 +281,7 @@ namespace CTS.Instance.Gameplay
 			netObj.Initialize(getNetworkIdentityCounter(),
 							  position, 
 							  rotation: 0);
-			_createObjectQueue.Enqueue(netObj);
+			_createObjectList.Add(netObj);
 
 			return netObj;
 
@@ -283,19 +303,19 @@ namespace CTS.Instance.Gameplay
 
 		public void AddDestroyEqueue(MasterNetworkObject networkObject)
 		{
-			_destroyObjectQueue.Enqueue(networkObject);
+			_destroyObjectList.Add(networkObject);
 		}
 
 		public void Clear()
 		{
 			_idCounter = new NetworkIdentity(0);
 
-			foreach (MasterNetworkObject netObj in _networkObjectById.ForwardValues)
+			foreach (var netObj in _networkObjectById.ForwardValues)
 			{
 				netObj.Destroy();
 			}
 
-			while (_createObjectQueue.TryDequeue(out var netObj))
+			foreach (var netObj in _createObjectList)
 			{
 				netObj.Destroy();
 			}
@@ -303,7 +323,7 @@ namespace CTS.Instance.Gameplay
 
 		public void ClearWithoutPersistentObject()
 		{
-			foreach (MasterNetworkObject netObj in _networkObjectById.ForwardValues)
+			foreach (var netObj in _networkObjectById.ForwardValues)
 			{
 				if (!netObj.IsPersistent)
 				{
@@ -311,7 +331,7 @@ namespace CTS.Instance.Gameplay
 				}
 			}
 
-			while (_createObjectQueue.TryDequeue(out var netObj))
+			foreach (var netObj in _createObjectList)
 			{
 				if (!netObj.IsPersistent)
 				{
