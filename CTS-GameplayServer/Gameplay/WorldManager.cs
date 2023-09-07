@@ -198,8 +198,9 @@ namespace CTS.Instance.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void UpdateObjectLifeCycle()
 		{
-			foreach (var destroyObj in _destroyObjectList)
+			for (int d = 0; d < _destroyObjectList.Count; d++)
 			{
+				MasterNetworkObject destroyObj = _destroyObjectList[d];
 				_objectPoolManager.Return(destroyObj);
 				if (!_networkObjectById.TryRemove(destroyObj))
 				{
@@ -234,11 +235,16 @@ namespace CTS.Instance.Gameplay
 				destroyObj.Dispose();
 			}
 
-			foreach (var createdObj in _createObjectList)
+			_destroyObjectList.Clear();
+
+			for (int c = 0; c < _createObjectList.Count; c++)
 			{
+				MasterNetworkObject createdObj = _createObjectList[c];
 				createdObj.InitializeAfterFrame();
 				_networkObjectById.Add(createdObj.Identity, createdObj);
 			}
+
+			_createObjectList.Clear();
 		}
 
 		#endregion
