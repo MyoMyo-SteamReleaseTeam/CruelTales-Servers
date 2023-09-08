@@ -157,7 +157,7 @@ namespace CTS.Instance.SyncObjects
 		/// 플레이어의 타입을 T로 변경 시도합니다.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public virtual void ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
+		public virtual PlayerCharacter ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
 		{
 			var _minigameController = GameplayManager.GameplayController.MiniGameController;
 			if (NetworkPlayer == null || 
@@ -165,7 +165,7 @@ namespace CTS.Instance.SyncObjects
 				_minigameController == null)
 			{
 				Console.WriteLine(@"NetWorkPlayer or GameplayController is Null");
-				return;
+				return null;
 			}
 
 			// 리스트에서 제거
@@ -188,8 +188,14 @@ namespace CTS.Instance.SyncObjects
 
 			// 현재 캐릭터 리스트에 추가
 			_minigameController.PlayerCharacterByPlayer.Add(createdAvatar.NetworkPlayer, createdAvatar);
+			return createdAvatar;
 		}
 
+		public virtual void LoadDefaultPlayerSkin()
+		{
+			BroadcastOrderTest((int)UserId.Id, 0);
+		}
+		
 		#region Sync
 
 		public void OnAnimationChanged(DokzaAnimationState state)
