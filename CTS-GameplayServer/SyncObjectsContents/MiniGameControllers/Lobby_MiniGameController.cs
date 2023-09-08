@@ -108,7 +108,7 @@ namespace CTS.Instance.SyncObjects
 
 				foreach (var p in RoomSessionManager.PlayerStateTable.Values)
 				{
-					if (!player.IsReady)
+					if (!p.IsReady)
 					{
 						Server_TryStartGameCallback(player, StartGameResultType.SomePlayerNotReady);
 						return false;

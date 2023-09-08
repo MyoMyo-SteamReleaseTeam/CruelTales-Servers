@@ -41,7 +41,7 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
-			foreach (NetworkPlayer player in PlayerCharacterByPlayer)
+			foreach (NetworkPlayer player in PlayerCharacterByPlayer.ForwardKeys)
 			{
 				player.IsMapLoaded = false;
 				player.IsReady = false;

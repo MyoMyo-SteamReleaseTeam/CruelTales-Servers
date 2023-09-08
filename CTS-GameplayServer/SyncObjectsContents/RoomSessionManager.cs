@@ -129,13 +129,6 @@ namespace CTS.Instance.SyncObjects
 				return;
 			}
 
-			if (GameplayManager.PlayerCount >= GameplayManager.RoomOption.MinUser &&
-				GameplayManager.PlayerCount < minUserCount)
-			{
-				ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMinUserUnderConnections);
-				return;
-			}
-
 			if (minUserCount < GameplayManager.Option.SystemMinUser)
 			{
 				ServerRoomSetAck_Callback(player, RoomSettingResult.MinimumUsersRequired);

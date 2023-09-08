@@ -23,6 +23,7 @@ namespace CTS.Instance.Gameplay
 		public RoomOption(InstanceInitializeOption option)
 		{
 			_option = option;
+			Reset();
 		}
 
 		public void Reset()
