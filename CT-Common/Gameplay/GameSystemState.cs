@@ -6,7 +6,7 @@ namespace CT.Common.Gameplay
 	{
 		None = 0,
 		Lobby,
-		Countdown,
+		GameStartCountdown,
 		Ready,
 		InGame,
 	}

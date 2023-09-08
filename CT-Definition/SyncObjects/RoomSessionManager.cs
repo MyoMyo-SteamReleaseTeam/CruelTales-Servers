@@ -23,9 +23,6 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int MinPlayerCount;
 
-		[SyncVar]
-		public bool IsAllReady;
-
 		[SyncObject]
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
@@ -43,6 +40,9 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void ClientRoomSetReq_SetRoomMaxUser(int maxUserCount) { }
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void ClientRoomSetReq_SetRoomMinUser(int minUserCount) { }
 	}
 }
 #pragma warning restore IDE0051

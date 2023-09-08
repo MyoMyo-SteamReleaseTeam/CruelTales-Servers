@@ -42,46 +42,46 @@ namespace CTS.Instance.SyncObjects
 	public partial class Lobby_MiniGameController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.Lobby_MiniGameController;
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_TryStartGameCallback(NetworkPlayer player, StartGameResultType result);
 		[SyncRpc]
-		public partial void Server_TryStartGameCallback(StartGameResultType result);
+		public partial void Server_StartGameCountdown(float second);
 		[SyncRpc]
-		public partial void Server_GameStartCountdown(float second);
-		[SyncRpc]
-		public partial void Server_CancelGameStartCountdown();
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_TryStartGame(NetworkPlayer player);
+		public partial void Server_CancelStartGameCountdown();
 		public Lobby_MiniGameController()
 		{
 		}
-		public partial void Server_TryStartGameCallback(StartGameResultType result)
+		public partial void Server_TryStartGameCallback(NetworkPlayer player, StartGameResultType result)
 		{
-			Server_TryStartGameCallbackSCallstack.Add(result);
-			_dirtyReliable_0[2] = true;
-			MarkDirtyReliable();
-		}
-		protected List<StartGameResultType> Server_TryStartGameCallbackSCallstack = new(4);
-		public partial void Server_GameStartCountdown(float second)
-		{
-			Server_GameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[3] = true;
-			MarkDirtyReliable();
-		}
-		protected List<float> Server_GameStartCountdownfCallstack = new(4);
-		public partial void Server_CancelGameStartCountdown()
-		{
-			Server_CancelGameStartCountdownCallstackCount++;
+			Server_TryStartGameCallbackSCallstack.Add(player, result);
 			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
-		protected byte Server_CancelGameStartCountdownCallstackCount = 0;
+		protected TargetCallstack<NetworkPlayer, StartGameResultType> Server_TryStartGameCallbackSCallstack = new(8);
+		public partial void Server_StartGameCountdown(float second)
+		{
+			Server_StartGameCountdownfCallstack.Add(second);
+			_dirtyReliable_0[5] = true;
+			MarkDirtyReliable();
+		}
+		protected List<float> Server_StartGameCountdownfCallstack = new(4);
+		public partial void Server_CancelStartGameCountdown()
+		{
+			Server_CancelStartGameCountdownCallstackCount++;
+			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
+		}
+		protected byte Server_CancelStartGameCountdownCallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_LoadMiniGameMCallstack.Clear();
+			Server_StartMiniGameCallstackCount = 0;
+			Server_NextGameStartCountdownfCallstack.Clear();
 			Server_TryStartGameCallbackSCallstack.Clear();
-			Server_GameStartCountdownfCallstack.Clear();
-			Server_CancelGameStartCountdownCallstackCount = 0;
+			Server_StartGameCountdownfCallstack.Clear();
+			Server_CancelStartGameCountdownCallstackCount = 0;
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -112,27 +112,49 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				byte count = (byte)Server_TryStartGameCallbackSCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_TryStartGameCallbackSCallstack[i];
-					writer.Put((byte)arg);
-				}
+				writer.Put((byte)Server_StartMiniGameCallstackCount);
 			}
 			if (_dirtyReliable_0[3])
 			{
-				byte count = (byte)Server_GameStartCountdownfCallstack.Count;
+				byte count = (byte)Server_NextGameStartCountdownfCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Server_GameStartCountdownfCallstack[i];
+					var arg = Server_NextGameStartCountdownfCallstack[i];
 					writer.Put(arg);
 				}
 			}
 			if (_dirtyReliable_0[4])
 			{
-				writer.Put((byte)Server_CancelGameStartCountdownCallstackCount);
+				int Server_TryStartGameCallbackSCount = Server_TryStartGameCallbackSCallstack.GetCallCount(player);
+				if (Server_TryStartGameCallbackSCount > 0)
+				{
+					var Server_TryStartGameCallbackScallList = Server_TryStartGameCallbackSCallstack.GetCallList(player);
+					writer.Put((byte)Server_TryStartGameCallbackSCount);
+					for (int i = 0; i < Server_TryStartGameCallbackSCount; i++)
+					{
+						var arg = Server_TryStartGameCallbackScallList[i];
+						writer.Put((byte)arg);
+					}
+				}
+				else
+				{
+					dirtyReliable_0[4] = false;
+				}
+			}
+			if (_dirtyReliable_0[5])
+			{
+				byte count = (byte)Server_StartGameCountdownfCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_StartGameCountdownfCallstack[i];
+					writer.Put(arg);
+				}
+			}
+			if (_dirtyReliable_0[6])
+			{
+				writer.Put((byte)Server_CancelStartGameCountdownCallstackCount);
 			}
 			if (dirtyReliable_0.AnyTrue())
 			{
@@ -172,14 +194,6 @@ namespace CTS.Instance.SyncObjects
 					Client_ReadyGame(player, isReady);
 				}
 			}
-			if (dirtyReliable_0[2])
-			{
-				byte count = reader.ReadByte();
-				for (int i = 0; i < count; i++)
-				{
-					Client_TryStartGame(player);
-				}
-			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
@@ -199,10 +213,6 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(1);
 				}
 			}
-			if (dirtyReliable_0[2])
-			{
-				reader.Ignore(1);
-			}
 		}
 		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -218,10 +228,6 @@ namespace CTS.Instance.SyncObjects
 				{
 					reader.Ignore(1);
 				}
-			}
-			if (dirtyReliable_0[2])
-			{
-				reader.Ignore(1);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

@@ -21,8 +21,6 @@ namespace CTS.Instance.SyncObjects
 			SetRoomDiscription("Play to fun");
 			SetRoomMaxUser(MaxPlayerCount);
 			SetPassword(-1);
-			IsAllReady = false;
-			PlayerStateTable.InternalClear();
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)
@@ -30,36 +28,12 @@ namespace CTS.Instance.SyncObjects
 			PlayerState state = PlayerStateTable.Add(player.UserId);
 			state.ClearDirtyReliable();
 			player.BindPlayerState(state);
-			CheckAllReady();
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
 		{
 			player.ReleasePlayerState();
 			PlayerStateTable.Remove(player.UserId);
-			CheckAllReady();
-		}
-
-		public bool CheckAllReady()
-		{
-			if (PlayerCount < MinPlayerCount ||
-				PlayerCount < GameplayManager.Option.SystemMinUser)
-			{
-				IsAllReady = false;
-				return IsAllReady;
-			}
-
-			foreach (var player in PlayerStateTable.Values)
-			{
-				if (!player.IsReady)
-				{
-					IsAllReady = false;
-					return IsAllReady;
-				}
-			}
-
-			IsAllReady = true;
-			return IsAllReady;
 		}
 
 		public void SetPassword(int password)
@@ -84,6 +58,12 @@ namespace CTS.Instance.SyncObjects
 		{
 			GameplayManager.RoomOption.MaxUser = maxUserCount;
 			MaxPlayerCount = maxUserCount;
+		}
+
+		public void SetRoomMinUser(int minUserCount)
+		{
+			GameplayManager.RoomOption.MinUser = minUserCount;
+			MinPlayerCount = minUserCount;
 		}
 
 		public partial void ClientRoomSetReq_SetPassword(NetworkPlayer player, int password)
@@ -111,6 +91,12 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (!checkAuthOrDisconnect(player)) return;
 
+			if (maxUserCount < GameplayManager.RoomOption.MinUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.CrossMaximumAndMinimum);
+				return;
+			}
+
 			if (GameplayManager.PlayerCount > maxUserCount)
 			{
 				ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMaxUserUnderConnections);
@@ -130,6 +116,39 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			SetRoomMaxUser(maxUserCount);
+			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
+		}
+
+		public partial void ClientRoomSetReq_SetRoomMinUser(NetworkPlayer player, int minUserCount)
+		{
+			if (!checkAuthOrDisconnect(player)) return;
+
+			if (minUserCount > GameplayManager.RoomOption.MaxUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.CrossMaximumAndMinimum);
+				return;
+			}
+
+			if (GameplayManager.PlayerCount >= GameplayManager.RoomOption.MinUser &&
+				GameplayManager.PlayerCount < minUserCount)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.CannotSetMinUserUnderConnections);
+				return;
+			}
+
+			if (minUserCount < GameplayManager.Option.SystemMinUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.MinimumUsersRequired);
+				return;
+			}
+
+			if (minUserCount > GameplayManager.Option.SystemMaxUser)
+			{
+				ServerRoomSetAck_Callback(player, RoomSettingResult.MaximumUsersReached);
+				return;
+			}
+
+			SetRoomMinUser(minUserCount);
 			ServerRoomSetAck_Callback(player, RoomSettingResult.Success);
 		}
 

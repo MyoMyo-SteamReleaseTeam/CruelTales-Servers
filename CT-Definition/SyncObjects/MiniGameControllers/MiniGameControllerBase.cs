@@ -20,6 +20,12 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyGame(bool isReady) { }
+
+		[SyncRpc]
+		public void Server_StartMiniGame() { }
+
+		[SyncRpc]
+		public void Server_NextGameStartCountdown(float second) { }
 	}
 
 	[SyncNetworkObjectDefinition(capacity: 1)]
@@ -31,17 +37,14 @@ namespace CT.Definitions.SyncObjects
 	[SyncNetworkObjectDefinition(capacity: 1)]
 	public class Lobby_MiniGameController : MiniGameControllerBase
 	{
-		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_TryStartGame() { }
-
-		[SyncRpc]
+		[SyncRpc(sync: SyncType.ReliableTarget)]
 		public void Server_TryStartGameCallback(StartGameResultType result) { }
 
 		[SyncRpc]
-		public void Server_GameStartCountdown(float second) { }
+		public void Server_StartGameCountdown(float second) { }
 
 		[SyncRpc]
-		public void Server_CancelGameStartCountdown() { }
+		public void Server_CancelStartGameCountdown() { }
 	}
 }
 #pragma warning restore IDE0051

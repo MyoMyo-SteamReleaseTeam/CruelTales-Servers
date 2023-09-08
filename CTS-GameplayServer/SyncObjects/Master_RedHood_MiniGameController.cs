@@ -50,6 +50,8 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_LoadMiniGameMCallstack.Clear();
+			Server_StartMiniGameCallstackCount = 0;
+			Server_NextGameStartCountdownfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -76,6 +78,20 @@ namespace CTS.Instance.SyncObjects
 				else
 				{
 					dirtyReliable_0[1] = false;
+				}
+			}
+			if (_dirtyReliable_0[2])
+			{
+				writer.Put((byte)Server_StartMiniGameCallstackCount);
+			}
+			if (_dirtyReliable_0[3])
+			{
+				byte count = (byte)Server_NextGameStartCountdownfCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_NextGameStartCountdownfCallstack[i];
+					writer.Put(arg);
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())

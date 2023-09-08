@@ -11,7 +11,7 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class Lobby_MiniGameController : MiniGameControllerBase
 	{
-		public const float GAME_START_COUNTDOWN = 3.95f;
+		public const float GAME_START_COUNTDOWN_TIME = 4.0f;
 
 		private CoroutineRunnerVoid _onGameStartRunner;
 
@@ -61,7 +61,7 @@ namespace CTS.Instance.SyncObjects
 			Server_LoadMiniGame(player, MiniGameIdentity);
 			createPlayerBy(player);
 
-			if (GameplayController.GameSystemState == GameSystemState.Countdown)
+			if (GameplayController.GameSystemState == GameSystemState.GameStartCountdown)
 			{
 				cancelCountdown();
 			}
@@ -71,52 +71,80 @@ namespace CTS.Instance.SyncObjects
 		{
 			base.OnPlayerLeave(player);
 
-			if (GameplayController.GameSystemState == GameSystemState.Countdown)
+			if (GameplayController.GameSystemState == GameSystemState.GameStartCountdown)
 			{
 				cancelCountdown();
 			}
 		}
 
-		public partial void Client_TryStartGame(NetworkPlayer player)
+		public override void Client_ReadyGame(NetworkPlayer player, bool isReady)
 		{
-			StartGameResultType result = StartGameResultType.Success;
-			int playerCount = GameplayController.RoomSessionManager.PlayerCount;
+			player.IsReady = isReady;
 
-			if (!player.IsHost)
-				result = StartGameResultType.YouAreNotHost;
+			if (!player.IsHost || !player.IsReady)
+				return;
 
-			if (playerCount < GameplayManager.Option.SystemMinUser)
-				result = StartGameResultType.NoEnoughPlayer;
-
-			if (playerCount > GameplayManager.Option.SystemMaxUser)
-				result = StartGameResultType.TooManyPlayer;
-
-			if (!GameplayController.RoomSessionManager.IsAllReady)
-				result = StartGameResultType.SomePlayerNotReady;
-
-			if (GameplayController.GameSystemState != GameSystemState.Lobby)
+			if (!tryStartGameBy(player))
 			{
-				result = GameplayController.GameSystemState == GameSystemState.Countdown ?
-					StartGameResultType.AlreadyStarting : StartGameResultType.NotInLobby;
-			}
-
-			if (result != StartGameResultType.Success)
-			{
-				Server_TryStartGameCallback(result);
+				player.IsReady = false;
 				return;
 			}
 
-			Server_TryStartGameCallback(StartGameResultType.Success);
-			Server_GameStartCountdown(GAME_START_COUNTDOWN);
-			GameplayController.GameSystemState = GameSystemState.Countdown;
-			_onGameStartRunner.StartCoroutine(GAME_START_COUNTDOWN);
+			// TODO : OnAllReady();
+
+			Server_StartGameCountdown(GAME_START_COUNTDOWN_TIME);
+			GameplayController.GameSystemState = GameSystemState.GameStartCountdown;
+			_onGameStartRunner.StartCoroutine(GAME_START_COUNTDOWN_TIME);
+
+			bool tryStartGameBy(NetworkPlayer player)
+			{
+				int playerCount = GameplayController.RoomSessionManager.PlayerCount;
+
+				if (!player.IsHost)
+				{
+					Server_TryStartGameCallback(player, StartGameResultType.YouAreNotHost);
+					return false;
+				}
+
+				foreach (var p in RoomSessionManager.PlayerStateTable.Values)
+				{
+					if (!player.IsReady)
+					{
+						Server_TryStartGameCallback(player, StartGameResultType.SomePlayerNotReady);
+						return false;
+					}
+				}
+
+				if (playerCount < RoomSessionManager.MinPlayerCount)
+				{
+					Server_TryStartGameCallback(player, StartGameResultType.NoEnoughPlayer);
+					return false;
+				}
+
+				if (playerCount > RoomSessionManager.MaxPlayerCount)
+				{
+					Server_TryStartGameCallback(player, StartGameResultType.TooManyPlayer);
+					return false;
+				}
+
+				if (GameplayController.GameSystemState != GameSystemState.Lobby)
+				{
+					StartGameResultType callback =
+						GameplayController.GameSystemState == GameSystemState.GameStartCountdown ?
+						StartGameResultType.AlreadyStarting : StartGameResultType.NotInLobby;
+					Server_TryStartGameCallback(player, callback);
+					return false;
+				}
+
+				return true;
+			}
 		}
 
 		private void cancelCountdown()
 		{
 			GameplayController.GameSystemState = GameSystemState.Lobby;
 			_onGameStartRunner.StopCoroutine();
-			Server_CancelGameStartCountdown();
+			Server_CancelStartGameCountdown();
 		}
 
 		private void onGameStart()

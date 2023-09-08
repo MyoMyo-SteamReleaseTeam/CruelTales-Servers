@@ -18,6 +18,7 @@ namespace CTS.Instance.SyncObjects
 
 		// Reference
 		public GameplayController GameplayController { get; private set; }
+		public RoomSessionManager RoomSessionManager => GameplayController.RoomSessionManager;
 		protected MiniGameMapData _miniGameData;
 
 		// Player Management
@@ -52,25 +53,32 @@ namespace CTS.Instance.SyncObjects
 		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
 		{
 			player.IsReady = isReady;
-			if (GameplayController.RoomSessionManager.CheckAllReady())
+
+			if (!isAllReady())
+				return;
+
+			OnGameStart();
+
+			bool isAllReady()
 			{
-				OnAllReady();
+				foreach (var player in RoomSessionManager.PlayerStateTable.Values)
+				{
+					if (!player.IsReady)
+						return false;
+				}
+
+				return true;
 			}
 		}
 
-		public virtual void OnAllReady()
-		{
-			_log.Info("All ready!");
-		}
-
-		public void OnGameStart()
+		public virtual void OnGameStart()
 		{
 			WorldManager.SetMiniGameMapData(_miniGameData);
 			_spawnIndex = 0;
 
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
 			{
-				OnPlayerEnter(player);
+				createPlayerBy(player);
 			}
 		}
 
@@ -86,7 +94,7 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual void OnPlayerEnter(NetworkPlayer player)
 		{
-
+			checkGameOverCondition();
 		}
 
 		public virtual void OnPlayerLeave(NetworkPlayer player)

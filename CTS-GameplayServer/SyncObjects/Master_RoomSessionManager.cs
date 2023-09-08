@@ -51,8 +51,6 @@ namespace CTS.Instance.SyncObjects
 		private int _maxPlayerCount;
 		[SyncVar]
 		private int _minPlayerCount;
-		[SyncVar]
-		private bool _isAllReady;
 		[SyncObject]
 		private readonly SyncObjectDictionary<UserId, PlayerState> _playerStateTable;
 		[SyncRpc(SyncType.ReliableTarget)]
@@ -65,6 +63,8 @@ namespace CTS.Instance.SyncObjects
 		public partial void ClientRoomSetReq_SetRoomDiscription(NetworkPlayer player, NetStringShort roomDiscription);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void ClientRoomSetReq_SetRoomMaxUser(NetworkPlayer player, int maxUserCount);
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public partial void ClientRoomSetReq_SetRoomMinUser(NetworkPlayer player, int minUserCount);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
 		public RoomSessionManager()
@@ -146,22 +146,11 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
-		public bool IsAllReady
-		{
-			get => _isAllReady;
-			set
-			{
-				if (_isAllReady == value) return;
-				_isAllReady = value;
-				_dirtyReliable_0[5] = true;
-				MarkDirtyReliable();
-			}
-		}
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable => _playerStateTable;
 		public partial void ServerRoomSetAck_Callback(NetworkPlayer player, RoomSettingResult callback)
 		{
 			ServerRoomSetAck_CallbackRCallstack.Add(player, callback);
-			_dirtyReliable_0[7] = true;
+			_dirtyReliable_0[6] = true;
 			MarkDirtyReliable();
 		}
 		private TargetCallstack<NetworkPlayer, RoomSettingResult> ServerRoomSetAck_CallbackRCallstack = new(8);
@@ -175,7 +164,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[6] = _playerStateTable.IsDirtyReliable;
+			_dirtyReliable_0[5] = _playerStateTable.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
@@ -200,13 +189,9 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[5])
 			{
-				writer.Put(_isAllReady);
-			}
-			if (_dirtyReliable_0[6])
-			{
 				_playerStateTable.SerializeSyncReliable(player, writer);
 			}
-			if (_dirtyReliable_0[7])
+			if (_dirtyReliable_0[6])
 			{
 				int ServerRoomSetAck_CallbackRCount = ServerRoomSetAck_CallbackRCallstack.GetCallCount(player);
 				if (ServerRoomSetAck_CallbackRCount > 0)
@@ -221,7 +206,7 @@ namespace CTS.Instance.SyncObjects
 				}
 				else
 				{
-					dirtyReliable_0[7] = false;
+					dirtyReliable_0[6] = false;
 				}
 			}
 			if (dirtyReliable_0.AnyTrue())
@@ -241,7 +226,6 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_password);
 			writer.Put(_maxPlayerCount);
 			writer.Put(_minPlayerCount);
-			writer.Put(_isAllReady);
 			_playerStateTable.SerializeEveryProperty(writer);
 		}
 		public void InitializeMasterProperties()
@@ -251,7 +235,6 @@ namespace CTS.Instance.SyncObjects
 			_password = 0;
 			_maxPlayerCount = 0;
 			_minPlayerCount = 0;
-			_isAllReady = false;
 			_playerStateTable.InitializeMasterProperties();
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
@@ -295,6 +278,15 @@ namespace CTS.Instance.SyncObjects
 					ClientRoomSetReq_SetRoomMaxUser(player, maxUserCount);
 				}
 			}
+			if (dirtyReliable_0[4])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					if (!reader.TryReadInt32(out int minUserCount)) return false;
+					ClientRoomSetReq_SetRoomMinUser(player, minUserCount);
+				}
+			}
 			return true;
 		}
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;
@@ -334,6 +326,14 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(4);
 				}
 			}
+			if (dirtyReliable_0[4])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+				}
+			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -363,6 +363,14 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 			if (dirtyReliable_0[3])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					reader.Ignore(4);
+				}
+			}
+			if (dirtyReliable_0[4])
 			{
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)

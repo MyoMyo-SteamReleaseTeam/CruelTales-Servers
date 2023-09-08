@@ -16,6 +16,7 @@ namespace CTS.Instance.Gameplay
 		public NetStringShort Name;
 		public NetStringShort Discription;
 		public int MaxUser;
+		public int MinUser;
 
 		public bool HasPassword => Password >= 0;
 
@@ -30,6 +31,7 @@ namespace CTS.Instance.Gameplay
 			Name = "CruelTales game room!";
 			Discription = "This game is good for mental health!";
 			MaxUser = _option.SystemMaxUser;
+			MinUser = _option.SystemMinUser;
 		}
 	}
 }
