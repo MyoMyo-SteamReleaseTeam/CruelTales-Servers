@@ -29,10 +29,13 @@ namespace CTS.Instance.SyncObjects
 						this.Stop();
 						this.ResetImpluse();
 						
-						other.ChangePlayerTypeTo<WolfCharacter>();
-						other.StateMachine.ChangeState(other.StateMachine.IdleState);
-						this.ChangePlayerTypeTo<PlayerCharacter>();
-						this.StateMachine.ChangeState(this.StateMachine.IdleState);
+						var otherCreatedCharacter = other.ChangePlayerTypeTo<WolfCharacter>();
+						otherCreatedCharacter.StateMachine.ChangeState(otherCreatedCharacter.StateMachine.IdleState);
+						otherCreatedCharacter.LoadDefaultPlayerSkin();
+						
+						var thisCreatedCharacter = this.ChangePlayerTypeTo<PlayerCharacter>();
+						thisCreatedCharacter.StateMachine.ChangeState(thisCreatedCharacter.StateMachine.IdleState);
+						thisCreatedCharacter.LoadDefaultPlayerSkin();
 					}
 					else
 					{
@@ -44,6 +47,11 @@ namespace CTS.Instance.SyncObjects
 					break;
 				}
 			}
+		}
+
+		public override void LoadDefaultPlayerSkin()
+		{
+			BroadcastOrderTest((int)UserId.Id, 1);
 		}
 	}
 }
