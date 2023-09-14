@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
+using CT.Common.Gameplay;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CTS.Instance.Coroutines;
+using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
@@ -26,40 +26,6 @@ namespace CTS.Instance.SyncObjects
 
 		private CoroutineRunnerVoid _skinInitRunner;
 		
-		#region Skin
-
-		/// <summary>
-		/// 현재 플레이어의 스킨셋입니다. 0이 나올 경우 빈 공간
-		/// </summary>
-		public int[] CurrentSkinSet = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		private bool _isSkinInit = false;
-		
-		public static readonly int[] DEFAULT_SKINSET = new[]
-		{
-			2000003,
-			3000004,
-			4000001,
-			5000002,
-			7000002,
-			12000002,
-			13000002,
-			14000004,
-		};
-
-		public static readonly int[] DEFAULT_WOLFSKINSET = new[]
-		{
-			7000001,
-			2000003,
-			3000006,
-			4000001,
-			12000001,
-			14000003,
-			15000002,
-		};
-
-		#endregion
-
-
 		public NetworkPlayer? NetworkPlayer { get; private set; }
 		public const float ActionRadius = 1;
 
@@ -107,6 +73,7 @@ namespace CTS.Instance.SyncObjects
 			_animationState = DokzaAnimationState.Idle;
 			_proxyDirection = ProxyDirection.RightDown;
 			StateMachine.ChangeState(StateMachine.IdleState);
+			_skinSet = SkinSetDataDB.DEFAULT_SKIN_SET;
 		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)
@@ -286,83 +253,85 @@ namespace CTS.Instance.SyncObjects
 
 		private bool _isClientSendingSkinData = false;
 		// 명령어 정리
-		// 0: NULL(STOP), 1: Request skin data to server,
-		// 2: Start send skin data from server, 3: Request skin change
+		// 0: NULL(STOP)
+		// 1: Request skin data to server
+		// 2: Start send skin data from server
+		// 3: Request skin change
 		public virtual partial void Client_RequestTest(NetworkPlayer player, int fromClient)
 		{
-			switch (fromClient)
-			{
-				case -2:
-					ChangePlayerTypeTo<WolfCharacter>();
-					break;
+			//switch (fromClient)
+			//{
+			//	case -2:
+			//		ChangePlayerTypeTo<WolfCharacter>();
+			//		break;
 				
-				case -1:
-					ChangePlayerTypeTo<PlayerCharacter>();
-					break;
+			//	case -1:
+			//		ChangePlayerTypeTo<PlayerCharacter>();
+			//		break;
 				
-				case 0:
-					if (!_isClientSendingSkinData)
-						break;
+			//	case 0:
+			//		if (!_isClientSendingSkinData)
+			//			break;
 
-					_isClientSendingSkinData = false;
-					BroadcastOrderTest((int)_userId.Id, 2);
-					foreach (var VARIABLE in CurrentSkinSet)
-					{
-						if (VARIABLE == 0)
-							break;
+			//		_isClientSendingSkinData = false;
+			//		BroadcastOrderTest((int)_userId.Id, 2);
+			//		foreach (var VARIABLE in CurrentSkinSet)
+			//		{
+			//			if (VARIABLE == 0)
+			//				break;
 						
-						BroadcastOrderTest((int)_userId.Id, VARIABLE);
-					}
-					BroadcastOrderTest((int)_userId.Id, 0);
-					break;
+			//			BroadcastOrderTest((int)_userId.Id, VARIABLE);
+			//		}
+			//		BroadcastOrderTest((int)_userId.Id, 0);
+			//		break;
 				
-				case 1:
-					Console.WriteLine($"Skin data request from {player.UserId.Id}");
-					BroadcastOrderTest((int)_userId.Id, 2);
+			//	case 1:
+			//		Console.WriteLine($"Skin data request from {player.UserId.Id}");
+			//		BroadcastOrderTest((int)_userId.Id, 2);
 
-					if (!_isSkinInit)
-					{
-						for (int i = 0; i < DEFAULT_SKINSET.Length; i++)
-						{
-							CurrentSkinSet[i] = DEFAULT_SKINSET[i];
-						}
+			//		if (!_isSkinInit)
+			//		{
+			//			for (int i = 0; i < DEFAULT_SKINSET.Length; i++)
+			//			{
+			//				CurrentSkinSet[i] = DEFAULT_SKINSET[i];
+			//			}
 
-						_isSkinInit = true;
-					}
+			//			_isSkinInit = true;
+			//		}
 					
-					foreach (var VARIABLE in CurrentSkinSet)
-					{
-						if (VARIABLE == 0)
-							break;
+			//		foreach (var VARIABLE in CurrentSkinSet)
+			//		{
+			//			if (VARIABLE == 0)
+			//				break;
 						
-						BroadcastOrderTest((int)_userId.Id, VARIABLE);
-					}
+			//			BroadcastOrderTest((int)_userId.Id, VARIABLE);
+			//		}
 					
-					BroadcastOrderTest((int)_userId.Id, 0);
-					break;
+			//		BroadcastOrderTest((int)_userId.Id, 0);
+			//		break;
 				
-				case 3:
-					for (int i = 0; i < CurrentSkinSet.Length; i++)
-					{
-						CurrentSkinSet[i] = 0;
-					}
-					_isClientSendingSkinData = true;
-					break;
+			//	case 3:
+			//		for (int i = 0; i < CurrentSkinSet.Length; i++)
+			//		{
+			//			CurrentSkinSet[i] = 0;
+			//		}
+			//		_isClientSendingSkinData = true;
+			//		break;
 				
-				case > 1000000:
-					if (!_isClientSendingSkinData)
-						break;
+			//	case > 1000000:
+			//		if (!_isClientSendingSkinData)
+			//			break;
 					
-					for (int i = 0; i < CurrentSkinSet.Length; i++)
-					{
-						if (CurrentSkinSet[i] == 0)
-						{
-							CurrentSkinSet[i] = fromClient;
-							break;
-						}
-					}
-					break;
-			}
+			//		for (int i = 0; i < CurrentSkinSet.Length; i++)
+			//		{
+			//			if (CurrentSkinSet[i] == 0)
+			//			{
+			//				CurrentSkinSet[i] = fromClient;
+			//				break;
+			//			}
+			//		}
+			//		break;
+			//}
 		}
 		
 		#endregion

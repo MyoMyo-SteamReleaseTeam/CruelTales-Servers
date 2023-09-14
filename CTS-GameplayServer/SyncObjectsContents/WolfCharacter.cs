@@ -1,10 +1,17 @@
-﻿using KaNet.Physics;
-using System.Numerics;
+﻿using System.Numerics;
+using CTS.Instance.Data;
+using KaNet.Physics;
 
 namespace CTS.Instance.SyncObjects
 {
 	public partial class WolfCharacter : PlayerCharacter
 	{
+		public override void OnCreated()
+		{
+			base.OnCreated();
+			_skinSet = SkinSetDataDB.WOLF_SKIN_SET;
+		}
+
 		public override void OnDuringAction()
 		{
 			if (PhysicsWorld.Raycast(RigidBody.Position,

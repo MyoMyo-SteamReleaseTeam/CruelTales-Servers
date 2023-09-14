@@ -46,6 +46,8 @@ namespace CTS.Instance.SyncObjects
 		protected UserId _userId = new();
 		[SyncVar]
 		protected NetStringShort _username = new();
+		[SyncVar]
+		protected SkinSet _skinSet = new();
 		[SyncVar(SyncType.ColdData)]
 		protected DokzaAnimationState _animationState = new();
 		[SyncVar(SyncType.ColdData)]
@@ -72,6 +74,7 @@ namespace CTS.Instance.SyncObjects
 		{
 		}
 		protected BitmaskByte _dirtyReliable_0 = new();
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public UserId UserId
 		{
 			get => _userId;
@@ -94,45 +97,56 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public SkinSet SkinSet
+		{
+			get => _skinSet;
+			set
+			{
+				if (_skinSet == value) return;
+				_skinSet = value;
+				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state)
 		{
 			Server_OnAnimationChangedDCallstack.Add(state);
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[3] = true;
 			MarkDirtyReliable();
 		}
 		protected List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
 		{
 			Server_OnAnimationChangedDPCallstack.Add((state, direction));
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
 		protected List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction)
 		{
 			Server_OnProxyDirectionChangedPCallstack.Add(direction);
-			_dirtyReliable_0[4] = true;
+			_dirtyReliable_0[5] = true;
 			MarkDirtyReliable();
 		}
 		protected List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
 		public partial void Server_OrderTest(NetworkPlayer player, int fromServer)
 		{
 			Server_OrderTestiCallstack.Add(player, fromServer);
-			_dirtyReliable_0[5] = true;
+			_dirtyReliable_0[6] = true;
 			MarkDirtyReliable();
 		}
 		protected TargetCallstack<NetworkPlayer, int> Server_OrderTestiCallstack = new(8);
 		public partial void Server_BroadcastOrderTest(int userId, int fromSever)
 		{
 			Server_BroadcastOrderTestiiCallstack.Add((userId, fromSever));
-			_dirtyReliable_0[6] = true;
+			_dirtyReliable_0[7] = true;
 			MarkDirtyReliable();
 		}
 		protected List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
 		public partial void Server_TestPositionTickByTick(Vector2 curPosition)
 		{
 			Server_TestPositionTickByTickVCallstack.Add(curPosition);
-			_dirtyReliable_0[7] = true;
+			_dirtyReliable_1[0] = true;
 			MarkDirtyReliable();
 		}
 		protected List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
@@ -145,98 +159,108 @@ namespace CTS.Instance.SyncObjects
 			Server_OnProxyDirectionChangedPCallstack.Clear();
 			Server_OrderTestiCallstack.Clear();
 			Server_BroadcastOrderTestiiCallstack.Clear();
+			_dirtyReliable_1.Clear();
 			Server_TestPositionTickByTickVCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			int originSize = writer.Size;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				_userId.Serialize(writer);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				_username.Serialize(writer);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Server_OnAnimationChangedDCallstack[i];
-					writer.Put((byte)arg);
+					_userId.Serialize(writer);
 				}
-			}
-			if (_dirtyReliable_0[3])
-			{
-				byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[1])
 				{
-					var arg = Server_OnAnimationChangedDPCallstack[i];
-					writer.Put((byte)arg.state);
-					writer.Put((byte)arg.direction);
+					_username.Serialize(writer);
 				}
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[2])
 				{
-					var arg = Server_OnProxyDirectionChangedPCallstack[i];
-					writer.Put((byte)arg);
+					_skinSet.Serialize(writer);
 				}
-			}
-			if (_dirtyReliable_0[5])
-			{
-				int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
-				if (Server_OrderTestiCount > 0)
+				if (_dirtyReliable_0[3])
 				{
-					var Server_OrderTesticallList = Server_OrderTestiCallstack.GetCallList(player);
-					writer.Put((byte)Server_OrderTestiCount);
-					for (int i = 0; i < Server_OrderTestiCount; i++)
+					byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
 					{
-						var arg = Server_OrderTesticallList[i];
-						writer.Put(arg);
+						var arg = Server_OnAnimationChangedDCallstack[i];
+						writer.Put((byte)arg);
 					}
 				}
-				else
+				if (_dirtyReliable_0[4])
 				{
-					dirtyReliable_0[5] = false;
+					byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_OnAnimationChangedDPCallstack[i];
+						writer.Put((byte)arg.state);
+						writer.Put((byte)arg.direction);
+					}
+				}
+				if (_dirtyReliable_0[5])
+				{
+					byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_OnProxyDirectionChangedPCallstack[i];
+						writer.Put((byte)arg);
+					}
+				}
+				if (_dirtyReliable_0[6])
+				{
+					int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
+					if (Server_OrderTestiCount > 0)
+					{
+						var Server_OrderTesticallList = Server_OrderTestiCallstack.GetCallList(player);
+						writer.Put((byte)Server_OrderTestiCount);
+						for (int i = 0; i < Server_OrderTestiCount; i++)
+						{
+							var arg = Server_OrderTesticallList[i];
+							writer.Put(arg);
+						}
+					}
+					else
+					{
+						dirtyReliable_0[6] = false;
+					}
+				}
+				if (_dirtyReliable_0[7])
+				{
+					byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_BroadcastOrderTestiiCallstack[i];
+						writer.Put(arg.userId);
+						writer.Put(arg.fromSever);
+					}
 				}
 			}
-			if (_dirtyReliable_0[6])
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_1[0])
 				{
-					var arg = Server_BroadcastOrderTestiiCallstack[i];
-					writer.Put(arg.userId);
-					writer.Put(arg.fromSever);
+					byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_TestPositionTickByTickVCallstack[i];
+						arg.Serialize(writer);
+					}
 				}
 			}
-			if (_dirtyReliable_0[7])
+			if (writer.Size == originSize + 2)
 			{
-				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_TestPositionTickByTickVCallstack[i];
-					arg.Serialize(writer);
-				}
-			}
-			if (dirtyReliable_0.AnyTrue())
-			{
-				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			}
-			else
-			{
-				writer.SetSize(dirtyReliable_0_pos);
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -244,6 +268,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
+			_skinSet.Serialize(writer);
 			writer.Put((byte)_animationState);
 			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
@@ -252,6 +277,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId = new();
 			_username = new();
+			_skinSet = new();
 			_animationState = (DokzaAnimationState)0;
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;
