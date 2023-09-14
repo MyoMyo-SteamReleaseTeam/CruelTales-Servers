@@ -17,7 +17,7 @@ namespace CTS.Instance.SyncObjects
 
 		private List<TestCube> _testCubeList = new();
 		private Action<TestCube> _onDestroyed;
-
+		
 		public override void Initialize(GameplayController gameplayController, MiniGameIdentity identity)
 		{
 			base.Initialize(gameplayController, identity);
