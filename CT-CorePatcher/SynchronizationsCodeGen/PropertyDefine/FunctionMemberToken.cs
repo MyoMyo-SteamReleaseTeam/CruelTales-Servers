@@ -103,17 +103,26 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 			if (option.Direction == SyncDirection.FromRemote)
 			{
-				format = _argGroup.Count == 0 ?
-					FuncMemberFormat.TargetDeclarationVoid :
-					FuncMemberFormat.DeclarationFromRemote;
+				if (_argGroup.Count == 0)
+				{
+					return string.Format(FuncMemberFormat.TargetDeclarationVoid,
+										 attribute, AccessModifier, _functionName, _inheritKeyword);
+				}
+				else
+				{
+					return string.Format(FuncMemberFormat.DeclarationFromRemote,
+										 attribute, AccessModifier, _functionName,
+										 _argGroup.GetParameterDeclaration(), _inheritKeyword);
+				}
 			}
 			else if (option.Direction == SyncDirection.FromMaster)
 			{
-				format = FuncMemberFormat.Declaration;
+				return string.Format(FuncMemberFormat.Declaration,
+									 attribute, AccessModifier, _functionName,
+									 _argGroup.GetParameterDeclaration(), _inheritKeyword);
 			}
 
-			return string.Format(format, attribute, AccessModifier, _functionName,
-								 _argGroup.GetParameterDeclaration(), _inheritKeyword);
+			throw new ArgumentOutOfRangeException($"There is no match declaration format in function : {PublicMemberName}");
 		}
 
 		public override string Remote_DeserializeByReader(GenOption option)
