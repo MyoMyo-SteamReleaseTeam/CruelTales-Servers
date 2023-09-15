@@ -138,11 +138,7 @@ namespace CTS.Instance.Synchronizations
 
 			IsAlive = false;
 			WorldManager.AddDestroyEqueue(this);
-
-			if (Visibility == VisibilityType.View)
-			{
-				_worldVisibilityManager.OnDestroy(this);
-			}
+			_worldVisibilityManager.OnDestroy(this);
 		}
 
 		/// <summary>객체를 강제로 삭제합니다. WorldManager에서는 사라지지 않습니다.</summary>
