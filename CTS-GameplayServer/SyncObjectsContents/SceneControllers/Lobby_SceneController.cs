@@ -9,7 +9,7 @@ using CTS.Instance.Gameplay;
 
 namespace CTS.Instance.SyncObjects
 {
-	public partial class Lobby_MiniGameController : MiniGameControllerBase
+	public partial class CustomLobby_SceneController : SceneControllerBase
 	{
 		public const float GAME_START_COUNTDOWN_TIME = 4.0f;
 
@@ -18,7 +18,7 @@ namespace CTS.Instance.SyncObjects
 		private List<TestCube> _testCubeList = new();
 		private Action<TestCube> _onDestroyed;
 		
-		public override void Initialize(GameplayController gameplayController, MiniGameIdentity identity)
+		public override void Initialize(GameplayController gameplayController, GameSceneIdentity identity)
 		{
 			base.Initialize(gameplayController, identity);
 			GameplayController.GameSystemState = GameSystemState.Lobby;
@@ -34,7 +34,6 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-			checkGameOverCondition();
 			if (_testCubeList.Count < 0)
 			{
 				Vector2 lb = new Vector2(-30, -30);
@@ -58,7 +57,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			base.OnPlayerEnter(player);
 
-			Server_LoadMiniGame(player, MiniGameIdentity);
+			Server_TryLoadScene(player, GameSceneIdentity);
 			createPlayerBy(player);
 
 			if (GameplayController.GameSystemState == GameSystemState.GameStartCountdown)
@@ -77,7 +76,7 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public override void Client_ReadyGame(NetworkPlayer player, bool isReady)
+		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady)
 		{
 			player.IsReady = isReady;
 

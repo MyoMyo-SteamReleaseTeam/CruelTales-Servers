@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 
 namespace CT.Common.Gameplay
 {
-	public class MiniGameMapData
+	public class GameSceneMapData
 	{
-		public MiniGameIdentity MiniGameIdentity;
+		public GameSceneIdentity GameSceneIdentity;
 		public List<Vector2> SpawnPositions = new();
 		public List<ColliderInfo> EnvironmentColliders = new();
 

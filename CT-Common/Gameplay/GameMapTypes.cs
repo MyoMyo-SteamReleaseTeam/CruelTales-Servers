@@ -5,7 +5,7 @@ namespace CT.Common.Gameplay
 	public enum GameModeType : ushort
 	{
 		None = 0,
-		Lobby,
+		CustomLobby,
 		RedHood,
 		Dueoksini,
 	}

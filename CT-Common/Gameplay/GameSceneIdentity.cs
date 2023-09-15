@@ -3,20 +3,24 @@ using CT.Common.Serialization;
 
 namespace CT.Common.Gameplay
 {
-	public struct MiniGameIdentity : IPacketSerializable, IEquatable<MiniGameIdentity>
+	public struct GameSceneIdentity : IPacketSerializable, IEquatable<GameSceneIdentity>
 	{
 		public GameModeType Mode;
 		public GameMapType Map;
 		public GameMapThemeType Theme;
 
-		public int SerializeSize => sizeof(ushort) * 3;
+		public const int SERIALIZE_SIZE = sizeof(GameModeType) +
+										  sizeof(GameMapType) +
+										  sizeof(GameMapThemeType);
 
-		public static bool operator ==(MiniGameIdentity lhs, MiniGameIdentity rhs)
+		public int SerializeSize => SERIALIZE_SIZE;
+
+		public static bool operator ==(GameSceneIdentity lhs, GameSceneIdentity rhs)
 		{
 			return lhs.Mode == rhs.Mode && lhs.Map == rhs.Map && lhs.Theme == rhs.Theme;
 		}
 
-		public static bool operator !=(MiniGameIdentity lhs, MiniGameIdentity rhs)
+		public static bool operator !=(GameSceneIdentity lhs, GameSceneIdentity rhs)
 		{
 			return !(lhs == rhs);
 		}
@@ -24,7 +28,7 @@ namespace CT.Common.Gameplay
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader)
 		{
-			reader.Ignore(6);
+			reader.Ignore(SERIALIZE_SIZE);
 		}
 
 		public void Serialize(IPacketWriter writer)
@@ -44,10 +48,10 @@ namespace CT.Common.Gameplay
 
 		public override bool Equals(object? obj)
 		{
-			return obj is MiniGameIdentity && Equals((MiniGameIdentity)obj);
+			return obj is GameSceneIdentity && Equals((GameSceneIdentity)obj);
 		}
 
-		public bool Equals(MiniGameIdentity other)
+		public bool Equals(GameSceneIdentity other)
 		{
 			return this == other;
 		}

@@ -12,7 +12,7 @@ namespace CTS.Instance.Data
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(MiniGameMapDataDB));
 
-		private static Dictionary<MiniGameIdentity, MiniGameMapData> _miniGameMapDataById = new();
+		private static Dictionary<GameSceneIdentity, GameSceneMapData> _miniGameMapDataById = new();
 		public static bool TryLoad()
 		{
 			if (!tryLoadByType(GameMapType.Square_Europe)) return false;
@@ -25,12 +25,12 @@ namespace CTS.Instance.Data
 			{
 				_log.Info($"Try load map data {mapType}");
 				string path = $"Data/MiniGameMapData/{mapType}.json";
-				var result = JsonHandler.TryReadObject<MiniGameMapData>(path);
+				var result = JsonHandler.TryReadObject<GameSceneMapData>(path);
 				if (result.ResultType == JobResultType.Success)
 				{
-					MiniGameMapData mapData = result.Value;
+					GameSceneMapData mapData = result.Value;
 					mapData.Initialize();
-					_miniGameMapDataById.Add(mapData.MiniGameIdentity, mapData);
+					_miniGameMapDataById.Add(mapData.GameSceneIdentity, mapData);
 					return true;
 				}
 
@@ -39,36 +39,36 @@ namespace CTS.Instance.Data
 			}
 		}
 
-		public static MiniGameMapData GetMiniGameMapData(MiniGameIdentity gameId)
+		public static GameSceneMapData GetMiniGameMapData(GameSceneIdentity gameId)
 		{
 			return _miniGameMapDataById[gameId];
 		}
 
-		public static MiniGameControllerBase CreateMiniGameControllerBy(this WorldManager worldManager, MiniGameIdentity gameId)
+		public static SceneControllerBase CreateSceneControllerBy(this WorldManager worldManager, GameSceneIdentity gameId)
 		{
 			return gameId.Mode switch
 			{
-				GameModeType.Lobby => worldManager.CreateObject<Lobby_MiniGameController>(),
+				GameModeType.CustomLobby => worldManager.CreateObject<CustomLobby_SceneController>(),
 				GameModeType.RedHood => worldManager.CreateObject<RedHood_MiniGameController>(),
 				_ => throw new ArgumentOutOfRangeException()
 			};
 		}
 
-		public static MiniGameIdentity Square = new MiniGameIdentity()
+		public static GameSceneIdentity Square = new GameSceneIdentity()
 		{
-			Mode = GameModeType.Lobby,
+			Mode = GameModeType.CustomLobby,
 			Map = GameMapType.Square_Europe,
 			Theme = GameMapThemeType.Europe_France
 		};
 
-		public static MiniGameIdentity RedHood = new MiniGameIdentity()
+		public static GameSceneIdentity RedHood = new GameSceneIdentity()
 		{
 			Mode = GameModeType.RedHood,
 			Map = GameMapType.RedHood_0,
 			Theme = GameMapThemeType.Europe_France
 		};
 
-		public static MiniGameIdentity Dueoksini = new MiniGameIdentity()
+		public static GameSceneIdentity Dueoksini = new GameSceneIdentity()
 		{
 			Mode = GameModeType.Dueoksini,
 			Map = GameMapType.Dueoksini_0,

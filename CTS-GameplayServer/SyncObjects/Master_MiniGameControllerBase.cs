@@ -42,51 +42,26 @@ namespace CTS.Instance.SyncObjects
 	public partial class MiniGameControllerBase
 	{
 		public override NetworkObjectType Type => NetworkObjectType.MiniGameControllerBase;
-		[SyncVar]
-		protected MiniGameIdentity _miniGameIdentity = new();
-		[SyncRpc(SyncType.ReliableTarget)]
-		public partial void Server_LoadMiniGame(NetworkPlayer player, MiniGameIdentity miniGameIdentity);
 		[SyncRpc]
 		public partial void Server_StartMiniGame();
 		[SyncRpc]
 		public partial void Server_NextGameStartCountdown(float second);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_OnMiniGameLoaded(NetworkPlayer player);
-		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady);
 		public MiniGameControllerBase()
 		{
 		}
-		protected BitmaskByte _dirtyReliable_0 = new();
-		public MiniGameIdentity MiniGameIdentity
-		{
-			get => _miniGameIdentity;
-			set
-			{
-				if (_miniGameIdentity == value) return;
-				_miniGameIdentity = value;
-				_dirtyReliable_0[0] = true;
-				MarkDirtyReliable();
-			}
-		}
-		public partial void Server_LoadMiniGame(NetworkPlayer player, MiniGameIdentity miniGameIdentity)
-		{
-			Server_LoadMiniGameMCallstack.Add(player, miniGameIdentity);
-			_dirtyReliable_0[1] = true;
-			MarkDirtyReliable();
-		}
-		protected TargetCallstack<NetworkPlayer, MiniGameIdentity> Server_LoadMiniGameMCallstack = new(8);
 		public partial void Server_StartMiniGame()
 		{
 			Server_StartMiniGameCallstackCount++;
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[3] = true;
 			MarkDirtyReliable();
 		}
 		protected byte Server_StartMiniGameCallstackCount = 0;
 		public partial void Server_NextGameStartCountdown(float second)
 		{
 			Server_NextGameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
 		protected List<float> Server_NextGameStartCountdownfCallstack = new(4);
@@ -94,7 +69,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
-			Server_LoadMiniGameMCallstack.Clear();
+			Server_TryLoadSceneAllGCallstack.Clear();
+			Server_TryLoadSceneGCallstack.Clear();
 			Server_StartMiniGameCallstackCount = 0;
 			Server_NextGameStartCountdownfCallstack.Clear();
 		}
@@ -105,31 +81,41 @@ namespace CTS.Instance.SyncObjects
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
-				_miniGameIdentity.Serialize(writer);
+				_gameSceneIdentity.Serialize(writer);
 			}
 			if (_dirtyReliable_0[1])
 			{
-				int Server_LoadMiniGameMCount = Server_LoadMiniGameMCallstack.GetCallCount(player);
-				if (Server_LoadMiniGameMCount > 0)
+				byte count = (byte)Server_TryLoadSceneAllGCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
 				{
-					var Server_LoadMiniGameMcallList = Server_LoadMiniGameMCallstack.GetCallList(player);
-					writer.Put((byte)Server_LoadMiniGameMCount);
-					for (int i = 0; i < Server_LoadMiniGameMCount; i++)
+					var arg = Server_TryLoadSceneAllGCallstack[i];
+					arg.Serialize(writer);
+				}
+			}
+			if (_dirtyReliable_0[2])
+			{
+				int Server_TryLoadSceneGCount = Server_TryLoadSceneGCallstack.GetCallCount(player);
+				if (Server_TryLoadSceneGCount > 0)
+				{
+					var Server_TryLoadSceneGcallList = Server_TryLoadSceneGCallstack.GetCallList(player);
+					writer.Put((byte)Server_TryLoadSceneGCount);
+					for (int i = 0; i < Server_TryLoadSceneGCount; i++)
 					{
-						var arg = Server_LoadMiniGameMcallList[i];
+						var arg = Server_TryLoadSceneGcallList[i];
 						arg.Serialize(writer);
 					}
 				}
 				else
 				{
-					dirtyReliable_0[1] = false;
+					dirtyReliable_0[2] = false;
 				}
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[3])
 			{
 				writer.Put((byte)Server_StartMiniGameCallstackCount);
 			}
-			if (_dirtyReliable_0[3])
+			if (_dirtyReliable_0[4])
 			{
 				byte count = (byte)Server_NextGameStartCountdownfCallstack.Count;
 				writer.Put(count);
@@ -151,11 +137,11 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
-			_miniGameIdentity.Serialize(writer);
+			_gameSceneIdentity.Serialize(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
-			_miniGameIdentity = new();
+			_gameSceneIdentity = new();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
@@ -165,7 +151,7 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					Client_OnMiniGameLoaded(player);
+					Client_OnSceneLoaded(player);
 				}
 			}
 			if (dirtyReliable_0[1])
@@ -197,7 +183,7 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 		}
-		public static void IgnoreSyncStaticReliable(IPacketReader reader)
+		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
 			BitmaskByte dirtyReliable_0 = reader.ReadBitmaskByte();
 			if (dirtyReliable_0[0])
@@ -214,7 +200,7 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }
-		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
+		public new static void IgnoreSyncStaticUnreliable(IPacketReader reader) { }
 	}
 }
 #pragma warning restore CS0649

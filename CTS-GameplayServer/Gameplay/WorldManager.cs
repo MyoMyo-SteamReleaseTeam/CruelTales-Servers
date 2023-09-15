@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Transactions;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
@@ -89,14 +88,10 @@ namespace CTS.Instance.Gameplay
 			_visibilityManager.Reset();
 		}
 
-		public void SetMiniGameMapData(MiniGameMapData mapData)
-		{
-			_physicsWorld.SetStaticRigidBodies(mapData.StaticRigidBodies);
-		}
-
-		public void ReleaseMiniGameMapData()
+		public void SetGameMapData(GameSceneMapData mapData)
 		{
 			_physicsWorld.ReleaseStaticRigidBodies();
+			_physicsWorld.SetStaticRigidBodies(mapData.StaticRigidBodies);
 		}
 
 		public void OnPlayerEnter(NetworkPlayer player)

@@ -165,7 +165,7 @@ namespace CTS.Instance.SyncObjects
 		/// <typeparam name="T"></typeparam>
 		public virtual PlayerCharacter ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
 		{
-			var _minigameController = GameplayManager.GameplayController.MiniGameController;
+			var _minigameController = GameplayManager.GameplayController.SceneController;
 			if (NetworkPlayer == null || 
 				GameplayManager.GameplayController == null ||
 				_minigameController == null)

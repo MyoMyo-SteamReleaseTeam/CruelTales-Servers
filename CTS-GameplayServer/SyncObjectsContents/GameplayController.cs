@@ -17,7 +17,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		// Reference
-		public MiniGameControllerBase? MiniGameController { get; private set; }
+		public SceneControllerBase? SceneController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
 		public override void OnUpdate(float deltaTime)
@@ -36,18 +36,17 @@ namespace CTS.Instance.SyncObjects
 			// Initialize managers
 			RoomSessionManager.OnCreated(this);
 
-			MiniGameIdentity lobbyGameId = MiniGameMapDataDB.Square;
-			MiniGameController = WorldManager.CreateMiniGameControllerBy(lobbyGameId);
-			MiniGameController.Initialize(this, lobbyGameId);
-			MiniGameController.OnGameStart();
+			GameSceneIdentity lobbyGameId = MiniGameMapDataDB.Square;
+			SceneController = WorldManager.CreateSceneControllerBy(lobbyGameId);
+			SceneController.Initialize(this, lobbyGameId);
 		}
 
 		public override void OnDestroyed()
 		{
-			if (MiniGameController != null)
+			if (SceneController != null)
 			{
-				MiniGameController.Destroy();
-				MiniGameController = null;
+				SceneController.Destroy();
+				SceneController = null;
 			}
 		}
 
@@ -78,7 +77,7 @@ namespace CTS.Instance.SyncObjects
 				player.IsReady = true;
 			}
 
-			MiniGameController?.OnPlayerEnter(player);
+			SceneController?.OnPlayerEnter(player);
 			RoomSessionManager.OnPlayerEnter(player);
 		}
 
@@ -101,7 +100,7 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 
-			MiniGameController?.OnPlayerLeave(player);
+			SceneController?.OnPlayerLeave(player);
 			RoomSessionManager.OnPlayerLeave(player);
 		}
 
@@ -110,11 +109,11 @@ namespace CTS.Instance.SyncObjects
 			_log.Debug($"Client {player} ready to controll");
 		}
 
-		public void ChangeMiniGameTo(MiniGameIdentity gameId)
+		public void ChangeMiniGameTo(GameSceneIdentity gameId)
 		{
-			MiniGameController?.Destroy();
-			MiniGameController = WorldManager.CreateMiniGameControllerBy(gameId);
-			MiniGameController.Initialize(this, gameId);
+			SceneController?.Destroy();
+			SceneController = WorldManager.CreateSceneControllerBy(gameId);
+			SceneController.Initialize(this, gameId);
 		}
 	}
 }
