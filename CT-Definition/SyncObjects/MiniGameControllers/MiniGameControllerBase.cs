@@ -6,7 +6,7 @@ using CT.Common.Synchronizations;
 
 namespace CT.Definitions.SyncObjects
 {
-	[SyncNetworkObjectDefinition(capacity: 1)]
+	[SyncNetworkObjectDefinition(capacity: 2)]
 	public class MiniGameControllerBase
 	{
 		[SyncVar]
@@ -28,13 +28,13 @@ namespace CT.Definitions.SyncObjects
 		public void Server_NextGameStartCountdown(float second) { }
 	}
 
-	[SyncNetworkObjectDefinition(capacity: 1)]
+	[SyncNetworkObjectDefinition(capacity: 2)]
 	public class RedHood_MiniGameController : MiniGameControllerBase
 	{
 
 	}
 
-	[SyncNetworkObjectDefinition(capacity: 1)]
+	[SyncNetworkObjectDefinition(capacity: 2)]
 	public class Lobby_MiniGameController : MiniGameControllerBase
 	{
 		[SyncRpc(sync: SyncType.ReliableTarget)]
