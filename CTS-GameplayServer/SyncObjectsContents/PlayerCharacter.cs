@@ -262,6 +262,25 @@ namespace CTS.Instance.SyncObjects
 		// 3: Request skin change
 		public virtual partial void Client_RequestTest(NetworkPlayer player, int fromClient)
 		{
+			if (!RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
+				return;
+			
+			SkinSet oldSkinSet = state.CurrentSkin;
+			
+			switch (fromClient)
+			{
+				case 0:
+					oldSkinSet.Cheek = 2_000_001;
+					state.CurrentSkin = oldSkinSet;
+					break;
+				
+				case 1:
+					oldSkinSet.Cheek = 2_000_002;
+					break;
+			}
+			
+			state.CurrentSkin = oldSkinSet;
+			
 			//switch (fromClient)
 			//{
 			//	case -2:
