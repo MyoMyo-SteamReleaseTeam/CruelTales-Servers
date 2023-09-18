@@ -109,6 +109,11 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_ReadyToSync(NetworkPlayer player, JoinRequestToken token)
 		{
 			_log.Debug($"Client {player} ready to controll");
+			if (RoomSessionManager.PlayerStateTable.TryGetValue(player.UserId, out var state))
+			{
+				state.SelectedSkin = token.ClientSkinSet;
+				state.CurrentSkin = state.SelectedSkin;
+			}
 		}
 
 		public void ChangeSceneTo(GameSceneIdentity gameId)

@@ -46,7 +46,9 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncVar]
-		private SkinSet _skin = new();
+		private SkinSet _selectedSkin = new();
+		[SyncVar]
+		private SkinSet _currentSkin = new();
 		[SyncVar]
 		private bool _isHost;
 		[SyncVar]
@@ -103,14 +105,25 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
-		public SkinSet Skin
+		public SkinSet SelectedSkin
 		{
-			get => _skin;
+			get => _selectedSkin;
 			set
 			{
-				if (_skin == value) return;
-				_skin = value;
+				if (_selectedSkin == value) return;
+				_selectedSkin = value;
 				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
+		public SkinSet CurrentSkin
+		{
+			get => _currentSkin;
+			set
+			{
+				if (_currentSkin == value) return;
+				_currentSkin = value;
+				_dirtyReliable_0[3] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -121,7 +134,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isHost == value) return;
 				_isHost = value;
-				_dirtyReliable_0[3] = true;
+				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -132,7 +145,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isReady == value) return;
 				_isReady = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_0[5] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -143,7 +156,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isMapLoaded == value) return;
 				_isMapLoaded = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_0[6] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -157,7 +170,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[6] = _costume.IsDirtyReliable;
+			_dirtyReliable_0[7] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
@@ -169,21 +182,25 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				_skin.Serialize(writer);
+				_selectedSkin.Serialize(writer);
 			}
 			if (_dirtyReliable_0[3])
 			{
-				writer.Put(_isHost);
+				_currentSkin.Serialize(writer);
 			}
 			if (_dirtyReliable_0[4])
 			{
-				writer.Put(_isReady);
+				writer.Put(_isHost);
 			}
 			if (_dirtyReliable_0[5])
 			{
-				writer.Put(_isMapLoaded);
+				writer.Put(_isReady);
 			}
 			if (_dirtyReliable_0[6])
+			{
+				writer.Put(_isMapLoaded);
+			}
+			if (_dirtyReliable_0[7])
 			{
 				_costume.SerializeSyncReliable(player, writer);
 			}
@@ -193,7 +210,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
-			_skin.Serialize(writer);
+			_selectedSkin.Serialize(writer);
+			_currentSkin.Serialize(writer);
 			writer.Put(_isHost);
 			writer.Put(_isReady);
 			writer.Put(_isMapLoaded);
@@ -203,7 +221,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId = new();
 			_username = new();
-			_skin = new();
+			_selectedSkin = new();
+			_currentSkin = new();
 			_isHost = false;
 			_isReady = false;
 			_isMapLoaded = false;

@@ -73,13 +73,16 @@ namespace CTS.Instance.SyncObjects
 			_animationState = DokzaAnimationState.Idle;
 			_proxyDirection = ProxyDirection.RightDown;
 			StateMachine.ChangeState(StateMachine.IdleState);
-			_skinSet = SkinSetDataDB.DEFAULT_SKIN_SET;
+
+			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
+			{
+				state.CurrentSkin = state.SelectedSkin;
+			}
 		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)
 		{
 			this.UserId = player.UserId;
-			this.Username = player.Username;
 			NetworkPlayer = player;
 			NetworkPlayer.BindViewTarget(RigidBody);
 		}

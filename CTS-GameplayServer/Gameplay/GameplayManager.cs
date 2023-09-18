@@ -31,7 +31,7 @@ namespace CTS.Instance.Gameplay
 		public int PlayerCount => _networkPlayerByUserId.Count;
 
 		// Objects
-		public GameplayController? GameplayController { get; private set; }
+		[AllowNull] public GameplayController GameplayController { get; private set; }
 
 		public GameplayManager(GameplayInstance gameplayInstance,
 							   ServerOption serverOption,

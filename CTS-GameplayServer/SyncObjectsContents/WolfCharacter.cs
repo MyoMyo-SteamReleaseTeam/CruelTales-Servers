@@ -9,7 +9,10 @@ namespace CTS.Instance.SyncObjects
 		public override void OnCreated()
 		{
 			base.OnCreated();
-			_skinSet = SkinSetDataDB.WOLF_SKIN_SET;
+			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
+			{
+				state.CurrentSkin = SkinSetDataDB.WOLF_SKIN_SET;
+			}
 		}
 
 		public override void OnDuringAction()

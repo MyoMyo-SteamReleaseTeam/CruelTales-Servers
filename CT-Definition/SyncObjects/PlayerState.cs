@@ -1,6 +1,7 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
 using CT.Common.DataType;
+using CT.Common.Gameplay;
 using CT.Common.Synchronizations;
 
 namespace CT.Definitions.SyncObjects
@@ -13,6 +14,12 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncVar]
 		public NetStringShort Username;
+
+		[SyncVar]
+		public SkinSet SelectedSkin;
+
+		[SyncVar]
+		public SkinSet CurrentSkin;
 
 		[SyncVar]
 		public bool IsHost;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
@@ -20,6 +21,14 @@ namespace CTS.Instance.Synchronizations
 	{
 		/// <summary>게임 매니져 입니다.</summary>
 		[AllowNull] public GameplayManager GameplayManager { get; private set; }
+
+		/// <summary>게임 컨트롤러 입니다.</summary>
+		[AllowNull] public GameplayController GameplayController
+			=> GameplayManager.GameplayController;
+
+		/// <summary>게임 세션 메니져입니다.</summary>
+		[AllowNull] public RoomSessionManager RoomSessionManager
+			=> GameplayController.RoomSessionManager;
 
 		/// <summary>네트워크 객체가 속해있는 World 입니다.</summary>
 		[AllowNull] public WorldManager WorldManager { get; private set; }

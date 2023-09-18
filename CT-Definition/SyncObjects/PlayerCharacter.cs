@@ -15,12 +15,6 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public UserId UserId;
 
-		[SyncVar]
-		public NetStringShort Username;
-
-		[SyncVar]
-		public SkinSet SkinSet;
-
 		// Animations
 		[SyncVar(SyncType.ColdData)]
 		public DokzaAnimationState AnimationState;
