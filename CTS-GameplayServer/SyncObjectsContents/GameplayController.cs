@@ -26,6 +26,8 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnCreated()
 		{
+			IsPersistent = true;
+
 			// Initialize server option
 			ServerRuntimeOption runtimeOption = new()
 			{
@@ -36,7 +38,7 @@ namespace CTS.Instance.SyncObjects
 			// Initialize managers
 			RoomSessionManager.OnCreated(this);
 
-			GameSceneIdentity lobbyGameId = MiniGameMapDataDB.Square;
+			GameSceneIdentity lobbyGameId = GameSceneMapDataDB.Square;
 			SceneController = WorldManager.CreateSceneControllerBy(lobbyGameId);
 			SceneController.Initialize(this, lobbyGameId);
 		}
@@ -109,9 +111,10 @@ namespace CTS.Instance.SyncObjects
 			_log.Debug($"Client {player} ready to controll");
 		}
 
-		public void ChangeMiniGameTo(GameSceneIdentity gameId)
+		public void ChangeSceneTo(GameSceneIdentity gameId)
 		{
 			SceneController?.Destroy();
+			WorldManager.ClearWithoutPersistentObject();
 			SceneController = WorldManager.CreateSceneControllerBy(gameId);
 			SceneController.Initialize(this, gameId);
 		}

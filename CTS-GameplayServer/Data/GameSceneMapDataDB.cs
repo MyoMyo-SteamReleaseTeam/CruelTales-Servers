@@ -8,11 +8,12 @@ using log4net;
 
 namespace CTS.Instance.Data
 {
-	public static class MiniGameMapDataDB
+	public static class GameSceneMapDataDB
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof(MiniGameMapDataDB));
+		private static readonly ILog _log = LogManager.GetLogger(typeof(GameSceneMapDataDB));
 
-		private static Dictionary<GameSceneIdentity, GameSceneMapData> _miniGameMapDataById = new();
+		private static Dictionary<GameSceneIdentity, GameSceneMapData> _gameSceneMapDataById = new();
+
 		public static bool TryLoad()
 		{
 			if (!tryLoadByType(GameMapType.Square_Europe)) return false;
@@ -30,7 +31,7 @@ namespace CTS.Instance.Data
 				{
 					GameSceneMapData mapData = result.Value;
 					mapData.Initialize();
-					_miniGameMapDataById.Add(mapData.GameSceneIdentity, mapData);
+					_gameSceneMapDataById.Add(mapData.GameSceneIdentity, mapData);
 					return true;
 				}
 
@@ -39,9 +40,9 @@ namespace CTS.Instance.Data
 			}
 		}
 
-		public static GameSceneMapData GetMiniGameMapData(GameSceneIdentity gameId)
+		public static GameSceneMapData GetGameSceneMapData(GameSceneIdentity gameId)
 		{
-			return _miniGameMapDataById[gameId];
+			return _gameSceneMapDataById[gameId];
 		}
 
 		public static SceneControllerBase CreateSceneControllerBy(this WorldManager worldManager, GameSceneIdentity gameId)

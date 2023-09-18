@@ -35,7 +35,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			GameplayController = gameplayController;
 			GameSceneIdentity = identity;
-			_mapData = MiniGameMapDataDB.GetMiniGameMapData(identity);
+			_mapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_spawnIndex = 0;
 		}
 

@@ -70,7 +70,7 @@ namespace CTS.Instance
 
 			// Initialize
 			LayerMaskHelper.Initialize();
-			if (!MiniGameMapDataDB.TryLoad()) return;
+			if (!GameSceneMapDataDB.TryLoad()) return;
 
 			// Start server
 			_serverTimer = new TickTimer();
