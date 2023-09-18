@@ -55,7 +55,7 @@ namespace CTS.Instance.SyncObjects
 			remove => _onRoomSessionManagerChanged -= value;
 		}
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_ReadyToSync(NetworkPlayer player);
+		public partial void Client_ReadyToSync(NetworkPlayer player, JoinRequestToken token);
 		public GameplayController()
 		{
 			_roomSessionManager = new(this);
@@ -148,7 +148,9 @@ namespace CTS.Instance.SyncObjects
 				byte count = reader.ReadByte();
 				for (int i = 0; i < count; i++)
 				{
-					Client_ReadyToSync(player);
+					JoinRequestToken token = new();
+					if (!token.TryDeserialize(reader)) return false;
+					Client_ReadyToSync(player, token);
 				}
 			}
 			return true;
@@ -167,7 +169,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[1])
 			{
-				reader.Ignore(1);
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					JoinRequestToken.IgnoreStatic(reader);
+				}
 			}
 		}
 		public static void IgnoreSyncStaticReliable(IPacketReader reader)
@@ -179,7 +185,11 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (dirtyReliable_0[1])
 			{
-				reader.Ignore(1);
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					JoinRequestToken.IgnoreStatic(reader);
+				}
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader) { }

@@ -106,7 +106,7 @@ namespace CTS.Instance.SyncObjects
 			RoomSessionManager.OnPlayerLeave(player);
 		}
 
-		public partial void Client_ReadyToSync(NetworkPlayer player)
+		public partial void Client_ReadyToSync(NetworkPlayer player, JoinRequestToken token)
 		{
 			_log.Debug($"Client {player} ready to controll");
 		}

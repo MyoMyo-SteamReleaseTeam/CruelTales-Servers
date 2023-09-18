@@ -46,6 +46,8 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncVar]
+		private SkinSet _skin = new();
+		[SyncVar]
 		private bool _isHost;
 		[SyncVar]
 		private bool _isReady;
@@ -101,6 +103,17 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public SkinSet Skin
+		{
+			get => _skin;
+			set
+			{
+				if (_skin == value) return;
+				_skin = value;
+				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public bool IsHost
 		{
 			get => _isHost;
@@ -108,7 +121,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isHost == value) return;
 				_isHost = value;
-				_dirtyReliable_0[2] = true;
+				_dirtyReliable_0[3] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -119,7 +132,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isReady == value) return;
 				_isReady = value;
-				_dirtyReliable_0[3] = true;
+				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -130,7 +143,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isMapLoaded == value) return;
 				_isMapLoaded = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_0[5] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -144,7 +157,7 @@ namespace CTS.Instance.SyncObjects
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[5] = _costume.IsDirtyReliable;
+			_dirtyReliable_0[6] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
@@ -156,17 +169,21 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_isHost);
+				_skin.Serialize(writer);
 			}
 			if (_dirtyReliable_0[3])
 			{
-				writer.Put(_isReady);
+				writer.Put(_isHost);
 			}
 			if (_dirtyReliable_0[4])
 			{
-				writer.Put(_isMapLoaded);
+				writer.Put(_isReady);
 			}
 			if (_dirtyReliable_0[5])
+			{
+				writer.Put(_isMapLoaded);
+			}
+			if (_dirtyReliable_0[6])
 			{
 				_costume.SerializeSyncReliable(player, writer);
 			}
@@ -176,6 +193,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
+			_skin.Serialize(writer);
 			writer.Put(_isHost);
 			writer.Put(_isReady);
 			writer.Put(_isMapLoaded);
@@ -185,6 +203,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId = new();
 			_username = new();
+			_skin = new();
 			_isHost = false;
 			_isReady = false;
 			_isMapLoaded = false;

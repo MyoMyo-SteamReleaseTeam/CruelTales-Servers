@@ -19,7 +19,7 @@ namespace CT.Definitions.SyncObjects
 		public RoomSessionManager RoomSessionManager = new();
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public void Client_ReadyToSync() { }
+		public void Client_ReadyToSync(JoinRequestToken token) { }
 	}
 }
 #pragma warning restore IDE0051
