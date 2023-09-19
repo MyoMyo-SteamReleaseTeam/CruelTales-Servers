@@ -18,9 +18,9 @@ namespace CTS.Instance.SyncObjects
 		private List<TestCube> _testCubeList = new();
 		private Action<TestCube> _onDestroyed;
 		
-		public override void Initialize(GameplayController gameplayController, GameSceneIdentity identity)
+		public override void Initialize(GameSceneIdentity identity)
 		{
-			base.Initialize(gameplayController, identity);
+			base.Initialize(identity);
 			GameplayController.GameSystemState = GameSystemState.Lobby;
 		}
 
@@ -58,7 +58,7 @@ namespace CTS.Instance.SyncObjects
 			base.OnPlayerEnter(player);
 
 			Server_TryLoadScene(player, GameSceneIdentity);
-			createPlayerBy(player);
+			SpawnPlayerBy<PlayerCharacter>(player);
 
 			if (GameplayController.GameSystemState == GameSystemState.GameStartCountdown)
 			{

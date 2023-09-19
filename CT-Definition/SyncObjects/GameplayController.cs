@@ -18,6 +18,12 @@ namespace CT.Definitions.SyncObjects
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		public RoomSessionManager RoomSessionManager = new();
 
+		[SyncObject]
+		public EffectController EffectController = new();
+
+		[SyncObject]
+		public SoundController SoundController = new();
+
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_ReadyToSync(JoinRequestToken token) { }
 	}

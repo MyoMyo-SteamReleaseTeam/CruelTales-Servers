@@ -48,6 +48,10 @@ namespace CTS.Instance.SyncObjects
 		private GameSystemState _gameSystemState = new();
 		[SyncObject(dir: SyncDirection.Bidirection)]
 		private readonly RoomSessionManager _roomSessionManager;
+		[SyncObject]
+		private readonly EffectController _effectController;
+		[SyncObject]
+		private readonly SoundController _soundController;
 		private Action<RoomSessionManager>? _onRoomSessionManagerChanged;
 		public event Action<RoomSessionManager> OnRoomSessionManagerChanged
 		{
@@ -59,6 +63,8 @@ namespace CTS.Instance.SyncObjects
 		public GameplayController()
 		{
 			_roomSessionManager = new(this);
+			_effectController = new(this);
+			_soundController = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		public ServerRuntimeOption ServerRuntimeOption
@@ -84,16 +90,22 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 		public RoomSessionManager RoomSessionManager => _roomSessionManager;
+		public EffectController EffectController => _effectController;
+		public SoundController SoundController => _soundController;
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			_roomSessionManager.ClearDirtyReliable();
+			_effectController.ClearDirtyReliable();
+			_soundController.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
 			_dirtyReliable_0[2] = _roomSessionManager.IsDirtyReliable;
+			_dirtyReliable_0[3] = _effectController.IsDirtyReliable;
+			_dirtyReliable_0[4] = _soundController.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
@@ -113,6 +125,14 @@ namespace CTS.Instance.SyncObjects
 					dirtyReliable_0[2] = false;
 				}
 			}
+			if (_dirtyReliable_0[3])
+			{
+				_effectController.SerializeSyncReliable(player, writer);
+			}
+			if (_dirtyReliable_0[4])
+			{
+				_soundController.SerializeSyncReliable(player, writer);
+			}
 			if (dirtyReliable_0.AnyTrue())
 			{
 				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
@@ -128,12 +148,16 @@ namespace CTS.Instance.SyncObjects
 			_serverRuntimeOption.Serialize(writer);
 			writer.Put((byte)_gameSystemState);
 			_roomSessionManager.SerializeEveryProperty(writer);
+			_effectController.SerializeEveryProperty(writer);
+			_soundController.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_serverRuntimeOption = new();
 			_gameSystemState = (GameSystemState)0;
 			_roomSessionManager.InitializeMasterProperties();
+			_effectController.InitializeMasterProperties();
+			_soundController.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

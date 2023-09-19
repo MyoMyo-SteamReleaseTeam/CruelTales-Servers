@@ -69,12 +69,12 @@ namespace CTS.Instance.SyncObjects
 		public void BindOwner(IDirtyable owner) => _owner = owner;
 		public RoomSessionManager()
 		{
-			_playerStateTable = new(this);
+			_playerStateTable = new(this, maxCapacity: 8);
 		}
 		public RoomSessionManager(IDirtyable owner)
 		{
 			_owner = owner;
-			_playerStateTable = new(this);
+			_playerStateTable = new(this, maxCapacity: 8);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		protected bool _isDirtyReliable;

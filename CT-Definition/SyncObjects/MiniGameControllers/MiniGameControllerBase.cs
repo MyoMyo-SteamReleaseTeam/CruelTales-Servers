@@ -16,11 +16,5 @@ namespace CT.Definitions.SyncObjects
 		[SyncRpc]
 		public void Server_NextGameStartCountdown(float second) { }
 	}
-
-	[SyncNetworkObjectDefinition(capacity: 2)]
-	public class RedHood_MiniGameController : MiniGameControllerBase
-	{
-
-	}
 }
 #pragma warning restore IDE0051

@@ -18,11 +18,6 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			Server_TryLoadSceneAll(GameSceneIdentity);
-
-			foreach (NetworkPlayer player in GameplayController.PlayerSet)
-			{
-				createPlayerBy(player);
-			}
 		}
 
 		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady)

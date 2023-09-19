@@ -12,6 +12,8 @@ namespace CTS.Instance.Data
 		{
 			{ NetworkObjectType.PlayerCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
 			{ NetworkObjectType.WolfCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
+			{ NetworkObjectType.RedHoodCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
+			{ NetworkObjectType.NormalCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
 			{ NetworkObjectType.TestCube, () => new CircleRigidBody(0.5f, false, PhysicsLayerMask.Player) },
 		};
 

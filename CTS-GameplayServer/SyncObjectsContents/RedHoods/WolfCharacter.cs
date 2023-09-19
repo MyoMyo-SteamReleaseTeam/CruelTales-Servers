@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using CTS.Instance.Data;
+using CTS.Instance.Gameplay.Events;
 using KaNet.Physics;
 
 namespace CTS.Instance.SyncObjects
@@ -32,20 +33,14 @@ namespace CTS.Instance.SyncObjects
 					if (netObj is not PlayerCharacter other)
 						continue;
 
-					if (other is not WolfCharacter)
+					if (other is NormalCharacter)
+						continue;
+
+					if (other is RedHoodCharacter redHood)
 					{
-						other.Stop();
-						other.ResetImpluse();
-						this.Stop();
-						this.ResetImpluse();
-						
-						var otherCreatedCharacter = other.ChangePlayerTypeTo<WolfCharacter>();
-						otherCreatedCharacter.StateMachine.ChangeState(otherCreatedCharacter.StateMachine.IdleState);
-						otherCreatedCharacter.LoadDefaultPlayerSkin();
-						
-						var thisCreatedCharacter = this.ChangePlayerTypeTo<PlayerCharacter>();
-						thisCreatedCharacter.StateMachine.ChangeState(thisCreatedCharacter.StateMachine.IdleState);
-						thisCreatedCharacter.LoadDefaultPlayerSkin();
+						var curScene = GameplayManager.GameplayController.SceneController;
+						var eventHandler = curScene as IWolfEventHandler;
+						eventHandler?.OnWolfCatch(this, redHood);
 					}
 					else
 					{

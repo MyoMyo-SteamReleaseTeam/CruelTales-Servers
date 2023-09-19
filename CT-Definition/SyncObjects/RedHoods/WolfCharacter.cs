@@ -1,4 +1,4 @@
-using CT.Common.Synchronizations;
+﻿using CT.Common.Synchronizations;
 
 namespace CT.Definitions.SyncObjects
 {

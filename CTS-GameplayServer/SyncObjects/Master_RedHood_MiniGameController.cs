@@ -42,8 +42,11 @@ namespace CTS.Instance.SyncObjects
 	public partial class RedHood_MiniGameController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.RedHood_MiniGameController;
+		[SyncObject]
+		protected readonly SyncObjectDictionary<UserId, PlayerRoleState> _playerRoleStateTable;
 		public RedHood_MiniGameController()
 		{
+			_playerRoleStateTable = new(this, maxCapacity: 8);
 		}
 		public override void ClearDirtyReliable()
 		{
@@ -53,10 +56,12 @@ namespace CTS.Instance.SyncObjects
 			Server_TryLoadSceneGCallstack.Clear();
 			Server_StartMiniGameCallstackCount = 0;
 			Server_NextGameStartCountdownfCallstack.Clear();
+			_playerRoleStateTable.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			_dirtyReliable_0[5] = _playerRoleStateTable.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
@@ -105,6 +110,10 @@ namespace CTS.Instance.SyncObjects
 					writer.Put(arg);
 				}
 			}
+			if (_dirtyReliable_0[5])
+			{
+				_playerRoleStateTable.SerializeSyncReliable(player, writer);
+			}
 			if (dirtyReliable_0.AnyTrue())
 			{
 				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
@@ -118,10 +127,12 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_gameSceneIdentity.Serialize(writer);
+			_playerRoleStateTable.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_gameSceneIdentity = new();
+			_playerRoleStateTable.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

@@ -40,7 +40,7 @@ namespace CTS.Instance.SyncObjects
 
 			GameSceneIdentity lobbyGameId = GameSceneMapDataDB.Square;
 			SceneController = WorldManager.CreateSceneControllerBy(lobbyGameId);
-			SceneController.Initialize(this, lobbyGameId);
+			SceneController.Initialize(lobbyGameId);
 		}
 
 		public override void OnDestroyed()
@@ -121,7 +121,7 @@ namespace CTS.Instance.SyncObjects
 			SceneController?.Destroy();
 			WorldManager.ClearWithoutPersistentObject();
 			SceneController = WorldManager.CreateSceneControllerBy(gameId);
-			SceneController.Initialize(this, gameId);
+			SceneController.Initialize(gameId);
 		}
 	}
 }

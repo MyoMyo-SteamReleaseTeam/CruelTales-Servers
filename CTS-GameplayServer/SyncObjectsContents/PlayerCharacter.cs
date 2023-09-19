@@ -25,8 +25,8 @@ namespace CTS.Instance.SyncObjects
 		public float Speed = 5.0f;
 
 		private CoroutineRunnerVoid _skinInitRunner;
-		
-		public NetworkPlayer? NetworkPlayer { get; private set; }
+
+		[AllowNull] public NetworkPlayer NetworkPlayer { get; private set; }
 		public const float ActionRadius = 1;
 
 		// States

@@ -23,7 +23,7 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int MinPlayerCount;
 
-		[SyncObject]
+		[SyncObject(cc: Constant.CAPACITY_BY_PLAYER)]
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
 		[SyncRpc(SyncType.ReliableTarget)]

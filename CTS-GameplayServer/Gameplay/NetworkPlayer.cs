@@ -181,6 +181,6 @@ namespace CTS.Instance.Gameplay
 			PlayerState = null;
 		}
 
-		public override string ToString() => Username;
+		public override string ToString() => $"{Username}:{UserId}";
 	}
 }

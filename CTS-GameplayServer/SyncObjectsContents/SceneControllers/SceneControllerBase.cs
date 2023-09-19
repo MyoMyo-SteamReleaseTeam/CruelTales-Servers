@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
@@ -16,9 +15,6 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		// Reference
-		public GameplayController GameplayController { get; private set; }
-		public RoomSessionManager RoomSessionManager => GameplayController.RoomSessionManager;
 		protected GameSceneMapData _mapData;
 
 		// Player Management
@@ -30,11 +26,10 @@ namespace CTS.Instance.SyncObjects
 			PlayerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
 		}
 
-		public virtual void Initialize(GameplayController gameplayController,
-									   GameSceneIdentity identity)
+		public virtual void Initialize(GameSceneIdentity identity)
 		{
-			GameplayController = gameplayController;
 			GameSceneIdentity = identity;
+			PlayerCharacterByPlayer.Clear();
 			_mapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_spawnIndex = 0;
 		}
@@ -54,16 +49,44 @@ namespace CTS.Instance.SyncObjects
 		public virtual void OnPlayerEnter(NetworkPlayer player) { }
 		public virtual void OnPlayerLeave(NetworkPlayer player) { }
 
-		protected void createPlayerBy(NetworkPlayer player)
+		public void SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
 		{
 			var spawnPositions = _mapData.SpawnPositions;
 			int spawnPosCount = spawnPositions.Count;
 			Vector2 spawnPos = spawnPositions[_spawnIndex];
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
+			CreatePlayerBy<T>(player, spawnPos);
+		}
 
-			var playerCharacter = WorldManager.CreateObject<PlayerCharacter>(spawnPos);
+		public void CreatePlayerBy<T>(NetworkPlayer player, Vector2 position) where T : PlayerCharacter, new()
+		{
+			if (PlayerCharacterByPlayer.TryGetValue(player, out var existCharacter))
+			{
+				_log.Error($"{player} already has player character. {existCharacter.GetType().Name}");
+				return;
+			}
+
+			var playerCharacter = WorldManager.CreateObject<T>(position);
 			playerCharacter.BindNetworkPlayer(player);
 			PlayerCharacterByPlayer.Add(player, playerCharacter);
+		}
+
+		public void DestroyPlayer(PlayerCharacter playerCharacter)
+		{
+			DestroyPlayer(playerCharacter.NetworkPlayer);
+		}
+
+		public void DestroyPlayer(NetworkPlayer player)
+		{
+			if (!PlayerCharacterByPlayer.TryGetValue(player, out var playerCharacter))
+			{
+				_log.Error($"There is no matched player character. NetworkPlayer : {player}");
+				return;
+			}
+
+			PlayerCharacterByPlayer.TryRemove(player);
+			playerCharacter.Destroy();
+			player.ReleaseViewTarget();
 		}
 	}
 }

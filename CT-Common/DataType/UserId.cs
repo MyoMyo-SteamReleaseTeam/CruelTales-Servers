@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using CT.Common.DataType.Primitives;
 using CT.Common.Serialization;
 
 namespace CT.Common.DataType
@@ -11,6 +12,8 @@ namespace CT.Common.DataType
 		public int SerializeSize => sizeof(ulong);
 
 		public UserId(ulong value) => Id = value;
+		public static implicit operator ulong(UserId value) => value.Id;
+		public static implicit operator UserId(ulong value) => new UserId(value);
 		public void Serialize(IPacketWriter writer) => writer.Put(Id);
 		public bool TryDeserialize(IPacketReader reader) => reader.TryReadUInt64(out Id);
 		public static bool operator ==(UserId left, UserId right) => left.Id == right.Id;
