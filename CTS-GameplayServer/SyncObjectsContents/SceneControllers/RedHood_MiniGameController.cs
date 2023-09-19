@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
+using CT.Common.Gameplay;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
@@ -131,9 +132,8 @@ namespace CTS.Instance.SyncObjects
 			Arg centerArg = new(center);
 			Arg isRight = new(center.X < wolfPos.X);
 
-			StartCoroutine(_onChangeRole, centerArg, isRight, wolfUserId, targetUserId, 3.0f);
-			// TODO : Show Effect
-			//GameplayController.EffectController.Play(EffectType)
+			StartCoroutine(_onChangeRole, centerArg, isRight, wolfUserId, targetUserId, 2.0f);
+			GameplayController.EffectController.Play(EffectType.WolfnPlayerFight, center);
 
 			DestroyPlayer(wolf);
 			DestroyPlayer(target);
