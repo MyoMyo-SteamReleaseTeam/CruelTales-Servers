@@ -270,6 +270,18 @@ namespace CTS.Instance.Gameplay
 			_coroutineRuntime.Start(coroutineAction);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionArgs4 coroutineAction)
+		{
+			_coroutineRuntime.Start(coroutineAction);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void StartCoroutine(CoroutineActionArgs5 coroutineAction)
+		{
+			_coroutineRuntime.Start(coroutineAction);
+		}
+
 		#endregion
 
 		#region Life Cycle

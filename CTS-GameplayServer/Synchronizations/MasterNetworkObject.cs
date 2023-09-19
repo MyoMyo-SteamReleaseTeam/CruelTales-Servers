@@ -314,6 +314,49 @@ namespace CTS.Instance.Synchronizations
 			return coroutineId;
 		}
 
+		public CoroutineIdentity StartCoroutine(Action<Arg, Arg, Arg, Arg> cachedAction,
+												Arg argument0, Arg argument1, Arg argument2, Arg argument3, float delay)
+		{
+			CoroutineIdentity coroutineId = new(Identity, _coroutineCallCounter);
+			CoroutineActionArgs4 coroutineAction = new CoroutineActionArgs4
+			(
+				callerObject: this,
+				identity: coroutineId,
+				action: cachedAction,
+				arg0: argument0,
+				arg1: argument1,
+				arg2: argument2,
+				arg3: argument3,
+				delay: delay
+			);
+			WorldManager.StartCoroutine(coroutineAction);
+			_wattingCoroutines.Add(coroutineId);
+			_coroutineCallCounter++;
+			return coroutineId;
+		}
+
+		public CoroutineIdentity StartCoroutine(Action<Arg, Arg, Arg, Arg, Arg> cachedAction,
+												Arg argument0, Arg argument1, Arg argument2, Arg argument3, Arg argument4, float delay)
+		{
+			CoroutineIdentity coroutineId = new(Identity, _coroutineCallCounter);
+			CoroutineActionArgs5 coroutineAction = new CoroutineActionArgs5
+			(
+				callerObject: this,
+				identity: coroutineId,
+				action: cachedAction,
+				arg0: argument0,
+				arg1: argument1,
+				arg2: argument2,
+				arg3: argument3,
+				arg4: argument4,
+				delay: delay
+			);
+			WorldManager.StartCoroutine(coroutineAction);
+			_wattingCoroutines.Add(coroutineId);
+			_coroutineCallCounter++;
+			return coroutineId;
+		}
+
 		public void CancelCoroutine(CoroutineIdentity coroutineIdentity)
 		{
 			_wattingCoroutines.Remove(coroutineIdentity);

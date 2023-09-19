@@ -8,6 +8,8 @@ namespace CTS.Instance.Coroutines
 		private PriorityQueue<CoroutineActionArg, float> _coroutineArgQueue;
 		private PriorityQueue<CoroutineActionArgs2, float> _coroutineArgs2Queue;
 		private PriorityQueue<CoroutineActionArgs3, float> _coroutineArgs3Queue;
+		private PriorityQueue<CoroutineActionArgs4, float> _coroutineArgs4Queue;
+		private PriorityQueue<CoroutineActionArgs5, float> _coroutineArgs5Queue;
 		private float _currentTime;
 
 		public CoroutineRuntime(int capacity)
@@ -16,6 +18,8 @@ namespace CTS.Instance.Coroutines
 			_coroutineArgQueue = new(capacity);
 			_coroutineArgs2Queue = new(capacity);
 			_coroutineArgs3Queue = new(capacity);
+			_coroutineArgs4Queue = new(capacity);
+			_coroutineArgs5Queue = new(capacity);
 		}
 
 		public void Start(CoroutineActionVoid action)
@@ -38,17 +42,24 @@ namespace CTS.Instance.Coroutines
 			_coroutineArgs3Queue.Enqueue(action, action.Delay + _currentTime);
 		}
 
-		public void CancelCoroutine(CoroutineIdentity coroutineIdentity)
+		public void Start(CoroutineActionArgs4 action)
 		{
-
+			_coroutineArgs4Queue.Enqueue(action, action.Delay + _currentTime);
 		}
 
+		public void Start(CoroutineActionArgs5 action)
+		{
+			_coroutineArgs5Queue.Enqueue(action, action.Delay + _currentTime);
+		}
+		
 		public void Reset()
 		{
 			_coroutineVoidQueue.Clear();
 			_coroutineArgQueue.Clear();
 			_coroutineArgs2Queue.Clear();
 			_coroutineArgs3Queue.Clear();
+			_coroutineArgs4Queue.Clear();
+			_coroutineArgs5Queue.Clear();
 			_currentTime = 0;
 		}
 
@@ -94,6 +105,26 @@ namespace CTS.Instance.Coroutines
 
 				curAction.Execute();
 				_coroutineArgs3Queue.Dequeue();
+			}
+
+			while (_coroutineArgs4Queue.TryPeek(out CoroutineActionArgs4 curAction,
+												out float delayTime))
+			{
+				if (delayTime > _currentTime)
+					break;
+
+				curAction.Execute();
+				_coroutineArgs4Queue.Dequeue();
+			}
+
+			while (_coroutineArgs5Queue.TryPeek(out CoroutineActionArgs5 curAction,
+												out float delayTime))
+			{
+				if (delayTime > _currentTime)
+					break;
+
+				curAction.Execute();
+				_coroutineArgs5Queue.Dequeue();
 			}
 		}
 	}

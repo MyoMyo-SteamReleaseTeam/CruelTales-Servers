@@ -90,4 +90,40 @@ namespace CTS.Instance.Coroutines
 			_identity = _networkObject.StartCoroutine(_cachedAction, argument0, argument1, argument2, delay);
 		}
 	}
+
+	public class CoroutineRunnerArgs4 : CoroutineRunnerBase
+	{
+		private Action<Arg, Arg, Arg, Arg> _cachedAction;
+
+		public CoroutineRunnerArgs4(MasterNetworkObject netObject, Action<Arg, Arg, Arg, Arg> cachedAction)
+			: base(netObject)
+		{
+			_networkObject = netObject;
+			_cachedAction = cachedAction;
+		}
+
+		public void StartCoroutine(Arg argument0, Arg argument1, Arg argument2, Arg argument3, float delay)
+		{
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, argument0, argument1, argument2, argument3, delay);
+		}
+	}
+
+	public class CoroutineRunnerArgs5 : CoroutineRunnerBase
+	{
+		private Action<Arg, Arg, Arg, Arg, Arg> _cachedAction;
+
+		public CoroutineRunnerArgs5(MasterNetworkObject netObject, Action<Arg, Arg, Arg, Arg, Arg> cachedAction)
+			: base(netObject)
+		{
+			_networkObject = netObject;
+			_cachedAction = cachedAction;
+		}
+
+		public void StartCoroutine(Arg argument0, Arg argument1, Arg argument2, Arg argument3, Arg argument4, float delay)
+		{
+			StopCoroutine();
+			_identity = _networkObject.StartCoroutine(_cachedAction, argument0, argument1, argument2, argument3, argument4, delay);
+		}
+	}
 }
