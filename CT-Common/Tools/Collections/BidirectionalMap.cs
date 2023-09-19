@@ -34,6 +34,18 @@ namespace CT.Common.Tools.Collections
 			_reverseMap = new Dictionary<T2, T1>(capacity);
 		}
 
+		public T2 this[T1 forwardKey]
+		{
+			get => _forwardMap[forwardKey];
+			set => _forwardMap[forwardKey] = value;
+		}
+
+		public T1 this[T2 reverseKey]
+		{
+			get => _reverseMap[reverseKey];
+			set => _reverseMap[reverseKey] = value;
+		}
+
 		/// <summary>Map의 모든 요소를 삭제합니다.</summary>
 		public void Clear()
 		{
