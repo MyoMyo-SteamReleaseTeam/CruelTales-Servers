@@ -43,48 +43,81 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.CameraController;
 		[SyncVar]
-		private NetworkIdentity _target = new();
+		private NetworkIdentity _targetId = new();
+		[SyncVar]
+		private float _followSpeed;
 		[SyncRpc]
 		public partial void Server_MoveTo(Vector2 position);
 		[SyncRpc]
-		public partial void Server_SetTo(Vector2 position, float time);
+		public partial void Server_LookAt(Vector2 position);
+		[SyncRpc]
+		public partial void Server_LookAt(Vector2 position, float time);
+		[SyncRpc]
+		public partial void Server_Shake();
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_CannotFindBindTarget(NetworkPlayer player);
 		public CameraController()
 		{
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
-		public NetworkIdentity Target
+		public NetworkIdentity TargetId
 		{
-			get => _target;
+			get => _targetId;
 			set
 			{
-				if (_target == value) return;
-				_target = value;
+				if (_targetId == value) return;
+				_targetId = value;
 				_dirtyReliable_0[0] = true;
+				MarkDirtyReliable();
+			}
+		}
+		public float FollowSpeed
+		{
+			get => _followSpeed;
+			set
+			{
+				if (_followSpeed == value) return;
+				_followSpeed = value;
+				_dirtyReliable_0[1] = true;
 				MarkDirtyReliable();
 			}
 		}
 		public partial void Server_MoveTo(Vector2 position)
 		{
 			Server_MoveToVCallstack.Add(position);
-			_dirtyReliable_0[1] = true;
-			MarkDirtyReliable();
-		}
-		private List<Vector2> Server_MoveToVCallstack = new(4);
-		public partial void Server_SetTo(Vector2 position, float time)
-		{
-			Server_SetToVfCallstack.Add((position, time));
 			_dirtyReliable_0[2] = true;
 			MarkDirtyReliable();
 		}
-		private List<(Vector2 position, float time)> Server_SetToVfCallstack = new(4);
+		private List<Vector2> Server_MoveToVCallstack = new(4);
+		public partial void Server_LookAt(Vector2 position)
+		{
+			Server_LookAtVCallstack.Add(position);
+			_dirtyReliable_0[3] = true;
+			MarkDirtyReliable();
+		}
+		private List<Vector2> Server_LookAtVCallstack = new(4);
+		public partial void Server_LookAt(Vector2 position, float time)
+		{
+			Server_LookAtVfCallstack.Add((position, time));
+			_dirtyReliable_0[4] = true;
+			MarkDirtyReliable();
+		}
+		private List<(Vector2 position, float time)> Server_LookAtVfCallstack = new(4);
+		public partial void Server_Shake()
+		{
+			Server_ShakeCallstackCount++;
+			_dirtyReliable_0[5] = true;
+			MarkDirtyReliable();
+		}
+		private byte Server_ShakeCallstackCount = 0;
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_MoveToVCallstack.Clear();
-			Server_SetToVfCallstack.Clear();
+			Server_LookAtVCallstack.Clear();
+			Server_LookAtVfCallstack.Clear();
+			Server_ShakeCallstackCount = 0;
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -92,9 +125,13 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
-				_target.Serialize(writer);
+				_targetId.Serialize(writer);
 			}
 			if (_dirtyReliable_0[1])
+			{
+				writer.Put(_followSpeed);
+			}
+			if (_dirtyReliable_0[2])
 			{
 				byte count = (byte)Server_MoveToVCallstack.Count;
 				writer.Put(count);
@@ -104,26 +141,42 @@ namespace CTS.Instance.SyncObjects
 					arg.Serialize(writer);
 				}
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[3])
 			{
-				byte count = (byte)Server_SetToVfCallstack.Count;
+				byte count = (byte)Server_LookAtVCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Server_SetToVfCallstack[i];
+					var arg = Server_LookAtVCallstack[i];
+					arg.Serialize(writer);
+				}
+			}
+			if (_dirtyReliable_0[4])
+			{
+				byte count = (byte)Server_LookAtVfCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_LookAtVfCallstack[i];
 					writer.Put(arg.position);
 					writer.Put(arg.time);
 				}
+			}
+			if (_dirtyReliable_0[5])
+			{
+				writer.Put((byte)Server_ShakeCallstackCount);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
-			_target.Serialize(writer);
+			_targetId.Serialize(writer);
+			writer.Put(_followSpeed);
 		}
 		public override void InitializeMasterProperties()
 		{
-			_target = new();
+			_targetId = new();
+			_followSpeed = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

@@ -304,7 +304,7 @@ namespace CTS.Instance.Gameplay
 				{
 					_idCounter++;
 
-					if (_networkObjectById.ContainsForward(_idCounter))
+					if (_networkObjectById.ContainsForward(_idCounter) || _idCounter == 0)
 						continue;
 
 					return _idCounter;
@@ -321,7 +321,7 @@ namespace CTS.Instance.Gameplay
 
 		public void Clear()
 		{
-			_idCounter = new NetworkIdentity(0);
+			_idCounter = new NetworkIdentity(1);
 
 			foreach (var netObj in _networkObjectById.ForwardValues)
 			{

@@ -122,6 +122,7 @@ namespace CTS.Instance.SyncObjects
 			else
 			{
 				CameraControllerByPlayer.Remove(player);
+				playerCamera.ReleaseNetworkPlayer(player);
 				playerCamera.Destroy();
 			}
 		}

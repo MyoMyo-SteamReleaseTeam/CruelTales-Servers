@@ -56,6 +56,15 @@ namespace CTS.Instance.SyncObjects
 			Vector2 spawnPos = spawnPositions[_spawnIndex];
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
 			CreatePlayerBy<T>(player, spawnPos);
+
+			if (GameplayController.CameraControllerByPlayer.TryGetValue(player, out var cameraController))
+			{
+				cameraController.MoveToTarget();
+			}
+			else
+			{
+				_log.Fatal($"There is no camera for {player} to move to target!");
+			}
 		}
 
 		public void CreatePlayerBy<T>(NetworkPlayer player, Vector2 position) where T : PlayerCharacter, new()
@@ -66,8 +75,12 @@ namespace CTS.Instance.SyncObjects
 				return;
 			}
 
+			// Create object
 			var playerCharacter = WorldManager.CreateObject<T>(position);
-			playerCharacter.BindNetworkPlayer(player);
+			playerCharacter.Initialize(player);
+
+			// Binding
+			player.BindCharacter(playerCharacter);
 			PlayerCharacterByPlayer.Add(player, playerCharacter);
 
 			// Bind camera
@@ -95,8 +108,12 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			PlayerCharacterByPlayer.TryRemove(player);
+
+			// Destroy object
 			playerCharacter.Destroy();
-			player.ReleaseViewTarget();
+			
+			// Releasing
+			player.ReleaseCharacter(playerCharacter);
 
 			// Release camera
 			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))

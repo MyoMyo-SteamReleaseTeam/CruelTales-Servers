@@ -82,13 +82,22 @@ namespace CTS.Instance.Gameplay
 		}
 
 		// Gameplay
-		public NetRigidBody? TargetRigidBody { get; private set; }
-		public Vector2 ViewPosition { get; private set; }
-		public bool HasViewTarget => TargetRigidBody != null;
+		public CameraController? CameraController { get; private set; }
+		public PlayerCharacter? PlayerCharacter { get; private set; }
+		//public NetRigidBody? TargetRigidBody { get; private set; }
+		public Vector2 ViewPosition
+		{
+			get
+			{
+				if (CameraController == null)
+					return Vector2.Zero;
+
+				return CameraController.ViewPosition;
+			}
+		}
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
 		public Faction Faction { get; private set; }
-		public float CameraSpeed { get; private set; } = 10.0f;
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;
@@ -143,23 +152,32 @@ namespace CTS.Instance.Gameplay
 
 		public void Update(float deltaTime)
 		{
-			Vector2 targetPosition = TargetRigidBody == null ?
-				ViewPosition : TargetRigidBody.Position;
-
-			ViewPosition = Vector2.Lerp(ViewPosition,
-										targetPosition,
-										CameraSpeed * deltaTime);
 		}
 
-		public void BindViewTarget(NetRigidBody target)
+		public void BindCamera(CameraController camera)
 		{
-			TargetRigidBody = target;
-			ViewPosition = TargetRigidBody.Position;
+			CameraController = camera;
 		}
 
-		public void ReleaseViewTarget()
+		public void ReleaseCamera(CameraController camera)
 		{
-			TargetRigidBody = null;
+			if (CameraController != camera)
+				return;
+
+			CameraController = null;
+		}
+
+		public void BindCharacter(PlayerCharacter character)
+		{
+			PlayerCharacter = character;
+		}
+
+		public void ReleaseCharacter(PlayerCharacter character)
+		{
+			if (PlayerCharacter != character)
+				return;
+
+			PlayerCharacter = null;
 		}
 
 		public void BindPlayerState(PlayerState state)

@@ -80,12 +80,11 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public void BindNetworkPlayer(NetworkPlayer player)
+		public void Initialize(NetworkPlayer player)
 		{
 			Owner = player.UserId;
 			UserId = player.UserId;
 			NetworkPlayer = player;
-			NetworkPlayer.BindViewTarget(RigidBody);
 		}
 
 		public override void OnUpdate(float deltaTime)
@@ -163,45 +162,6 @@ namespace CTS.Instance.SyncObjects
 			StateMachine.ChangeState(StateMachine.PushedState);
 		}
 		
-		/// <summary>
-		/// 플레이어의 타입을 T로 변경 시도합니다.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		[Obsolete]
-		public virtual PlayerCharacter ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
-		{
-			var _minigameController = GameplayManager.GameplayController.SceneController;
-			if (NetworkPlayer == null || 
-				GameplayManager.GameplayController == null ||
-				_minigameController == null)
-			{
-				Console.WriteLine(@"NetWorkPlayer or GameplayController is Null");
-				return null;
-			}
-
-			// 리스트에서 제거
-			_minigameController.PlayerCharacterByPlayer.TryRemove(this);
-			NetworkPlayer.ReleaseViewTarget();
-
-			NetworkIdentity previousId = this.Identity;
-
-			// 우선 생성 후 바인딩
-			NetworkPlayer currentPlayer = NetworkPlayer;
-			this.NetworkPlayer = null;
-			var createdAvatar = WorldManager.CreateObject<T>(Position);
-			createdAvatar.BindNetworkPlayer(currentPlayer);
-
-			NetworkIdentity nextId = createdAvatar.Identity;
-			Console.WriteLine($"PlayerCharacter switch {previousId} to {nextId}");
-
-			// 원본 캐릭터 제거
-			Destroy();
-
-			// 현재 캐릭터 리스트에 추가
-			_minigameController.PlayerCharacterByPlayer.Add(createdAvatar.NetworkPlayer, createdAvatar);
-			return createdAvatar;
-		}
-
 		public virtual void LoadDefaultPlayerSkin()
 		{
 			BroadcastOrderTest((int)UserId.Id, 0);

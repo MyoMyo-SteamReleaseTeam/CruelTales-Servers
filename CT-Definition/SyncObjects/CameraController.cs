@@ -10,13 +10,25 @@ namespace CT.Definitions.SyncObjects
 	public class CameraController
 	{
 		[SyncVar]
-		public NetworkIdentity Target;
+		public NetworkIdentity TargetId;
 
+		[SyncVar]
+		public float FollowSpeed;
+
+		/// <summary>카메라가 특정 지점으로 강제 이동함</summary>
 		[SyncRpc]
 		public void Server_MoveTo(Vector2 position) { }
 
+		/// <summary>카메라가 특정 지점을 바라봄</summary>
 		[SyncRpc]
-		public void Server_SetTo(Vector2 position, float time) { }
+		public void Server_LookAt(Vector2 position) { }
+
+		/// <summary>카메라가 특정 지점을 특정 시간동안 바라봄</summary>
+		[SyncRpc]
+		public void Server_LookAt(Vector2 position, float time) { }
+
+		[SyncRpc]
+		public void Server_Shake() { }
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_CannotFindBindTarget() { }
