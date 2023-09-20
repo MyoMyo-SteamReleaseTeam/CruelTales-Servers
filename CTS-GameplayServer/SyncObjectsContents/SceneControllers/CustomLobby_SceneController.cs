@@ -34,12 +34,12 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-			if (_testCubeList.Count < 0)
+			if (_testCubeList.Count < 55)
 			{
-				Vector2 lb = new Vector2(-30, -30);
-				Vector2 rt = new Vector2(30, 30);
-				//Vector2 lb = new Vector2(0, 0);
-				//Vector2 rt = new Vector2(0, 0);
+				//Vector2 lb = new Vector2(-30, -30);
+				//Vector2 rt = new Vector2(30, 30);
+				Vector2 lb = new Vector2(0, 0);
+				Vector2 rt = new Vector2(0, 0);
 				var createPos = RandomHelper.NextVector2(lb, rt);
 				//var createPos = Vector2.Zero;
 				var testCube = WorldManager.CreateObject<TestCube>(createPos);

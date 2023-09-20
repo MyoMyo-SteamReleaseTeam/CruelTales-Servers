@@ -157,11 +157,7 @@ namespace CTS.Instance.Synchronizations
 				return;
 
 			IsAlive = false;
-
-			if (Visibility == VisibilityType.View)
-			{
-				_worldVisibilityManager.OnDestroy(this);
-			}
+			//_worldVisibilityManager.OnDestroy(this);
 
 			OnDestroyed();
 			Dispose();

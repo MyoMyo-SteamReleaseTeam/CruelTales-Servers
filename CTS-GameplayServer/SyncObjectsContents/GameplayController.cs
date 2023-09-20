@@ -84,6 +84,7 @@ namespace CTS.Instance.SyncObjects
 			// Create camera for player
 			CameraController playerCamera = WorldManager.CreateObject<CameraController>();
 			playerCamera.BindNetworkPlayer(player);
+			player.BindCamera(playerCamera);
 			CameraControllerByPlayer.Add(player, playerCamera);
 
 			// Enter events
@@ -121,6 +122,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			else
 			{
+				player.ReleaseCamera(playerCamera);
 				CameraControllerByPlayer.Remove(player);
 				playerCamera.ReleaseNetworkPlayer(player);
 				playerCamera.Destroy();
@@ -140,6 +142,7 @@ namespace CTS.Instance.SyncObjects
 		public void ChangeSceneTo(GameSceneIdentity gameId)
 		{
 			SceneController?.Destroy();
+			SceneController?.Release();
 			WorldManager.ClearWithoutPersistentObject();
 			SceneController = WorldManager.CreateSceneControllerBy(gameId);
 			SceneController.Initialize(gameId);

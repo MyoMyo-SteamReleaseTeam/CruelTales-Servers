@@ -36,6 +36,7 @@ namespace CTS.Instance.SyncObjects
 
 			ViewPosition = Vector2.Lerp(ViewPosition, targetPosition,
 										FollowSpeed * deltaTime);
+			NetworkPlayer.ViewPosition = ViewPosition;
 		}
 
 		public void BindNetworkPlayer(NetworkPlayer player)

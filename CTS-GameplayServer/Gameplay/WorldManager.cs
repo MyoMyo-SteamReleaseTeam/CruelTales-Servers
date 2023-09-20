@@ -85,7 +85,7 @@ namespace CTS.Instance.Gameplay
 		{
 			Clear();
 			_coroutineRuntime.Reset();
-			_visibilityManager.Reset();
+			//_visibilityManager.Reset();
 		}
 
 		public void SetGameMapData(GameSceneMapData mapData)
@@ -199,29 +199,31 @@ namespace CTS.Instance.Gameplay
 				_objectPoolManager.Return(destroyObj);
 				if (!_networkObjectById.TryRemove(destroyObj))
 				{
-					bool findInCreationList = false;
-					int count = _createObjectList.Count;
-					for (int i = 0; i < count; i++)
-					{
-						/*
-						 * 생성과 동시에 삭제된 경우
-						 * 생성 로직을 완료하고 강제로 삭제합니다.
-						 */
-						if (_createObjectList[i] == destroyObj)
-						{
-							destroyObj.InitializeAfterFrame();
-							destroyObj.ForceDestroy();
-							findInCreationList = true;
-							break;
-						}
-					}
+					// 생성과 소멸이 동시에 일어난 경우
+					Debug.Assert(false);
 
-					if (!findInCreationList)
-					{
-						_log.Fatal($"There is no network object to remove. " +
-							$"Object : [{destroyObj.GetType().Name}: {destroyObj.Identity}]");
-						Debug.Assert(false);
-					}
+					//bool findInCreationList = false;
+					//int count = _createObjectList.Count;
+					//for (int i = 0; i < count; i++)
+					//{
+					//	/*
+					//	 * 생성과 동시에 삭제된 경우
+					//	 * 생성 로직을 완료하고 강제로 삭제합니다.
+					//	 */
+					//	if (_createObjectList[i] == destroyObj)
+					//	{
+					//		destroyObj.ForceDestroy();
+					//		findInCreationList = true;
+					//		break;
+					//	}
+					//}
+
+					//if (!findInCreationList)
+					//{
+					//	_log.Fatal($"There is no network object to remove. " +
+					//		$"Object : [{destroyObj.GetType().Name}: {destroyObj.Identity}]");
+					//	Debug.Assert(false);
+					//}
 
 					continue;
 				}
@@ -328,9 +330,14 @@ namespace CTS.Instance.Gameplay
 				netObj.Destroy();
 			}
 
-			foreach (var netObj in _createObjectList)
+			for (int i = _createObjectList.Count - 1; i >= 0; i--)
 			{
-				netObj.Destroy();
+				var netObj = _createObjectList[i];
+				if (!netObj.IsPersistent)
+				{
+					forceDestroy(netObj);
+				}
+				_createObjectList.RemoveAt(i);
 			}
 		}
 
@@ -343,14 +350,23 @@ namespace CTS.Instance.Gameplay
 					netObj.Destroy();
 				}
 			}
-
-			foreach (var netObj in _createObjectList)
+			
+			for (int i = _createObjectList.Count - 1; i >= 0; i--)
 			{
+				var netObj = _createObjectList[i];
 				if (!netObj.IsPersistent)
 				{
-					netObj.Destroy();
+					forceDestroy(netObj);
 				}
+				_createObjectList.RemoveAt(i);
 			}
+		}
+
+		private void forceDestroy(MasterNetworkObject destroyObj)
+		{
+			_objectPoolManager.Return(destroyObj);
+			destroyObj.OnCreated();
+			destroyObj.ForceDestroy();
 		}
 
 		//public bool TryGetObjectIDsBy(Func<MasterNetworkObject, bool> selector,

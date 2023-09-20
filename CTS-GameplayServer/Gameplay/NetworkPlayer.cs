@@ -85,16 +85,7 @@ namespace CTS.Instance.Gameplay
 		public CameraController? CameraController { get; private set; }
 		public PlayerCharacter? PlayerCharacter { get; private set; }
 		//public NetRigidBody? TargetRigidBody { get; private set; }
-		public Vector2 ViewPosition
-		{
-			get
-			{
-				if (CameraController == null)
-					return Vector2.Zero;
-
-				return CameraController.ViewPosition;
-			}
-		}
+		public Vector2 ViewPosition { get; set; }
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
 		public Faction Faction { get; private set; }

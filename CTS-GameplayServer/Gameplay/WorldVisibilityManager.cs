@@ -100,12 +100,6 @@ namespace CTS.Instance.Gameplay
 			_playerVisibleBySession.Clear();
 		}
 
-		[Obsolete("가능하면 이미 계산된 Cell 좌표를 사용해야합니다.")]
-		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(Vector3 pos)
-		{
-			return getCell(GetWorldCell(pos));
-		}
-
 		private Dictionary<NetworkIdentity, MasterNetworkObject> getCell(Vector2Int internalCell)
 		{
 			if (internalCell.Y < 0 || internalCell.Y >= CELL_HEIGHT ||
@@ -324,7 +318,6 @@ namespace CTS.Instance.Gameplay
 				bool isAdded = curCell.TryAdd(netObj.Identity, netObj);
 				Debug.Assert(isAdded);
 			}
-			_tempSpawnList.Clear();
 
 			// Remove despawn object from world partition
 			int despawnCount = _tempDespawnList.Count;
@@ -340,6 +333,8 @@ namespace CTS.Instance.Gameplay
 				bool isRemoved = curCell.Remove(netObj.Identity);
 				Debug.Assert(isRemoved);
 			}
+
+			_tempSpawnList.Clear();
 			_tempDespawnList.Clear();
 
 			// Transition visibility cycle
@@ -393,7 +388,14 @@ namespace CTS.Instance.Gameplay
 
 			if (netObj.Visibility == VisibilityType.View)
 			{
-				_tempDespawnList.Add(netObj);
+				if (_tempSpawnList.Contains(id))
+				{
+					_tempSpawnList.Remove(id);
+				}
+				else
+				{
+					_tempDespawnList.Add(netObj);
+				}
 			}
 			else if (netObj.Visibility == VisibilityType.Global)
 			{

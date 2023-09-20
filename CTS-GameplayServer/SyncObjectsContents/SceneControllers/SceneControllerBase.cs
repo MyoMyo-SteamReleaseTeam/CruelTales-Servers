@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
@@ -123,6 +124,14 @@ namespace CTS.Instance.SyncObjects
 			else
 			{
 				playerCamera.ReleasePlayerCharacter(playerCharacter);
+			}
+		}
+
+		public void Release()
+		{
+			foreach (NetworkPlayer player in PlayerCharacterByPlayer.ForwardKeys)
+			{
+				DestroyPlayer(player);
 			}
 		}
 	}

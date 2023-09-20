@@ -28,16 +28,16 @@ namespace CTS.Instance.Gameplay
 		public Dictionary<NetworkIdentity, MasterNetworkObject> EnterObjects { get; private set; }
 
 		/// <summary>
-		/// 추적중인 오브젝트의 집합입니다.
-		/// 갱신 주기마다 동기화 데이터를 전송합니다.
-		/// </summary>
-		public Dictionary<NetworkIdentity, MasterNetworkObject> TraceObjects { get; private set; }
-
-		/// <summary>
 		/// 가시성에서 벗어난 오브젝트의 집합입니다.
 		/// 삭제후 1회 삭제 데이터를 송신한 뒤 집합에서 제거됩니다.
 		/// </summary>
 		public Dictionary<NetworkIdentity, MasterNetworkObject> LeaveObjects { get; private set; }
+
+		/// <summary>
+		/// 추적중인 오브젝트의 집합입니다.
+		/// 갱신 주기마다 동기화 데이터를 전송합니다.
+		/// </summary>
+		public Dictionary<NetworkIdentity, MasterNetworkObject> TraceObjects { get; private set; }
 
 		/// <summary>
 		/// 거리에 따른 가시성 영향을 받지 않는 생성된 오브젝트의 집합입니다.
@@ -62,8 +62,8 @@ namespace CTS.Instance.Gameplay
 			SpawnObjects = new(option.SpawnObjectCapacity);
 			DespawnObjects = new(option.DespawnObjectCapacity);
 			EnterObjects = new(option.EnterObjectCapacity);
-			TraceObjects = new(option.TraceObjectCapacity);
 			LeaveObjects = new(option.LeaveObjectCapacity);
+			TraceObjects = new(option.TraceObjectCapacity);
 
 			GlobalSpawnObjects = new(option.GlobalSpawnObjectCapacity);
 			GlobalTraceObjects = new(option.GlobalTraceObjectCapacity);
@@ -80,9 +80,10 @@ namespace CTS.Instance.Gameplay
 			_networkPlayer = null;
 
 			SpawnObjects.Clear();
+			DespawnObjects.Clear();
 			EnterObjects.Clear();
-			TraceObjects.Clear();
 			LeaveObjects.Clear();
+			TraceObjects.Clear();
 
 			GlobalSpawnObjects.Clear();
 			GlobalTraceObjects.Clear();
