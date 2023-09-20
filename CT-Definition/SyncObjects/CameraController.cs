@@ -15,6 +15,9 @@ namespace CT.Definitions.SyncObjects
 		[SyncRpc]
 		public void Server_MoveTo(Vector2 position) { }
 
+		[SyncRpc]
+		public void Server_SetTo(Vector2 position, float time) { }
+
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_CannotFindBindTarget() { }
 	}

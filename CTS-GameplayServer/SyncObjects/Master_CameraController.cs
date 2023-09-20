@@ -46,6 +46,8 @@ namespace CTS.Instance.SyncObjects
 		private NetworkIdentity _target = new();
 		[SyncRpc]
 		public partial void Server_MoveTo(Vector2 position);
+		[SyncRpc]
+		public partial void Server_SetTo(Vector2 position, float time);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_CannotFindBindTarget(NetworkPlayer player);
 		public CameraController()
@@ -70,11 +72,19 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		private List<Vector2> Server_MoveToVCallstack = new(4);
+		public partial void Server_SetTo(Vector2 position, float time)
+		{
+			Server_SetToVfCallstack.Add((position, time));
+			_dirtyReliable_0[2] = true;
+			MarkDirtyReliable();
+		}
+		private List<(Vector2 position, float time)> Server_SetToVfCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_MoveToVCallstack.Clear();
+			Server_SetToVfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -92,6 +102,17 @@ namespace CTS.Instance.SyncObjects
 				{
 					var arg = Server_MoveToVCallstack[i];
 					arg.Serialize(writer);
+				}
+			}
+			if (_dirtyReliable_0[2])
+			{
+				byte count = (byte)Server_SetToVfCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_SetToVfCallstack[i];
+					writer.Put(arg.position);
+					writer.Put(arg.time);
 				}
 			}
 		}
