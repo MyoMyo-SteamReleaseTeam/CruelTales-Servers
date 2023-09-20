@@ -82,7 +82,8 @@ namespace CTS.Instance.SyncObjects
 
 		public void BindNetworkPlayer(NetworkPlayer player)
 		{
-			this.UserId = player.UserId;
+			Owner = player.UserId;
+			UserId = player.UserId;
 			NetworkPlayer = player;
 			NetworkPlayer.BindViewTarget(RigidBody);
 		}
@@ -166,6 +167,7 @@ namespace CTS.Instance.SyncObjects
 		/// 플레이어의 타입을 T로 변경 시도합니다.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
+		[Obsolete]
 		public virtual PlayerCharacter ChangePlayerTypeTo<T>() where T : PlayerCharacter, new()
 		{
 			var _minigameController = GameplayManager.GameplayController.SceneController;

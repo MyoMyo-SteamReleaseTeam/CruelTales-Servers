@@ -94,21 +94,6 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public void CreateRedHood(Vector2 position)
-		{
-
-		}
-
-		public void CreateWolf(Vector2 position)
-		{
-
-		}
-
-		public void CreateNormal(Vector2 position)
-		{
-
-		}
-
 		public override void OnPlayerEnter(NetworkPlayer player)
 		{
 			SpawnPlayerBy<RedHoodCharacter>(player);

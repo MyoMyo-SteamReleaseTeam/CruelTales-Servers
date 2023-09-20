@@ -69,6 +69,16 @@ namespace CTS.Instance.SyncObjects
 			var playerCharacter = WorldManager.CreateObject<T>(position);
 			playerCharacter.BindNetworkPlayer(player);
 			PlayerCharacterByPlayer.Add(player, playerCharacter);
+
+			// Bind camera
+			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
+			{
+				_log.Fatal($"There is no camera for {player}!");
+			}
+			else
+			{
+				playerCamera.BindPlayerCharacter(playerCharacter);
+			}
 		}
 
 		public void DestroyPlayer(PlayerCharacter playerCharacter)
@@ -87,6 +97,16 @@ namespace CTS.Instance.SyncObjects
 			PlayerCharacterByPlayer.TryRemove(player);
 			playerCharacter.Destroy();
 			player.ReleaseViewTarget();
+
+			// Release camera
+			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
+			{
+				_log.Fatal($"There is no camera for {player}!");
+			}
+			else
+			{
+				playerCamera.ReleasePlayerCharacter(playerCharacter);
+			}
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace CTS.Instance.SyncObjects
 	public enum NetworkObjectType
 	{
 		None = 0,
+		CameraController,
 		GameplayController,
 		CustomLobby_SceneController,
 		MiniGameControllerBase,

@@ -20,6 +20,8 @@ namespace CTS.Instance.SyncObjects
 		public SceneControllerBase? SceneController { get; private set; }
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
+		public Dictionary<NetworkPlayer, CameraController> CameraControllerByPlayer { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
+
 		public override void OnUpdate(float deltaTime)
 		{
 		}
@@ -79,6 +81,12 @@ namespace CTS.Instance.SyncObjects
 				player.IsReady = true;
 			}
 
+			// Create camera for player
+			CameraController playerCamera = WorldManager.CreateObject<CameraController>();
+			playerCamera.BindNetworkPlayer(player);
+			CameraControllerByPlayer.Add(player, playerCamera);
+
+			// Enter events
 			SceneController?.OnPlayerEnter(player);
 			RoomSessionManager.OnPlayerEnter(player);
 		}
@@ -102,8 +110,20 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 
+			// Leave events
 			SceneController?.OnPlayerLeave(player);
 			RoomSessionManager.OnPlayerLeave(player);
+
+			// Destroy player's camera
+			if (!CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
+			{
+				_log.Fatal($"There is no {player}'s camera to destroy!");
+			}
+			else
+			{
+				CameraControllerByPlayer.Remove(player);
+				playerCamera.Destroy();
+			}
 		}
 
 		public partial void Client_ReadyToSync(NetworkPlayer player, JoinRequestToken token)

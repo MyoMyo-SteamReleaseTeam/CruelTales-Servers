@@ -18,6 +18,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 		{
 			_netObjectPoolByType = new()
 			{
+				{ typeof(CameraController), new NetworkObjectPool<CameraController>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(CustomLobby_SceneController), new NetworkObjectPool<CustomLobby_SceneController>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(MiniGameControllerBase), new NetworkObjectPool<MiniGameControllerBase>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
