@@ -112,6 +112,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 		{
 			option.SyncType = _syncType;
 			option.Direction = _direction;
+			option.HasCallback = false;
 
 			if (_direction == SyncDirection.FromMaster)
 			{

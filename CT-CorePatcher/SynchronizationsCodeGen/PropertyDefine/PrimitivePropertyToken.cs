@@ -66,7 +66,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Format(MemberFormat.ReadEmbededTypeProperty, _privateMemberName, _clrTypeName));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			if (option.HasCallback)
+			{
+				sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			}
 			return sb.ToString();
 		}
 

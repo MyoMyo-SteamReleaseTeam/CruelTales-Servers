@@ -71,7 +71,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			{
 				sb.AppendLine(string.Format(MemberFormat.ReadByDeserializer, _privateMemberName));
 			}
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			if (option.HasCallback)
+			{
+				sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			}
 			return sb.ToString();
 		}
 

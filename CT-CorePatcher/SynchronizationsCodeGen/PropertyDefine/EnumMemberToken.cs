@@ -62,7 +62,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine(string.Format(MemberFormat.ReadEnum, _privateMemberName, _typeName, _clrEnumSizeTypeName));
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			if (option.HasCallback)
+			{
+				sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			}
 			return sb.ToString();
 		}
 

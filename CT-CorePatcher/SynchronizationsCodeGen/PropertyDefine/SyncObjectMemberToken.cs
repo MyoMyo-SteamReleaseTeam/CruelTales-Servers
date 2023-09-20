@@ -196,8 +196,10 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 			{
 				sb.AppendLine(string.Format(MemberFormat.ReadSyncObject, _privateMemberName, option.SyncType));
 			}
-
-			sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			if (option.HasCallback)
+			{
+				sb.AppendLine(string.Format(MemberFormat.CallbackEvent, _publicMemberName, _privateMemberName));
+			}
 			return sb.ToString();
 		}
 
