@@ -89,4 +89,28 @@ public static class KaMath
 	{
 		return a.X * b.Y - a.Y * b.X;
 	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static byte NormalizeFloatToByte(float value)
+	{
+		float normalize = value / 1.0f;
+		if (normalize > 1.0f)
+		{
+			return 255;
+		}
+		else if (normalize < 0)
+		{
+			return 0;
+		}
+		else
+		{
+			return (byte)(value * 255);
+		}
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static float ByteToNormalizeFloat(byte value)
+	{
+		return value / 255.0f;
+	}
 }

@@ -22,6 +22,15 @@ public static class StringExtension
 		return true;
 	}
 
+	/// <summary>해당 문자가 16진수 문자인지 여부를 반환합니다.</summary>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsHexChar(this char c)
+	{
+		return (c >= '0' && c <= '9') || 
+			   (c >= 'a' && c <= 'f') || 
+			   (c >= 'A' && c <= 'F');
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsAlphabetOrNumber(this char c)
 	{
