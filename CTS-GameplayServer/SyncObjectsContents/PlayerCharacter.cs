@@ -121,7 +121,7 @@ namespace CTS.Instance.SyncObjects
 			RigidBody.ResetImpluse();
 		}
 
-		public virtual void OnDuringAction()
+		public void OnDuringAction()
 		{
 			if (PhysicsWorld.Raycast(RigidBody.Position,
 									 ActionRadius, out var hits,
@@ -135,25 +135,39 @@ namespace CTS.Instance.SyncObjects
 					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
 						continue;
 
-					if (netObj is not PlayerCharacter other)
-						continue;
+					OnActionCollide(netObj, out bool isInterrupt);
 
-					var curState = other.StateMachine.CurrentState;
-					Vector2 direction = Vector2.Normalize(other.Position - Position);
-
-					if (curState == other.StateMachine.PushState)
-					{
-						other.OnReactionBy(direction);
-						this.OnReactionBy(-direction);
-					}
-					else if (curState != other.StateMachine.PushedState)
-					{
-						other.OnReactionBy(direction);
-					}
-
-					break;
+					if (isInterrupt)
+						break;
 				}
 			}
+		}
+
+		/// <summary>망치 충돌 발생시 이벤트입니다.</summary>
+		/// <param name="netObj">충돌한 객체입니다.</param>
+		/// <param name="isBreak">충돌된 객체가 여러개인 경우 순회를 종료합니다.</param>
+		public virtual void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)
+		{
+			if (netObj is not PlayerCharacter other)
+			{
+				isBreak = false;
+				return;
+			}
+
+			var curState = other.StateMachine.CurrentState;
+			Vector2 direction = Vector2.Normalize(other.Position - Position);
+
+			if (curState == other.StateMachine.PushState)
+			{
+				other.OnReactionBy(direction);
+				this.OnReactionBy(-direction);
+			}
+			else if (curState != other.StateMachine.PushedState)
+			{
+				other.OnReactionBy(direction);
+			}
+
+			isBreak = true;
 		}
 
 		public void OnReactionBy(Vector2 direction)

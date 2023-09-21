@@ -1,6 +1,8 @@
 ﻿using System.Numerics;
 using CTS.Instance.Data;
+using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
+using CTS.Instance.Synchronizations;
 using KaNet.Physics;
 
 namespace CTS.Instance.SyncObjects
@@ -16,41 +18,31 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public override void OnDuringAction()
+		public override void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)
 		{
-			if (PhysicsWorld.Raycast(RigidBody.Position,
-				    ActionRadius, out var hits,
-				    PhysicsLayerMask.Player))
+			if (netObj is not PlayerCharacter other ||
+				other is NormalCharacter ||
+				other is WolfCharacter)
 			{
-				foreach (var id in hits)
-				{
-					if (Identity.Id == id )
-						continue;
+				isBreak = false;
+				return;
+			}
 
-					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
-						continue;
-
-					if (netObj is not PlayerCharacter other)
-						continue;
-
-					if (other is NormalCharacter)
-						continue;
-
-					if (other is RedHoodCharacter redHood)
-					{
-						var curScene = GameplayManager.GameplayController.SceneController;
-						var eventHandler = curScene as IWolfEventHandler;
-						eventHandler?.OnWolfCatch(this, redHood);
-					}
-					else
-					{
-						Vector2 direction = Vector2.Normalize(other.Position - Position);
-						other.OnReactionBy(direction);
-						this.OnReactionBy(-direction);
-					}
-					
-					break;
-				}
+			if (other is RedHoodCharacter redHood)
+			{
+				var curScene = GameplayManager.GameplayController.SceneController;
+				var eventHandler = curScene as IWolfEventHandler;
+				eventHandler?.OnWolfCatch(this, redHood);
+				isBreak = true;
+			}
+			else if (other is WolfCharacter)
+			{
+				PlayerPushActionBehaviour.OnPushAction(this, other);
+				isBreak = true;
+			}
+			else
+			{
+				isBreak = false;
 			}
 		}
 
