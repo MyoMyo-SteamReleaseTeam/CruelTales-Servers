@@ -35,14 +35,14 @@ namespace CTS.Instance.SyncObjects
 				eventHandler?.OnWolfCatch(this, redHood);
 				isBreak = true;
 			}
-			else if (other is WolfCharacter)
+			else if (other is NormalCharacter)
 			{
-				PlayerPushActionBehaviour.OnPushAction(this, other);
-				isBreak = true;
+				isBreak = false;
 			}
 			else
 			{
-				isBreak = false;
+				PlayerPushActionBehaviour.OnPushAction(this, other);
+				isBreak = true;
 			}
 		}
 
