@@ -6,9 +6,10 @@ namespace CT.Common.Gameplay
 	[Serializable]
 	public struct SkinSet : IPacketSerializable, IEquatable<SkinSet>
 	{
-		public const int SERIALIZE_SIZE = 4 * 14;
+		public const int SERIALIZE_SIZE = 4 * 14 + 4 * 3;
 
 		public int Back;
+		public int Tail;
 		public int Cheek;
 		public int Dress;
 		public int Eyes;
@@ -22,6 +23,9 @@ namespace CT.Common.Gameplay
 		public int Nose;
 		public int Shoes;
 		public int Hammer;
+		public Color32 SkinColor;
+		public Color32 HairColor;
+		public Color32 EyesColor;
 
 		public int SerializeSize => SERIALIZE_SIZE;
 
@@ -29,6 +33,7 @@ namespace CT.Common.Gameplay
 		{
 			return
 				lhs.Back == rhs.Back &&
+				lhs.Tail == rhs.Tail &&
 				lhs.Cheek == rhs.Cheek &&
 				lhs.Dress == rhs.Dress &&
 				lhs.Eyes == rhs.Eyes &&
@@ -41,7 +46,10 @@ namespace CT.Common.Gameplay
 				lhs.Lips == rhs.Lips &&
 				lhs.Nose == rhs.Nose &&
 				lhs.Shoes == rhs.Shoes &&
-				lhs.Hammer == rhs.Hammer;
+				lhs.Hammer == rhs.Hammer &&
+				lhs.SkinColor == rhs.SkinColor &&
+				lhs.HairColor == rhs.HairColor &&
+				lhs.EyesColor == rhs.EyesColor;
 		}
 
 		public static bool operator !=(SkinSet lhs, SkinSet rhs)
@@ -62,6 +70,7 @@ namespace CT.Common.Gameplay
 		public void Serialize(IPacketWriter writer)
 		{
 			writer.Put(Back);
+			writer.Put(Tail);
 			writer.Put(Cheek);
 			writer.Put(Dress);
 			writer.Put(Eyes);
@@ -75,11 +84,15 @@ namespace CT.Common.Gameplay
 			writer.Put(Nose);
 			writer.Put(Shoes);
 			writer.Put(Hammer);
+			writer.Put(SkinColor);
+			writer.Put(HairColor);
+			writer.Put(EyesColor);
 		}
 
 		public bool TryDeserialize(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out Back)) return false;
+			if (!reader.TryReadInt32(out Tail)) return false;
 			if (!reader.TryReadInt32(out Cheek)) return false;
 			if (!reader.TryReadInt32(out Dress)) return false;
 			if (!reader.TryReadInt32(out Eyes)) return false;
@@ -93,6 +106,9 @@ namespace CT.Common.Gameplay
 			if (!reader.TryReadInt32(out Nose)) return false;
 			if (!reader.TryReadInt32(out Shoes)) return false;
 			if (!reader.TryReadInt32(out Hammer)) return false;
+			if (!SkinColor.TryDeserialize(reader)) return false;
+			if (!HairColor.TryDeserialize(reader)) return false;
+			if (!EyesColor.TryDeserialize(reader)) return false;
 			return true;
 		}
 
@@ -108,6 +124,7 @@ namespace CT.Common.Gameplay
 			return
 			(
 				Back,
+				Tail,
 				Cheek,
 				Dress,
 				Eyes,
@@ -120,7 +137,10 @@ namespace CT.Common.Gameplay
 				Lips,
 				Nose,
 				Shoes,
-				Hammer
+				Hammer,
+				SkinColor,
+				HairColor,
+				EyesColor
 			).GetHashCode();
 		}
 	}
