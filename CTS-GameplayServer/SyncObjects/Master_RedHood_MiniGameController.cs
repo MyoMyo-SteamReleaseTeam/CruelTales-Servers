@@ -42,11 +42,8 @@ namespace CTS.Instance.SyncObjects
 	public partial class RedHood_MiniGameController
 	{
 		public override NetworkObjectType Type => NetworkObjectType.RedHood_MiniGameController;
-		[SyncObject]
-		protected readonly SyncObjectDictionary<UserId, PlayerRoleState> _playerRoleStateTable;
 		public RedHood_MiniGameController()
 		{
-			_playerRoleStateTable = new(this, maxCapacity: 8);
 		}
 		public override void ClearDirtyReliable()
 		{
@@ -58,13 +55,13 @@ namespace CTS.Instance.SyncObjects
 			_mapVoteController.ClearDirtyReliable();
 			Server_GameStartCountdownffCallstack.Clear();
 			_dirtyReliable_1.Clear();
+			Server_GameStartfCallstack.Clear();
 			Server_GameEndfCallstack.Clear();
 			Server_ShowResultfCallstack.Clear();
 			Server_ShowExecutionEfCallstack.Clear();
 			Server_StartVoteMapfCallstack.Clear();
 			Server_ShowVotedNextMapGfCallstack.Clear();
 			Server_SyncTimerfCallstack.Clear();
-			_playerRoleStateTable.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -137,11 +134,20 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			_dirtyReliable_1[6] = _playerRoleStateTable.IsDirtyReliable;
 			_dirtyReliable_1.Serialize(writer);
 			if (_dirtyReliable_1.AnyTrue())
 			{
 				if (_dirtyReliable_1[0])
+				{
+					byte count = (byte)Server_GameStartfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_GameStartfCallstack[i];
+						writer.Put(arg);
+					}
+				}
+				if (_dirtyReliable_1[1])
 				{
 					byte count = (byte)Server_GameEndfCallstack.Count;
 					writer.Put(count);
@@ -151,7 +157,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[1])
+				if (_dirtyReliable_1[2])
 				{
 					byte count = (byte)Server_ShowResultfCallstack.Count;
 					writer.Put(count);
@@ -161,7 +167,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[2])
+				if (_dirtyReliable_1[3])
 				{
 					byte count = (byte)Server_ShowExecutionEfCallstack.Count;
 					writer.Put(count);
@@ -172,7 +178,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.playTime);
 					}
 				}
-				if (_dirtyReliable_1[3])
+				if (_dirtyReliable_1[4])
 				{
 					byte count = (byte)Server_StartVoteMapfCallstack.Count;
 					writer.Put(count);
@@ -182,7 +188,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[4])
+				if (_dirtyReliable_1[5])
 				{
 					byte count = (byte)Server_ShowVotedNextMapGfCallstack.Count;
 					writer.Put(count);
@@ -193,7 +199,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.showTime);
 					}
 				}
-				if (_dirtyReliable_1[5])
+				if (_dirtyReliable_1[6])
 				{
 					byte count = (byte)Server_SyncTimerfCallstack.Count;
 					writer.Put(count);
@@ -202,10 +208,6 @@ namespace CTS.Instance.SyncObjects
 						var arg = Server_SyncTimerfCallstack[i];
 						writer.Put(arg);
 					}
-				}
-				if (_dirtyReliable_1[6])
-				{
-					_playerRoleStateTable.SerializeSyncReliable(player, writer);
 				}
 			}
 			if (writer.Size == originSize + 2)
@@ -222,7 +224,6 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_currentTime);
 			_eliminatedPlayers.SerializeEveryProperty(writer);
 			_mapVoteController.SerializeEveryProperty(writer);
-			_playerRoleStateTable.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
@@ -232,7 +233,6 @@ namespace CTS.Instance.SyncObjects
 			_currentTime = 0;
 			_eliminatedPlayers.InitializeMasterProperties();
 			_mapVoteController.InitializeMasterProperties();
-			_playerRoleStateTable.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

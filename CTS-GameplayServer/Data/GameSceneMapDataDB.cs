@@ -51,6 +51,7 @@ namespace CTS.Instance.Data
 			{
 				GameModeType.CustomLobby => worldManager.CreateObject<CustomLobby_SceneController>(),
 				GameModeType.RedHood => worldManager.CreateObject<RedHood_MiniGameController>(),
+				GameModeType.Dueoksini => worldManager.CreateObject<Dueoksini_MiniGameController>(),
 				_ => throw new ArgumentOutOfRangeException()
 			};
 		}

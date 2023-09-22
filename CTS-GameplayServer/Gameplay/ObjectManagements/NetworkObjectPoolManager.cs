@@ -21,6 +21,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 				{ typeof(CameraController), new NetworkObjectPool<CameraController>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(CustomLobby_SceneController), new NetworkObjectPool<CustomLobby_SceneController>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(Dueoksini_MiniGameController), new NetworkObjectPool<Dueoksini_MiniGameController>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(MiniGameControllerBase), new NetworkObjectPool<MiniGameControllerBase>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(RedHood_MiniGameController), new NetworkObjectPool<RedHood_MiniGameController>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(SceneControllerBase), new NetworkObjectPool<SceneControllerBase>(2, worldManager, visibilityManager, gameManager, physicsWorld) },

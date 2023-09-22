@@ -29,6 +29,9 @@ namespace CT.Definitions.SyncObjects
 		public void Server_GameStartCountdown(float missionShowTime, float countdown) { }
 
 		[SyncRpc]
+		public void Server_GameStart(float timeLeft) { }
+
+		[SyncRpc]
 		public void Server_GameEnd(float freezeTime) { }
 
 		[SyncRpc]

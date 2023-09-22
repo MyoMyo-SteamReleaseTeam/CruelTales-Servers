@@ -13,6 +13,7 @@ namespace CTS.Instance.SyncObjects
 		CameraController,
 		GameplayController,
 		CustomLobby_SceneController,
+		Dueoksini_MiniGameController,
 		MiniGameControllerBase,
 		RedHood_MiniGameController,
 		SceneControllerBase,
