@@ -10,15 +10,27 @@ namespace CTS.Instance.SyncObjects
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(MiniGameControllerBase));
 
+#if DEBUG
+		public const float TIMER_SYNC_INTERVAL = 50.0f;
+		public const float MISSION_SHOW_TIME = 0.5f;
+		public const float GAME_START_COUNTDOWN_TIME = 1.0f;
+		public const float GAME_END_COUNTDOWN_TIME = 1.0f;
+		public const float RESULT_SHOW_TIME = 1.0f;
+		// TODO : Need to set cut scene duration from DB
+		public const float EXECUTION_CUT_SCENE_TIME = 1.0f;
+		public const float MAP_VOTE_TIME = 3.0f;
+		public const float NEXT_MAP_SHOW_TIME = 1.0f;
+#else
+		public const float TIMER_SYNC_INTERVAL = 50.0f;
 		public const float MISSION_SHOW_TIME = 1.5f;
 		public const float GAME_START_COUNTDOWN_TIME = 3.0f;
 		public const float GAME_END_COUNTDOWN_TIME = 3.0f;
-		public const float TIMER_SYNC_INTERVAL = 50.0f;
 		public const float RESULT_SHOW_TIME = 5.0f;
 		// TODO : Need to set cut scene duration from DB
 		public const float EXECUTION_CUT_SCENE_TIME = 10.0f;
 		public const float MAP_VOTE_TIME = 10.0f;
 		public const float NEXT_MAP_SHOW_TIME = 3.0f;
+#endif
 
 		public float CurrentTime
 		{
