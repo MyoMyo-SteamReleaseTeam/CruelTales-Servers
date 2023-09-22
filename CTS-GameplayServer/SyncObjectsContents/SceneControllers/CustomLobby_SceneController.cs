@@ -148,7 +148,6 @@ namespace CTS.Instance.SyncObjects
 
 		private void onGameStart()
 		{
-			GameplayController.GameSystemState = GameSystemState.Ready;
 			GameplayController.ChangeSceneTo(GameSceneMapDataDB.RedHood);
 		}
 	}

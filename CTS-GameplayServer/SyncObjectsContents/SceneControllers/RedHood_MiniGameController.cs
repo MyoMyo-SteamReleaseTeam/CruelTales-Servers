@@ -105,6 +105,12 @@ namespace CTS.Instance.SyncObjects
 			DestroyPlayer(player);
 			_playerCharacterTable.DeletePlayer(player);
 		}
+		
+		protected override void onGameEnd()
+		{
+			base.onGameEnd();
+			_playerCharacterTable.GetPlayerSetBy(NetworkObjectType.WolfCharacter);
+		}
 
 		public void OnWolfCatch(WolfCharacter wolf, RedHoodCharacter target)
 		{

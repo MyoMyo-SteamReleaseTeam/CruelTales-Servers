@@ -12,7 +12,7 @@ namespace CTS.Instance.Data
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(GameSceneMapDataDB));
 
-		private static Dictionary<GameSceneIdentity, GameSceneMapData> _gameSceneMapDataById = new();
+		private static readonly Dictionary<GameSceneIdentity, GameSceneMapData> _gameSceneMapDataById = new();
 
 		public static bool TryLoad()
 		{

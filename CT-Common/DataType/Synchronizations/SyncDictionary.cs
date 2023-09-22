@@ -38,7 +38,7 @@ namespace CT.Common.DataType.Synchronizations
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
 
-		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
+		//[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
 		public SyncDictionary(int capacity = 8, int operationCapacity = 4)
 		{
 			_dictionary = new(capacity);

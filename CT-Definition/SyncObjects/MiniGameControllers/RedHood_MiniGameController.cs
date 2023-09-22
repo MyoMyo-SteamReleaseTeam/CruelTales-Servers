@@ -9,7 +9,7 @@ namespace CT.Definitions.SyncObjects
 	[SyncNetworkObjectDefinition(capacity: 2)]
 	public class RedHood_MiniGameController : MiniGameControllerBase
 	{
-		[SyncObject(cc: Constant.CAPACITY_BY_PLAYER)]
+		[SyncObject(cc: Constant.MAX_CAPACITY_BY_PLAYER)]
 		protected SyncObjectDictionary<UserId, PlayerRoleState> PlayerRoleStateTable = new();
 	}
 

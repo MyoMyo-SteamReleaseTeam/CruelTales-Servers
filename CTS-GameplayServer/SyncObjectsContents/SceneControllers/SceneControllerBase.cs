@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;

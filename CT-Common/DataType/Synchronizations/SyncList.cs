@@ -36,7 +36,7 @@ namespace CT.Common.DataType.Synchronizations
 		public bool IsDirtyReliable => _isDirtyReliable;
 		private bool _isInitialSynchronized = false;
 
-		[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
+		//[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
 		public SyncList(int capacity = 8, int operationCapacity = 4)
 		{
 			_list = new(capacity);

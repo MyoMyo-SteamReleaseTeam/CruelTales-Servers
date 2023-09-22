@@ -1,9 +1,7 @@
-﻿using System.Numerics;
-using CTS.Instance.Data;
+﻿using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
 using CTS.Instance.Synchronizations;
-using KaNet.Physics;
 
 namespace CTS.Instance.SyncObjects
 {

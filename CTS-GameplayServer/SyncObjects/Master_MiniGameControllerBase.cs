@@ -42,106 +42,288 @@ namespace CTS.Instance.SyncObjects
 	public partial class MiniGameControllerBase
 	{
 		public override NetworkObjectType Type => NetworkObjectType.MiniGameControllerBase;
+		[SyncVar]
+		protected GameplayState _gameplayState = new();
+		[SyncVar]
+		protected float _gameTime;
+		[SyncVar(SyncType.ColdData)]
+		protected float _currentTime;
+		[SyncObject]
+		protected readonly SyncList<UserId> _eliminatedPlayers;
+		[SyncObject]
+		protected readonly MapVoteController _mapVoteController;
 		[SyncRpc]
-		public partial void Server_StartMiniGame();
+		public partial void Server_GameStartCountdown(float missionShowTime, float countdown);
 		[SyncRpc]
-		public partial void Server_NextGameStartCountdown(float second);
+		public partial void Server_GameEnd(float freezeTime);
+		[SyncRpc]
+		public partial void Server_ShowResult(float resultTime);
+		[SyncRpc]
+		public partial void Server_ShowExecution(ExecutionCutSceneType cutSceneType, float playTime);
+		[SyncRpc]
+		public partial void Server_StartVoteMap(float mapVoteTime);
+		[SyncRpc]
+		public partial void Server_ShowVotedNextMap(GameSceneIdentity nextMap, float showTime);
+		[SyncRpc]
+		public partial void Server_SyncTimer(float timeLeft);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public virtual partial void Client_ReadyGame(NetworkPlayer player, bool isReady);
 		public MiniGameControllerBase()
 		{
+			_eliminatedPlayers = new(this);
+			_mapVoteController = new(this);
 		}
-		public partial void Server_StartMiniGame()
+		protected BitmaskByte _dirtyReliable_1 = new();
+		public GameplayState GameplayState
 		{
-			Server_StartMiniGameCallstackCount++;
-			_dirtyReliable_0[3] = true;
+			get => _gameplayState;
+			set
+			{
+				if (_gameplayState == value) return;
+				_gameplayState = value;
+				_dirtyReliable_0[3] = true;
+				MarkDirtyReliable();
+			}
+		}
+		public float GameTime
+		{
+			get => _gameTime;
+			set
+			{
+				if (_gameTime == value) return;
+				_gameTime = value;
+				_dirtyReliable_0[4] = true;
+				MarkDirtyReliable();
+			}
+		}
+		public SyncList<UserId> EliminatedPlayers => _eliminatedPlayers;
+		public MapVoteController MapVoteController => _mapVoteController;
+		public partial void Server_GameStartCountdown(float missionShowTime, float countdown)
+		{
+			Server_GameStartCountdownffCallstack.Add((missionShowTime, countdown));
+			_dirtyReliable_0[7] = true;
 			MarkDirtyReliable();
 		}
-		protected byte Server_StartMiniGameCallstackCount = 0;
-		public partial void Server_NextGameStartCountdown(float second)
+		protected List<(float missionShowTime, float countdown)> Server_GameStartCountdownffCallstack = new(4);
+		public partial void Server_GameEnd(float freezeTime)
 		{
-			Server_NextGameStartCountdownfCallstack.Add(second);
-			_dirtyReliable_0[4] = true;
+			Server_GameEndfCallstack.Add(freezeTime);
+			_dirtyReliable_1[0] = true;
 			MarkDirtyReliable();
 		}
-		protected List<float> Server_NextGameStartCountdownfCallstack = new(4);
+		protected List<float> Server_GameEndfCallstack = new(4);
+		public partial void Server_ShowResult(float resultTime)
+		{
+			Server_ShowResultfCallstack.Add(resultTime);
+			_dirtyReliable_1[1] = true;
+			MarkDirtyReliable();
+		}
+		protected List<float> Server_ShowResultfCallstack = new(4);
+		public partial void Server_ShowExecution(ExecutionCutSceneType cutSceneType, float playTime)
+		{
+			Server_ShowExecutionEfCallstack.Add((cutSceneType, playTime));
+			_dirtyReliable_1[2] = true;
+			MarkDirtyReliable();
+		}
+		protected List<(ExecutionCutSceneType cutSceneType, float playTime)> Server_ShowExecutionEfCallstack = new(4);
+		public partial void Server_StartVoteMap(float mapVoteTime)
+		{
+			Server_StartVoteMapfCallstack.Add(mapVoteTime);
+			_dirtyReliable_1[3] = true;
+			MarkDirtyReliable();
+		}
+		protected List<float> Server_StartVoteMapfCallstack = new(4);
+		public partial void Server_ShowVotedNextMap(GameSceneIdentity nextMap, float showTime)
+		{
+			Server_ShowVotedNextMapGfCallstack.Add((nextMap, showTime));
+			_dirtyReliable_1[4] = true;
+			MarkDirtyReliable();
+		}
+		protected List<(GameSceneIdentity nextMap, float showTime)> Server_ShowVotedNextMapGfCallstack = new(4);
+		public partial void Server_SyncTimer(float timeLeft)
+		{
+			Server_SyncTimerfCallstack.Add(timeLeft);
+			_dirtyReliable_1[5] = true;
+			MarkDirtyReliable();
+		}
+		protected List<float> Server_SyncTimerfCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_TryLoadSceneAllGCallstack.Clear();
 			Server_TryLoadSceneGCallstack.Clear();
-			Server_StartMiniGameCallstackCount = 0;
-			Server_NextGameStartCountdownfCallstack.Clear();
+			_eliminatedPlayers.ClearDirtyReliable();
+			_mapVoteController.ClearDirtyReliable();
+			Server_GameStartCountdownffCallstack.Clear();
+			_dirtyReliable_1.Clear();
+			Server_GameEndfCallstack.Clear();
+			Server_ShowResultfCallstack.Clear();
+			Server_ShowExecutionEfCallstack.Clear();
+			Server_StartVoteMapfCallstack.Clear();
+			Server_ShowVotedNextMapGfCallstack.Clear();
+			Server_SyncTimerfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			int originSize = writer.Size;
+			_dirtyReliable_0[5] = _eliminatedPlayers.IsDirtyReliable;
+			_dirtyReliable_0[6] = _mapVoteController.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				_gameSceneIdentity.Serialize(writer);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				byte count = (byte)Server_TryLoadSceneAllGCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Server_TryLoadSceneAllGCallstack[i];
-					arg.Serialize(writer);
+					_gameSceneIdentity.Serialize(writer);
 				}
-			}
-			if (_dirtyReliable_0[2])
-			{
-				int Server_TryLoadSceneGCount = Server_TryLoadSceneGCallstack.GetCallCount(player);
-				if (Server_TryLoadSceneGCount > 0)
+				if (_dirtyReliable_0[1])
 				{
-					var Server_TryLoadSceneGcallList = Server_TryLoadSceneGCallstack.GetCallList(player);
-					writer.Put((byte)Server_TryLoadSceneGCount);
-					for (int i = 0; i < Server_TryLoadSceneGCount; i++)
+					byte count = (byte)Server_TryLoadSceneAllGCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
 					{
-						var arg = Server_TryLoadSceneGcallList[i];
+						var arg = Server_TryLoadSceneAllGCallstack[i];
 						arg.Serialize(writer);
 					}
 				}
-				else
+				if (_dirtyReliable_0[2])
 				{
-					dirtyReliable_0[2] = false;
+					int Server_TryLoadSceneGCount = Server_TryLoadSceneGCallstack.GetCallCount(player);
+					if (Server_TryLoadSceneGCount > 0)
+					{
+						var Server_TryLoadSceneGcallList = Server_TryLoadSceneGCallstack.GetCallList(player);
+						writer.Put((byte)Server_TryLoadSceneGCount);
+						for (int i = 0; i < Server_TryLoadSceneGCount; i++)
+						{
+							var arg = Server_TryLoadSceneGcallList[i];
+							arg.Serialize(writer);
+						}
+					}
+					else
+					{
+						dirtyReliable_0[2] = false;
+					}
+				}
+				if (_dirtyReliable_0[3])
+				{
+					writer.Put((byte)_gameplayState);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					writer.Put(_gameTime);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					_eliminatedPlayers.SerializeSyncReliable(writer);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					_mapVoteController.SerializeSyncReliable(player, writer);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					byte count = (byte)Server_GameStartCountdownffCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_GameStartCountdownffCallstack[i];
+						writer.Put(arg.missionShowTime);
+						writer.Put(arg.countdown);
+					}
 				}
 			}
-			if (_dirtyReliable_0[3])
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				writer.Put((byte)Server_StartMiniGameCallstackCount);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_NextGameStartCountdownfCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_1[0])
 				{
-					var arg = Server_NextGameStartCountdownfCallstack[i];
-					writer.Put(arg);
+					byte count = (byte)Server_GameEndfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_GameEndfCallstack[i];
+						writer.Put(arg);
+					}
+				}
+				if (_dirtyReliable_1[1])
+				{
+					byte count = (byte)Server_ShowResultfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_ShowResultfCallstack[i];
+						writer.Put(arg);
+					}
+				}
+				if (_dirtyReliable_1[2])
+				{
+					byte count = (byte)Server_ShowExecutionEfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_ShowExecutionEfCallstack[i];
+						writer.Put((byte)arg.cutSceneType);
+						writer.Put(arg.playTime);
+					}
+				}
+				if (_dirtyReliable_1[3])
+				{
+					byte count = (byte)Server_StartVoteMapfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_StartVoteMapfCallstack[i];
+						writer.Put(arg);
+					}
+				}
+				if (_dirtyReliable_1[4])
+				{
+					byte count = (byte)Server_ShowVotedNextMapGfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_ShowVotedNextMapGfCallstack[i];
+						arg.nextMap.Serialize(writer);
+						writer.Put(arg.showTime);
+					}
+				}
+				if (_dirtyReliable_1[5])
+				{
+					byte count = (byte)Server_SyncTimerfCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_SyncTimerfCallstack[i];
+						writer.Put(arg);
+					}
 				}
 			}
-			if (dirtyReliable_0.AnyTrue())
+			if (writer.Size == originSize + 2)
 			{
-				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			}
-			else
-			{
-				writer.SetSize(dirtyReliable_0_pos);
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_gameSceneIdentity.Serialize(writer);
+			writer.Put((byte)_gameplayState);
+			writer.Put(_gameTime);
+			writer.Put(_currentTime);
+			_eliminatedPlayers.SerializeEveryProperty(writer);
+			_mapVoteController.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_gameSceneIdentity = new();
+			_gameplayState = (GameplayState)0;
+			_gameTime = 0;
+			_currentTime = 0;
+			_eliminatedPlayers.InitializeMasterProperties();
+			_mapVoteController.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
