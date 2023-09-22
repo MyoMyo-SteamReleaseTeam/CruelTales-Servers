@@ -169,6 +169,8 @@ namespace CTS.Instance.SyncObjects
 		protected virtual void onGameStart()
 		{
 			GameplayState = GameplayState.Gameplay;
+			Server_GameStart(CurrentTime);
+
 			// TODO : Unlock input
 		}
 
