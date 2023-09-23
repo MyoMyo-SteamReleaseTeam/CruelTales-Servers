@@ -11,7 +11,8 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class CustomLobby_SceneController : SceneControllerBase
 	{
-		public const float GAME_START_COUNTDOWN_TIME = 4.0f;
+		//public const float GAME_START_COUNTDOWN_TIME = 4.0f;
+		public const float GAME_START_COUNTDOWN_TIME = 1.0f;
 
 		private CoroutineRunnerVoid _onGameStartRunner;
 
