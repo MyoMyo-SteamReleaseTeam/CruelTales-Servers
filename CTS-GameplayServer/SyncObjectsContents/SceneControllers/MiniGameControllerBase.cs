@@ -103,7 +103,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				CurrentTime -= deltaTime;
 			}
-			else
+			else if (GameplayState == GameplayState.Gameplay)
 			{
 				onGameEnd();
 
