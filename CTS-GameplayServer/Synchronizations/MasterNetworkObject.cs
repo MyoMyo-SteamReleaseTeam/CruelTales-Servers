@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
+using CT.Networks;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
@@ -46,7 +46,7 @@ namespace CTS.Instance.Synchronizations
 		public UserId Owner { get; protected set; } = new UserId(0);
 
 		/// <summary>유저의 소속입니다.</summary>
-		public Faction Faction { get; protected set; } = Faction.System;
+		public Faction Faction { get; set; } = Faction.System;
 
 		/// <summary>물리 강체 입니다.</summary>
 		public readonly NetRigidBody RigidBody;
@@ -61,6 +61,9 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>네트워크 객체가 보일 대상을 결정합니다.</summary>
 		public VisibilityAuthority VisibilityAuthority { get; protected set; }
 		public abstract VisibilityAuthority InitialVisibilityAuthority { get; }
+
+		/// <summary>보일 유저를 선택합니다.</summary>
+		private readonly HashSet<UserId> _visibleUserSet;
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
@@ -85,6 +88,7 @@ namespace CTS.Instance.Synchronizations
 			_physicsRigidBody.BindAction(onCollisionWith);
 			RigidBody = new NetRigidBody(_physicsRigidBody);
 			_wattingCoroutines = new HashSet<CoroutineIdentity>(16);
+			_visibleUserSet = new HashSet<UserId>(GlobalNetwork.SYSTEM_MAX_USER);
 		}
 
 		public void BindReferences(WorldManager worldManager,
@@ -116,6 +120,9 @@ namespace CTS.Instance.Synchronizations
 			_physicsRigidBody.ForceVelocity = Vector2.Zero;
 			_physicsRigidBody.ForceFriction = 0;
 			PhysicsWorld.AddRigidBody(_physicsRigidBody);
+
+			// Initialize visible set
+			_visibleUserSet.Clear();
 		}
 
 		public void InitializeAfterFrame()
@@ -204,7 +211,8 @@ namespace CTS.Instance.Synchronizations
 
 		public bool IsValidVisibilityAuthority(NetworkPlayer networkPlayer)
 		{
-			if (this.Visibility == VisibilityType.View && !networkPlayer.CanSeeViewObject)
+			if (Visibility == VisibilityType.View &&
+				!networkPlayer.CanSeeViewObject)
 			{
 				return false;
 			}
@@ -220,6 +228,9 @@ namespace CTS.Instance.Synchronizations
 				case VisibilityAuthority.Faction:
 					return networkPlayer.Faction == Faction;
 
+				case VisibilityAuthority.Users:
+					return _visibleUserSet.Contains(networkPlayer.UserId);
+
 				default:
 					return false;
 			}
@@ -233,6 +244,16 @@ namespace CTS.Instance.Synchronizations
 		public virtual bool IsSameFaction(NetworkPlayer networkPlayer)
 		{
 			return Faction == networkPlayer.Faction;
+		}
+
+		public void AddVisibleUser(UserId userId)
+		{
+			_visibleUserSet.Add(userId);
+		}
+
+		public void RemoveVisibleUser(UserId userId)
+		{
+			_visibleUserSet.Remove(userId);
 		}
 
 		#endregion

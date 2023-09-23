@@ -37,7 +37,7 @@
 		Faction,
 
 		/// <summary>해당되는 유저에게만 보입니다.</summary>
-		//Users,
+		Users,
 	}
 
 	public enum Faction : byte
