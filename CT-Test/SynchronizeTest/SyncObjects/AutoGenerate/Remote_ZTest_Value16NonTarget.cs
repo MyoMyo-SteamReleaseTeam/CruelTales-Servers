@@ -328,39 +328,22 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadByte(out _v0)) return false;
-			_onV0Changed?.Invoke(_v0);
 			if (!reader.TryReadSByte(out _v1)) return false;
-			_onV1Changed?.Invoke(_v1);
 			if (!reader.TryReadUInt16(out _v2)) return false;
-			_onV2Changed?.Invoke(_v2);
 			if (!reader.TryReadInt16(out _v3)) return false;
-			_onV3Changed?.Invoke(_v3);
 			if (!reader.TryReadUInt32(out _v4)) return false;
-			_onV4Changed?.Invoke(_v4);
 			if (!reader.TryReadInt32(out _v5)) return false;
-			_onV5Changed?.Invoke(_v5);
 			if (!reader.TryReadUInt64(out _v6)) return false;
-			_onV6Changed?.Invoke(_v6);
 			if (!reader.TryReadInt64(out _v7)) return false;
-			_onV7Changed?.Invoke(_v7);
 			if (!reader.TryReadSingle(out _v8)) return false;
-			_onV8Changed?.Invoke(_v8);
 			if (!reader.TryReadDouble(out _v9)) return false;
-			_onV9Changed?.Invoke(_v9);
 			if (!_v10.TryDeserialize(reader)) return false;
-			_onV10Changed?.Invoke(_v10);
 			if (!_v11.TryDeserialize(reader)) return false;
-			_onV11Changed?.Invoke(_v11);
 			if (!_v12.TryDeserializeEveryProperty(reader)) return false;
-			_onV12Changed?.Invoke(_v12);
 			if (!_v13.TryDeserializeEveryProperty(reader)) return false;
-			_onV13Changed?.Invoke(_v13);
 			if (!_v14.TryDeserializeEveryProperty(reader)) return false;
-			_onV14Changed?.Invoke(_v14);
 			if (!reader.TryReadByte(out _uv0)) return false;
-			_onUv0Changed?.Invoke(_uv0);
 			if (!reader.TryReadSByte(out _uv1)) return false;
-			_onUv1Changed?.Invoke(_uv1);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

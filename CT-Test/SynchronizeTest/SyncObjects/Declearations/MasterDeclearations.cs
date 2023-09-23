@@ -39,7 +39,7 @@ namespace CTS.Instance.SyncObjects
 
 		public float Field_Client_P2_Public => _field_Client_P2;
 
-		public partial void Client_P1(NetworkPlayer player)
+		public virtual partial void Client_P1(NetworkPlayer player)
 		{
 			TestHelper.AddOneTo(player, Client_P1_CountTable);
 		}
@@ -78,12 +78,12 @@ namespace CTS.Instance.SyncObjects
 
 		public float Field_Client_C4_Public => _field_Client_C4;
 
-		public partial void Client_C3(NetworkPlayer player)
+		public virtual partial void Client_C3(NetworkPlayer player)
 		{
 			TestHelper.AddOneTo(player, Client_C3_CountTable);
 		}
 
-		protected partial void Client_c4(NetworkPlayer player)
+		protected virtual partial void Client_c4(NetworkPlayer player)
 		{
 			TestHelper.AddOneTo(player, Client_C4_CountTable);
 		}
@@ -108,12 +108,12 @@ namespace CTS.Instance.SyncObjects
 
 		public float Field_Client_CC6_Public => _field_Client_CC6;
 
-		public partial void Client_CC5(NetworkPlayer player)
+		public virtual partial void Client_CC5(NetworkPlayer player)
 		{
 			TestHelper.AddOneTo(player, Client_CC5_CountTable);
 		}
 
-		protected partial void Client_cc6(NetworkPlayer player)
+		protected virtual partial void Client_cc6(NetworkPlayer player)
 		{
 			TestHelper.AddOneTo(player, Client_CC6_CountTable);
 		}
@@ -210,11 +210,6 @@ namespace CTS.Instance.SyncObjects
 	{
 		private Dictionary<UserId, int> _callTable = new();
 
-		public ZTest_InnerTest()
-		{
-			
-		}
-
 		public partial void Client_Test(NetworkPlayer player)
 		{
 			if (!_callTable.ContainsKey(player.UserId))
@@ -238,8 +233,5 @@ namespace CTS.Instance.SyncObjects
 
 	public partial class ZTest_InnerTestNoTarget : IMasterSynchronizable
 	{
-		public ZTest_InnerTestNoTarget()
-		{
-		}
 	}
 }

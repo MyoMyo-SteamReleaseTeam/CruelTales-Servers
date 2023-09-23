@@ -49,6 +49,9 @@ namespace CTS.Instance.SyncObjects
 		public partial void f1(NetStringShort a);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_InnerObject()
+		{
+		}
 		public ZTest_InnerObject(IDirtyable owner)
 		{
 			_owner = owner;

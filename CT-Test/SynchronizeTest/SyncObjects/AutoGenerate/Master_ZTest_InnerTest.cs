@@ -62,6 +62,9 @@ namespace CTS.Instance.SyncObjects
 		public partial void Client_Test(NetworkPlayer player);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_InnerTest()
+		{
+		}
 		public ZTest_InnerTest(IDirtyable owner)
 		{
 			_owner = owner;

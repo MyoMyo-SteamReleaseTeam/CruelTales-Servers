@@ -355,29 +355,17 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out _field_Server_P1)) return false;
-			_onField_Server_P1Changed?.Invoke(_field_Server_P1);
 			if (!reader.TryReadSingle(out _field_Server_P2)) return false;
-			_onField_Server_P2Changed?.Invoke(_field_Server_P2);
 			if (!reader.TryReadInt32(out _space_1)) return false;
-			_onSpace_1Changed?.Invoke(_space_1);
 			if (!reader.TryReadInt32(out _field_Server_C3)) return false;
-			_onField_Server_C3Changed?.Invoke(_field_Server_C3);
 			if (!reader.TryReadInt32(out _field_Server_C4)) return false;
-			_onField_Server_C4Changed?.Invoke(_field_Server_C4);
 			if (!reader.TryReadInt32(out _space_2)) return false;
-			_onSpace_2Changed?.Invoke(_space_2);
 			if (!reader.TryReadInt32(out _space_3)) return false;
-			_onSpace_3Changed?.Invoke(_space_3);
 			if (!reader.TryReadInt32(out _field_Server_CC5)) return false;
-			_onField_Server_CC5Changed?.Invoke(_field_Server_CC5);
 			if (!reader.TryReadInt32(out _space_4)) return false;
-			_onSpace_4Changed?.Invoke(_space_4);
 			if (!reader.TryReadInt32(out _field_Server_CC6)) return false;
-			_onField_Server_CC6Changed?.Invoke(_field_Server_CC6);
 			if (!reader.TryReadInt32(out _space_5)) return false;
-			_onSpace_5Changed?.Invoke(_space_5);
 			if (!reader.TryReadInt32(out _space_6)) return false;
-			_onSpace_6Changed?.Invoke(_space_6);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

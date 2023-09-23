@@ -288,6 +288,7 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 	{
 		public static string MasterNamespace => $"CTS.Instance.SyncObjects";
 		public static string RemoteNamespace => $"CTC.Networks.SyncObjects.SyncObjects";
+		public static string TestRemoteNamespace => $"CTC.Networks.SyncObjects.TestSyncObjects";
 
 		public static string MasterNetworkObjectTypeName => "MasterNetworkObject";
 		public static string RemoteNetworkObjectTypeName => "RemoteNetworkObject";
@@ -1171,6 +1172,8 @@ if (writer.Size == curSize)
 		/// {1} SyncType<br/>
 		/// </summary>
 		public static string ClearDirty => @"{0}.ClearDirty{1}();";
+
+		public static string SerializeExtension => "SerializeExtension";
 
 		/// <summary>
 		/// {0} Primitive data size constant<br/>

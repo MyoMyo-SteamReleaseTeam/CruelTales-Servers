@@ -95,9 +95,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!_userIdList.TryDeserializeEveryProperty(reader)) return false;
-			_onUserIdListChanged?.Invoke(_userIdList);
 			if (!_syncObj.TryDeserializeEveryProperty(reader)) return false;
-			_onSyncObjChanged?.Invoke(_syncObj);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

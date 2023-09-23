@@ -61,6 +61,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void f1(NetStringShort a);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_InnerObject()
+		{
+		}
 		public ZTest_InnerObject(IDirtyable owner)
 		{
 			_owner = owner;
@@ -117,9 +120,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out _v0)) return false;
-			_onV0Changed?.Invoke(_v0);
 			if (!reader.TryReadInt32(out _uv1)) return false;
-			_onUv1Changed?.Invoke(_uv1);
 			return true;
 		}
 		public void InitializeRemoteProperties()

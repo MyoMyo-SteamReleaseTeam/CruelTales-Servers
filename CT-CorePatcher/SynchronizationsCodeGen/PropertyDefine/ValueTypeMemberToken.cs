@@ -80,7 +80,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine
 
 		public override string Remote_IgnoreDeserialize(GenOption option, bool isStatic)
 		{
-			string dataTypeName = IsNativeStruct ? _typeName + "Extension" : _typeName;
+			string dataTypeName = IsNativeStruct ?
+				_typeName + MemberFormat.SerializeExtension : _typeName;
 			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);
 		}
 	}

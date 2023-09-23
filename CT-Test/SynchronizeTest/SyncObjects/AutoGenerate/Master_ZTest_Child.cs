@@ -71,9 +71,9 @@ namespace CTS.Instance.SyncObjects
 			remove => _onField_Client_C4Changed -= value;
 		}
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		public partial void Client_C3(NetworkPlayer player);
+		public virtual partial void Client_C3(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
-		protected partial void Client_c4(NetworkPlayer player);
+		protected virtual partial void Client_c4(NetworkPlayer player);
 		public ZTest_Child()
 		{
 		}

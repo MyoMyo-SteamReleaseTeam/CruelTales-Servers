@@ -67,6 +67,9 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public partial void Server_CompositeArg_3(Vector2 v0, TestEnumType v1, float v2);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
+		public ZTest_FuntionObject()
+		{
+		}
 		public ZTest_FuntionObject(IDirtyable owner)
 		{
 			_owner = owner;

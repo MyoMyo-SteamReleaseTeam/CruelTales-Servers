@@ -36,7 +36,8 @@ namespace CT.CorePatcher.SynchronizationsCodeGen.PropertyDefine.FunctionArgument
 
 		public override string GetIgnoreRead()
 		{
-			string dataTypeName = IsNativeStruct ? _typeName + "SerializeExtension" : _typeName;
+			string dataTypeName = IsNativeStruct ?
+				_typeName + MemberFormat.SerializeExtension : _typeName;
 			return string.Format(MemberFormat.IgnoreValueType, dataTypeName);
 		}
 	}

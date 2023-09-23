@@ -135,8 +135,14 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 				UsingTable.DebugRemoteUsingStatements :
 				UsingTable.RemoteUsingStatements;
 
+
+#pragma warning disable CA1416
+			string namespaceStr = MainProcess.IsDebug ? 
+				CommonFormat.TestRemoteNamespace : CommonFormat.RemoteNamespace;
+#pragma warning restore CA1416
+
 			string genCode = gnerateCode(usingStatements,
-										 CommonFormat.RemoteNamespace,
+										 namespaceStr,
 										 SyncDirection.FromRemote,
 										 CodeGenDirection.Remote,
 										 _remoteSideMembers,

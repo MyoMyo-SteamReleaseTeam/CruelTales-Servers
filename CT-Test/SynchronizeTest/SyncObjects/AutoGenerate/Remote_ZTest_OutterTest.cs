@@ -183,17 +183,11 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!_dictionary.TryDeserializeEveryProperty(reader)) return false;
-			_onDictionaryChanged?.Invoke(_dictionary);
 			if (!_innerList.TryDeserializeEveryProperty(reader)) return false;
-			_onInnerListChanged?.Invoke(_innerList);
 			if (!_noTargetList.TryDeserializeEveryProperty(reader)) return false;
-			_onNoTargetListChanged?.Invoke(_noTargetList);
 			if (!_objectDictionary.TryDeserializeEveryProperty(reader)) return false;
-			_onObjectDictionaryChanged?.Invoke(_objectDictionary);
 			if (!_inner.TryDeserializeEveryProperty(reader)) return false;
-			_onInnerChanged?.Invoke(_inner);
 			if (!reader.TryReadInt32(out _testInt)) return false;
-			_onTestIntChanged?.Invoke(_testInt);
 			return true;
 		}
 		public override void InitializeRemoteProperties()

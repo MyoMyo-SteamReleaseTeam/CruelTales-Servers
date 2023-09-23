@@ -200,11 +200,8 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 		public override bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
 			if (!reader.TryReadInt32(out _field_Server_P1)) return false;
-			_onField_Server_P1Changed?.Invoke(_field_Server_P1);
 			if (!reader.TryReadSingle(out _field_Server_P2)) return false;
-			_onField_Server_P2Changed?.Invoke(_field_Server_P2);
 			if (!reader.TryReadInt32(out _space_1)) return false;
-			_onSpace_1Changed?.Invoke(_space_1);
 			return true;
 		}
 		public override void InitializeRemoteProperties()
