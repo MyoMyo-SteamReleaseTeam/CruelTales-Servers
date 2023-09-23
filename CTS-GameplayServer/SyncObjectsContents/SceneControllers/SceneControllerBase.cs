@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using CT.Common.Gameplay;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
@@ -18,18 +19,18 @@ namespace CTS.Instance.SyncObjects
 		protected GameSceneMapData _mapData;
 
 		// Player Management
-		public BidirectionalMap<NetworkPlayer, PlayerCharacter> PlayerCharacterByPlayer { get; private set; }
+		protected BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		protected int _spawnIndex;
 
 		public override void Constructor()
 		{
-			PlayerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
+			_playerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
 		}
 
 		public virtual void Initialize(GameSceneIdentity identity)
 		{
 			GameSceneIdentity = identity;
-			PlayerCharacterByPlayer.Clear();
+			_playerCharacterByPlayer.Clear();
 			_mapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_spawnIndex = 0;
 		}
@@ -48,6 +49,13 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual void OnPlayerEnter(NetworkPlayer player) { }
 		public virtual void OnPlayerLeave(NetworkPlayer player) { }
+
+		public bool TryGetPlayerCharacter(NetworkPlayer player,
+										  [MaybeNullWhen(false)]
+										  out PlayerCharacter playerCharacter)
+		{
+			return _playerCharacterByPlayer.TryGetValue(player, out playerCharacter);
+		}
 
 		public void SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
 		{
@@ -69,7 +77,7 @@ namespace CTS.Instance.SyncObjects
 
 		public void CreatePlayerBy<T>(NetworkPlayer player, Vector2 position) where T : PlayerCharacter, new()
 		{
-			if (PlayerCharacterByPlayer.TryGetValue(player, out var existCharacter))
+			if (_playerCharacterByPlayer.TryGetValue(player, out var existCharacter))
 			{
 				_log.Error($"{player} already has player character. {existCharacter.GetType().Name}");
 				return;
@@ -81,7 +89,7 @@ namespace CTS.Instance.SyncObjects
 
 			// Binding
 			player.BindCharacter(playerCharacter);
-			PlayerCharacterByPlayer.Add(player, playerCharacter);
+			_playerCharacterByPlayer.Add(player, playerCharacter);
 
 			// Bind camera
 			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
@@ -101,13 +109,13 @@ namespace CTS.Instance.SyncObjects
 
 		public void DestroyPlayer(NetworkPlayer player)
 		{
-			if (!PlayerCharacterByPlayer.TryGetValue(player, out var playerCharacter))
+			if (!_playerCharacterByPlayer.TryGetValue(player, out var playerCharacter))
 			{
 				_log.Error($"There is no matched player character. NetworkPlayer : {player}");
 				return;
 			}
 
-			PlayerCharacterByPlayer.TryRemove(player);
+			_playerCharacterByPlayer.TryRemove(player);
 
 			// Destroy object
 			playerCharacter.Destroy();
@@ -128,7 +136,7 @@ namespace CTS.Instance.SyncObjects
 
 		public void Release()
 		{
-			foreach (NetworkPlayer player in PlayerCharacterByPlayer.ForwardKeys)
+			foreach (NetworkPlayer player in _playerCharacterByPlayer.ForwardKeys)
 			{
 				DestroyPlayer(player);
 			}

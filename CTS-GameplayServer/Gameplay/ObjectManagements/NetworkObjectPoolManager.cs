@@ -30,6 +30,9 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 				{ typeof(RedHoodCharacter), new NetworkObjectPool<RedHoodCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(TestCube), new NetworkObjectPool<TestCube>(120, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(Interactor), new NetworkObjectPool<Interactor>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(RedHoodMissionInteractor), new NetworkObjectPool<RedHoodMissionInteractor>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(Teleporter), new NetworkObjectPool<Teleporter>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
 				
 			};
 		}

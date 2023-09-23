@@ -63,7 +63,7 @@ namespace CTS.Instance.Synchronizations
 		public abstract VisibilityAuthority InitialVisibilityAuthority { get; }
 
 		/// <summary>보일 유저를 선택합니다.</summary>
-		private readonly HashSet<UserId> _visibleUserSet;
+		protected readonly HashSet<UserId> _visibleUserSet;
 
 		/// <summary>네트워크 객체가 활성화된 상태인지 여부입니다.</summary>
 		public bool IsAlive { get; private set; } = false;
@@ -226,7 +226,7 @@ namespace CTS.Instance.Synchronizations
 					return networkPlayer.UserId == Owner;
 
 				case VisibilityAuthority.Faction:
-					return networkPlayer.Faction == Faction;
+					return networkPlayer.Faction.IsSameFaction(Faction);
 
 				case VisibilityAuthority.Users:
 					return _visibleUserSet.Contains(networkPlayer.UserId);

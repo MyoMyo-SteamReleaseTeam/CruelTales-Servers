@@ -7,6 +7,7 @@ using CT.Common.Tools.Data;
 #endif
 using CT.Networks.Runtimes;
 using CTS.Instance.Data;
+using CTS.Instance.Gameplay;
 using CTS.Instance.Networks;
 using KaNet.Physics;
 using log4net;
@@ -82,6 +83,14 @@ namespace CTS.Instance
 			{
 				Thread.Sleep(10000);
 			}
+		}
+	}
+
+	public static class Anticheat
+	{
+		public static void CheatDetected(NetworkPlayer player)
+		{
+
 		}
 	}
 }

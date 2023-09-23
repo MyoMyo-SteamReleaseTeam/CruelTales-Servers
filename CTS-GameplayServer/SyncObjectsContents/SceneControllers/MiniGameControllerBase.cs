@@ -70,7 +70,7 @@ namespace CTS.Instance.SyncObjects
 			GameplayController.GameSystemState = GameSystemState.Ready;
 			GameplayState = GameplayState.Ready;
 
-			foreach (NetworkPlayer player in PlayerCharacterByPlayer.ForwardKeys)
+			foreach (NetworkPlayer player in _playerCharacterByPlayer.ForwardKeys)
 			{
 				player.IsMapLoaded = false;
 				player.IsReady = false;
@@ -80,6 +80,18 @@ namespace CTS.Instance.SyncObjects
 			MiniGameData = MiniGameDataDB.GetMiniGameData(GameSceneIdentity);
 			GameTime = MiniGameData.GameTime;
 			CurrentTime = GameTime;
+
+			// Create teleporters
+			if (_mapData.InteractorTable.TryGetValue(InteractorType.Teleporter,
+													 out var teleporterInfoList))
+			{
+				foreach (var info in teleporterInfoList)
+				{
+					var teleporter = WorldManager.CreateObject<Teleporter>(info.Position);
+					teleporter.Initialize(info);
+				}
+			}
+
 
 			Server_TryLoadSceneAll(GameSceneIdentity);
 		}
@@ -142,10 +154,10 @@ namespace CTS.Instance.SyncObjects
 		{
 			MapVoteController.OnPlayerLeave(player);
 
-			if (PlayerCharacterByPlayer.TryGetValue(player, out var pc))
+			if (_playerCharacterByPlayer.TryGetValue(player, out var pc))
 			{
 				pc.Destroy();
-				PlayerCharacterByPlayer.TryRemove(player);
+				_playerCharacterByPlayer.TryRemove(player);
 			}
 		}
 

@@ -67,6 +67,10 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
+				writer.Put(_section);
+			}
+			if (_dirtyReliable_0[2])
+			{
 				byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
@@ -75,7 +79,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[3])
 			{
 				byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
 				writer.Put(count);
@@ -86,7 +90,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg.direction);
 				}
 			}
-			if (_dirtyReliable_0[3])
+			if (_dirtyReliable_0[4])
 			{
 				byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
 				writer.Put(count);
@@ -96,7 +100,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[4])
+			if (_dirtyReliable_0[5])
 			{
 				int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
 				if (Server_OrderTestiCount > 0)
@@ -111,10 +115,10 @@ namespace CTS.Instance.SyncObjects
 				}
 				else
 				{
-					dirtyReliable_0[4] = false;
+					dirtyReliable_0[5] = false;
 				}
 			}
-			if (_dirtyReliable_0[5])
+			if (_dirtyReliable_0[6])
 			{
 				byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
 				writer.Put(count);
@@ -125,7 +129,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put(arg.fromSever);
 				}
 			}
-			if (_dirtyReliable_0[6])
+			if (_dirtyReliable_0[7])
 			{
 				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
 				writer.Put(count);
@@ -148,6 +152,7 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userId.Serialize(writer);
+			writer.Put(_section);
 			writer.Put((byte)_animationState);
 			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
@@ -155,6 +160,7 @@ namespace CTS.Instance.SyncObjects
 		public override void InitializeMasterProperties()
 		{
 			_userId = new();
+			_section = 0;
 			_animationState = (DokzaAnimationState)0;
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;

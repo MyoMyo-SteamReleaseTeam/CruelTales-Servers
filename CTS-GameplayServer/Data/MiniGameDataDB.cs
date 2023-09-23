@@ -21,13 +21,13 @@ namespace CTS.Instance.Data
 			_miniGameDataByMode.Add(GameModeType.RedHood, new()
 			{
 				ExecutionCutScene = ExecutionCutSceneType.RedHood,
-				GameTime = 5.0f,
+				GameTime = 240.0f,
 				FeverTime = 1.0f,
 			});
 			_miniGameDataByMode.Add(GameModeType.Dueoksini, new()
 			{
 				ExecutionCutScene = ExecutionCutSceneType.Dueoksini,
-				GameTime = 5.0f,
+				GameTime = 3.0f,
 				FeverTime = 1.0f,
 			});
 

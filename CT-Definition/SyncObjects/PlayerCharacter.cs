@@ -3,7 +3,6 @@
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.DataType.Input;
-using CT.Common.Gameplay;
 using CT.Common.Gameplay.Players;
 using CT.Common.Synchronizations;
 
@@ -14,6 +13,9 @@ namespace CT.Definitions.SyncObjects
 	{
 		[SyncVar]
 		public UserId UserId;
+
+		[SyncVar]
+		public byte Section;
 
 		// Animations
 		[SyncVar(SyncType.ColdData)]

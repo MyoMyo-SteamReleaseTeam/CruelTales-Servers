@@ -22,5 +22,8 @@ namespace CTS.Instance.SyncObjects
 		RedHoodCharacter,
 		WolfCharacter,
 		TestCube,
+		Interactor,
+		RedHoodMissionInteractor,
+		Teleporter,
 	}
 }

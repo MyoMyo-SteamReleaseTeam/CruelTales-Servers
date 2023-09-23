@@ -100,8 +100,8 @@
         "Y": 16.40164
       },
       "Rotation": 0.0,
-      "Radius": 4.473427,
-      "Width": 8.946854,
+      "Radius": 3.29870486,
+      "Width": 6.59740973,
       "Height": 15.899106,
       "IsStatic": true
     },
@@ -110,12 +110,12 @@
       "LayerMask": 0,
       "Position": {
         "X": 29.90299,
-        "Y": 19.40194
+        "Y": 17.53
       },
       "Rotation": 0.0,
       "Radius": 1.74874544,
       "Width": 3.497491,
-      "Height": 10.2610312,
+      "Height": 7.43781137,
       "IsStatic": true
     },
     {
@@ -379,16 +379,16 @@
       "IsStatic": true
     },
     {
-      "PhysicsShapeType": 1,
+      "PhysicsShapeType": 3,
       "LayerMask": 0,
       "Position": {
         "X": -1.70017,
         "Y": 11.40114
       },
       "Rotation": 0.0,
-      "Radius": 0.6582108,
-      "Width": 1.31642163,
-      "Height": 0.59485,
+      "Radius": 0.5,
+      "Width": 1.0,
+      "Height": 1.0,
       "IsStatic": true
     },
     {
@@ -876,12 +876,12 @@
       "PhysicsShapeType": 1,
       "LayerMask": 0,
       "Position": {
-        "X": 13.50135,
+        "X": 12.25,
         "Y": 15.40154
       },
       "Rotation": 0.0,
-      "Radius": 0.61441946,
-      "Width": 1.22883892,
+      "Radius": 0.806486964,
+      "Width": 1.61297393,
       "Height": 1.40661335,
       "IsStatic": true
     },
@@ -1059,7 +1059,7 @@
       "LayerMask": 0,
       "Position": {
         "X": -5.0005,
-        "Y": 23.40234
+        "Y": 23.38
       },
       "Rotation": 0.0,
       "Radius": 1.22632647,
@@ -1072,7 +1072,7 @@
       "LayerMask": 0,
       "Position": {
         "X": -0.8000798,
-        "Y": 23.40234
+        "Y": 23.36
       },
       "Rotation": 0.0,
       "Radius": 1.22632647,
@@ -1085,7 +1085,7 @@
       "LayerMask": 0,
       "Position": {
         "X": -3.0003,
-        "Y": 23.90239
+        "Y": 23.46
       },
       "Rotation": 0.0,
       "Radius": 1.22632647,
@@ -1430,6 +1430,175 @@
       "Width": 1.86064553,
       "Height": 0.6317129,
       "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 0,
+      "Position": {
+        "X": 18.94,
+        "Y": 18.38
+      },
+      "Rotation": 0.0,
+      "Radius": 0.78725,
+      "Width": 1.5745,
+      "Height": 1.5745,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 0,
+      "Position": {
+        "X": 24.11,
+        "Y": 18.38
+      },
+      "Rotation": 0.0,
+      "Radius": 0.78725,
+      "Width": 1.5745,
+      "Height": 1.5745,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 0,
+      "Position": {
+        "X": 18.94,
+        "Y": 22.09
+      },
+      "Rotation": 0.0,
+      "Radius": 0.78725,
+      "Width": 1.5745,
+      "Height": 1.5745,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 3,
+      "LayerMask": 0,
+      "Position": {
+        "X": 24.11,
+        "Y": 22.09
+      },
+      "Rotation": 0.0,
+      "Radius": 0.78725,
+      "Width": 1.5745,
+      "Height": 1.5745,
+      "IsStatic": true
+    },
+    {
+      "PhysicsShapeType": 1,
+      "LayerMask": 0,
+      "Position": {
+        "X": 30.73,
+        "Y": 21.8
+      },
+      "Rotation": 0.0,
+      "Radius": 1.74874544,
+      "Width": 3.497491,
+      "Height": 7.43781137,
+      "IsStatic": true
     }
-  ]
+  ],
+  "InteractorTable": {
+    "Teleporter": [
+      {
+        "InteractorType": 1,
+        "BehaviourType": 2,
+        "Position": {
+          "X": 21.53,
+          "Y": 25.62
+        },
+        "Size": {
+          "X": 2.0,
+          "Y": 1.0
+        },
+        "PrograssTime": 3.0,
+        "Cooltime": 3.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 2.08,
+          "Y": 17.2
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": -2.77,
+          "Y": 22.9
+        },
+        "Size": {
+          "X": 2.0,
+          "Y": 1.0
+        },
+        "PrograssTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 1,
+        "ByteValue": 0,
+        "VectorValue": {
+          "X": -31.24,
+          "Y": 21.72
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": -31.32,
+          "Y": 20.29
+        },
+        "Size": {
+          "X": 4.0,
+          "Y": 1.0
+        },
+        "PrograssTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 0,
+        "VectorValue": {
+          "X": -2.88,
+          "Y": 21.52
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 17.19,
+          "Y": -3.62
+        },
+        "Size": {
+          "X": 2.0,
+          "Y": 1.0
+        },
+        "PrograssTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 2,
+        "ByteValue": 0,
+        "VectorValue": {
+          "X": 43.43,
+          "Y": -8.21
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 43.58,
+          "Y": -9.56
+        },
+        "Size": {
+          "X": 4.0,
+          "Y": 1.0
+        },
+        "PrograssTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 0,
+        "VectorValue": {
+          "X": 17.11,
+          "Y": -4.78
+        }
+      }
+    ]
+  }
 }

@@ -2,7 +2,6 @@
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Networks;
-using CTS.Instance.Synchronizations;
 using CTS.Instance.SyncObjects;
 using log4net;
 

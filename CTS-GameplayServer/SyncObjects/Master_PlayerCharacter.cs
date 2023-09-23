@@ -44,6 +44,8 @@ namespace CTS.Instance.SyncObjects
 		public override NetworkObjectType Type => NetworkObjectType.PlayerCharacter;
 		[SyncVar]
 		protected UserId _userId = new();
+		[SyncVar]
+		protected byte _section;
 		[SyncVar(SyncType.ColdData)]
 		protected DokzaAnimationState _animationState = new();
 		[SyncVar(SyncType.ColdData)]
@@ -81,45 +83,56 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public byte Section
+		{
+			get => _section;
+			set
+			{
+				if (_section == value) return;
+				_section = value;
+				_dirtyReliable_0[1] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state)
 		{
 			Server_OnAnimationChangedDCallstack.Add(state);
-			_dirtyReliable_0[1] = true;
+			_dirtyReliable_0[2] = true;
 			MarkDirtyReliable();
 		}
 		protected List<DokzaAnimationState> Server_OnAnimationChangedDCallstack = new(4);
 		public partial void Server_OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction)
 		{
 			Server_OnAnimationChangedDPCallstack.Add((state, direction));
-			_dirtyReliable_0[2] = true;
+			_dirtyReliable_0[3] = true;
 			MarkDirtyReliable();
 		}
 		protected List<(DokzaAnimationState state, ProxyDirection direction)> Server_OnAnimationChangedDPCallstack = new(4);
 		public partial void Server_OnProxyDirectionChanged(ProxyDirection direction)
 		{
 			Server_OnProxyDirectionChangedPCallstack.Add(direction);
-			_dirtyReliable_0[3] = true;
+			_dirtyReliable_0[4] = true;
 			MarkDirtyReliable();
 		}
 		protected List<ProxyDirection> Server_OnProxyDirectionChangedPCallstack = new(4);
 		public partial void Server_OrderTest(NetworkPlayer player, int fromServer)
 		{
 			Server_OrderTestiCallstack.Add(player, fromServer);
-			_dirtyReliable_0[4] = true;
+			_dirtyReliable_0[5] = true;
 			MarkDirtyReliable();
 		}
 		protected TargetCallstack<NetworkPlayer, int> Server_OrderTestiCallstack = new(8);
 		public partial void Server_BroadcastOrderTest(int userId, int fromSever)
 		{
 			Server_BroadcastOrderTestiiCallstack.Add((userId, fromSever));
-			_dirtyReliable_0[5] = true;
+			_dirtyReliable_0[6] = true;
 			MarkDirtyReliable();
 		}
 		protected List<(int userId, int fromSever)> Server_BroadcastOrderTestiiCallstack = new(4);
 		public partial void Server_TestPositionTickByTick(Vector2 curPosition)
 		{
 			Server_TestPositionTickByTickVCallstack.Add(curPosition);
-			_dirtyReliable_0[6] = true;
+			_dirtyReliable_0[7] = true;
 			MarkDirtyReliable();
 		}
 		protected List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
@@ -145,6 +158,10 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
+				writer.Put(_section);
+			}
+			if (_dirtyReliable_0[2])
+			{
 				byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
@@ -153,7 +170,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[2])
+			if (_dirtyReliable_0[3])
 			{
 				byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
 				writer.Put(count);
@@ -164,7 +181,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg.direction);
 				}
 			}
-			if (_dirtyReliable_0[3])
+			if (_dirtyReliable_0[4])
 			{
 				byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
 				writer.Put(count);
@@ -174,7 +191,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[4])
+			if (_dirtyReliable_0[5])
 			{
 				int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
 				if (Server_OrderTestiCount > 0)
@@ -189,10 +206,10 @@ namespace CTS.Instance.SyncObjects
 				}
 				else
 				{
-					dirtyReliable_0[4] = false;
+					dirtyReliable_0[5] = false;
 				}
 			}
-			if (_dirtyReliable_0[5])
+			if (_dirtyReliable_0[6])
 			{
 				byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
 				writer.Put(count);
@@ -203,7 +220,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put(arg.fromSever);
 				}
 			}
-			if (_dirtyReliable_0[6])
+			if (_dirtyReliable_0[7])
 			{
 				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
 				writer.Put(count);
@@ -226,6 +243,7 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			_userId.Serialize(writer);
+			writer.Put(_section);
 			writer.Put((byte)_animationState);
 			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
@@ -233,6 +251,7 @@ namespace CTS.Instance.SyncObjects
 		public override void InitializeMasterProperties()
 		{
 			_userId = new();
+			_section = 0;
 			_animationState = (DokzaAnimationState)0;
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;

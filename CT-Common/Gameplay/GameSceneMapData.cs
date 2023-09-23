@@ -11,6 +11,7 @@ namespace CT.Common.Gameplay
 		public GameSceneIdentity GameSceneIdentity;
 		public List<Vector2> SpawnPositions = new();
 		public List<ColliderInfo> EnvironmentColliders = new();
+		public Dictionary<InteractorType, List<InteractorInfo>> InteractorTable = new();
 
 		[JsonIgnore]
 		public List<KaRigidBody> StaticRigidBodies { get; private set; } = new();

@@ -2,8 +2,7 @@
 
 namespace CT.Common.DataType.Input
 {
-	/// <summary></summary>
-	public enum InteractionType : byte
+	public enum InteractionInputType : byte
 	{
 		None = 0,
 
@@ -45,9 +44,9 @@ namespace CT.Common.DataType.Input
 		public NetworkIdentity TargetID;
 
 		/// <summary>상호작용 타입입니다.</summary>
-		public InteractionType InteractionType;
+		public InteractionInputType InteractionType;
 
-		public int SerializeSize => TargetID.SerializeSize + sizeof(InteractionType);
+		public int SerializeSize => TargetID.SerializeSize + sizeof(InteractionInputType);
 
 		public void Ignore(IPacketReader reader)
 		{
@@ -57,7 +56,7 @@ namespace CT.Common.DataType.Input
 		public static void IgnoreStatic(IPacketReader reader)
 		{
 			NetworkIdentity.IgnoreStatic(reader);
-			reader.Ignore(sizeof(InteractionType));
+			reader.Ignore(sizeof(InteractionInputType));
 		}
 
 		public void Serialize(IPacketWriter writer)
@@ -71,7 +70,7 @@ namespace CT.Common.DataType.Input
 			if (!TargetID.TryDeserialize(reader)) return false;
 			if (!reader.TryReadByte(out byte interactionType)) return false;
 
-			InteractionType = (InteractionType)interactionType;
+			InteractionType = (InteractionInputType)interactionType;
 
 			return true;
 		}
