@@ -130,7 +130,7 @@ namespace CTS.Instance.Synchronizations
 			OnCreated();
 
 			// Add to trace visibility
-			if (Visibility == VisibilityType.View)
+			if (Visibility.IsViewType())
 			{
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
 			}
@@ -199,7 +199,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>월드에서의 Cell 위치를 갱신합니다.</summary>
 		public void UpdateWorldCell()
 		{
-			if (Visibility == VisibilityType.View)
+			if (Visibility.IsViewType())
 			{
 				Vector2Int previousPos = CurrentCellPos;
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
@@ -211,7 +211,7 @@ namespace CTS.Instance.Synchronizations
 
 		public bool IsValidVisibilityAuthority(NetworkPlayer networkPlayer)
 		{
-			if (Visibility == VisibilityType.View &&
+			if (Visibility.IsViewType() &&
 				!networkPlayer.CanSeeViewObject)
 			{
 				return false;

@@ -13,6 +13,23 @@
 
 		/// <summary>시야 내에 있을 때 보입니다.</summary>
 		View,
+
+		/// <summary>시야 내에 있거나 소유자라면 보입니다.</summary>
+		ViewAndOwner,
+	}
+
+	public static class VisibilityTypeExtension
+	{
+		public static bool IsViewType(this VisibilityType value)
+		{
+			return value == VisibilityType.View ||
+				value == VisibilityType.ViewAndOwner;
+		}
+
+		public static bool IsGlobalType(this VisibilityType value)
+		{
+			return value == VisibilityType.Global;
+		}
 	}
 
 	/// <summary>

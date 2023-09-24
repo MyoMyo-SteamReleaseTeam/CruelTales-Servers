@@ -207,8 +207,9 @@ namespace CTS.Instance.Gameplay
 					}
 
 					Vector2 objPos = spawnObject.RigidBody.Position;
-					if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-						objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
+					if ((objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
+						objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y) ||
+						shouldForceShow(player, spawnObject))
 					{
 						if (spawnObject.IsValidVisibilityAuthority(player))
 						{
@@ -227,8 +228,9 @@ namespace CTS.Instance.Gameplay
 						foreach (var netObj in curCell.Values)
 						{
 							Vector2 objPos = netObj.RigidBody.Position;
-							if (objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-								objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y)
+							if ((objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
+								objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y) ||
+								shouldForceShow(player, netObj))
 							{
 								if (viewTable.TraceObjects.ContainsKey(netObj.Identity))
 								{
@@ -278,9 +280,10 @@ namespace CTS.Instance.Gameplay
 				foreach (var netObj in viewTable.TraceObjects.Values)
 				{
 					Vector2 objPos = netObj.RigidBody.Position;
-					if (objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
+					if ((objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
 						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y ||
-						!netObj.IsValidVisibilityAuthority(player))
+						!netObj.IsValidVisibilityAuthority(player)) && 
+						!shouldForceShow(player, netObj))
 					{
 						bool isAdded = _outObjectSet.TryAdd(netObj.Identity, netObj);
 						Debug.Assert(isAdded);
@@ -347,6 +350,16 @@ namespace CTS.Instance.Gameplay
 				_worldManager.SendSynchronization(kv.Key, visibleTable);
 				visibleTable.TransitionVisibilityCycle();
 			}
+
+			bool shouldForceShow(NetworkPlayer player, MasterNetworkObject netObj)
+			{
+				if (netObj.Visibility == VisibilityType.ViewAndOwner)
+				{
+					return player.UserId == netObj.Owner;
+				}
+
+				return false;
+			}
 		}
 
 		public void OnCellChanged(MasterNetworkObject netObj, Vector2Int previous, Vector2Int current)
@@ -364,11 +377,13 @@ namespace CTS.Instance.Gameplay
 		{
 			var id = netObj.Identity;
 
-			if (netObj.Visibility == VisibilityType.View)
+			VisibilityType visibility = netObj.Visibility;
+
+			if (visibility.IsViewType())
 			{
 				_tempSpawnList.Add(id);
 			}
-			else if (netObj.Visibility == VisibilityType.Global)
+			else if (visibility.IsGlobalType())
 			{
 				_globalObjectSet.Add(netObj);
 
@@ -386,7 +401,9 @@ namespace CTS.Instance.Gameplay
 		{
 			var id = netObj.Identity;
 
-			if (netObj.Visibility == VisibilityType.View)
+			VisibilityType visibility = netObj.Visibility;
+
+			if (visibility.IsViewType())
 			{
 				if (_tempSpawnList.Contains(id))
 				{
@@ -397,7 +414,7 @@ namespace CTS.Instance.Gameplay
 					_tempDespawnList.Add(netObj);
 				}
 			}
-			else if (netObj.Visibility == VisibilityType.Global)
+			else if (visibility.IsGlobalType())
 			{
 				_globalObjectSet.Remove(netObj);
 
