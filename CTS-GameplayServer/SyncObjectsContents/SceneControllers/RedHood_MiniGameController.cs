@@ -126,6 +126,9 @@ namespace CTS.Instance.SyncObjects
 			StartCoroutine(_onChangeRole, centerArg, isRight, wolfUserId, targetUserId, 2.0f);
 			GameplayController.EffectController.Play(EffectType.WolfnPlayerFight, center);
 
+			wolf.NetworkPlayer.CameraController?.Server_LookAt(center, 0.1f);
+			target.NetworkPlayer.CameraController?.Server_LookAt(center, 0.1f);
+
 			DestroyPlayer(wolf);
 			DestroyPlayer(target);
 		}

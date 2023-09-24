@@ -19,7 +19,7 @@ namespace CTS.Instance.SyncObjects
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(PlayerCharacter));
 
-		public override VisibilityType Visibility => VisibilityType.View;
+		public override VisibilityType Visibility => VisibilityType.ViewAndOwner;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
 		public float Speed = 5.0f;
@@ -181,6 +181,11 @@ namespace CTS.Instance.SyncObjects
 			BroadcastOrderTest((int)UserId.Id, 0);
 		}
 		
+		public void OnPushed(Vector2 pushedDirection)
+		{
+			NetworkPlayer.CameraController?.Server_Shake();
+		}
+
 		#region Sync
 
 		public void OnAnimationChanged(DokzaAnimationState state)

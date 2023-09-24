@@ -289,12 +289,16 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.Player.Impluse(Reference.Player.ActionDirection, _pushedPower, _pushedFriction);
+
+			Vector2 pushedDir = Reference.Player.ActionDirection;
+			Reference.Player.Impluse(pushedDir, _pushedPower, _pushedFriction);
 			Reference.UpdateProxyDirectionByActionDirection();
 			Reference.UpdateProxyDirectionToFront();
 
 			Reference.Player.Stop();
 			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
+
+			Reference.Player.OnPushed(pushedDir);
 		}
 
 		public override void OnExit()

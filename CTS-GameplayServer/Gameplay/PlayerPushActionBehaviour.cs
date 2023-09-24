@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using CT.Common.Gameplay;
 using CTS.Instance.SyncObjects;
 
 namespace CTS.Instance.Gameplay
@@ -13,12 +14,17 @@ namespace CTS.Instance.Gameplay
 		/// <param name="other">대상자</param>
 		public static void OnPushAction(PlayerCharacter actor, PlayerCharacter other)
 		{
-			Vector2 direction = Vector2.Normalize(other.Position - actor.Position);
-			if (other.StateMachine.CurrentState == other.StateMachine.PushState)
+			if (other.StateMachine.CurrentState != other.StateMachine.PushedState)
 			{
-				actor.OnReactionBy(-direction);
+				Vector2 direction = Vector2.Normalize(other.Position - actor.Position);
+				if (other.StateMachine.CurrentState == other.StateMachine.PushState)
+				{
+					actor.OnReactionBy(-direction);
+				}
+				other.OnReactionBy(direction);
+				Vector2 hitPos = (actor.Position + other.Position) * 0.5f;
+				actor.GameplayController.EffectController.Play(EffectType.HammerHit, hitPos);
 			}
-			other.OnReactionBy(direction);
 		}
 	}
 }

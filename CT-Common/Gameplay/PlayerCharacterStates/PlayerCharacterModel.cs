@@ -169,6 +169,11 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			UpdateProxyDirectionByMoveDirection();
 		}
 		
+		public void OnPushed(Vector2 pushedDirection)
+		{
+			Player.OnPushed(pushedDirection);
+		}
+
 		public void Update(float deltaTime)
 		{
 			Player.AnimationTime += deltaTime;

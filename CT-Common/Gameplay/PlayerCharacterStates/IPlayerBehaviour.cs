@@ -20,5 +20,6 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public void OnAnimationChanged(DokzaAnimationState state, ProxyDirection direction);
 		public void OnProxyDirectionChanged(ProxyDirection direction);
 		public void OnDuringAction();
+		public void OnPushed(Vector2 pushedDirection);
 	}
 }
