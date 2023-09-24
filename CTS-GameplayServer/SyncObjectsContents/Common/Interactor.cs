@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Networks;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
@@ -19,7 +20,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		private readonly HashSet<UserId> _cooltimePlayers;
+		private HashSet<UserId> _cooltimePlayers;
 
 		private Action<Arg> _onCooltimeEnd;
 
@@ -28,6 +29,7 @@ namespace CTS.Instance.SyncObjects
 		public override void Constructor()
 		{
 			_onCooltimeEnd = onCooltimeEnd;
+			_cooltimePlayers = new HashSet<UserId>(GlobalNetwork.SYSTEM_MAX_USER);
 		}
 
 		public virtual void Initialize(InteractorInfo info)
