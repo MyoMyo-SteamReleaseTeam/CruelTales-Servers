@@ -8,7 +8,7 @@ namespace CT.Common
 {
 	[Serializable]
 	[StructLayout(LayoutKind.Explicit)]
-	public struct Color32 : IPacketSerializable, IEquatable<Color32>
+	public struct NetColor : IPacketSerializable, IEquatable<NetColor>
 	{
 		internal const int RedShift = 24;
 		internal const int GreenShift = 16;
@@ -28,35 +28,35 @@ namespace CT.Common
 		[FieldOffset(0)]
 		public uint RGBA;
 
-		public static readonly Color32 White	= new Color32(255, 255, 255, 255);
-		public static readonly Color32 Black	= new Color32(0, 0, 0, 255);
-		public static readonly Color32 Red		= new Color32(255, 0, 0, 255);
-		public static readonly Color32 Green	= new Color32(0, 255, 0, 255);
-		public static readonly Color32 Blue		= new Color32(0, 0, 255, 255);
-		public static readonly Color32 Yellow	= new Color32(255, 255, 0, 255);
-		public static readonly Color32 Purple	= new Color32(255, 0, 255, 255);
-		public static readonly Color32 Cyan		= new Color32(0, 255, 255, 255);
-		public static readonly Color32 Void		= new Color32(0, 0, 0, 0);
+		public static readonly NetColor White	= new NetColor(255, 255, 255, 255);
+		public static readonly NetColor Black	= new NetColor(0, 0, 0, 255);
+		public static readonly NetColor Red		= new NetColor(255, 0, 0, 255);
+		public static readonly NetColor Green	= new NetColor(0, 255, 0, 255);
+		public static readonly NetColor Blue		= new NetColor(0, 0, 255, 255);
+		public static readonly NetColor Yellow	= new NetColor(255, 255, 0, 255);
+		public static readonly NetColor Purple	= new NetColor(255, 0, 255, 255);
+		public static readonly NetColor Cyan		= new NetColor(0, 255, 255, 255);
+		public static readonly NetColor Void		= new NetColor(0, 0, 0, 0);
 
 		public const int SERIALIZE_SIZE = sizeof(uint);
 		public int SerializeSize => SERIALIZE_SIZE;
 
 		/// <summary>RGBA 순서로 색상을 바인딩합니다.</summary>
-		public Color32(uint value)
+		public NetColor(uint value)
 		{
 			RGBA = value;
 		}
 
-		public Color32(float r, float g, float b, float a = 1.0f)
+		public NetColor(float r, float g, float b, float a = 1.0f)
 		{
 			byte rv = KaMath.NormalizeFloatToByte(r);
 			byte gv = KaMath.NormalizeFloatToByte(g);
 			byte bv = KaMath.NormalizeFloatToByte(b);
 			byte av = KaMath.NormalizeFloatToByte(a);
-			this = new Color32(rv, gv, bv, av);
+			this = new NetColor(rv, gv, bv, av);
 		}
 
-		public Color32(byte r, byte g, byte b, byte a = 255)
+		public NetColor(byte r, byte g, byte b, byte a = 255)
 		{
 			RGBA = 0;
 			RGBA |= (uint)(r << RedShift);
@@ -71,7 +71,7 @@ namespace CT.Common
 		/// 해석할 수 없는 문자인 경우 RGBA가 각각 0인 색상을 생성합니다.
 		/// </summary>
 		/// <param name="hexCode">6, 8글자의 16진수 코드입니다.</param>
-		public Color32(string hexCode)
+		public NetColor(string hexCode)
 		{
 			this = ParseFromHex(hexCode);
 		}
@@ -79,7 +79,7 @@ namespace CT.Common
 		/// <summary>
 		/// 6자리 16진수 RGB 색상 코드를 색상 코드로 변환합니다.
 		/// </summary>
-		public static Color32 ParseFromHex(string colorHexCode)
+		public static NetColor ParseFromHex(string colorHexCode)
 		{
 			int codeLength = colorHexCode.Length;
 
@@ -93,7 +93,7 @@ namespace CT.Common
 				byte r = byte.Parse($"{colorHexCode[0..2]}", NumberStyles.HexNumber);
 				byte g = byte.Parse($"{colorHexCode[2..4]}", NumberStyles.HexNumber);
 				byte b = byte.Parse($"{colorHexCode[4..6]}", NumberStyles.HexNumber);
-				return new Color32(r, g, b);
+				return new NetColor(r, g, b);
 			}
 			else if (codeLength == 8)
 			{
@@ -106,7 +106,7 @@ namespace CT.Common
 				byte g = byte.Parse($"{colorHexCode[2..4]}", NumberStyles.HexNumber);
 				byte b = byte.Parse($"{colorHexCode[4..6]}", NumberStyles.HexNumber);
 				byte a = byte.Parse($"{colorHexCode[6..8]}", NumberStyles.HexNumber);
-				return new Color32(r, g, b, a);
+				return new NetColor(r, g, b, a);
 			}
 
 			return Void;
@@ -150,22 +150,22 @@ namespace CT.Common
 		}
 #endif
 
-		public static bool operator ==(Color32 lhs, Color32 rhs)
+		public static bool operator ==(NetColor lhs, NetColor rhs)
 		{
 			return lhs.RGBA == rhs.RGBA;
 		}
 
-		public static bool operator !=(Color32 lhs, Color32 rhs)
+		public static bool operator !=(NetColor lhs, NetColor rhs)
 		{
 			return lhs.RGBA != rhs.RGBA;
 		}
 
 		public override bool Equals([NotNullWhen(true)] object? obj)
 		{
-			return (obj is not Color32 value) ? false : value == this;
+			return (obj is not NetColor value) ? false : value == this;
 		}
 
-		public bool Equals(Color32 other)
+		public bool Equals(NetColor other)
 		{
 			return this == other;
 		}

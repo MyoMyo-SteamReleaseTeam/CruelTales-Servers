@@ -23,9 +23,9 @@ namespace CT.Common.Gameplay
 		public int Nose;
 		public int Shoes;
 		public int Hammer;
-		public Color32 SkinColor;
-		public Color32 HairColor;
-		public Color32 EyesColor;
+		public NetColor SkinColor;
+		public NetColor HairColor;
+		public NetColor EyesColor;
 
 		public int SerializeSize => SERIALIZE_SIZE;
 
