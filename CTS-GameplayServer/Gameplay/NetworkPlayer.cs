@@ -45,7 +45,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public bool _isHost = false;
+		private bool _isHost = false;
 		public bool IsHost
 		{
 			get => _isHost;
@@ -57,7 +57,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public bool _isReady = false;
+		private bool _isReady = false;
 		public bool IsReady
 		{
 			get => _isReady;
@@ -69,7 +69,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public bool _isMapLoaded = false;
+		private bool _isMapLoaded = false;
 		public bool IsMapLoaded
 		{
 			get => _isMapLoaded;
@@ -81,6 +81,18 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
+		private Faction _faction = Faction.System;
+		public Faction Faction
+		{
+			get => _faction;
+			set
+			{
+				_faction = value;
+				if (PlayerState != null)
+					PlayerState.Faction = _faction;
+			}
+		}
+
 		// Gameplay
 		public CameraController? CameraController { get; private set; }
 		public PlayerCharacter? PlayerCharacter { get; private set; }
@@ -88,7 +100,6 @@ namespace CTS.Instance.Gameplay
 		public Vector2 ViewPosition { get; set; }
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
-		public Faction Faction { get; set; }
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;

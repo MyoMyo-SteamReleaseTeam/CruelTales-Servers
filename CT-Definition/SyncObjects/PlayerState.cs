@@ -16,6 +16,9 @@ namespace CT.Definitions.SyncObjects
 		public NetStringShort Username;
 
 		[SyncVar]
+		public Faction Faction;
+
+		[SyncVar]
 		public SkinSet SelectedSkin;
 
 		[SyncVar]

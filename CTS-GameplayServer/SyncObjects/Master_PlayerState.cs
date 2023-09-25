@@ -48,6 +48,8 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private NetStringShort _username = new();
 		[SyncVar]
+		private Faction _faction = new();
+		[SyncVar]
 		private SkinSet _selectedSkin = new();
 		[SyncVar]
 		private SkinSet _currentSkin = new();
@@ -71,6 +73,7 @@ namespace CTS.Instance.SyncObjects
 			_costume = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
+		private BitmaskByte _dirtyReliable_1 = new();
 		protected bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
 		public void MarkDirtyReliable()
@@ -107,6 +110,17 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public Faction Faction
+		{
+			get => _faction;
+			set
+			{
+				if (_faction == value) return;
+				_faction = value;
+				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public SkinSet SelectedSkin
 		{
 			get => _selectedSkin;
@@ -114,7 +128,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_selectedSkin == value) return;
 				_selectedSkin = value;
-				_dirtyReliable_0[2] = true;
+				_dirtyReliable_0[3] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -125,7 +139,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_currentSkin == value) return;
 				_currentSkin = value;
-				_dirtyReliable_0[3] = true;
+				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -136,7 +150,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isHost == value) return;
 				_isHost = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_0[5] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -147,7 +161,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isReady == value) return;
 				_isReady = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_0[6] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -158,7 +172,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isMapLoaded == value) return;
 				_isMapLoaded = value;
-				_dirtyReliable_0[6] = true;
+				_dirtyReliable_0[7] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -167,44 +181,56 @@ namespace CTS.Instance.SyncObjects
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
+			_dirtyReliable_1.Clear();
 			_costume.ClearDirtyReliable();
 		}
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[7] = _costume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				_userId.Serialize(writer);
+				if (_dirtyReliable_0[0])
+				{
+					_userId.Serialize(writer);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					_username.Serialize(writer);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					writer.Put((byte)_faction);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					_selectedSkin.Serialize(writer);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					_currentSkin.Serialize(writer);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					writer.Put(_isHost);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					writer.Put(_isReady);
+				}
+				if (_dirtyReliable_0[7])
+				{
+					writer.Put(_isMapLoaded);
+				}
 			}
-			if (_dirtyReliable_0[1])
+			_dirtyReliable_1[0] = _costume.IsDirtyReliable;
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				_username.Serialize(writer);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				_selectedSkin.Serialize(writer);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				_currentSkin.Serialize(writer);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				writer.Put(_isHost);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				writer.Put(_isReady);
-			}
-			if (_dirtyReliable_0[6])
-			{
-				writer.Put(_isMapLoaded);
-			}
-			if (_dirtyReliable_0[7])
-			{
-				_costume.SerializeSyncReliable(player, writer);
+				if (_dirtyReliable_1[0])
+				{
+					_costume.SerializeSyncReliable(player, writer);
+				}
 			}
 		}
 		public void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -212,6 +238,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
+			writer.Put((byte)_faction);
 			_selectedSkin.Serialize(writer);
 			_currentSkin.Serialize(writer);
 			writer.Put(_isHost);
@@ -223,6 +250,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId = new();
 			_username = new();
+			_faction = (Faction)0;
 			_selectedSkin = new();
 			_currentSkin = new();
 			_isHost = false;
