@@ -24,6 +24,7 @@ using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Gameplay.Infos;
+using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -55,6 +56,8 @@ namespace CTS.Instance.SyncObjects
 		protected bool _interactable;
 		[SyncRpc]
 		public partial void Server_InteractResult(InteractResultType result);
+		[SyncRpc]
+		public partial void Server_TestPositionTickByTick(Vector2 curPosition);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public virtual partial void Client_TryInteract(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -125,11 +128,19 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		protected List<InteractResultType> Server_InteractResultICallstack = new(4);
+		public partial void Server_TestPositionTickByTick(Vector2 curPosition)
+		{
+			Server_TestPositionTickByTickVCallstack.Add(curPosition);
+			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
+		}
+		protected List<Vector2> Server_TestPositionTickByTickVCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_InteractResultICallstack.Clear();
+			Server_TestPositionTickByTickVCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -163,6 +174,16 @@ namespace CTS.Instance.SyncObjects
 				{
 					var arg = Server_InteractResultICallstack[i];
 					writer.Put((byte)arg);
+				}
+			}
+			if (_dirtyReliable_0[6])
+			{
+				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_TestPositionTickByTickVCallstack[i];
+					arg.Serialize(writer);
 				}
 			}
 		}

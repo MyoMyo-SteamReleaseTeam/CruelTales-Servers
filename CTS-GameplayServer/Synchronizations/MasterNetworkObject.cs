@@ -203,7 +203,10 @@ namespace CTS.Instance.Synchronizations
 			{
 				Vector2Int previousPos = CurrentCellPos;
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
-				_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
+				if (CurrentCellPos != previousPos)
+				{
+					_worldVisibilityManager.OnCellChanged(this, previousPos, CurrentCellPos);
+				}
 			}
 		}
 

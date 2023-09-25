@@ -22,7 +22,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.ViewAndOwner;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public float Speed = 5.0f;
+		public float Speed = 10.0f;
 
 		private CoroutineRunnerVoid _skinInitRunner;
 
@@ -78,6 +78,12 @@ namespace CTS.Instance.SyncObjects
 			{
 				state.CurrentSkin = state.SelectedSkin;
 			}
+		}
+
+		public override void OnDestroyed()
+		{
+			DropItem();
+			base.OnDestroyed();
 		}
 
 		public void Initialize(NetworkPlayer player)
@@ -184,6 +190,32 @@ namespace CTS.Instance.SyncObjects
 		public void OnPushed(Vector2 pushedDirection)
 		{
 			NetworkPlayer.CameraController?.Server_Shake();
+			DropItem(-pushedDirection);
+		}
+
+		public void DropItem(Vector2 direction = default)
+		{
+			var sceneController = GameplayController.SceneController;
+			if (sceneController == null || FieldItem == FieldItemType.None)
+			{
+				return;
+			}
+
+			var item = sceneController.SpawnFieldItemBy(FieldItem, Position);
+			if (direction == Vector2.Zero)
+			{
+				if (KaPhysics.NearlyEqual(RigidBody.LinearVelocity, Vector2.Zero))
+				{
+					direction = RandomHelper.RandomDirection();
+				}
+				else
+				{
+					direction = Vector2.Normalize(-RigidBody.LinearVelocity);
+				}
+			}
+
+			item.RigidBody.Impulse(direction * 6.0f, 2.0f);
+			FieldItem = FieldItemType.None;
 		}
 
 		#region Sync
@@ -205,13 +237,14 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual partial void Client_RequestInput(NetworkPlayer player, InputData inputData)
 		{
-			if (_userId != player.UserId)
-			{
-				player.Session?.Disconnect(DisconnectReasonType.ServerError_UnauthorizedBehaviour);
-				return;
-			}
-
+			if (!isValidRequset(player)) return;
 			StateMachine.OnInputEvent(inputData);
+		}
+
+		public virtual partial void Client_TryDropItem(NetworkPlayer player)
+		{
+			if (!isValidRequset(player)) return;
+			DropItem();
 		}
 
 		public void OrderTest(NetworkPlayer player, int fromServer)
@@ -338,5 +371,16 @@ namespace CTS.Instance.SyncObjects
 		}
 		
 		#endregion
+
+		private bool isValidRequset(NetworkPlayer player)
+		{
+			if (_userId != player.UserId)
+			{
+				player.Session?.Disconnect(DisconnectReasonType.ServerError_UnauthorizedBehaviour);
+				return false;
+			}
+
+			return true;
+		}
 	}
 }

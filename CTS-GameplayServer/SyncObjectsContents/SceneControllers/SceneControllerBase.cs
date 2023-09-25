@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.Gameplay;
-using CT.Common.Gameplay.Infos;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
@@ -72,10 +71,15 @@ namespace CTS.Instance.SyncObjects
 
 		public T SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
 		{
-			var spawnPositions = MapData.SpawnPositions;
-			int spawnPosCount = spawnPositions.Count;
-			Vector2 spawnPos = spawnPositions[_spawnIndex];
+			int spawnPosCount = MapData.SpawnPositions.Count;
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
+			return SpawnPlayerBy<T>(player, _spawnIndex);
+		}
+
+		public T SpawnPlayerBy<T>(NetworkPlayer player, int spwanIndex) where T : PlayerCharacter, new()
+		{
+			var spawnPositions = MapData.SpawnPositions;
+			Vector2 spawnPos = spawnPositions[spwanIndex];
 			TryCreatePlayerBy<T>(player, spawnPos, out var character);
 
 			if (GameplayController.CameraControllerByPlayer.TryGetValue(player, out var cameraController))
@@ -91,11 +95,10 @@ namespace CTS.Instance.SyncObjects
 			return character;
 		}
 
-		public FieldItem SpawnFieldItemBy(FieldItemType itemType, Vector2 position, float radius = 0.5f)
+		public FieldItem SpawnFieldItemBy(FieldItemType itemType, Vector2 position)
 		{
 			var item = WorldManager.CreateObject<FieldItem>(position);
-			var interactor = InteractorInfoExtension.FieldItemInteractorInfo;
-			interactor.Size.Radius = radius;
+			var interactor = InteractorConst.FieldItemInteractorInfo;
 			item.Initialize(interactor);
 			item.InitializeAs(itemType);
 			return item;

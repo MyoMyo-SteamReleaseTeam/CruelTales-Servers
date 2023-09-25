@@ -15,6 +15,19 @@ public static class RandomHelper
 #endif
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void Shuffle<T>(this ref Span<T> array)
+	{
+		int n = array.Length;
+		for (int i = n - 1; i > 0; i--)
+		{
+			int j = NextInt(0, i + 1);
+			T temp = array[i];
+			array[i] = array[j];
+			array[j] = temp;
+		}
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool NextBollean()
 	{
 		return NextInt(0, 2) == 0;
@@ -87,5 +100,14 @@ public static class RandomHelper
 		return new Vector3(NextSingle(min.X, max.X),
 						   NextSingle(min.Y, max.Y),
 						   NextSingle(min.Z, max.Z));
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Vector2 RandomDirection()
+	{
+		float rad = NextSingle(MathF.PI * 2);
+		float y = MathF.Sin(rad);
+		float x = MathF.Cos(rad);
+		return new Vector2(x, y);
 	}
 }

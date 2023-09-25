@@ -24,6 +24,7 @@ using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Gameplay.Infos;
+using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -190,6 +191,14 @@ namespace CTS.Instance.SyncObjects
 					Client_RequestTest(player, fromClient);
 				}
 			}
+			if (dirtyReliable_0[1])
+			{
+				byte count = reader.ReadByte();
+				for (int i = 0; i < count; i++)
+				{
+					Client_TryDropItem(player);
+				}
+			}
 			return true;
 		}
 		public override bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader)
@@ -219,6 +228,10 @@ namespace CTS.Instance.SyncObjects
 					reader.Ignore(4);
 				}
 			}
+			if (dirtyReliable_0[1])
+			{
+				reader.Ignore(1);
+			}
 		}
 		public new static void IgnoreSyncStaticReliable(IPacketReader reader)
 		{
@@ -230,6 +243,10 @@ namespace CTS.Instance.SyncObjects
 				{
 					reader.Ignore(4);
 				}
+			}
+			if (dirtyReliable_0[1])
+			{
+				reader.Ignore(1);
 			}
 		}
 		public override void IgnoreSyncUnreliable(IPacketReader reader)

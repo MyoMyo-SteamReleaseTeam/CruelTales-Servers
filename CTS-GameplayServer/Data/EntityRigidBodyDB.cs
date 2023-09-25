@@ -15,7 +15,7 @@ namespace CTS.Instance.Data
 			{ NetworkObjectType.RedHoodCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
 			{ NetworkObjectType.NormalCharacter, () => new CircleRigidBody(0.25f, false, PhysicsLayerMask.Player) },
 			{ NetworkObjectType.TestCube, () => new CircleRigidBody(0.5f, false, PhysicsLayerMask.Player) },
-			{ NetworkObjectType.FieldItem, () => new CircleRigidBody(0.5f, true, PhysicsLayerMask.Item) },
+			{ NetworkObjectType.FieldItem, () => new CircleRigidBody(0.5f, false, PhysicsLayerMask.Item) },
 			{ NetworkObjectType.DueoksiniTable, () => new CircleRigidBody(3.0f, true, PhysicsLayerMask.Environment) },
 		};
 

@@ -68,6 +68,9 @@
 
 		/// <summary>이미 아이템을 들고 있습니다.</summary>
 		Failed_YouAlreadyHaveItem,
+
+		/// <summary>이 아이템은 더 올려놓을 수 없습니다.</summary>
+		Failed_ItemLimit,
 	}
 
 	public static class InteractResultTypeExtension

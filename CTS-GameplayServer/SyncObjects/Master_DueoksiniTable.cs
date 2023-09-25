@@ -24,6 +24,7 @@ using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Gameplay.Infos;
+using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -51,6 +52,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_itemCountByType = new(this);
 		}
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public Faction Faction
 		{
 			get => _faction;
@@ -58,7 +60,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_faction == value) return;
 				_faction = value;
-				_dirtyReliable_0[6] = true;
+				_dirtyReliable_0[7] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -68,50 +70,69 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_InteractResultICallstack.Clear();
+			Server_TestPositionTickByTickVCallstack.Clear();
+			_dirtyReliable_1.Clear();
 			_itemCountByType.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[7] = _itemCountByType.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				writer.Put((byte)_behaviourType);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				_size.Serialize(writer);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				writer.Put(_prograssTime);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				writer.Put(_cooltime);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				writer.Put(_interactable);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				byte count = (byte)Server_InteractResultICallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Server_InteractResultICallstack[i];
-					writer.Put((byte)arg);
+					writer.Put((byte)_behaviourType);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					_size.Serialize(writer);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					writer.Put(_prograssTime);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					writer.Put(_cooltime);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					writer.Put(_interactable);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					byte count = (byte)Server_InteractResultICallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_InteractResultICallstack[i];
+						writer.Put((byte)arg);
+					}
+				}
+				if (_dirtyReliable_0[6])
+				{
+					byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_TestPositionTickByTickVCallstack[i];
+						arg.Serialize(writer);
+					}
+				}
+				if (_dirtyReliable_0[7])
+				{
+					writer.Put((byte)_faction);
 				}
 			}
-			if (_dirtyReliable_0[6])
+			_dirtyReliable_1[0] = _itemCountByType.IsDirtyReliable;
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				writer.Put((byte)_faction);
-			}
-			if (_dirtyReliable_0[7])
-			{
-				_itemCountByType.SerializeSyncReliable(writer);
+				if (_dirtyReliable_1[0])
+				{
+					_itemCountByType.SerializeSyncReliable(writer);
+				}
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }

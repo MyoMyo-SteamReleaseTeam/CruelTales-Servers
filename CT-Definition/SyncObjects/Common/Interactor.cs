@@ -33,6 +33,9 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncRpc]
 		public void Server_InteractResult(InteractResultType result) { }
+
+		[SyncRpc]
+		public void Server_TestPositionTickByTick(Vector2 curPosition) { }
 	}
 
 	[SyncNetworkObjectDefinition(capacity: 16)]

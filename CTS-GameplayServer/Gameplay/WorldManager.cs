@@ -104,8 +104,12 @@ namespace CTS.Instance.Gameplay
 			this._visibilityManager.DestroyNetworkPlayer(player);
 		}
 
-		public bool TryGetNetworkObject(NetworkIdentity id,
-									    [MaybeNullWhen(false)]
+		/// <summary>
+		/// Id를 기준으로 네트워크 객체를 찾습니다.
+		/// 찾기에 실패하는 경우 Assert가 동작합니다.
+		/// </summary>
+		public bool TryGetNetworkObjectInternal(NetworkIdentity id,
+										[MaybeNullWhen(false)]
 										out MasterNetworkObject networkObject)
 		{
 			if (_networkObjectById.TryGetValue(id, out networkObject))
@@ -115,6 +119,14 @@ namespace CTS.Instance.Gameplay
 
 			Debug.Assert(false);
 			return false;
+		}
+
+		/// <summary>Id를 기준으로 네트워크 객체를 찾습니다.</summary>
+		public bool TryGetNetworkObject(NetworkIdentity id,
+									    [MaybeNullWhen(false)]
+										out MasterNetworkObject networkObject)
+		{
+			return _networkObjectById.TryGetValue(id, out networkObject);
 		}
 
 		#region Update funtions

@@ -4,70 +4,11 @@ using System.Diagnostics;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
-using CT.Common.Gameplay.Infos;
+using CT.Common.Gameplay.MiniGames;
 using CTS.Instance.Gameplay;
 
 namespace CTS.Instance.SyncObjects
 {
-	public struct DueoksiniItemInfo
-	{
-		public FieldItemType ItemType;
-		public int SpwanCount;
-		public int Score;
-	}
-
-	public static class DueoksiniHelper
-	{
-		private readonly static DueoksiniItemInfo[] _itemInfos = new DueoksiniItemInfo[]
-		{
-			new() { ItemType = FieldItemType.Dueoksini_Rice, SpwanCount = 8, Score = 2 },
-			new() { ItemType = FieldItemType.Dueoksini_Kimchi, SpwanCount = 8, Score = 2 },
-			new() { ItemType = FieldItemType.Dueoksini_TaroSoup, SpwanCount = 8, Score = 3 },
-			new() { ItemType = FieldItemType.Dueoksini_Japchae, SpwanCount = 4, Score = 4 },
-			new() { ItemType = FieldItemType.Dueoksini_Jeon, SpwanCount = 4, Score = 4 },
-			new() { ItemType = FieldItemType.Dueoksini_Yukjeon, SpwanCount = 4, Score = 5 },
-			new() { ItemType = FieldItemType.Dueoksini_RawMeat, SpwanCount = 4, Score = 5 },
-			new() { ItemType = FieldItemType.Dueoksini_SteamedSeaBream, SpwanCount = 2, Score = 6 },
-			new() { ItemType = FieldItemType.Dueoksini_Galbijjim, SpwanCount = 2, Score = 7 },
-			new() { ItemType = FieldItemType.Dueoksini_Gujeolpan, SpwanCount = 2, Score = 7 },
-			new() { ItemType = FieldItemType.Dueoksini_Sinseonro, SpwanCount = 1, Score = 10 },
-		};
-
-		public static int _totalSpwanItemCount = 0;
-
-		public static int GetTotalSpwanItemCount()
-		{
-			if (_totalSpwanItemCount > 0)
-			{
-				return _totalSpwanItemCount;
-			}
-
-			_totalSpwanItemCount = 0;
-
-			int count = (int)(FieldItemType.Dueoksini_Gujeolpan - FieldItemType.Dueoksini_Rice);
-			for (int i = 0; i < count; i++)
-			{
-				var info = _itemInfos[i];
-				_totalSpwanItemCount += info.SpwanCount;
-			}
-
-			return _totalSpwanItemCount;
-		}
-
-		public static bool TryGetItemInfo(FieldItemType fieldItemType, out DueoksiniItemInfo itemInfo)
-		{
-			if (!fieldItemType.IsBaseType(FieldItemBaseType.Dueoksini))
-			{
-				itemInfo = new();
-				return false;
-			}
-
-			int index = (int)(fieldItemType - FieldItemType.Dueoksini) - 1;
-			itemInfo = _itemInfos[index];
-			return true;
-		}
-	}
-
 	public partial class Dueoksini_MiniGameController : MiniGameControllerBase
 	{
 		private DueoksiniTable? _redTeamTable;
@@ -95,14 +36,14 @@ namespace CTS.Instance.SyncObjects
 				if (pivot.Index == 0)
 				{
 					_redTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
-					_redTeamTable.Initialize(InteractorInfoExtension.TableInteractorInfo);
+					_redTeamTable.Initialize(InteractorConst.TableInteractorInfo);
 					_redTeamTable.InitializeAs(Faction.Red);
 
 				}
 				else if (pivot.Index == 1)
 				{
 					_blueTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
-					_blueTeamTable.Initialize(InteractorInfoExtension.TableInteractorInfo);
+					_blueTeamTable.Initialize(InteractorConst.TableInteractorInfo);
 					_blueTeamTable.InitializeAs(Faction.Blue);
 				}
 				else if (pivot.Index == 2)
@@ -143,6 +84,8 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 
+			spwanPosList.Shuffle();
+
 			Debug.Assert(totalItemCount == -1);
 			totalItemCount = 0;
 
@@ -170,20 +113,25 @@ namespace CTS.Instance.SyncObjects
 			users.Sort();
 
 			int halfPlayerCount = playerCount / 2;
+			int redPlayer = 0;
+			int bluePlayer = 0;
 			foreach (NetworkPlayer player in GameplayController.PlayerSet)
 			{
-				var character = SpawnPlayerBy<NormalCharacter>(player);
+				int spwanIndex = 0;
 				if (halfPlayerCount > 0)
 				{
-					character.Faction = Faction.Blue;
-					player.Faction = Faction.Blue;
+					player.Faction = Faction.Red;
+					redPlayer++;
+					spwanIndex = redPlayer;
 				}
 				else
 				{
-					character.Faction = Faction.Red;
-					player.Faction = Faction.Red;
+					player.Faction = Faction.Blue;
+					bluePlayer++;
+					spwanIndex = bluePlayer + 3;
 				}
 
+				var character = SpawnPlayerBy<NormalCharacter>(player, spwanIndex);
 				halfPlayerCount--;
 			}
 		}

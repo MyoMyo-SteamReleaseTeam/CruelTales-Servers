@@ -48,7 +48,10 @@ namespace CT.Definitions.SyncObjects
 		
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_RequestTest(int fromClient) { }
-		
+
+		[SyncRpc(dir: SyncDirection.FromRemote)]
+		public void Client_TryDropItem() { }
+
 		[SyncRpc]
 		public void Server_BroadcastOrderTest(int userId, int fromSever) { }
 

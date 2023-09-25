@@ -35,7 +35,7 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-			if (_testCubeList.Count < 55)
+			if (_testCubeList.Count < 0)
 			{
 				//Vector2 lb = new Vector2(-30, -30);
 				//Vector2 rt = new Vector2(30, 30);

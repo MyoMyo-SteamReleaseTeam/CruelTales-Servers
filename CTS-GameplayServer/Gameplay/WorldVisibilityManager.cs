@@ -200,7 +200,7 @@ namespace CTS.Instance.Gameplay
 				for (int i = 0; i < sCount; i++)
 				{
 					var spawnObjectId = _tempSpawnList[i];
-					if (!_worldManager.TryGetNetworkObject(spawnObjectId, out var spawnObject))
+					if (!_worldManager.TryGetNetworkObjectInternal(spawnObjectId, out var spawnObject))
 					{
 						Debug.Assert(false);
 						continue;
@@ -242,7 +242,7 @@ namespace CTS.Instance.Gameplay
 								if (netObj.IsValidVisibilityAuthority(player))
 								{
 									bool isAdded = viewTable.EnterObjects.TryAdd(netObj.Identity, netObj);
-									Debug.Assert(isAdded);
+									//Debug.Assert(isAdded);
 								}
 							}
 						}
@@ -312,7 +312,7 @@ namespace CTS.Instance.Gameplay
 			for (int i = 0; i < spawnCount; i++)
 			{
 				var transitId = _tempSpawnList[i];
-				if (!_worldManager.TryGetNetworkObject(transitId, out var netObj))
+				if (!_worldManager.TryGetNetworkObjectInternal(transitId, out var netObj))
 				{
 					Debug.Assert(false);
 					continue;
@@ -327,7 +327,7 @@ namespace CTS.Instance.Gameplay
 			for (int i = 0; i < despawnCount; i++)
 			{
 				var transitId = _tempDespawnList[i];
-				if (!_worldManager.TryGetNetworkObject(transitId.Identity, out var netObj))
+				if (!_worldManager.TryGetNetworkObjectInternal(transitId.Identity, out var netObj))
 				{
 					Debug.Assert(false);
 					continue;
