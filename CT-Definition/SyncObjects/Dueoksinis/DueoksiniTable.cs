@@ -11,7 +11,7 @@ namespace CT.Definitions.SyncObjects
 	public class DueoksiniTable : Interactor
 	{
 		[SyncVar]
-		public Faction Faction;
+		public Faction Team;
 
 		[SyncObject]
 		public SyncDictionary<NetInt32, NetByte> ItemCountByType = new();

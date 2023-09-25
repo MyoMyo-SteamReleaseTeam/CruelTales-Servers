@@ -45,7 +45,7 @@ namespace CTS.Instance.SyncObjects
 	{
 		public override NetworkObjectType Type => NetworkObjectType.DueoksiniTable;
 		[SyncVar]
-		protected Faction _faction = new();
+		protected Faction _team = new();
 		[SyncObject]
 		protected readonly SyncDictionary<NetInt32, NetByte> _itemCountByType;
 		public DueoksiniTable()
@@ -53,13 +53,13 @@ namespace CTS.Instance.SyncObjects
 			_itemCountByType = new(this);
 		}
 		protected BitmaskByte _dirtyReliable_1 = new();
-		public Faction Faction
+		public Faction Team
 		{
-			get => _faction;
+			get => _team;
 			set
 			{
-				if (_faction == value) return;
-				_faction = value;
+				if (_team == value) return;
+				_team = value;
 				_dirtyReliable_0[7] = true;
 				MarkDirtyReliable();
 			}
@@ -122,7 +122,7 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_0[7])
 				{
-					writer.Put((byte)_faction);
+					writer.Put((byte)_team);
 				}
 			}
 			_dirtyReliable_1[0] = _itemCountByType.IsDirtyReliable;
@@ -143,7 +143,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_prograssTime);
 			writer.Put(_cooltime);
 			writer.Put(_interactable);
-			writer.Put((byte)_faction);
+			writer.Put((byte)_team);
 			_itemCountByType.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
@@ -153,7 +153,7 @@ namespace CTS.Instance.SyncObjects
 			_prograssTime = 0;
 			_cooltime = 0;
 			_interactable = false;
-			_faction = (Faction)0;
+			_team = (Faction)0;
 			_itemCountByType.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)

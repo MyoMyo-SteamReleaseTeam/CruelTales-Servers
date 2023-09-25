@@ -38,6 +38,7 @@ namespace CTS.Instance.SyncObjects
 					_redTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
 					_redTeamTable.Initialize(InteractorConst.TableInteractorInfo);
 					_redTeamTable.InitializeAs(Faction.Red);
+					_redTeamTable.BindController(this);
 
 				}
 				else if (pivot.Index == 1)
@@ -45,6 +46,7 @@ namespace CTS.Instance.SyncObjects
 					_blueTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
 					_blueTeamTable.Initialize(InteractorConst.TableInteractorInfo);
 					_blueTeamTable.InitializeAs(Faction.Blue);
+					_blueTeamTable.BindController(this);
 				}
 				else if (pivot.Index == 2)
 				{

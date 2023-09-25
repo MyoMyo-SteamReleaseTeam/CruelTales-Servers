@@ -1,6 +1,7 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
 using CT.Common.DataType;
+using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
 using CT.Common.Gameplay;
 using CT.Common.Synchronizations;
@@ -24,6 +25,9 @@ namespace CT.Definitions.SyncObjects
 
 		[SyncObject]
 		public MapVoteController MapVoteController = new();
+
+		[SyncObject(cc: "capacity: 4")]
+		public SyncDictionary<NetByte, NetInt16> TeamScoreByFaction = new();
 
 		[SyncRpc]
 		public void Server_GameStartCountdown(float missionShowTime, float countdown) { }

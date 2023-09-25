@@ -1,7 +1,7 @@
-﻿using CT.Common.DataType.Primitives;
+﻿using System.Diagnostics.CodeAnalysis;
+using CT.Common.DataType.Primitives;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.MiniGames;
-using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -12,9 +12,16 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
+		[AllowNull] private MiniGameControllerBase? _miniGameController;
+
 		public void InitializeAs(Faction faction)
 		{
-			Faction = faction;
+			Team = faction;
+		}
+
+		public void BindController(MiniGameControllerBase controller)
+		{
+			_miniGameController = controller;
 		}
 
 		public override void OnCreated()
@@ -26,7 +33,7 @@ namespace CTS.Instance.SyncObjects
 										  PlayerCharacter playerCharacter)
 		{
 			base.OnInteracted(player, playerCharacter);
-			if (player.Faction != Faction)
+			if (player.Faction != Team)
 			{
 				return;
 			}
@@ -52,7 +59,24 @@ namespace CTS.Instance.SyncObjects
 
 				ItemCountByType[typeKey]++;
 				playerCharacter.FieldItem = FieldItemType.None;
+				onScoreAdd(itemInfo.Score);
 			}
+		}
+
+		private void onScoreAdd(int score)
+		{
+			NetByte factionKey = (byte)Team;
+			if (_miniGameController == null)
+				return;
+
+			var table = _miniGameController.TeamScoreByFaction;
+
+			if (!table.ContainsKey(factionKey))
+			{
+				table.Add(factionKey, 0);
+			}
+
+			table[factionKey] += (short)score;
 		}
 	}
 }

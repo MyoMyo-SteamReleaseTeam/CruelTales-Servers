@@ -45,7 +45,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 소유한 유저의 ID입니다.</summary>
 		public UserId Owner { get; protected set; } = new UserId(0);
 
-		/// <summary>유저의 소속입니다.</summary>
+		/// <summary>객체의 소속입니다.</summary>
 		public Faction Faction { get; set; } = Faction.System;
 
 		/// <summary>물리 강체 입니다.</summary>

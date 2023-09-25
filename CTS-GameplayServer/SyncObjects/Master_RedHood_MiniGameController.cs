@@ -55,8 +55,9 @@ namespace CTS.Instance.SyncObjects
 			Server_TryLoadSceneGCallstack.Clear();
 			_eliminatedPlayers.ClearDirtyReliable();
 			_mapVoteController.ClearDirtyReliable();
-			Server_GameStartCountdownffCallstack.Clear();
+			_teamScoreByFaction.ClearDirtyReliable();
 			_dirtyReliable_1.Clear();
+			Server_GameStartCountdownffCallstack.Clear();
 			Server_GameStartfCallstack.Clear();
 			Server_GameEndfCallstack.Clear();
 			Server_ShowResultfCallstack.Clear();
@@ -71,6 +72,7 @@ namespace CTS.Instance.SyncObjects
 			int originSize = writer.Size;
 			_dirtyReliable_0[5] = _eliminatedPlayers.IsDirtyReliable;
 			_dirtyReliable_0[6] = _mapVoteController.IsDirtyReliable;
+			_dirtyReliable_0[7] = _teamScoreByFaction.IsDirtyReliable;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0.AnyTrue())
@@ -125,6 +127,15 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_0[7])
 				{
+					_teamScoreByFaction.SerializeSyncReliable(writer);
+				}
+			}
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
+			{
+				if (_dirtyReliable_1[0])
+				{
 					byte count = (byte)Server_GameStartCountdownffCallstack.Count;
 					writer.Put(count);
 					for (int i = 0; i < count; i++)
@@ -134,12 +145,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.countdown);
 					}
 				}
-			}
-			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			_dirtyReliable_1.Serialize(writer);
-			if (_dirtyReliable_1.AnyTrue())
-			{
-				if (_dirtyReliable_1[0])
+				if (_dirtyReliable_1[1])
 				{
 					byte count = (byte)Server_GameStartfCallstack.Count;
 					writer.Put(count);
@@ -149,7 +155,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[1])
+				if (_dirtyReliable_1[2])
 				{
 					byte count = (byte)Server_GameEndfCallstack.Count;
 					writer.Put(count);
@@ -159,7 +165,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[2])
+				if (_dirtyReliable_1[3])
 				{
 					byte count = (byte)Server_ShowResultfCallstack.Count;
 					writer.Put(count);
@@ -169,7 +175,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[3])
+				if (_dirtyReliable_1[4])
 				{
 					byte count = (byte)Server_ShowExecutionEfCallstack.Count;
 					writer.Put(count);
@@ -180,7 +186,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.playTime);
 					}
 				}
-				if (_dirtyReliable_1[4])
+				if (_dirtyReliable_1[5])
 				{
 					byte count = (byte)Server_StartVoteMapfCallstack.Count;
 					writer.Put(count);
@@ -190,7 +196,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[5])
+				if (_dirtyReliable_1[6])
 				{
 					byte count = (byte)Server_ShowVotedNextMapGfCallstack.Count;
 					writer.Put(count);
@@ -201,7 +207,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.showTime);
 					}
 				}
-				if (_dirtyReliable_1[6])
+				if (_dirtyReliable_1[7])
 				{
 					byte count = (byte)Server_SyncTimerfCallstack.Count;
 					writer.Put(count);
@@ -226,6 +232,7 @@ namespace CTS.Instance.SyncObjects
 			writer.Put(_currentTime);
 			_eliminatedPlayers.SerializeEveryProperty(writer);
 			_mapVoteController.SerializeEveryProperty(writer);
+			_teamScoreByFaction.SerializeEveryProperty(writer);
 		}
 		public override void InitializeMasterProperties()
 		{
@@ -235,6 +242,7 @@ namespace CTS.Instance.SyncObjects
 			_currentTime = 0;
 			_eliminatedPlayers.InitializeMasterProperties();
 			_mapVoteController.InitializeMasterProperties();
+			_teamScoreByFaction.InitializeMasterProperties();
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
