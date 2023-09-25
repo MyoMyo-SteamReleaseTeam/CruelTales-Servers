@@ -36,8 +36,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			BehaviourType = info.BehaviourType;
 			Size = info.Size;
-			
-			Time = info.ProgressTime;
+			ProgressTime = info.ProgressTime;
 			Cooltime = info.Cooltime;
 		}
 
@@ -45,9 +44,6 @@ namespace CTS.Instance.SyncObjects
 
 		public override void OnUpdate(float deltaTime)
 		{
-			// TODO : DEBUG Remove
-			Server_TestPositionTickByTick(Position);
-
 			if (BehaviourType == InteractionBehaviourType.Touch)
 			{
 				if (Interactable == false)
@@ -87,7 +83,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (HasPlayerCooltime(player))
 				{
-					Server_InteractResult(InteractResultType.Failed_Cooltime);
+					//Server_InteractResult(InteractResultType.Failed_Cooltime);
 					return;
 				}
 

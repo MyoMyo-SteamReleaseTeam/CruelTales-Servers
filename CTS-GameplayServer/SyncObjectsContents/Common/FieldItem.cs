@@ -36,6 +36,12 @@ namespace CTS.Instance.SyncObjects
 			if (!IsAlive)
 				return;
 
+			if (playerCharacter.FieldItem == ItemType)
+			{
+				playerCharacter.DropItem();
+				return;
+			}
+
 			if (playerCharacter.FieldItem != FieldItemType.None)
 			{
 				playerCharacter.DropItem();
