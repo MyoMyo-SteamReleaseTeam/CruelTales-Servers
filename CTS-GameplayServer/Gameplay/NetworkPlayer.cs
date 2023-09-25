@@ -16,6 +16,7 @@ namespace CTS.Instance.Gameplay
 		public GameplayManager GameManager { get; private set; }
 		public WorldManager WorldManager { get; private set; }
 		public PlayerState? PlayerState { get; private set; }
+		public InstanceInitializeOption Option { get; private set; }
 
 		// Session Info
 		public UserSession? Session { get; private set; }
@@ -107,8 +108,8 @@ namespace CTS.Instance.Gameplay
 		{
 			GameManager = gameManager;
 			WorldManager = worldManager;
-			HalfViewInSize = option.HalfViewInSize;
-			HalfViewOutSize = option.HalfViewOutSize;
+			Option = option;
+			OptimizeViewSize();
 		}
 
 		public void OnCreated(UserSession userSession)
@@ -160,6 +161,15 @@ namespace CTS.Instance.Gameplay
 		public void BindCharacter(PlayerCharacter character)
 		{
 			PlayerCharacter = character;
+
+			if (character is WolfCharacter)
+			{
+				MaximizeViewSize();
+			}
+			else
+			{
+				OptimizeViewSize();
+			}
 		}
 
 		public void ReleaseCharacter(PlayerCharacter character)
@@ -168,6 +178,7 @@ namespace CTS.Instance.Gameplay
 				return;
 
 			PlayerCharacter = null;
+			OptimizeViewSize();
 		}
 
 		public void BindPlayerState(PlayerState state)
@@ -187,6 +198,18 @@ namespace CTS.Instance.Gameplay
 		public void ReleasePlayerState()
 		{
 			PlayerState = null;
+		}
+
+		public void MaximizeViewSize()
+		{
+			HalfViewInSize = new Vector2(10000, 10000);
+			HalfViewOutSize = new Vector2(10100, 10100);
+		}
+
+		public void OptimizeViewSize()
+		{
+			HalfViewInSize = Option.HalfViewInSize;
+			HalfViewOutSize = Option.HalfViewOutSize;
 		}
 
 		public override string ToString() => $"{Username}:{UserId}";
