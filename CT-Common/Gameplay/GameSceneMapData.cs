@@ -15,6 +15,7 @@ namespace CT.Common.Gameplay
 		public Dictionary<InteractorType, List<InteractorInfo>> InteractorTable = new();
 		public List<AreaInfo> AreaInfos = new();
 		public List<PivotInfo> PivotInfos = new();
+		public Dictionary<ushort, Vector2> SectionDirectionTable = new();
 
 		[JsonIgnore]
 		public List<KaRigidBody> StaticRigidBodies { get; private set; } = new();

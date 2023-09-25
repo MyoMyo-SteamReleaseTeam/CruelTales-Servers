@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using CT.Common;
+﻿using CT.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CT.Test.DataTypes
