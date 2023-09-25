@@ -57,6 +57,28 @@ namespace CT.Common.Gameplay
 			return !(lhs == rhs);
 		}
 
+		public void OverrideSet(SkinSet skinSet)
+		{
+			if (skinSet.Back != 0) Back = skinSet.Back;
+			if (skinSet.Tail != 0) Tail = skinSet.Tail;
+			if (skinSet.Cheek != 0) Cheek = skinSet.Cheek;
+			if (skinSet.Dress != 0) Dress = skinSet.Dress;
+			if (skinSet.Eyes != 0) Eyes = skinSet.Eyes;
+			if (skinSet.Eyebrow != 0) Eyebrow = skinSet.Eyebrow;
+			if (skinSet.FaceAcc != 0) FaceAcc = skinSet.FaceAcc;
+			if (skinSet.Hair != 0) Hair = skinSet.Hair;
+			if (skinSet.HairAcc != 0) HairAcc = skinSet.HairAcc;
+			if (skinSet.HairHelmet != 0) HairHelmet = skinSet.HairHelmet;
+			if (skinSet.Headgear != 0) Headgear = skinSet.Headgear;
+			if (skinSet.Lips != 0) Lips = skinSet.Lips;
+			if (skinSet.Nose != 0) Nose = skinSet.Nose;
+			if (skinSet.Shoes != 0) Shoes = skinSet.Shoes;
+			if (skinSet.Hammer != 0) Hammer = skinSet.Hammer;
+			if (skinSet.SkinColor != NetColor.Void) SkinColor = skinSet.SkinColor;
+			if (skinSet.HairColor != NetColor.Void) HairColor = skinSet.HairColor;
+			if (skinSet.EyesColor != NetColor.Void) EyesColor = skinSet.EyesColor;
+		}
+
 		public override bool Equals(object? obj)
 		{
 			return obj is SkinSet && Equals((SkinSet)obj);

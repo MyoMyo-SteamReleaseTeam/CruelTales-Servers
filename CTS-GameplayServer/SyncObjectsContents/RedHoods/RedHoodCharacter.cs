@@ -11,7 +11,9 @@ namespace CTS.Instance.SyncObjects
 			base.OnCreated();
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 			{
-				state.CurrentSkin = SkinSetDataDB.REDHOOD_SKIN_SET;
+				var curSkin = state.SelectedSkin;
+				curSkin.OverrideSet(SkinSetDataDB.REDHOOD_SKIN_SET);
+				state.CurrentSkin = curSkin;
 			}
 		}
 
