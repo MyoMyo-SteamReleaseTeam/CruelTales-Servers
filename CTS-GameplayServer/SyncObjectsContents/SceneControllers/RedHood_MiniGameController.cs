@@ -175,7 +175,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (targetPlayer != null)
 				{
-					CreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos);
+					TryCreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos, out _);
 					_playerCharacterTable.AddPlayerByType(targetPlayer, NetworkObjectType.WolfCharacter);
 				}
 			}
@@ -188,7 +188,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (wolfPlayer != null)
 				{
-					CreatePlayerBy<WolfCharacter>(wolfPlayer, wolfPos);
+					TryCreatePlayerBy<WolfCharacter>(wolfPlayer, wolfPos, out _);
 					_playerCharacterTable.AddPlayerByType(wolfPlayer, NetworkObjectType.WolfCharacter);
 				}
 			}
@@ -200,10 +200,10 @@ namespace CTS.Instance.SyncObjects
 			 */
 			else
 			{
-				CreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos);
+				TryCreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos, out _);
 				_playerCharacterTable.AddPlayerByType(targetPlayer, NetworkObjectType.WolfCharacter);
 
-				CreatePlayerBy<RedHoodCharacter>(wolfPlayer, targetPos);
+				TryCreatePlayerBy<RedHoodCharacter>(wolfPlayer, targetPos, out _);
 				_playerCharacterTable.AddPlayerByType(wolfPlayer, NetworkObjectType.RedHoodCharacter);
 			}
 		}

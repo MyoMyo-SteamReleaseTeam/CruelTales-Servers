@@ -5,7 +5,7 @@ using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Synchronizations;
 
-namespace CT.Definitions.SyncObjects.Common
+namespace CT.Definitions.SyncObjects
 {
 	[SyncNetworkObjectDefinition(capacity: 16)]
 	public class Interactor
@@ -14,13 +14,16 @@ namespace CT.Definitions.SyncObjects.Common
 		public InteractionBehaviourType BehaviourType;
 
 		[SyncVar]
-		public Vector2 Size;
+		public InteractorSize Size;
 
 		[SyncVar]
 		public float PrograssTime;
 
 		[SyncVar]
 		public float Cooltime;
+
+		[SyncVar]
+		public bool Interactable;
 
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_TryInteract() { }
@@ -33,16 +36,17 @@ namespace CT.Definitions.SyncObjects.Common
 	}
 
 	[SyncNetworkObjectDefinition(capacity: 16)]
-	public class RedHoodMissionInteractor : Interactor
-	{
-
-	}
-
-	[SyncNetworkObjectDefinition(capacity: 16)]
 	public class Teleporter : Interactor
 	{
 		[SyncVar]
 		public TeleporterShapeType TeleporterShape;
+	}
+
+	[SyncNetworkObjectDefinition(capacity: 64)]
+	public class FieldItem : Interactor
+	{
+		[SyncVar]
+		public FieldItemType ItemType;
 	}
 }
 #pragma warning restore IDE0051

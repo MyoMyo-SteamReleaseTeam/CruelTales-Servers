@@ -23,6 +23,7 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Infos;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -45,11 +46,13 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		protected InteractionBehaviourType _behaviourType = new();
 		[SyncVar]
-		protected Vector2 _size = new();
+		protected InteractorSize _size = new();
 		[SyncVar]
 		protected float _prograssTime;
 		[SyncVar]
 		protected float _cooltime;
+		[SyncVar]
+		protected bool _interactable;
 		[SyncRpc]
 		public partial void Server_InteractResult(InteractResultType result);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -71,7 +74,7 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
-		public Vector2 Size
+		public InteractorSize Size
 		{
 			get => _size;
 			set
@@ -104,10 +107,21 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public bool Interactable
+		{
+			get => _interactable;
+			set
+			{
+				if (_interactable == value) return;
+				_interactable = value;
+				_dirtyReliable_0[4] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public partial void Server_InteractResult(InteractResultType result)
 		{
 			Server_InteractResultICallstack.Add(result);
-			_dirtyReliable_0[4] = true;
+			_dirtyReliable_0[5] = true;
 			MarkDirtyReliable();
 		}
 		protected List<InteractResultType> Server_InteractResultICallstack = new(4);
@@ -127,7 +141,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				writer.Put(_size);
+				_size.Serialize(writer);
 			}
 			if (_dirtyReliable_0[2])
 			{
@@ -138,6 +152,10 @@ namespace CTS.Instance.SyncObjects
 				writer.Put(_cooltime);
 			}
 			if (_dirtyReliable_0[4])
+			{
+				writer.Put(_interactable);
+			}
+			if (_dirtyReliable_0[5])
 			{
 				byte count = (byte)Server_InteractResultICallstack.Count;
 				writer.Put(count);
@@ -152,9 +170,10 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put((byte)_behaviourType);
-			writer.Put(_size);
+			_size.Serialize(writer);
 			writer.Put(_prograssTime);
 			writer.Put(_cooltime);
+			writer.Put(_interactable);
 		}
 		public override void InitializeMasterProperties()
 		{
@@ -162,6 +181,7 @@ namespace CTS.Instance.SyncObjects
 			_size = new();
 			_prograssTime = 0;
 			_cooltime = 0;
+			_interactable = false;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

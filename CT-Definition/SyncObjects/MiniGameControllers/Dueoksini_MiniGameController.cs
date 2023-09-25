@@ -7,7 +7,6 @@ namespace CT.Definitions.SyncObjects
 	[SyncNetworkObjectDefinition(capacity: 2)]
 	public class Dueoksini_MiniGameController : MiniGameControllerBase
 	{
-
 	}
 
 	//[SyncObjectDefinition]

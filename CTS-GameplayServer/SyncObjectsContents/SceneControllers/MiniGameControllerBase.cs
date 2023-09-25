@@ -81,18 +81,6 @@ namespace CTS.Instance.SyncObjects
 			GameTime = MiniGameData.GameTime;
 			CurrentTime = GameTime;
 
-			// Create teleporters
-			if (_mapData.InteractorTable.TryGetValue(InteractorType.Teleporter,
-													 out var teleporterInfoList))
-			{
-				foreach (var info in teleporterInfoList)
-				{
-					var teleporter = WorldManager.CreateObject<Teleporter>(info.Position);
-					teleporter.Initialize(info);
-				}
-			}
-
-
 			Server_TryLoadSceneAll(GameSceneIdentity);
 		}
 

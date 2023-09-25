@@ -23,6 +23,7 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Infos;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -54,98 +55,108 @@ namespace CTS.Instance.SyncObjects
 			Server_OnProxyDirectionChangedPCallstack.Clear();
 			Server_OrderTestiCallstack.Clear();
 			Server_BroadcastOrderTestiiCallstack.Clear();
+			_dirtyReliable_1.Clear();
 			Server_TestPositionTickByTickVCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			int originSize = writer.Size;
 			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
 			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
-			if (_dirtyReliable_0[0])
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				_userId.Serialize(writer);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				writer.Put(_section);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Server_OnAnimationChangedDCallstack[i];
-					writer.Put((byte)arg);
+					_userId.Serialize(writer);
 				}
-			}
-			if (_dirtyReliable_0[3])
-			{
-				byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[1])
 				{
-					var arg = Server_OnAnimationChangedDPCallstack[i];
-					writer.Put((byte)arg.state);
-					writer.Put((byte)arg.direction);
+					writer.Put(_section);
 				}
-			}
-			if (_dirtyReliable_0[4])
-			{
-				byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[2])
 				{
-					var arg = Server_OnProxyDirectionChangedPCallstack[i];
-					writer.Put((byte)arg);
+					writer.Put((uint)_fieldItem);
 				}
-			}
-			if (_dirtyReliable_0[5])
-			{
-				int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
-				if (Server_OrderTestiCount > 0)
+				if (_dirtyReliable_0[3])
 				{
-					var Server_OrderTesticallList = Server_OrderTestiCallstack.GetCallList(player);
-					writer.Put((byte)Server_OrderTestiCount);
-					for (int i = 0; i < Server_OrderTestiCount; i++)
+					byte count = (byte)Server_OnAnimationChangedDCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
 					{
-						var arg = Server_OrderTesticallList[i];
-						writer.Put(arg);
+						var arg = Server_OnAnimationChangedDCallstack[i];
+						writer.Put((byte)arg);
 					}
 				}
-				else
+				if (_dirtyReliable_0[4])
 				{
-					dirtyReliable_0[5] = false;
+					byte count = (byte)Server_OnAnimationChangedDPCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_OnAnimationChangedDPCallstack[i];
+						writer.Put((byte)arg.state);
+						writer.Put((byte)arg.direction);
+					}
+				}
+				if (_dirtyReliable_0[5])
+				{
+					byte count = (byte)Server_OnProxyDirectionChangedPCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_OnProxyDirectionChangedPCallstack[i];
+						writer.Put((byte)arg);
+					}
+				}
+				if (_dirtyReliable_0[6])
+				{
+					int Server_OrderTestiCount = Server_OrderTestiCallstack.GetCallCount(player);
+					if (Server_OrderTestiCount > 0)
+					{
+						var Server_OrderTesticallList = Server_OrderTestiCallstack.GetCallList(player);
+						writer.Put((byte)Server_OrderTestiCount);
+						for (int i = 0; i < Server_OrderTestiCount; i++)
+						{
+							var arg = Server_OrderTesticallList[i];
+							writer.Put(arg);
+						}
+					}
+					else
+					{
+						dirtyReliable_0[6] = false;
+					}
+				}
+				if (_dirtyReliable_0[7])
+				{
+					byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_BroadcastOrderTestiiCallstack[i];
+						writer.Put(arg.userId);
+						writer.Put(arg.fromSever);
+					}
 				}
 			}
-			if (_dirtyReliable_0[6])
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				byte count = (byte)Server_BroadcastOrderTestiiCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_1[0])
 				{
-					var arg = Server_BroadcastOrderTestiiCallstack[i];
-					writer.Put(arg.userId);
-					writer.Put(arg.fromSever);
+					byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
+					writer.Put(count);
+					for (int i = 0; i < count; i++)
+					{
+						var arg = Server_TestPositionTickByTickVCallstack[i];
+						arg.Serialize(writer);
+					}
 				}
 			}
-			if (_dirtyReliable_0[7])
+			if (writer.Size == originSize + 2)
 			{
-				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_TestPositionTickByTickVCallstack[i];
-					arg.Serialize(writer);
-				}
-			}
-			if (dirtyReliable_0.AnyTrue())
-			{
-				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			}
-			else
-			{
-				writer.SetSize(dirtyReliable_0_pos);
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -153,6 +164,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId.Serialize(writer);
 			writer.Put(_section);
+			writer.Put((uint)_fieldItem);
 			writer.Put((byte)_animationState);
 			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
@@ -161,6 +173,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_userId = new();
 			_section = 0;
+			_fieldItem = (FieldItemType)0;
 			_animationState = (DokzaAnimationState)0;
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;

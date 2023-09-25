@@ -11,6 +11,11 @@ namespace CTS.Instance.SyncObjects
 	{
 		None = 0,
 		CameraController,
+		Interactor,
+		Teleporter,
+		FieldItem,
+		RedHoodMissionInteractor,
+		DueoksiniTable,
 		GameplayController,
 		CustomLobby_SceneController,
 		Dueoksini_MiniGameController,
@@ -22,8 +27,5 @@ namespace CTS.Instance.SyncObjects
 		RedHoodCharacter,
 		WolfCharacter,
 		TestCube,
-		Interactor,
-		RedHoodMissionInteractor,
-		Teleporter,
 	}
 }

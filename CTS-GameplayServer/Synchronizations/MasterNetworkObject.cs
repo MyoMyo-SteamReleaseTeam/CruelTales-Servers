@@ -241,11 +241,6 @@ namespace CTS.Instance.Synchronizations
 			return Owner == networkPlayer.UserId;
 		}
 
-		public virtual bool IsSameFaction(NetworkPlayer networkPlayer)
-		{
-			return Faction == networkPlayer.Faction;
-		}
-
 		public void AddVisibleUser(UserId userId)
 		{
 			_visibleUserSet.Add(userId);

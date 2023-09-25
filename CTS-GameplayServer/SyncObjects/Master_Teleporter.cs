@@ -23,6 +23,7 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Infos;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CT.Common.Tools.CodeGen;
@@ -54,7 +55,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_teleporterShape == value) return;
 				_teleporterShape = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_0[6] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -74,7 +75,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[1])
 			{
-				writer.Put(_size);
+				_size.Serialize(writer);
 			}
 			if (_dirtyReliable_0[2])
 			{
@@ -86,6 +87,10 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[4])
 			{
+				writer.Put(_interactable);
+			}
+			if (_dirtyReliable_0[5])
+			{
 				byte count = (byte)Server_InteractResultICallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
@@ -94,7 +99,7 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[5])
+			if (_dirtyReliable_0[6])
 			{
 				writer.Put((byte)_teleporterShape);
 			}
@@ -103,9 +108,10 @@ namespace CTS.Instance.SyncObjects
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put((byte)_behaviourType);
-			writer.Put(_size);
+			_size.Serialize(writer);
 			writer.Put(_prograssTime);
 			writer.Put(_cooltime);
+			writer.Put(_interactable);
 			writer.Put((byte)_teleporterShape);
 		}
 		public override void InitializeMasterProperties()
@@ -114,6 +120,7 @@ namespace CTS.Instance.SyncObjects
 			_size = new();
 			_prograssTime = 0;
 			_cooltime = 0;
+			_interactable = false;
 			_teleporterShape = (TeleporterShapeType)0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)

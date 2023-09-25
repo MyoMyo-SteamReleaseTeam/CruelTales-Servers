@@ -1,4 +1,4 @@
-﻿namespace CTS.Instance.Gameplay
+﻿namespace CT.Common.Gameplay
 {
 	public enum Faction : byte
 	{
@@ -12,16 +12,8 @@
 		Speculator,
 
 		Red,
-		Bule,
+		Blue,
 		Green,
-
-		// RedHood
-		RedHood_RedHood,
-		RedHood_Wolf,
-		RedHood_Freeman,
-
-		// Dueoksini
-		// Horus
 	}
 
 	public static class FactionExtension

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Infos;
 using CT.Networks;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
@@ -20,9 +21,8 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.View;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		private HashSet<UserId> _cooltimePlayers;
-
-		private Action<Arg> _onCooltimeEnd;
+		[AllowNull] private HashSet<UserId> _cooltimePlayers;
+		[AllowNull] private Action<Arg> _onCooltimeEnd;
 
 		public bool HasCooltime => Cooltime > 0;
 
@@ -32,7 +32,7 @@ namespace CTS.Instance.SyncObjects
 			_cooltimePlayers = new HashSet<UserId>(GlobalNetwork.SYSTEM_MAX_USER);
 		}
 
-		public virtual void Initialize(InteractorInfo info)
+		public virtual void Initialize(in InteractorInfo info)
 		{
 			BehaviourType = info.BehaviourType;
 			Size = info.Size;
@@ -46,11 +46,11 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (BehaviourType == InteractionBehaviourType.Touch)
 			{
-				if (!PhysicsWorld.Raycast(Position, Size.X, Size.Y,
-										  out var hits, PhysicsLayerMask.Player))
-				{
+				if (Interactable == false)
 					return;
-				}
+
+				if (!tryGetHits(out var hits))
+					return;
 
 				foreach (var id in hits)
 				{
@@ -67,6 +67,9 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual partial void Client_TryInteract(NetworkPlayer player)
 		{
+			if (Interactable == false)
+				return;
+
 			if (!checkValidationRequest(player))
 			{
 				_log.Warn($"Authentication failed! Wrong interaction request! Player: {player}");
@@ -147,11 +150,8 @@ namespace CTS.Instance.SyncObjects
 
 			playerCharacter = character;
 
-			if (!PhysicsWorld.Raycast(Position, Size.X, Size.Y,
-									  out var hits, PhysicsLayerMask.Player))
-			{
+			if (!tryGetHits(out var hits))
 				return false;
-			}
 
 			bool isCollide = false;
 
@@ -165,6 +165,34 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			return isCollide;
+		}
+
+		private bool tryGetHits([MaybeNullWhen(false)] out List<int> hits)
+		{
+			InteractorColliderShapeType shapeType = Size.ShapeType;
+			if (shapeType == InteractorColliderShapeType.Box)
+			{
+				if (!PhysicsWorld.Raycast(Position, Size.Width, Size.Height,
+										  out hits, PhysicsLayerMask.Player))
+				{
+					return false;
+				}
+			}
+			else if (shapeType == InteractorColliderShapeType.Circle)
+			{
+				if (!PhysicsWorld.Raycast(Position, Size.Radius,
+										  out hits, PhysicsLayerMask.Player))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				hits = null;
+				return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>

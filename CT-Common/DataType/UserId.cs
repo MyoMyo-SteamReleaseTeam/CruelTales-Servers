@@ -6,7 +6,7 @@ using CT.Common.Serialization;
 namespace CT.Common.DataType
 {
 	[Serializable]
-	public struct UserId : IPacketSerializable, IEquatable<UserId>
+	public struct UserId : IPacketSerializable, IEquatable<UserId>, IComparable<UserId>
 	{
 		public ulong Id;
 		public int SerializeSize => sizeof(ulong);
@@ -26,6 +26,7 @@ namespace CT.Common.DataType
 			return value == this;
 		}
 		public bool Equals(UserId other) => this == other;
+		public int CompareTo(UserId other) => Id.CompareTo(other.Id);
 		public void Ignore(IPacketReader reader) => IgnoreStatic(reader);
 		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(sizeof(ulong));
 		public override string ToString() => Id.ToString();

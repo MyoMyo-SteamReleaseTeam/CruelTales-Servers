@@ -58,7 +58,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			TargetPlayerCharacter = player;
 			TargetId = player.Identity;
-			ViewPosition = TargetPlayerCharacter.Position;
+			MoveToTarget();
 		}
 
 		public void ReleasePlayerCharacter(PlayerCharacter player)
@@ -74,7 +74,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (TargetPlayerCharacter == null)
 				return;
-			Server_MoveTo(TargetPlayerCharacter.Position);
+			ViewPosition = TargetPlayerCharacter.Position;
+			Server_MoveTo(ViewPosition);
 		}
 
 		public partial void Client_CannotFindBindTarget(NetworkPlayer player)

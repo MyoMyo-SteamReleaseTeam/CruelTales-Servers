@@ -87,7 +87,7 @@ namespace CTS.Instance.Gameplay
 		public Vector2 ViewPosition { get; set; }
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
-		public Faction Faction { get; private set; }
+		public Faction Faction { get; set; }
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;

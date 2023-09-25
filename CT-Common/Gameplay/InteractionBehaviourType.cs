@@ -5,6 +5,7 @@
 		None,
 		Teleporter,
 		Mission,
+		FieldItem,
 	}
 
 	public enum InteractionBehaviourType : byte
@@ -64,6 +65,9 @@
 
 		/// <summary>상호작용 할 수 없는 위치에 있습니다.</summary>
 		Failed_WrongPosition,
+
+		/// <summary>이미 아이템을 들고 있습니다.</summary>
+		Failed_YouAlreadyHaveItem,
 	}
 
 	public static class InteractResultTypeExtension

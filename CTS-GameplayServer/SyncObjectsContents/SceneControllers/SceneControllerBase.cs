@@ -1,6 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Infos;
 using CT.Common.Tools.Collections;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
@@ -16,7 +18,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		protected GameSceneMapData _mapData;
+		public GameSceneMapData MapData { get; private set; }
 
 		// Player Management
 		protected BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
@@ -31,14 +33,25 @@ namespace CTS.Instance.SyncObjects
 		{
 			GameSceneIdentity = identity;
 			_playerCharacterByPlayer.Clear();
-			_mapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
+			MapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_spawnIndex = 0;
 		}
 
 		public override void OnCreated()
 		{
-			WorldManager.SetGameMapData(_mapData);
+			WorldManager.SetGameMapData(MapData);
 			_spawnIndex = 0;
+
+			// Create teleporters
+			if (MapData.InteractorTable.TryGetValue(InteractorType.Teleporter,
+													 out var teleporterInfoList))
+			{
+				foreach (var info in teleporterInfoList)
+				{
+					var teleporter = WorldManager.CreateObject<Teleporter>(info.Position);
+					teleporter.Initialize(info);
+				}
+			}
 		}
 
 		public virtual partial void Client_OnSceneLoaded(NetworkPlayer player)
@@ -57,13 +70,13 @@ namespace CTS.Instance.SyncObjects
 			return _playerCharacterByPlayer.TryGetValue(player, out playerCharacter);
 		}
 
-		public void SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
+		public T SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
 		{
-			var spawnPositions = _mapData.SpawnPositions;
+			var spawnPositions = MapData.SpawnPositions;
 			int spawnPosCount = spawnPositions.Count;
 			Vector2 spawnPos = spawnPositions[_spawnIndex];
 			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
-			CreatePlayerBy<T>(player, spawnPos);
+			TryCreatePlayerBy<T>(player, spawnPos, out var character);
 
 			if (GameplayController.CameraControllerByPlayer.TryGetValue(player, out var cameraController))
 			{
@@ -73,18 +86,35 @@ namespace CTS.Instance.SyncObjects
 			{
 				_log.Fatal($"There is no camera for {player} to move to target!");
 			}
+
+			Debug.Assert(character != null);
+			return character;
 		}
 
-		public void CreatePlayerBy<T>(NetworkPlayer player, Vector2 position) where T : PlayerCharacter, new()
+		public FieldItem SpawnFieldItemBy(FieldItemType itemType, Vector2 position, float radius = 0.5f)
+		{
+			var item = WorldManager.CreateObject<FieldItem>(position);
+			var interactor = InteractorInfoExtension.FieldItemInteractorInfo;
+			interactor.Size.Radius = radius;
+			item.Initialize(interactor);
+			item.InitializeAs(itemType);
+			return item;
+		}
+
+		public bool TryCreatePlayerBy<T>(NetworkPlayer player,
+										 Vector2 position,
+										 [MaybeNullWhen(false)]
+										 out T playerCharacter) where T : PlayerCharacter, new()
 		{
 			if (_playerCharacterByPlayer.TryGetValue(player, out var existCharacter))
 			{
 				_log.Error($"{player} already has player character. {existCharacter.GetType().Name}");
-				return;
+				playerCharacter = null;
+				return false;
 			}
 
 			// Create object
-			var playerCharacter = WorldManager.CreateObject<T>(position);
+			playerCharacter = WorldManager.CreateObject<T>(position);
 			playerCharacter.Initialize(player);
 
 			// Binding
@@ -100,6 +130,8 @@ namespace CTS.Instance.SyncObjects
 			{
 				playerCamera.BindPlayerCharacter(playerCharacter);
 			}
+
+			return true;
 		}
 
 		public void DestroyPlayer(PlayerCharacter playerCharacter)

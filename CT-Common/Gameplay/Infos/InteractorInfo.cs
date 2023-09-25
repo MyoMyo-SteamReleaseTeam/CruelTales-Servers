@@ -2,7 +2,7 @@
 using System.Numerics;
 using Newtonsoft.Json;
 
-namespace CT.Common.Gameplay
+namespace CT.Common.Gameplay.Infos
 {
 	[Serializable]
 	public struct InteractorInfo
@@ -11,7 +11,7 @@ namespace CT.Common.Gameplay
 		public InteractorType InteractorType;
 		public InteractionBehaviourType BehaviourType;
 		public Vector2 Position;
-		public Vector2 Size;
+		public InteractorSize Size;
 		public float PrograssTime;
 		public float Cooltime;
 
@@ -56,5 +56,31 @@ namespace CT.Common.Gameplay
 		}
 
 		#endregion
+	}
+
+	public static class InteractorInfoExtension
+	{
+		public static InteractorInfo TableInteractorInfo = new()
+		{
+			InteractorType = InteractorType.Mission,
+			BehaviourType = InteractionBehaviourType.Tigger,
+			Size = new InteractorSize()
+			{
+				ShapeType = InteractorColliderShapeType.Circle,
+				Radius = 4.0f
+			},
+			Cooltime = 0.5f,
+		};
+
+		public static InteractorInfo FieldItemInteractorInfo = new()
+		{
+			InteractorType = InteractorType.FieldItem,
+			BehaviourType = InteractionBehaviourType.Tigger,
+			Size = new InteractorSize()
+			{
+				ShapeType = InteractorColliderShapeType.Circle,
+				Radius = 1.0f
+			},
+		};
 	}
 }

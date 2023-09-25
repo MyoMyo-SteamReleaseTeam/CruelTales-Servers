@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using CT.Common.Gameplay;
+using CT.Common.Gameplay.Infos;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -13,19 +13,20 @@ namespace CTS.Instance.SyncObjects
 		public Vector2 Destination;
 		public byte SectionTo;
 
-		public override void Initialize(InteractorInfo info)
+		public override void Initialize(in InteractorInfo info)
 		{
 			base.Initialize(info);
 			Destination = info.Destination;
 			SectionTo = info.SectionTo;
 			TeleporterShape = info.TeleporterShape;
+			Interactable = true;
 		}
 
 		public override void OnInteracted(NetworkPlayer player,
 										  PlayerCharacter playerCharacter)
 		{
-			player.CameraController?.Server_MoveTo(Destination);
 			playerCharacter.RigidBody.MoveTo(Destination);
+			player.CameraController?.MoveToTarget();
 			playerCharacter.Section = SectionTo;
 		}
 	}
