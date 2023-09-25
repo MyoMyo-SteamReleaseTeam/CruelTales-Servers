@@ -52,7 +52,6 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_InteractResultICallstack.Clear();
-			Server_TestPositionTickByTickVCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -68,7 +67,7 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_prograssTime);
+				writer.Put(_progressTime);
 			}
 			if (_dirtyReliable_0[3])
 			{
@@ -88,23 +87,13 @@ namespace CTS.Instance.SyncObjects
 					writer.Put((byte)arg);
 				}
 			}
-			if (_dirtyReliable_0[6])
-			{
-				byte count = (byte)Server_TestPositionTickByTickVCallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
-				{
-					var arg = Server_TestPositionTickByTickVCallstack[i];
-					arg.Serialize(writer);
-				}
-			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
 		public override void SerializeEveryProperty(IPacketWriter writer)
 		{
 			writer.Put((byte)_behaviourType);
 			_size.Serialize(writer);
-			writer.Put(_prograssTime);
+			writer.Put(_progressTime);
 			writer.Put(_cooltime);
 			writer.Put(_interactable);
 		}
@@ -112,7 +101,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_behaviourType = (InteractionBehaviourType)0;
 			_size = new();
-			_prograssTime = 0;
+			_progressTime = 0;
 			_cooltime = 0;
 			_interactable = false;
 		}

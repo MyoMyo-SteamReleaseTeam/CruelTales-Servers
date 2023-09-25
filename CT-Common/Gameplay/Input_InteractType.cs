@@ -9,6 +9,6 @@
 		Switch,
 		
 		/// <summary>누르고 있습니다.</summary>
-		Prograss,
+		Progress,
 	}
 }

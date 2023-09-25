@@ -12,7 +12,7 @@ namespace CT.Common.Gameplay.Infos
 		public InteractionBehaviourType BehaviourType;
 		public Vector2 Position;
 		public InteractorSize Size;
-		public float PrograssTime;
+		public float ProgressTime;
 		public float Cooltime;
 
 		// Addition Variables

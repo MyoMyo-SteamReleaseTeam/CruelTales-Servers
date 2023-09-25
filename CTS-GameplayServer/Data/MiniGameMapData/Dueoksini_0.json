@@ -2391,7 +2391,7 @@
           "Value0": 2.5878,
           "Value1": 1.0
         },
-        "PrograssTime": 3.0,
+        "ProgressTime": 3.0,
         "Cooltime": 0.0,
         "IntValue": 1,
         "ByteValue": 1,
@@ -2412,7 +2412,7 @@
           "Value0": 4.384768,
           "Value1": 1.0
         },
-        "PrograssTime": 3.0,
+        "ProgressTime": 3.0,
         "Cooltime": 0.0,
         "IntValue": 0,
         "ByteValue": 1,
@@ -2433,7 +2433,7 @@
           "Value0": 2.5878,
           "Value1": 1.0
         },
-        "PrograssTime": 3.0,
+        "ProgressTime": 3.0,
         "Cooltime": 0.0,
         "IntValue": 2,
         "ByteValue": 1,
@@ -2454,7 +2454,7 @@
           "Value0": 4.384768,
           "Value1": 1.0
         },
-        "PrograssTime": 3.0,
+        "ProgressTime": 3.0,
         "Cooltime": 0.0,
         "IntValue": 0,
         "ByteValue": 1,

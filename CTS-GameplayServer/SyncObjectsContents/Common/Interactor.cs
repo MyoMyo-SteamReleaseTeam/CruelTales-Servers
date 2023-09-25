@@ -36,7 +36,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			BehaviourType = info.BehaviourType;
 			Size = info.Size;
-			PrograssTime = info.PrograssTime;
+			
+			Time = info.ProgressTime;
 			Cooltime = info.Cooltime;
 		}
 
@@ -113,7 +114,7 @@ namespace CTS.Instance.SyncObjects
 					Server_InteractResult(InteractResultType.Success);
 					break;
 
-				case InteractionBehaviourType.Prograss:
+				case InteractionBehaviourType.Progress:
 					break;
 
 				case InteractionBehaviourType.Toggle:

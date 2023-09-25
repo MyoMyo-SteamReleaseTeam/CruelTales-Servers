@@ -19,7 +19,7 @@
 		Tigger,
 
 		/// <summary>범위에서 누르고 있어야 동작합니다.</summary>
-		Prograss,
+		Progress,
 
 		/// <summary>범위에서 한 번 누르면 동작하고, 다시 한 번 누르면 해제됩니다.</summary>
 		Toggle,
