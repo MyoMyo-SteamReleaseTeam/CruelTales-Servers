@@ -75,7 +75,10 @@ namespace CTS.Instance.SyncObjects
 		}
 
 		public virtual void OnPlayerEnter(NetworkPlayer player) { }
-		public virtual void OnPlayerLeave(NetworkPlayer player) { }
+		public virtual void OnPlayerLeave(NetworkPlayer player)
+		{
+			DestroyPlayer(player);
+		}
 
 		public bool TryGetPlayerCharacter(NetworkPlayer player,
 										  [MaybeNullWhen(false)]

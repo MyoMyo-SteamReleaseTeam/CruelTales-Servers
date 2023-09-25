@@ -129,14 +129,14 @@ namespace CTS.Instance.SyncObjects
 				if (halfPlayerCount > 0)
 				{
 					player.Faction = Faction.Red;
-					redPlayer++;
 					spwanIndex = redPlayer;
+					redPlayer++;
 				}
 				else
 				{
 					player.Faction = Faction.Blue;
-					bluePlayer++;
 					spwanIndex = bluePlayer + 3;
+					bluePlayer++;
 				}
 
 				var character = SpawnPlayerBy<NormalCharacter>(player, spwanIndex);
