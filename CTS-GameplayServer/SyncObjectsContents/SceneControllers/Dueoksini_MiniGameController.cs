@@ -5,6 +5,7 @@ using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.MiniGames;
+using CT.Networks;
 using CTS.Instance.Gameplay;
 
 namespace CTS.Instance.SyncObjects
@@ -60,11 +61,14 @@ namespace CTS.Instance.SyncObjects
 
 			// Create Items
 			// Step 1: Select random positions
-			int areaCount = MapData.AreaInfos.Count;
+			int areaCount = 0;
 			float totalArea = 0;
-			foreach (var area in MapData.AreaInfos)
+			foreach (var areaInfo in MapData.AreaInfos)
 			{
-				totalArea += area.Area;
+				if (areaInfo.Index != GlobalNetwork.LAST_SECTION_AREA_INDEX + 1)
+					continue;
+				totalArea += areaInfo.Area;
+				areaCount++;
 			}
 
 			int totalItemSpwanCount = DueoksiniHelper.GetTotalSpwanItemCount();
@@ -74,6 +78,8 @@ namespace CTS.Instance.SyncObjects
 			totalItemCount--;
 			foreach (var areaInfo in MapData.AreaInfos)
 			{
+				if (areaInfo.Index != GlobalNetwork.LAST_SECTION_AREA_INDEX + 1)
+					continue;
 				float area = areaInfo.Area;
 				int itemCreate = (int)(totalCountInArea * (areaInfo.Area / totalArea));
 				totalCountInArea -= itemCreate;

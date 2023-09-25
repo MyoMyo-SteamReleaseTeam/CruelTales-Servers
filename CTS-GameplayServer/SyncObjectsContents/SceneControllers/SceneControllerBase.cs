@@ -1,8 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.Infos;
 using CT.Common.Tools.Collections;
+using CT.Networks;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
@@ -23,8 +26,11 @@ namespace CTS.Instance.SyncObjects
 		protected BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
 		protected int _spawnIndex;
 
+		[AllowNull] private Dictionary<int, AreaInfo> _areaInfoBySection;
+
 		public override void Constructor()
 		{
+			_areaInfoBySection = new Dictionary<int, AreaInfo>(30);
 			_playerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
 		}
 
@@ -32,8 +38,17 @@ namespace CTS.Instance.SyncObjects
 		{
 			GameSceneIdentity = identity;
 			_playerCharacterByPlayer.Clear();
-			MapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_spawnIndex = 0;
+
+			// Setup Map Data
+			MapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
+			_areaInfoBySection.Clear();
+			foreach (var areaInfo in MapData.AreaInfos)
+			{
+				if (areaInfo.Index >= GlobalNetwork.LAST_SECTION_AREA_INDEX)
+					continue;
+				_areaInfoBySection.Add(areaInfo.Index, areaInfo);
+			}
 		}
 
 		public override void OnCreated()
@@ -123,6 +138,16 @@ namespace CTS.Instance.SyncObjects
 			// Binding
 			player.BindCharacter(playerCharacter);
 			_playerCharacterByPlayer.Add(player, playerCharacter);
+
+			// Set Section
+			foreach (var value in _areaInfoBySection.Values)
+			{
+				if (value.IsInnerPosition(position))
+				{
+					playerCharacter.Section = (byte)value.Index;
+					break;
+				}
+			}
 
 			// Bind camera
 			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))

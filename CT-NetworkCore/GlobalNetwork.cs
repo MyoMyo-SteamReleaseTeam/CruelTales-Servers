@@ -16,5 +16,8 @@
 		public const int SYSTEM_MIN_USER = 1;
 
 		public const float DEFAULT_PHYSICS_STEP_TIME = 0.03f;
+
+		/// <summary>Section을 나타내는 Area Info의 마지막 Index 입니다.</summary>
+		public const int LAST_SECTION_AREA_INDEX = 29;
 	}
 }

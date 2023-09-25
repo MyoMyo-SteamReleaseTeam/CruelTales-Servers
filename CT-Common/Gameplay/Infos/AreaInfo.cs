@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using KaNet.Physics;
 using Newtonsoft.Json;
 
 namespace CT.Common.Gameplay.Infos
@@ -27,6 +28,14 @@ namespace CT.Common.Gameplay.Infos
 			Index = index;
 			Position = position;
 			Size = size;
+		}
+
+		public bool IsInnerPosition(Vector2 position)
+		{
+			Vector2 min = Position - Size * 0.5f;
+			Vector2 delta = position - min;
+			return delta.X >= 0 && delta.X <= Size.X &&
+				   delta.Y >= 0 && delta.Y <= Size.Y;
 		}
 	}
 }
