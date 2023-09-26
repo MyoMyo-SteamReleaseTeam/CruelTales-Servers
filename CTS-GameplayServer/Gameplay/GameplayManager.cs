@@ -81,8 +81,13 @@ namespace CTS.Instance.Gameplay
 				player.Update(deltaTime);
 			}
 
+			WorldManager.CallObjectLifeCycleEvent();
+
 			// Send sync data to each user
 			WorldManager.UpdateVisibilityAndSendData();
+
+			// Update objects life cycle
+			WorldManager.UpdateObjectLifeCycle();
 
 			// Update network objects physics
 			WorldManager.FixedUpdate(deltaTime);
@@ -92,9 +97,6 @@ namespace CTS.Instance.Gameplay
 
 			// Reset dirtys
 			WorldManager.ClearDirtys();
-
-			// Update objects life cycle
-			WorldManager.UpdateObjectLifeCycle();
 		}
 
 		public void OnUserEnterGame(UserSession userSession)

@@ -125,11 +125,6 @@ namespace CTS.Instance.Synchronizations
 			_visibleUserSet.Clear();
 
 			WorldManager.AddCreatedEqueue(this);
-		}
-
-		public void InitializeAfterFrame()
-		{
-			OnCreated();
 
 			// Add to trace visibility
 			if (Visibility.IsViewType())
@@ -139,16 +134,6 @@ namespace CTS.Instance.Synchronizations
 			_worldVisibilityManager.OnCreated(this);
 		}
 
-		/// <summary>객체를 해제합니다.</summary>
-		public void Dispose()
-		{
-			OnDestroyed();
-			Debug.Assert(PhysicsWorld != null);
-			PhysicsWorld.RemoveRigidBody(_physicsRigidBody);
-			_wattingCoroutines.Clear();
-			_coroutineCallCounter = 0;
-		}
-
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>
 		public void Destroy()
 		{
@@ -156,8 +141,8 @@ namespace CTS.Instance.Synchronizations
 				return;
 
 			IsAlive = false;
-			_worldVisibilityManager.OnDestroy(this);
 			WorldManager.AddDestroyEqueue(this);
+			OnDestroyed();
 		}
 
 		/// <summary>객체를 강제로 삭제합니다. WorldManager에서는 사라지지 않습니다.</summary>
@@ -170,6 +155,16 @@ namespace CTS.Instance.Synchronizations
 			//_worldVisibilityManager.OnDestroy(this);
 
 			Dispose();
+		}
+
+		/// <summary>객체를 해제합니다.</summary>
+		public void Dispose()
+		{
+			Debug.Assert(PhysicsWorld != null);
+			PhysicsWorld.RemoveRigidBody(_physicsRigidBody);
+			_worldVisibilityManager.OnDestroy(this);
+			_wattingCoroutines.Clear();
+			_coroutineCallCounter = 0;
 		}
 
 		private void onCollisionWith(int id)
