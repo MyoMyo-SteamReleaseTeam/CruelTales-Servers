@@ -148,6 +148,7 @@ namespace CTS.Instance.SyncObjects
 				if (value.IsInnerPosition(position))
 				{
 					playerCharacter.Section = (byte)value.Index;
+					player.CameraController?.ResetZoom();
 					break;
 				}
 			}

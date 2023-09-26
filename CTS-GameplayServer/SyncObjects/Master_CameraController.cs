@@ -56,6 +56,8 @@ namespace CTS.Instance.SyncObjects
 		public partial void Server_LookAt(Vector2 position, float time);
 		[SyncRpc]
 		public partial void Server_Shake();
+		[SyncRpc]
+		public partial void Server_Zoom(float zoom);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public partial void Client_CannotFindBindTarget(NetworkPlayer player);
 		public CameraController()
@@ -112,6 +114,13 @@ namespace CTS.Instance.SyncObjects
 			MarkDirtyReliable();
 		}
 		private byte Server_ShakeCallstackCount = 0;
+		public partial void Server_Zoom(float zoom)
+		{
+			Server_ZoomfCallstack.Add(zoom);
+			_dirtyReliable_0[6] = true;
+			MarkDirtyReliable();
+		}
+		private List<float> Server_ZoomfCallstack = new(4);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
@@ -120,6 +129,7 @@ namespace CTS.Instance.SyncObjects
 			Server_LookAtVCallstack.Clear();
 			Server_LookAtVfCallstack.Clear();
 			Server_ShakeCallstackCount = 0;
+			Server_ZoomfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -167,6 +177,16 @@ namespace CTS.Instance.SyncObjects
 			if (_dirtyReliable_0[5])
 			{
 				writer.Put((byte)Server_ShakeCallstackCount);
+			}
+			if (_dirtyReliable_0[6])
+			{
+				byte count = (byte)Server_ZoomfCallstack.Count;
+				writer.Put(count);
+				for (int i = 0; i < count; i++)
+				{
+					var arg = Server_ZoomfCallstack[i];
+					writer.Put(arg);
+				}
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }

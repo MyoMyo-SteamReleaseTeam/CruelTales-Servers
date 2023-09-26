@@ -143,8 +143,8 @@ namespace CTS.Instance.SyncObjects
 			GameplayManager.TryGetNetworkPlayer(wolfUserId, out var wolfPlayer);
 			GameplayManager.TryGetNetworkPlayer(targetUserId, out var targetPlayer);
 
-			const float offsetX = 0.3f;
-			const float offsetY = 0.2f;
+			const float offsetX = 1f;
+			const float offsetY = 1f;
 
 			float wolfX;
 			float targetX;

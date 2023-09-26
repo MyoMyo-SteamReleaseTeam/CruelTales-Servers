@@ -1,9 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
+using static System.Collections.Specialized.BitVector32;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -16,6 +18,13 @@ namespace CTS.Instance.SyncObjects
 		public PlayerCharacter? TargetPlayerCharacter { get; private set; }
 
 		public Vector2 ViewPosition { get; private set; }
+
+		private Action _moveToTarget;
+
+		public override void Constructor()
+		{
+			_moveToTarget = moveToTarget;
+		}
 
 		public override void OnCreated()
 		{
@@ -81,7 +90,7 @@ namespace CTS.Instance.SyncObjects
 			if (TargetPlayerCharacter == null)
 				return;
 			ViewPosition = TargetPlayerCharacter.Position;
-			Server_MoveTo(ViewPosition);
+			StartCoroutine(_moveToTarget, 0);
 		}
 
 		public partial void Client_CannotFindBindTarget(NetworkPlayer player)
@@ -89,8 +98,24 @@ namespace CTS.Instance.SyncObjects
 			if (TargetPlayerCharacter != null)
 			{
 				ViewPosition = TargetPlayerCharacter.Position;
-				Server_MoveTo(ViewPosition);
+				StartCoroutine(_moveToTarget, 0);
 			}
+		}
+
+		private void moveToTarget()
+		{
+			Server_MoveTo(ViewPosition);
+			ResetZoom();
+		}
+
+		public void ResetZoom()
+		{
+			float zoom = 7.0f;
+			if (TargetPlayerCharacter != null)
+			{
+				zoom = TargetPlayerCharacter.Section == 0 ? 7 : 6;
+			}
+			Server_Zoom(zoom);
 		}
 	}
 }

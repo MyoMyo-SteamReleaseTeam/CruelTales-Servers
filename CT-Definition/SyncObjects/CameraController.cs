@@ -30,6 +30,9 @@ namespace CT.Definitions.SyncObjects
 		[SyncRpc]
 		public void Server_Shake() { }
 
+		[SyncRpc]
+		public void Server_Zoom(float zoom) { }
+
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_CannotFindBindTarget() { }
 	}

@@ -22,7 +22,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.ViewAndOwner;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public float Speed = 7;
+		public float Speed = 14;
 
 		private CoroutineRunnerVoid _skinInitRunner;
 
@@ -100,7 +100,7 @@ namespace CTS.Instance.SyncObjects
 		public override void OnUpdate(float deltaTime)
 		{
 			StateMachine.UpdateState(deltaTime);
-			Server_TestPositionTickByTick(Position);
+			//Server_TestPositionTickByTick(Position);
 		}
 
 		public void Move(Vector2 moveDirection, bool isWalk)

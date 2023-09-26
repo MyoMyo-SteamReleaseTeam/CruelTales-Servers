@@ -28,8 +28,11 @@ namespace CTS.Instance.SyncObjects
 			playerCharacter.RigidBody.MoveTo(Destination);
 			if (playerCharacter.Section != SectionTo)
 			{
-				player.CameraController?.MoveToTarget();
 				playerCharacter.Section = SectionTo;
+				if (player.CameraController == null)
+					return;
+
+				player.CameraController.MoveToTarget();
 			}
 		}
 	}
