@@ -125,13 +125,18 @@ namespace CTS.Instance.Synchronizations
 			_visibleUserSet.Clear();
 
 			WorldManager.AddCreatedEqueue(this);
+		}
 
+		public void Creation()
+		{
 			// Add to trace visibility
 			if (Visibility.IsViewType())
 			{
 				CurrentCellPos = WorldVisibilityManager.GetWorldCell(_physicsRigidBody.Position);
 			}
 			_worldVisibilityManager.OnCreated(this);
+
+			OnCreated();
 		}
 
 		/// <summary>객체를 삭제합니다. 다음 프레임에 삭제됩니다.</summary>

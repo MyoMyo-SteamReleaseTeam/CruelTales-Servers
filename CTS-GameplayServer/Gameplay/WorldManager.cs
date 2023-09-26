@@ -134,8 +134,18 @@ namespace CTS.Instance.Gameplay
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void UpdateNetworkObjects(float deltaTime)
 		{
-			foreach (var netObj in _networkObjectById.ForwardValues)
+			Span<NetworkIdentity> netObjIds = stackalloc NetworkIdentity[_networkObjectById.Count];
+			int netIndex = 0;
+			foreach (var netObj in _networkObjectById.ForwardKeys)
 			{
+				netObjIds[netIndex++] = netObj;
+			}
+
+			for (int i = 0; i < netIndex; i++)
+			{
+				if (!_networkObjectById.TryGetValue(netObjIds[i], out var netObj))
+					continue;
+
 				if (!netObj.IsAlive)
 					continue;
 
@@ -214,7 +224,7 @@ namespace CTS.Instance.Gameplay
 			for (int c = 0; c < _createObjectList.Count; c++)
 			{
 				MasterNetworkObject createdObj = _createObjectList[c];
-				createdObj.OnCreated();
+				createdObj.Creation();
 			}
 
 			_createObjectList.Clear();
@@ -357,11 +367,9 @@ namespace CTS.Instance.Gameplay
 			for (int i = _createObjectList.Count - 1; i >= 0; i--)
 			{
 				var netObj = _createObjectList[i];
-				if (!netObj.IsPersistent)
-				{
-					forceDestroy(netObj);
-				}
-				_createObjectList.RemoveAt(i);
+				netObj.Destroy();
+				//forceDestroy(netObj);
+				//_createObjectList.RemoveAt(i);
 			}
 		}
 
@@ -380,9 +388,10 @@ namespace CTS.Instance.Gameplay
 				var netObj = _createObjectList[i];
 				if (!netObj.IsPersistent)
 				{
-					forceDestroy(netObj);
+					netObj.Destroy();
+					//forceDestroy(netObj);
 				}
-				_createObjectList.RemoveAt(i);
+				//_createObjectList.RemoveAt(i);
 			}
 		}
 

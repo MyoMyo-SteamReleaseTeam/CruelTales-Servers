@@ -216,7 +216,7 @@ namespace CTS.Instance.SyncObjects
 
 		private void onChangeNextMap()
 		{
-			GameplayController.ChangeSceneTo(MapVoteController.NextMap);
+			GameplayController.TryChangeSceneTo(MapVoteController.NextMap);
 		}
 
 		#endregion
