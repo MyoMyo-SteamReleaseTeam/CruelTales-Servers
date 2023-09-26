@@ -123,7 +123,7 @@ namespace CTS.Instance.SyncObjects
 			Arg isRight = new(center.X < wolfPos.X);
 
 			StartCoroutine(_onChangeRole, centerArg, isRight, wolfUserId, targetUserId, 2.0f);
-			GameplayController.EffectController.Play(EffectType.WolfnPlayerFight, center);
+			GameplayController.EffectController.Play(EffectType.WolfnPlayerFight, center, 2.1f);
 
 			wolf.NetworkPlayer.CameraController?.Server_LookAt(center, 0.1f);
 			target.NetworkPlayer.CameraController?.Server_LookAt(center, 0.1f);

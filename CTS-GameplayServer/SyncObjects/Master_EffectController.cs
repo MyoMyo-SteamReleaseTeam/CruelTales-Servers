@@ -44,9 +44,9 @@ namespace CTS.Instance.SyncObjects
 	public partial class EffectController : IMasterSynchronizable
 	{
 		[SyncRpc]
-		public partial void Play(EffectType effect, Vector2 position);
+		public partial void Play(EffectType effect, Vector2 position, float duration);
 		[SyncRpc]
-		public partial void Play3D(EffectType effect, Vector3 position);
+		public partial void Play3D(EffectType effect, Vector3 position, float duration);
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
 		public EffectController()
@@ -71,26 +71,26 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyUnreliable = true;
 			_owner.MarkDirtyUnreliable();
 		}
-		public partial void Play(EffectType effect, Vector2 position)
+		public partial void Play(EffectType effect, Vector2 position, float duration)
 		{
-			PlayEVCallstack.Add((effect, position));
+			PlayEVfCallstack.Add((effect, position, duration));
 			_dirtyReliable_0[0] = true;
 			MarkDirtyReliable();
 		}
-		private List<(EffectType effect, Vector2 position)> PlayEVCallstack = new(4);
-		public partial void Play3D(EffectType effect, Vector3 position)
+		private List<(EffectType effect, Vector2 position, float duration)> PlayEVfCallstack = new(4);
+		public partial void Play3D(EffectType effect, Vector3 position, float duration)
 		{
-			Play3DEVCallstack.Add((effect, position));
+			Play3DEVfCallstack.Add((effect, position, duration));
 			_dirtyReliable_0[1] = true;
 			MarkDirtyReliable();
 		}
-		private List<(EffectType effect, Vector3 position)> Play3DEVCallstack = new(4);
+		private List<(EffectType effect, Vector3 position, float duration)> Play3DEVfCallstack = new(4);
 		public void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
-			PlayEVCallstack.Clear();
-			Play3DEVCallstack.Clear();
+			PlayEVfCallstack.Clear();
+			Play3DEVfCallstack.Clear();
 		}
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
@@ -98,24 +98,26 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0[0])
 			{
-				byte count = (byte)PlayEVCallstack.Count;
+				byte count = (byte)PlayEVfCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = PlayEVCallstack[i];
+					var arg = PlayEVfCallstack[i];
 					writer.Put((int)arg.effect);
 					writer.Put(arg.position);
+					writer.Put(arg.duration);
 				}
 			}
 			if (_dirtyReliable_0[1])
 			{
-				byte count = (byte)Play3DEVCallstack.Count;
+				byte count = (byte)Play3DEVfCallstack.Count;
 				writer.Put(count);
 				for (int i = 0; i < count; i++)
 				{
-					var arg = Play3DEVCallstack[i];
+					var arg = Play3DEVfCallstack[i];
 					writer.Put((int)arg.effect);
 					writer.Put(arg.position);
+					writer.Put(arg.duration);
 				}
 			}
 		}

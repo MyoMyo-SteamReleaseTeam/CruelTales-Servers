@@ -23,7 +23,7 @@ namespace CTS.Instance.Gameplay
 				}
 				other.OnReactionBy(direction);
 				Vector2 hitPos = (actor.Position + other.Position) * 0.5f;
-				actor.GameplayController.EffectController.Play(EffectType.HammerHit, hitPos);
+				actor.GameplayController.EffectController.Play(EffectType.HammerHit, hitPos, 2f);
 			}
 		}
 	}

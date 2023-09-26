@@ -8,9 +8,9 @@ namespace CT.Definitions.SyncObjects
 	public class EffectController
 	{
 		[SyncRpc]
-		public void Play(EffectType effect, Vector2 position) { }
+		public void Play(EffectType effect, Vector2 position, float duration) { }
 
 		[SyncRpc]
-		public void Play3D(EffectType effect, Vector3 position) { }
+		public void Play3D(EffectType effect, Vector3 position, float duration) { }
 	}
 }
