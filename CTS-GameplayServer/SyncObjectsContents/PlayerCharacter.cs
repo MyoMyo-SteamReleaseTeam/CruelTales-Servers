@@ -22,7 +22,7 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.ViewAndOwner;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public float Speed = 10.0f;
+		public float Speed = 7;
 
 		private CoroutineRunnerVoid _skinInitRunner;
 
