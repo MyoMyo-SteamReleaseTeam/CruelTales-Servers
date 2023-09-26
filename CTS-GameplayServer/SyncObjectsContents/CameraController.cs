@@ -3,6 +3,7 @@ using System.Numerics;
 using CT.Common.DataType;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
+using KaNet.Physics;
 
 namespace CTS.Instance.SyncObjects
 {
@@ -34,8 +35,13 @@ namespace CTS.Instance.SyncObjects
 			Vector2 targetPosition = TargetPlayerCharacter == null ?
 				ViewPosition : TargetPlayerCharacter.Position;
 
-			ViewPosition = Vector2.Lerp(ViewPosition, targetPosition,
-										FollowSpeed * deltaTime);
+			float ratio = FollowSpeed * deltaTime;
+			if (ratio > 1)
+			{
+				ratio = 1;
+			}
+
+			ViewPosition = Vector2.Lerp(ViewPosition, targetPosition, ratio);
 			NetworkPlayer.ViewPosition = ViewPosition;
 		}
 
