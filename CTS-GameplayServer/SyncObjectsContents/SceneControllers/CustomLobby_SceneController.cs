@@ -149,8 +149,8 @@ namespace CTS.Instance.SyncObjects
 
 		private void onGameStart()
 		{
-			//GameplayController.ChangeSceneTo(GameSceneMapDataDB.RedHood);
-			GameplayController.TryChangeSceneTo(GameSceneMapDataDB.Dueoksini);
+			GameplayController.TryChangeSceneTo(GameSceneMapDataDB.RedHood);
+			//GameplayController.TryChangeSceneTo(GameSceneMapDataDB.Dueoksini);
 		}
 	}
 }
