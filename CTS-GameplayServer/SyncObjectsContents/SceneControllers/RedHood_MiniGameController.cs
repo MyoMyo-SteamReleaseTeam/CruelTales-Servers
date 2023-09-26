@@ -34,8 +34,7 @@ namespace CTS.Instance.SyncObjects
 			_playerCharacterTable.Clear();
 
 			int playerCount = GameplayController.PlayerSet.Count;
-			int wolfCount = (int)(playerCount / WOLF_RATIO);
-
+			int wolfCount = (playerCount > 2) ? (int)(playerCount / WOLF_RATIO) : 1;
 			if (wolfCount > playerCount)
 			{
 				_log.Fatal($"Initial wolf count error! PlayerCount : {playerCount} / WolfCount : {wolfCount}");
