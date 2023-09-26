@@ -240,7 +240,6 @@ namespace CTS.Instance.Gameplay
 					continue;
 				}
 
-				destroyObj.OnDestroyed();
 				destroyObj.Dispose();
 			}
 
@@ -308,7 +307,6 @@ namespace CTS.Instance.Gameplay
 			netObj.Initialize(getNetworkIdentityCounter(),
 							  position, 
 							  rotation: 0);
-			_createObjectList.Add(netObj);
 
 			return netObj;
 
@@ -326,6 +324,11 @@ namespace CTS.Instance.Gameplay
 
 				throw new IndexOutOfRangeException($"There are no more network identity");
 			}
+		}
+
+		public void AddCreatedEqueue(MasterNetworkObject networkObject)
+		{
+			_createObjectList.Add(networkObject);
 		}
 
 		public void AddDestroyEqueue(MasterNetworkObject networkObject)

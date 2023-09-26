@@ -123,6 +123,8 @@ namespace CTS.Instance.Synchronizations
 
 			// Initialize visible set
 			_visibleUserSet.Clear();
+
+			WorldManager.AddCreatedEqueue(this);
 		}
 
 		public void InitializeAfterFrame()
@@ -140,6 +142,7 @@ namespace CTS.Instance.Synchronizations
 		/// <summary>객체를 해제합니다.</summary>
 		public void Dispose()
 		{
+			OnDestroyed();
 			Debug.Assert(PhysicsWorld != null);
 			PhysicsWorld.RemoveRigidBody(_physicsRigidBody);
 			_wattingCoroutines.Clear();
@@ -153,8 +156,8 @@ namespace CTS.Instance.Synchronizations
 				return;
 
 			IsAlive = false;
-			WorldManager.AddDestroyEqueue(this);
 			_worldVisibilityManager.OnDestroy(this);
+			WorldManager.AddDestroyEqueue(this);
 		}
 
 		/// <summary>객체를 강제로 삭제합니다. WorldManager에서는 사라지지 않습니다.</summary>
@@ -166,7 +169,6 @@ namespace CTS.Instance.Synchronizations
 			IsAlive = false;
 			//_worldVisibilityManager.OnDestroy(this);
 
-			OnDestroyed();
 			Dispose();
 		}
 
