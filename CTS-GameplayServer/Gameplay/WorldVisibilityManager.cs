@@ -353,10 +353,11 @@ namespace CTS.Instance.Gameplay
 
 			bool shouldForceShow(NetworkPlayer player, MasterNetworkObject netObj)
 			{
+				if (player.IsShowAll)
+					return true;
+
 				if (netObj.Visibility == VisibilityType.ViewAndOwner)
-				{
 					return player.UserId == netObj.Owner;
-				}
 
 				return false;
 			}

@@ -103,6 +103,7 @@ namespace CTS.Instance.Gameplay
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;
+		public bool IsShowAll { get; private set; }
 
 #if DEBUG
 #pragma warning disable CS8618
@@ -136,6 +137,7 @@ namespace CTS.Instance.Gameplay
 
 			// Visibility
 			CanSeeViewObject = false;
+			IsShowAll = false;
 
 			_log.Debug($"Player {Username} created!");
 		}
@@ -175,11 +177,11 @@ namespace CTS.Instance.Gameplay
 
 			if (character is WolfCharacter)
 			{
-				MaximizeViewSize();
+				IsShowAll = true;
 			}
 			else
 			{
-				OptimizeViewSize();
+				IsShowAll = false;
 			}
 		}
 
@@ -209,12 +211,6 @@ namespace CTS.Instance.Gameplay
 		public void ReleasePlayerState()
 		{
 			PlayerState = null;
-		}
-
-		public void MaximizeViewSize()
-		{
-			HalfViewInSize = new Vector2(10000, 10000);
-			HalfViewOutSize = new Vector2(10100, 10100);
 		}
 
 		public void OptimizeViewSize()
