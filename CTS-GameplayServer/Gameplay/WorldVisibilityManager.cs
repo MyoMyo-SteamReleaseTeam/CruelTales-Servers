@@ -266,12 +266,12 @@ namespace CTS.Instance.Gameplay
 					else if (viewTable.LeaveObjects.Remove(despawnId))
 					{
 						// It was destroyed and leave at the same time!
-						Debug.Assert(false);
+						//Debug.Assert(false);
 					}
 					else if (viewTable.SpawnObjects.Remove(despawnId))
 					{
 						// or, it was spawned and immediately despawned
-						Debug.Assert(false);
+						//Debug.Assert(false);
 					}
 				}
 

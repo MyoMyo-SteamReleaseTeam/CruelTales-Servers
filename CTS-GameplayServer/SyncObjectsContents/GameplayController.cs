@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
@@ -21,6 +22,14 @@ namespace CTS.Instance.SyncObjects
 		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
 		public Dictionary<NetworkPlayer, CameraController> CameraControllerByPlayer { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
+
+		private GameSceneIdentity _currentSceneId;
+		private Action _onStartNextScene;
+
+		public override void Constructor()
+		{
+			_onStartNextScene =	onStartNextScene;
+		}
 
 		public override void OnUpdate(float deltaTime)
 		{
@@ -139,13 +148,28 @@ namespace CTS.Instance.SyncObjects
 			}
 		}
 
-		public void ChangeSceneTo(GameSceneIdentity gameId)
+		private bool _isCurrentlyLoading = false;
+		public bool TryChangeSceneTo(GameSceneIdentity gameId)
 		{
+			if (_isCurrentlyLoading)
+			{
+				return false;
+			}
+
 			SceneController?.Destroy();
 			SceneController?.Release();
+			_currentSceneId = gameId;
 			WorldManager.ClearWithoutPersistentObject();
-			SceneController = WorldManager.CreateSceneControllerBy(gameId);
-			SceneController.Initialize(gameId);
+			_isCurrentlyLoading = true;
+			StartCoroutine(_onStartNextScene, 0.01f);
+			return true;
+		}
+
+		private void onStartNextScene()
+		{
+			SceneController = WorldManager.CreateSceneControllerBy(_currentSceneId);
+			SceneController.Initialize(_currentSceneId);
+			_isCurrentlyLoading = false;
 		}
 	}
 }

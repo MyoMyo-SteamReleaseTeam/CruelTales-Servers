@@ -74,6 +74,10 @@ namespace CTS.Instance.SyncObjects
 			_proxyDirection = ProxyDirection.RightDown;
 			StateMachine.ChangeState(StateMachine.IdleState);
 
+			MoveDirection = Vector2.Zero;
+			ActionDirection = Vector2.Zero;
+			AnimationTime = 0;
+
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 			{
 				state.CurrentSkin = state.SelectedSkin;
