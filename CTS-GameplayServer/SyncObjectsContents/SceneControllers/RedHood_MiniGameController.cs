@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Security.Cryptography;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Coroutines;
