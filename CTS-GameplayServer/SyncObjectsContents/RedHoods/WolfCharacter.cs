@@ -21,8 +21,7 @@ namespace CTS.Instance.SyncObjects
 		public override void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)
 		{
 			if (netObj is not PlayerCharacter other ||
-				other is NormalCharacter ||
-				other is WolfCharacter)
+				other is NormalCharacter)
 			{
 				isBreak = false;
 				return;
@@ -34,10 +33,6 @@ namespace CTS.Instance.SyncObjects
 				var eventHandler = curScene as IWolfEventHandler;
 				eventHandler?.OnWolfCatch(this, redHood);
 				isBreak = true;
-			}
-			else if (other is NormalCharacter)
-			{
-				isBreak = false;
 			}
 			else
 			{
