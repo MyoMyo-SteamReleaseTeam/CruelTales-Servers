@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Security.Cryptography;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CTS.Instance.Coroutines;
@@ -15,7 +16,6 @@ namespace CTS.Instance.SyncObjects
 
 		public const float WOLF_RATIO = 2.5f;
 
-
 		private Action<Arg, Arg, Arg, Arg> _onChangeRole;
 
 		public override void Constructor()
@@ -27,6 +27,8 @@ namespace CTS.Instance.SyncObjects
 		public override void OnCreated()
 		{
 			base.OnCreated();
+
+			// Calculate wolf count
 			int playerCount = GameplayController.PlayerSet.Count;
 			int wolfCount = (playerCount > 2) ? (int)(playerCount / WOLF_RATIO) : 1;
 			if (wolfCount > playerCount)
@@ -35,53 +37,18 @@ namespace CTS.Instance.SyncObjects
 				wolfCount = playerCount;
 			}
 
-			Span<int> wolfIndices = stackalloc int[wolfCount];
-
-			int i = 0;
-			while (i < wolfCount)
+			// Select wolf and spawn players as roles
+			var players = GameplayController.GetShuffledPlayers();
+			for (int i = 0; i < wolfCount; i++)
 			{
-				wolfIndices[i] = RandomHelper.NextInt(playerCount);
-
-				bool hasSameIndex = false;
-				for (int c = 0; c < i; c++)
-				{
-					if (wolfIndices[c] == wolfIndices[i])
-					{
-						hasSameIndex = true;
-						break;
-					}
-				}
-
-				if (!hasSameIndex)
-				{
-					i++;
-				}
+				NetworkPlayer player = players[i];
+				SpawnPlayerBy<WolfCharacter>(player);
 			}
 
-			int spawnCount = 0;
-			foreach (NetworkPlayer player in GameplayController.PlayerSet)
+			for (int i = wolfCount; i < playerCount; i++)
 			{
-				bool isWolf = false;
-
-				for (int w = 0; w < wolfCount; w++)
-				{
-					if (wolfIndices[w] == spawnCount)
-					{
-						isWolf = true;
-						break;
-					}
-				}
-
-				if (isWolf)
-				{
-					SpawnPlayerBy<WolfCharacter>(player);
-				}
-				else
-				{
-					SpawnPlayerBy<RedHoodCharacter>(player);
-				}
-
-				spawnCount++;
+				NetworkPlayer player = players[i];
+				SpawnPlayerBy<RedHoodCharacter>(player);
 			}
 		}
 
