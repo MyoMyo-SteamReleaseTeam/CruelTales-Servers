@@ -1,4 +1,4 @@
-namespace CT.Common.Gameplay
+﻿namespace CT.Common.Gameplay
 {
 	public enum ExecutionCutSceneType : byte
 	{

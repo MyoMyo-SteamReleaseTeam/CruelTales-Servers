@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
@@ -16,23 +15,18 @@ namespace CTS.Instance.SyncObjects
 
 		public const float WOLF_RATIO = 2.5f;
 
-		[AllowNull] private PlayerCharacterTable _playerCharacterTable;
 
 		private Action<Arg, Arg, Arg, Arg> _onChangeRole;
 
 		public override void Constructor()
 		{
 			base.Constructor();
-
 			_onChangeRole = onChangeRole;
-			_playerCharacterTable = new(GameplayManager.Option.SystemMaxUser);
 		}
 
 		public override void OnCreated()
 		{
 			base.OnCreated();
-			_playerCharacterTable.Clear();
-
 			int playerCount = GameplayController.PlayerSet.Count;
 			int wolfCount = (playerCount > 2) ? (int)(playerCount / WOLF_RATIO) : 1;
 			if (wolfCount > playerCount)
@@ -81,34 +75,20 @@ namespace CTS.Instance.SyncObjects
 				if (isWolf)
 				{
 					SpawnPlayerBy<WolfCharacter>(player);
-					_playerCharacterTable.AddPlayerByType(player, NetworkObjectType.WolfCharacter);
 				}
 				else
 				{
 					SpawnPlayerBy<RedHoodCharacter>(player);
-					_playerCharacterTable.AddPlayerByType(player, NetworkObjectType.RedHoodCharacter);
 				}
 
 				spawnCount++;
 			}
 		}
 
-		public override void OnPlayerEnter(NetworkPlayer player)
-		{
-			SpawnPlayerBy<RedHoodCharacter>(player);
-			_playerCharacterTable.AddPlayerByType(player, NetworkObjectType.RedHoodCharacter);
-		}
-
-		public override void OnPlayerLeave(NetworkPlayer player)
-		{
-			DestroyPlayer(player);
-			_playerCharacterTable.DeletePlayer(player);
-		}
-		
 		protected override void onGameEnd()
 		{
 			base.onGameEnd();
-			_playerCharacterTable.GetPlayerSetBy(NetworkObjectType.WolfCharacter);
+			var eliminatedPlayers = GetPlayerSetBy(NetworkObjectType.WolfCharacter);
 		}
 
 		public void OnWolfCatch(WolfCharacter wolf, RedHoodCharacter target)
@@ -175,7 +155,6 @@ namespace CTS.Instance.SyncObjects
 				if (targetPlayer != null)
 				{
 					TryCreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos, out _);
-					_playerCharacterTable.AddPlayerByType(targetPlayer, NetworkObjectType.WolfCharacter);
 				}
 			}
 			/*
@@ -188,7 +167,6 @@ namespace CTS.Instance.SyncObjects
 				if (wolfPlayer != null)
 				{
 					TryCreatePlayerBy<WolfCharacter>(wolfPlayer, wolfPos, out _);
-					_playerCharacterTable.AddPlayerByType(wolfPlayer, NetworkObjectType.WolfCharacter);
 				}
 			}
 			/*
@@ -200,10 +178,7 @@ namespace CTS.Instance.SyncObjects
 			else
 			{
 				TryCreatePlayerBy<WolfCharacter>(targetPlayer, wolfPos, out _);
-				_playerCharacterTable.AddPlayerByType(targetPlayer, NetworkObjectType.WolfCharacter);
-
 				TryCreatePlayerBy<RedHoodCharacter>(wolfPlayer, targetPos, out _);
-				_playerCharacterTable.AddPlayerByType(wolfPlayer, NetworkObjectType.RedHoodCharacter);
 			}
 		}
 	}

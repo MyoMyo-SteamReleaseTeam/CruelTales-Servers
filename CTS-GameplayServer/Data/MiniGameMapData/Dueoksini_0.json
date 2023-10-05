@@ -5,36 +5,158 @@
     "Theme": 201,
     "SerializeSize": 6
   },
-  "SpawnPositions": [
-    {
-      "X": -4.1,
-      "Y": 96.42
+  "SpawnPositionTable": {
+    "Red": [
+      {
+        "X": -4.1,
+        "Y": 96.42
+      },
+      {
+        "X": -6.94,
+        "Y": 95.25
+      },
+      {
+        "X": -4.94,
+        "Y": 94.06
+      },
+      {
+        "X": 0.329999983,
+        "Y": 6.43999863
+      },
+      {
+        "X": -0.94,
+        "Y": 4.799999
+      }
+    ],
+    "Blue": [
+      {
+        "X": 5.46,
+        "Y": 96.42
+      },
+      {
+        "X": 8.0199995,
+        "Y": 95.61
+      },
+      {
+        "X": 5.75,
+        "Y": 94.21
+      },
+      {
+        "X": 3.48,
+        "Y": 6.43000031
+      },
+      {
+        "X": 4.81,
+        "Y": 4.720001
+      }
+    ]
+  },
+  "InteractorTable": {
+    "Teleporter": [
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 1.83,
+          "Y": 9.46
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 2.5878,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 1,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 0.748,
+          "Y": 93.9790039
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 0.81,
+          "Y": 92.47
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 4.384768,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 1.75,
+          "Y": 7.33
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 0.65,
+          "Y": -47.56
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 2.5878,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 2,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": -0.06,
+          "Y": -120.8
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": -0.07,
+          "Y": -122.22
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 4.384768,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 0.46,
+          "Y": -48.83
+        }
+      }
+    ]
+  },
+  "SectionDirectionTable": {
+    "1": {
+      "X": 1.87,
+      "Y": 11.3
     },
-    {
-      "X": -6.94,
-      "Y": 95.25
+    "256": {
+      "X": 0.27,
+      "Y": 91.42
     },
-    {
-      "X": -4.94,
-      "Y": 94.06
+    "2": {
+      "X": 1.65,
+      "Y": -45.33
     },
-    {
-      "X": 5.46,
-      "Y": 96.42
-    },
-    {
-      "X": 8.0199995,
-      "Y": 95.61
-    },
-    {
-      "X": 5.75,
-      "Y": 94.21
-    },
-    {
-      "X": 1.81,
-      "Y": 4.799999
+    "512": {
+      "X": -0.07,
+      "Y": -123.98
     }
-  ],
+  },
   "EnvironmentColliders": [
     {
       "PhysicsShapeType": 1,
@@ -2377,236 +2499,16 @@
       "IsStatic": true
     }
   ],
-  "InteractorTable": {
-    "Teleporter": [
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": 1.83,
-          "Y": 9.46
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 2.5878,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 1,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 0.748,
-          "Y": 93.9790039
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": 0.81,
-          "Y": 92.47
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 4.384768,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 0,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 1.75,
-          "Y": 7.33
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": 0.65,
-          "Y": -47.56
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 2.5878,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 2,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": -0.06,
-          "Y": -120.8
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": -0.07,
-          "Y": -122.22
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 4.384768,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 0,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 0.46,
-          "Y": -48.83
-        }
-      }
-    ]
-  },
   "AreaInfos": [
     {
       "Index": 30,
       "Position": {
-        "X": 1.84000015,
-        "Y": -1.73999989
+        "X": 13.4400005,
+        "Y": 95.64
       },
       "Size": {
-        "X": 21.3905087,
-        "Y": 7.78793144
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": -27.69,
-        "Y": -15.16
-      },
-      "Size": {
-        "X": 23.091404,
-        "Y": 12.0429459
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": -19.91,
-        "Y": -2.30000019
-      },
-      "Size": {
-        "X": 7.22913742,
-        "Y": 13.0971375
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 1.29999971,
-        "Y": -17.57
-      },
-      "Size": {
-        "X": 33.624157,
-        "Y": 8.490559
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 30.99,
-        "Y": -10.46
-      },
-      "Size": {
-        "X": 23.5532112,
-        "Y": 21.68493
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 1.63000011,
-        "Y": -9.78
-      },
-      "Size": {
-        "X": 2.525813,
-        "Y": 6.027532
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 17.02,
-        "Y": -0.56
-      },
-      "Size": {
-        "X": 2.22841644,
-        "Y": 0.4807514
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": -13.95,
-        "Y": -0.21
-      },
-      "Size": {
-        "X": 2.40158653,
-        "Y": 0.4187524
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 3.34000015,
-        "Y": -34.64
-      },
-      "Size": {
-        "X": 25.0897179,
-        "Y": 16.8135376
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 19.72,
-        "Y": -30.09
-      },
-      "Size": {
-        "X": 6.47773743,
-        "Y": 2.8031044
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": -13.54,
-        "Y": -27.24
-      },
-      "Size": {
-        "X": 6.47773933,
-        "Y": 5.277405
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": -5.09,
-        "Y": -47.55
-      },
-      "Size": {
-        "X": 5.1507473,
-        "Y": 6.55664825
-      }
-    },
-    {
-      "Index": 30,
-      "Position": {
-        "X": 8.09,
-        "Y": -47.37
-      },
-      "Size": {
-        "X": 4.178852,
-        "Y": 6.55664825
+        "X": 7.14357471,
+        "Y": 4.96270752
       }
     },
     {
@@ -2645,57 +2547,39 @@
   ],
   "PivotInfos": [
     {
-      "Index": 3,
-      "Position": {
-        "X": -33.41,
-        "Y": 0.86
-      }
-    },
-    {
-      "Index": 3,
-      "Position": {
-        "X": 0.7,
-        "Y": 95.9200058
-      }
-    },
-    {
-      "Index": 2,
-      "Position": {
-        "X": -0.07,
-        "Y": -119.36
-      }
-    },
-    {
-      "Index": 0,
+      "Index": 30,
       "Position": {
         "X": -16.09,
         "Y": 86.2700043
       }
     },
     {
-      "Index": 1,
+      "Index": 31,
       "Position": {
         "X": 17.8,
         "Y": 86.2700043
       }
+    },
+    {
+      "Index": 32,
+      "Position": {
+        "X": -0.07,
+        "Y": -119.36
+      }
+    },
+    {
+      "Index": 33,
+      "Position": {
+        "X": -33.41,
+        "Y": 0.86
+      }
+    },
+    {
+      "Index": 33,
+      "Position": {
+        "X": 0.7,
+        "Y": 95.9200058
+      }
     }
-  ],
-  "SectionDirectionTable": {
-    "1": {
-      "X": 1.87,
-      "Y": 11.3
-    },
-    "256": {
-      "X": 0.27,
-      "Y": 91.42
-    },
-    "2": {
-      "X": 1.65,
-      "Y": -45.33
-    },
-    "512": {
-      "X": -0.07,
-      "Y": -123.98
-    }
-  }
+  ]
 }

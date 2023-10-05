@@ -130,9 +130,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
-		public bool TryGetNetworkPlayer(UserId user,
-										[MaybeNullWhen(false)]
-										out NetworkPlayer player)
+		public bool TryGetNetworkPlayer(UserId user, [MaybeNullWhen(false)] out NetworkPlayer player)
 		{
 			return _networkPlayerByUserId.TryGetForward(user, out player);
 		}

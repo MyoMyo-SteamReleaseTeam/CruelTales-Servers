@@ -5,40 +5,165 @@
     "Theme": 101,
     "SerializeSize": 6
   },
-  "SpawnPositions": [
-    {
-      "X": -6.34,
-      "Y": 21.7400017
+  "SpawnPositionTable": {
+    "None": [
+      {
+        "X": -6.34,
+        "Y": 21.7400017
+      },
+      {
+        "X": -4.84,
+        "Y": 20.04
+      },
+      {
+        "X": -2.84,
+        "Y": 19.54
+      },
+      {
+        "X": -0.8399999,
+        "Y": 20.04
+      },
+      {
+        "X": 0.6600001,
+        "Y": 21.7400017
+      },
+      {
+        "X": -4.04,
+        "Y": 22.04
+      },
+      {
+        "X": -1.63999987,
+        "Y": 22.04
+      }
+    ]
+  },
+  "InteractorTable": {
+    "Teleporter": [
+      {
+        "InteractorType": 1,
+        "BehaviourType": 2,
+        "Position": {
+          "X": 21.53,
+          "Y": 25.62
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 2.0,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 3.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 2.08,
+          "Y": 17.2
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": -2.77,
+          "Y": 22.9
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 2.0,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 1,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": -99.87,
+          "Y": -2.43
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": -99.9500046,
+          "Y": -3.85999823
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 4.0,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": -2.88,
+          "Y": 21.52
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 17.19,
+          "Y": -3.62
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 2.0,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 2,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 99.88,
+          "Y": -2.4199996
+        }
+      },
+      {
+        "InteractorType": 1,
+        "BehaviourType": 1,
+        "Position": {
+          "X": 100.03,
+          "Y": -3.77
+        },
+        "Size": {
+          "ShapeType": 1,
+          "Value0": 4.0,
+          "Value1": 1.0
+        },
+        "ProgressTime": 3.0,
+        "Cooltime": 0.0,
+        "IntValue": 0,
+        "ByteValue": 1,
+        "VectorValue": {
+          "X": 17.11,
+          "Y": -4.78
+        }
+      }
+    ]
+  },
+  "SectionDirectionTable": {
+    "1": {
+      "X": -2.79,
+      "Y": 28.09
     },
-    {
-      "X": -4.84,
-      "Y": 20.04
+    "256": {
+      "X": -99.91,
+      "Y": -9.56
     },
-    {
-      "X": -2.84,
-      "Y": 19.54
+    "2": {
+      "X": 17.41,
+      "Y": -1.08
     },
-    {
-      "X": -0.8399999,
-      "Y": 20.04
-    },
-    {
-      "X": 0.6600001,
-      "Y": 21.7400017
-    },
-    {
-      "X": -4.04,
-      "Y": 22.04
-    },
-    {
-      "X": -1.63999987,
-      "Y": 22.04
-    },
-    {
-      "X": -2.84,
-      "Y": 20.84
+    "512": {
+      "X": 100.08,
+      "Y": -6.12
     }
-  ],
+  },
   "EnvironmentColliders": [
     {
       "PhysicsShapeType": 1,
@@ -1497,115 +1622,6 @@
       "IsStatic": true
     }
   ],
-  "InteractorTable": {
-    "Teleporter": [
-      {
-        "InteractorType": 1,
-        "BehaviourType": 2,
-        "Position": {
-          "X": 21.53,
-          "Y": 25.62
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 2.0,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 3.0,
-        "IntValue": 0,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 2.08,
-          "Y": 17.2
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": -2.77,
-          "Y": 22.9
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 2.0,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 1,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": -99.87,
-          "Y": -2.43
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": -99.9500046,
-          "Y": -3.85999823
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 4.0,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 0,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": -2.88,
-          "Y": 21.52
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": 17.19,
-          "Y": -3.62
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 2.0,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 2,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 99.88,
-          "Y": -2.4199996
-        }
-      },
-      {
-        "InteractorType": 1,
-        "BehaviourType": 1,
-        "Position": {
-          "X": 100.03,
-          "Y": -3.77
-        },
-        "Size": {
-          "ShapeType": 1,
-          "Value0": 4.0,
-          "Value1": 1.0
-        },
-        "ProgressTime": 3.0,
-        "Cooltime": 0.0,
-        "IntValue": 0,
-        "ByteValue": 1,
-        "VectorValue": {
-          "X": 17.11,
-          "Y": -4.78
-        }
-      }
-    ]
-  },
   "AreaInfos": [
     {
       "Index": 0,
@@ -1641,23 +1657,5 @@
       }
     }
   ],
-  "PivotInfos": [],
-  "SectionDirectionTable": {
-    "1": {
-      "X": -2.79,
-      "Y": 28.09
-    },
-    "256": {
-      "X": -99.91,
-      "Y": -9.56
-    },
-    "2": {
-      "X": 17.41,
-      "Y": -1.08
-    },
-    "512": {
-      "X": 100.08,
-      "Y": -6.12
-    }
-  }
+  "PivotInfos": []
 }

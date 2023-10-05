@@ -2,6 +2,12 @@
 {
 	public enum Faction : byte
 	{
+		None = 0,
+
+		Red = 1,
+		Blue = 2,
+		Green = 3,
+
 		/// <summary>시스템입니다.</summary>
 		System,
 
@@ -10,10 +16,6 @@
 
 		/// <summary>관전자입니다.</summary>
 		Speculator,
-
-		Red,
-		Blue,
-		Green,
 	}
 
 	public static class FactionExtension

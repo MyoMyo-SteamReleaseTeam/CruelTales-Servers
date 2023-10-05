@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -18,6 +19,19 @@ public static class RandomHelper
 	public static void Shuffle<T>(this ref Span<T> array)
 	{
 		int n = array.Length;
+		for (int i = n - 1; i > 0; i--)
+		{
+			int j = NextInt(0, i + 1);
+			T temp = array[i];
+			array[i] = array[j];
+			array[j] = temp;
+		}
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static void Shuffle<T>(this List<T> array)
+	{
+		int n = array.Count;
 		for (int i = n - 1; i > 0; i--)
 		{
 			int j = NextInt(0, i + 1);

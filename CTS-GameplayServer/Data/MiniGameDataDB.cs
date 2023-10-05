@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using CT.Common.Gameplay;
 using log4net;
 
@@ -12,23 +13,27 @@ namespace CTS.Instance.Data
 
 		public static bool TryLoad()
 		{
+			_miniGameDataByMode.Clear();
 			_miniGameDataByMode.Add(GameModeType.CustomLobby, new()
 			{
-				ExecutionCutScene = ExecutionCutSceneType.None,
 				GameTime = 1000000.0f,
-				FeverTime = 1.0f,
+				FeverTime = new Vector2(0, 0),
+				ExecutionCutScene = ExecutionCutSceneType.None,
+				CompetitionType = CompetitionType.None,
 			});
 			_miniGameDataByMode.Add(GameModeType.RedHood, new()
 			{
+				GameTime = 240,
+				FeverTime = new Vector2(30, 60),
 				ExecutionCutScene = ExecutionCutSceneType.RedHood,
-				GameTime = 180.0f,
-				FeverTime = 30.0f,
+				CompetitionType = CompetitionType.Individual,
 			});
 			_miniGameDataByMode.Add(GameModeType.Dueoksini, new()
 			{
+				GameTime = 240,
+				FeverTime = new Vector2(60, 90),
 				ExecutionCutScene = ExecutionCutSceneType.Dueoksini,
-				GameTime = 180.0f,
-				FeverTime = 30.0f,
+				CompetitionType = CompetitionType.Team,
 			});
 
 			return true;

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.Infos;
 using CT.Common.Tools.Collections;
@@ -20,32 +22,34 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public GameSceneMapData MapData { get; private set; }
+		[AllowNull] public GameSceneMapData MapData { get; private set; }
 
 		// Player Management
-		protected BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer;
-		protected int _spawnIndex;
+		protected BidirectionalMap<NetworkPlayer, PlayerCharacter> _playerCharacterByPlayer = new(GlobalNetwork.SYSTEM_MAX_USER);
+		private PlayerCharacterTable _playerCharacterTable = new(GlobalNetwork.SYSTEM_MAX_USER);
+		protected Dictionary<Faction, int> _spawnIndexTable = new()
+		{
+			{ Faction.None, 0 }, { Faction.Red, 0 },
+			{ Faction.Blue, 0 }, { Faction.Green, 0 },
+		};
 
-		[AllowNull] private Dictionary<int, AreaInfo> _areaInfoBySection;
+		// Maps
+		protected Dictionary<int, AreaInfo> _areaInfoBySection = new(64);
 
 		public override void Constructor()
 		{
-			_areaInfoBySection = new Dictionary<int, AreaInfo>(30);
-			_playerCharacterByPlayer = new(GameplayManager.Option.SystemMaxUser);
 		}
 
+		/// <summary>Scene Controller를 초기화합니다. OnCreated 보다 먼저 호출됩니다.</summary>
 		public virtual void Initialize(GameSceneIdentity identity)
 		{
 			GameSceneIdentity = identity;
-			_playerCharacterByPlayer.Clear();
-			_spawnIndex = 0;
-
 			// Setup Map Data
 			MapData = GameSceneMapDataDB.GetGameSceneMapData(identity);
 			_areaInfoBySection.Clear();
 			foreach (var areaInfo in MapData.AreaInfos)
 			{
-				if (areaInfo.Index >= GlobalNetwork.LAST_SECTION_AREA_INDEX)
+				if (areaInfo.Index >= GlobalNetwork.SYSTEM_AREA_INDEX_LIMIT)
 					continue;
 				_areaInfoBySection.Add(areaInfo.Index, areaInfo);
 			}
@@ -54,11 +58,20 @@ namespace CTS.Instance.SyncObjects
 		public override void OnCreated()
 		{
 			WorldManager.SetGameMapData(MapData);
-			_spawnIndex = 0;
+
+			// Initialize
+			_playerCharacterByPlayer.Clear();
+			_playerCharacterTable.Clear();
+
+			// Initialize spawn indices
+			_spawnIndexTable[Faction.None] = 0;
+			_spawnIndexTable[Faction.Red] = 0;
+			_spawnIndexTable[Faction.Blue] = 0;
+			_spawnIndexTable[Faction.Green] = 0;
 
 			// Create teleporters
 			if (MapData.InteractorTable.TryGetValue(InteractorType.Teleporter,
-													 out var teleporterInfoList))
+													out var teleporterInfoList))
 			{
 				foreach (var info in teleporterInfoList)
 				{
@@ -87,17 +100,36 @@ namespace CTS.Instance.SyncObjects
 			return _playerCharacterByPlayer.TryGetValue(player, out playerCharacter);
 		}
 
-		public T SpawnPlayerBy<T>(NetworkPlayer player) where T : PlayerCharacter, new()
+		public void SpawnPlayersByTeam<T>(Action<T, Faction>? onCreated, params Faction[] factions)
+			where T : PlayerCharacter, new()
 		{
-			int spawnPosCount = MapData.SpawnPositions.Count;
-			_spawnIndex = (_spawnIndex + 1) % spawnPosCount;
-			return SpawnPlayerBy<T>(player, _spawnIndex);
+			var shuffledPlayers = GameplayController.GetShuffledPlayers();
+			int factionCount = factions.Length;
+			int divide = shuffledPlayers.Count / factionCount;
+			if (divide == 0)
+			{
+				divide = 1;
+			}
+			int spawnIndex = 0;
+			foreach (var player in shuffledPlayers)
+			{
+				int factionIndex = spawnIndex / divide;
+				if (factionIndex > factionCount)
+				{
+					factionIndex = factionCount;
+				}
+				Faction curFaction = factions[factionIndex];
+				player.Faction = curFaction;
+				var character = SpawnPlayerBy<T>(player, curFaction);
+				onCreated?.Invoke(character, curFaction);
+				spawnIndex++;
+			}
 		}
 
-		public T SpawnPlayerBy<T>(NetworkPlayer player, int spwanIndex) where T : PlayerCharacter, new()
+		public T SpawnPlayerBy<T>(NetworkPlayer player, Faction faction = Faction.None)
+			where T : PlayerCharacter, new()
 		{
-			var spawnPositions = MapData.SpawnPositions;
-			Vector2 spawnPos = spawnPositions[spwanIndex];
+			Vector2 spawnPos = getNextSpawnPositionBy(faction);
 			TryCreatePlayerBy<T>(player, spawnPos, out var character);
 
 			if (GameplayController.CameraControllerByPlayer.TryGetValue(player, out var cameraController))
@@ -111,6 +143,15 @@ namespace CTS.Instance.SyncObjects
 
 			Debug.Assert(character != null);
 			return character;
+
+			Vector2 getNextSpawnPositionBy(Faction faction)
+			{
+				var curSpawnList = MapData.SpawnPositionTable[faction];
+				int spawnPosCount = curSpawnList.Count;
+				int curSpawnIndex = _spawnIndexTable[faction];
+				_spawnIndexTable[faction] = (curSpawnIndex + 1) % spawnPosCount;
+				return curSpawnList[curSpawnIndex];
+			}
 		}
 
 		public FieldItem SpawnFieldItemBy(FieldItemType itemType, Vector2 position)
@@ -129,7 +170,8 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (_playerCharacterByPlayer.TryGetValue(player, out var existCharacter))
 			{
-				_log.Error($"{player} already has player character. {existCharacter.GetType().Name}");
+				string typeName = existCharacter == null ? "Unknown" : existCharacter.GetType().Name;
+				_log.Error($"{player} already has player character. {typeName}");
 				playerCharacter = null;
 				return false;
 			}
@@ -141,6 +183,7 @@ namespace CTS.Instance.SyncObjects
 			// Binding
 			player.BindCharacter(playerCharacter);
 			_playerCharacterByPlayer.Add(player, playerCharacter);
+			_playerCharacterTable.AddPlayerByType(player, playerCharacter.Type);
 
 			// Set Section
 			foreach (var value in _areaInfoBySection.Values)
@@ -175,10 +218,9 @@ namespace CTS.Instance.SyncObjects
 		{
 			if (!_playerCharacterByPlayer.TryGetValue(player, out var playerCharacter))
 			{
-				_log.Error($"There is no matched player character. NetworkPlayer : {player}");
+				// There is no matched player character by NetworkPlayer
 				return;
 			}
-
 			_playerCharacterByPlayer.TryRemove(player);
 
 			// Destroy object
@@ -186,6 +228,7 @@ namespace CTS.Instance.SyncObjects
 			
 			// Releasing
 			player.ReleaseCharacter(playerCharacter);
+			_playerCharacterTable.DeletePlayer(player);
 
 			// Release camera
 			if (!GameplayController.CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
@@ -196,6 +239,11 @@ namespace CTS.Instance.SyncObjects
 			{
 				playerCamera.ReleasePlayerCharacter(playerCharacter);
 			}
+		}
+
+		public HashSet<NetworkPlayer> GetPlayerSetBy(NetworkObjectType type)
+		{
+			return _playerCharacterTable.GetPlayerSetBy(type);
 		}
 
 		public void Release()

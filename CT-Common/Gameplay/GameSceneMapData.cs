@@ -10,12 +10,12 @@ namespace CT.Common.Gameplay
 	public class GameSceneMapData
 	{
 		public GameSceneIdentity GameSceneIdentity;
-		public List<Vector2> SpawnPositions = new();
-		public List<ColliderInfo> EnvironmentColliders = new();
+		public Dictionary<Faction, List<Vector2>> SpawnPositionTable = new();
 		public Dictionary<InteractorType, List<InteractorInfo>> InteractorTable = new();
+		public Dictionary<ushort, Vector2> SectionDirectionTable = new();
+		public List<ColliderInfo> EnvironmentColliders = new();
 		public List<AreaInfo> AreaInfos = new();
 		public List<PivotInfo> PivotInfos = new();
-		public Dictionary<ushort, Vector2> SectionDirectionTable = new();
 
 		[JsonIgnore]
 		public List<KaRigidBody> StaticRigidBodies { get; private set; } = new();

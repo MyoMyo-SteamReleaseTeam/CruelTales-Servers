@@ -34,7 +34,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				Vector2 position = pivot.Position;
 
-				if (pivot.Index == 0)
+				if (pivot.Index == GlobalNetwork.SYSTEM_PIVOT_INDEX_LIMIT + 0)
 				{
 					_redTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
 					_redTeamTable.Initialize(InteractorConst.TableInteractorInfo);
@@ -42,18 +42,18 @@ namespace CTS.Instance.SyncObjects
 					_redTeamTable.BindController(this);
 
 				}
-				else if (pivot.Index == 1)
+				else if (pivot.Index == GlobalNetwork.SYSTEM_PIVOT_INDEX_LIMIT + 1)
 				{
 					_blueTeamTable = WorldManager.CreateObject<DueoksiniTable>(position);
 					_blueTeamTable.Initialize(InteractorConst.TableInteractorInfo);
 					_blueTeamTable.InitializeAs(Faction.Blue);
 					_blueTeamTable.BindController(this);
 				}
-				else if (pivot.Index == 2)
+				else if (pivot.Index == GlobalNetwork.SYSTEM_PIVOT_INDEX_LIMIT + 2)
 				{
 					SpawnFieldItemBy(FieldItemType.Dueoksini_Sinseonro, position);
 				}
-				else if (pivot.Index == 3)
+				else if (pivot.Index == GlobalNetwork.SYSTEM_PIVOT_INDEX_LIMIT + 3)
 				{
 					SpawnFieldItemBy(FieldItemType.Dueoksini_Gujeolpan, position);
 				}
@@ -65,7 +65,7 @@ namespace CTS.Instance.SyncObjects
 			float totalArea = 0;
 			foreach (var areaInfo in MapData.AreaInfos)
 			{
-				if (areaInfo.Index != GlobalNetwork.LAST_SECTION_AREA_INDEX + 1)
+				if (areaInfo.Index != GlobalNetwork.SYSTEM_AREA_INDEX_LIMIT + 0)
 					continue;
 				totalArea += areaInfo.Area;
 				areaCount++;
@@ -78,7 +78,7 @@ namespace CTS.Instance.SyncObjects
 			totalItemCount--;
 			foreach (var areaInfo in MapData.AreaInfos)
 			{
-				if (areaInfo.Index != GlobalNetwork.LAST_SECTION_AREA_INDEX + 1)
+				if (areaInfo.Index != GlobalNetwork.SYSTEM_AREA_INDEX_LIMIT + 0)
 					continue;
 				float area = areaInfo.Area;
 				int itemCreate = (int)(totalCountInArea * (areaInfo.Area / totalArea));
@@ -110,38 +110,8 @@ namespace CTS.Instance.SyncObjects
 				}
 			}
 
-			// Spawn players
-		 	int playerCount = GameplayController.PlayerSet.Count;
-			Span<UserId> users = stackalloc UserId[playerCount];
-			int u = 0;
-			foreach (NetworkPlayer player in GameplayController.PlayerSet)
-			{
-				users[u++] = player.UserId;
-			}
-			users.Sort();
-
-			int halfPlayerCount = playerCount / 2;
-			int redPlayer = 0;
-			int bluePlayer = 0;
-			foreach (NetworkPlayer player in GameplayController.PlayerSet)
-			{
-				int spwanIndex = 0;
-				if (halfPlayerCount > 0)
-				{
-					player.Faction = Faction.Red;
-					spwanIndex = redPlayer;
-					redPlayer++;
-				}
-				else
-				{
-					player.Faction = Faction.Blue;
-					spwanIndex = bluePlayer + 3;
-					bluePlayer++;
-				}
-
-				var character = SpawnPlayerBy<NormalCharacter>(player, spwanIndex);
-				halfPlayerCount--;
-			}
+			// Create players
+			SpawnPlayersByTeam<NormalCharacter>(null, Faction.Red, Faction.Blue);
 		}
 	}
 }

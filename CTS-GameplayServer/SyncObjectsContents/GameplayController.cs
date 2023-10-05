@@ -17,12 +17,14 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.Global;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		// Reference
+		// References
 		public SceneControllerBase? SceneController { get; private set; }
-		public HashSet<NetworkPlayer> PlayerSet { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
 
-		public Dictionary<NetworkPlayer, CameraController> CameraControllerByPlayer { get; private set; } = new(GlobalNetwork.SYSTEM_MAX_USER);
+		// Gameplay Collections
+		public readonly HashSet<NetworkPlayer> PlayerSet = new(GlobalNetwork.SYSTEM_MAX_USER);
+		public readonly Dictionary<NetworkPlayer, CameraController> CameraControllerByPlayer = new(GlobalNetwork.SYSTEM_MAX_USER);
 
+		// Scene managements
 		private GameSceneIdentity _currentSceneId;
 		private Action _onStartNextScene;
 
@@ -170,6 +172,18 @@ namespace CTS.Instance.SyncObjects
 			SceneController = WorldManager.CreateSceneControllerBy(_currentSceneId);
 			SceneController.Initialize(_currentSceneId);
 			_isCurrentlyLoading = false;
+		}
+
+		private readonly List<NetworkPlayer> _returnNetworkPlayerList = new(GlobalNetwork.SYSTEM_MAX_USER);
+		public List<NetworkPlayer> GetShuffledPlayers()
+		{
+			_returnNetworkPlayerList.Clear();
+			foreach (NetworkPlayer player in PlayerSet)
+			{
+				_returnNetworkPlayerList.Add(player);
+			}
+			_returnNetworkPlayerList.Shuffle();
+			return _returnNetworkPlayerList;
 		}
 	}
 }

@@ -17,7 +17,10 @@
 
 		public const float DEFAULT_PHYSICS_STEP_TIME = 0.03f;
 
-		/// <summary>Section을 나타내는 Area Info의 마지막 Index 입니다.</summary>
-		public const int LAST_SECTION_AREA_INDEX = 29;
+		/// <summary>System Area Info의 Index 한계입니다.</summary>
+		public const int SYSTEM_AREA_INDEX_LIMIT = 30;
+
+		/// <summary>System Pivot Info의 Index 한계입니다.</summary>
+		public const int SYSTEM_PIVOT_INDEX_LIMIT = 30;
 	}
 }
