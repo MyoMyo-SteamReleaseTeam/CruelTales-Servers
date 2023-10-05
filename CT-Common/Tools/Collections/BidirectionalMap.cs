@@ -103,14 +103,14 @@ namespace CT.Common.Tools.Collections
 
 		/// <summary>첫 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
-		public bool TryGetForward(in T1 key, out T2? value)
+		public bool TryGetForward(in T1 key, [MaybeNullWhen(false)] out T2 value)
 		{
 			return _forwardMap.TryGetValue(key, out value);
 		}
 
 		/// <summary>두 번째 맵의 키를 기준으로 값을 찾습니다.</summary>
 		/// <returns>성공 여부입니다.</returns>
-		public bool TryGetReverse(in T2 key, out T1? value)
+		public bool TryGetReverse(in T2 key, [MaybeNullWhen(false)] out T1 value)
 		{
 			return _reverseMap.TryGetValue(key, out value);
 		}
