@@ -10,6 +10,7 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 	{
 		None,
 		SyncList,
+		SyncHashSet,
 		SyncDictionary,
 		SyncObjectList,
 		SyncObjectDictionary,
@@ -135,6 +136,7 @@ using CTS.Instance.SyncObjects;";
 		private static Dictionary<PredefinedType, string> _genericTypeNames = new()
 		{
 			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
+			{ PredefinedType.SyncHashSet, PredefinedType.SyncHashSet.ToString() },
 			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
 			{ PredefinedType.SyncObjectList, PredefinedType.SyncObjectList.ToString() },
 			{ PredefinedType.SyncObjectDictionary, PredefinedType.SyncObjectDictionary.ToString() },
@@ -149,6 +151,7 @@ using CTS.Instance.SyncObjects;";
 		private static Dictionary<PredefinedType, string> _valueCollectionNames = new()
 		{
 			{ PredefinedType.SyncList, PredefinedType.SyncList.ToString() },
+			{ PredefinedType.SyncHashSet, PredefinedType.SyncHashSet.ToString() },
 			{ PredefinedType.SyncDictionary, PredefinedType.SyncDictionary.ToString() },
 		};
 

@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Data;
@@ -82,6 +81,9 @@ namespace CT.CorePatcher.SynchronizationsCodeGen
 			switch (definedType)
 			{
 				case PredefinedType.SyncList:
+					return false;
+
+				case PredefinedType.SyncHashSet:
 					return false;
 
 				case PredefinedType.SyncDictionary:
