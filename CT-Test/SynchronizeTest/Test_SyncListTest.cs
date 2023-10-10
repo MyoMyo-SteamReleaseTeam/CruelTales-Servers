@@ -46,6 +46,7 @@ namespace CTC.Networks.SyncObjects.TestSyncObjects
 			src.Remove(123);
 			Assert.IsTrue(dsrc.IsDirtyReliable);
 			dsrc.ClearDirtyReliable();
+			Assert.IsFalse(src.Remove(123));
 			src.RemoveAt(0);
 			Assert.IsTrue(dsrc.IsDirtyReliable);
 
