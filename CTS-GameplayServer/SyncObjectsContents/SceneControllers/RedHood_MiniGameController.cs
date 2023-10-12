@@ -28,7 +28,8 @@ namespace CTS.Instance.SyncObjects
 			base.OnCreated();
 
 			// Calculate wolf count
-			int playerCount = GameplayController.PlayerSet.Count;
+			var players = GameplayController.GetShuffledAlivePlayers();
+			int playerCount = players.Count;
 			int wolfCount = (playerCount > 2) ? (int)(playerCount / WOLF_RATIO) : 1;
 			if (wolfCount > playerCount)
 			{
@@ -37,7 +38,6 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			// Select wolf and spawn players as roles
-			var players = GameplayController.GetShuffledPlayers();
 			for (int i = 0; i < wolfCount; i++)
 			{
 				NetworkPlayer player = players[i];
@@ -55,6 +55,10 @@ namespace CTS.Instance.SyncObjects
 		{
 			base.onGameEnd();
 			var eliminatedPlayers = GetPlayerSetBy(NetworkObjectType.WolfCharacter);
+			foreach (var ep in eliminatedPlayers)
+			{
+				EliminatedPlayers.Add(ep.UserId);
+			}
 		}
 
 		public void OnWolfCatch(WolfCharacter wolf, RedHoodCharacter target)
@@ -76,6 +80,12 @@ namespace CTS.Instance.SyncObjects
 
 			DestroyPlayer(wolf);
 			DestroyPlayer(target);
+		}
+
+		public override void OnPlayerLeave(NetworkPlayer player)
+		{
+			base.OnPlayerLeave(player);
+
 		}
 
 		private void onChangeRole(Arg centerPosArg, Arg wasWolfRightArg,

@@ -25,6 +25,18 @@ namespace CTS.Instance.SyncObjects
 			GameplayController.GameSystemState = GameSystemState.Lobby;
 		}
 
+		public override void OnCreated()
+		{
+			base.OnCreated();
+			GameplayController.RoomSessionManager.TrimDisconnectedUsers();
+		}
+
+		public override void OnDestroyed()
+		{
+			base.OnDestroyed();
+			GameplayController.RoomSessionManager.TrimDisconnectedUsers();
+		}
+
 		public override void Constructor()
 		{
 			base.Constructor();

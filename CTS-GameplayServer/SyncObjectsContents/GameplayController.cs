@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Networks;
+using CTS.Instance.ClientShared;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
@@ -27,6 +28,10 @@ namespace CTS.Instance.SyncObjects
 		// Scene managements
 		private GameSceneIdentity _currentSceneId;
 		private Action _onStartNextScene;
+		private bool _isCurrentlyLoading = false;
+
+		// Returns
+		private readonly List<NetworkPlayer> _returnNetworkPlayerList = new(GlobalNetwork.SYSTEM_MAX_USER);
 
 		public override void Constructor()
 		{
@@ -51,9 +56,8 @@ namespace CTS.Instance.SyncObjects
 			// Initialize managers
 			RoomSessionManager.OnCreated(this);
 
-			GameSceneIdentity lobbyGameId = GameSceneMapDataDB.Square;
-			SceneController = WorldManager.CreateSceneControllerBy(lobbyGameId);
-			SceneController.Initialize(lobbyGameId);
+			// Load lobby
+			GotoLobby();
 		}
 
 		public override void OnDestroyed()
@@ -63,6 +67,11 @@ namespace CTS.Instance.SyncObjects
 				SceneController.Destroy();
 				SceneController = null;
 			}
+		}
+
+		public void GotoLobby()
+		{
+			TryChangeSceneTo(GameSceneMapDataDB.Square);
 		}
 
 		public bool CheckIfCanJoin(out DisconnectReasonType reason)
@@ -100,7 +109,7 @@ namespace CTS.Instance.SyncObjects
 
 			// Enter events
 			SceneController?.OnPlayerEnter(player);
-			RoomSessionManager.OnPlayerEnter(player);
+			RoomSessionManager.AddPlayerState(player);
 		}
 
 		public void OnPlayerLeave(NetworkPlayer player)
@@ -124,7 +133,8 @@ namespace CTS.Instance.SyncObjects
 
 			// Leave events
 			SceneController?.OnPlayerLeave(player);
-			RoomSessionManager.OnPlayerLeave(player);
+			bool shouldRemoveState = SceneController is not MiniGameControllerBase;
+			RoomSessionManager.ReleasePlayerState(player, shouldRemoveState);
 
 			// Destroy player's camera
 			if (!CameraControllerByPlayer.TryGetValue(player, out var playerCamera))
@@ -145,12 +155,11 @@ namespace CTS.Instance.SyncObjects
 			_log.Debug($"Client {player} ready to controll");
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(player.UserId, out var state))
 			{
-				state.SelectedSkin = token.ClientSkinSet;
-				state.CurrentSkin = state.SelectedSkin;
+				state.SelectedCostume.SetBy(token.ClientSkinSet);
+				state.CurrentCostume.SetBy(state.SelectedCostume);
 			}
 		}
 
-		private bool _isCurrentlyLoading = false;
 		public bool TryChangeSceneTo(GameSceneIdentity gameId)
 		{
 			if (_isCurrentlyLoading)
@@ -174,16 +183,23 @@ namespace CTS.Instance.SyncObjects
 			_isCurrentlyLoading = false;
 		}
 
-		private readonly List<NetworkPlayer> _returnNetworkPlayerList = new(GlobalNetwork.SYSTEM_MAX_USER);
-		public List<NetworkPlayer> GetShuffledPlayers()
+		public List<NetworkPlayer> GetAlivePlayers()
 		{
 			_returnNetworkPlayerList.Clear();
 			foreach (NetworkPlayer player in PlayerSet)
 			{
+				if (player.IsEliminated)
+					continue;
 				_returnNetworkPlayerList.Add(player);
 			}
-			_returnNetworkPlayerList.Shuffle();
 			return _returnNetworkPlayerList;
+		}
+
+		public List<NetworkPlayer> GetShuffledAlivePlayers()
+		{
+			var result = GetAlivePlayers();
+			result.Shuffle();
+			return result;
 		}
 	}
 }

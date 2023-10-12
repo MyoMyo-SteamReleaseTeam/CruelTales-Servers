@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType;
 using CTS.Instance.Gameplay;
 
@@ -23,17 +24,37 @@ namespace CTS.Instance.SyncObjects
 			SetPassword(-1);
 		}
 
-		public void OnPlayerEnter(NetworkPlayer player)
+		public void TrimDisconnectedUsers()
+		{
+			// Remove disconnected user's state
+			int disconnectedUserCount = 0;
+			Span<UserId> disconnectedUsers = stackalloc UserId[PlayerStateTable.Count];
+			foreach (var player in PlayerStateTable.Values)
+			{
+				if (!ConnectedPlayers.Contains(player.UserId))
+				{
+					disconnectedUsers[disconnectedUserCount++] = player.UserId;
+				}
+			}
+			for (int i = 0; i < disconnectedUserCount; i++)
+			{
+				PlayerStateTable.Remove(disconnectedUsers[i]);
+			}
+		}
+
+		public void AddPlayerState(NetworkPlayer player)
 		{
 			PlayerState state = PlayerStateTable.Add(player.UserId);
 			state.ClearDirtyReliable();
 			player.BindPlayerState(state);
 		}
 
-		public void OnPlayerLeave(NetworkPlayer player)
+		public void ReleasePlayerState(NetworkPlayer player, bool shouldRemoveState)
 		{
-			player.ReleasePlayerState();
-			PlayerStateTable.Remove(player.UserId);
+			if (shouldRemoveState)
+			{
+				PlayerStateTable.Remove(player.UserId);
+			}
 		}
 
 		public void SetPassword(int password)

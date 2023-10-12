@@ -6,8 +6,8 @@ using CT.Common.DataType.Input;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CTS.Instance.ClientShared;
 using CTS.Instance.Coroutines;
-using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 using KaNet.Physics;
@@ -80,7 +80,7 @@ namespace CTS.Instance.SyncObjects
 
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 			{
-				state.CurrentSkin = state.SelectedSkin;
+				state.CurrentCostume.SetBy(state.SelectedCostume);
 			}
 		}
 
@@ -283,21 +283,16 @@ namespace CTS.Instance.SyncObjects
 			if (!RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 				return;
 			
-			SkinSet oldSkinSet = state.CurrentSkin;
-			
 			switch (fromClient)
 			{
 				case 0:
-					oldSkinSet.Cheek = 2_000_001;
-					state.CurrentSkin = oldSkinSet;
+					state.CurrentCostume.Cheek = 2_000_001;
 					break;
 				
 				case 1:
-					oldSkinSet.Cheek = 2_000_002;
+					state.CurrentCostume.Cheek = 2_000_002;
 					break;
 			}
-			
-			state.CurrentSkin = oldSkinSet;
 			
 			//switch (fromClient)
 			//{

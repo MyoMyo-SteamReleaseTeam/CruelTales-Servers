@@ -19,10 +19,7 @@ namespace CT.Definitions.SyncObjects
 		public Faction Faction;
 
 		[SyncVar]
-		public SkinSet SelectedSkin;
-
-		[SyncVar]
-		public SkinSet CurrentSkin;
+		public bool IsEliminated;
 
 		[SyncVar]
 		public bool IsHost;
@@ -34,7 +31,10 @@ namespace CT.Definitions.SyncObjects
 		public bool IsMapLoaded;
 
 		[SyncObject]
-		public PlayerCostume Costume = new();
+		public CostumeSet SelectedCostume = new();
+
+		[SyncObject]
+		public CostumeSet CurrentCostume = new();
 	}
 }
 #pragma warning restore IDE0051

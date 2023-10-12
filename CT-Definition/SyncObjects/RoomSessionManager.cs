@@ -1,6 +1,7 @@
 ﻿#pragma warning disable IDE0051 // 사용되지 않는 private 멤버 제거
 
 using CT.Common.DataType;
+using CT.Common.DataType.Synchronizations;
 using CT.Common.Synchronizations;
 
 namespace CT.Definitions.SyncObjects
@@ -23,7 +24,10 @@ namespace CT.Definitions.SyncObjects
 		[SyncVar]
 		public int MinPlayerCount;
 
-		[SyncObject(cc: Constant.MAX_CAPACITY_BY_PLAYER)]
+		[SyncObject(cc: Constant.CAPACITY_BY_PLAYER_MULTIPLE)]
+		public SyncHashSet<UserId> ConnectedPlayers = new();
+
+		[SyncObject(cc: Constant.MAX_CAPACITY_BY_PLAYER_MULTIPLE)]
 		public SyncObjectDictionary<UserId, PlayerState> PlayerStateTable = new();
 
 		[SyncRpc(SyncType.ReliableTarget)]

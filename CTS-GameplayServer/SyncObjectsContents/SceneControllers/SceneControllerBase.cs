@@ -103,7 +103,7 @@ namespace CTS.Instance.SyncObjects
 		public void SpawnPlayersByTeam<T>(Action<T, Faction>? onCreated, params Faction[] factions)
 			where T : PlayerCharacter, new()
 		{
-			var shuffledPlayers = GameplayController.GetShuffledPlayers();
+			var shuffledPlayers = GameplayController.GetShuffledAlivePlayers();
 			int factionCount = factions.Length;
 			int divide = shuffledPlayers.Count / factionCount;
 			if (divide == 0)

@@ -1,4 +1,5 @@
-﻿using CTS.Instance.Data;
+﻿using CTS.Instance.ClientShared;
+using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -11,9 +12,9 @@ namespace CTS.Instance.SyncObjects
 			base.OnCreated();
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 			{
-				var curSkin = state.SelectedSkin;
+				var curSkin = state.SelectedCostume.GetSkinSet();
 				curSkin.OverrideSet(SkinSetDataDB.REDHOOD_SKIN_SET);
-				state.CurrentSkin = curSkin;
+				state.CurrentCostume.SetBy(curSkin);
 			}
 		}
 

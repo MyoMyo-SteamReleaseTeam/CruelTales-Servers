@@ -50,9 +50,7 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private Faction _faction = new();
 		[SyncVar]
-		private SkinSet _selectedSkin = new();
-		[SyncVar]
-		private SkinSet _currentSkin = new();
+		private bool _isEliminated;
 		[SyncVar]
 		private bool _isHost;
 		[SyncVar]
@@ -60,17 +58,21 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		private bool _isMapLoaded;
 		[SyncObject]
-		private readonly PlayerCostume _costume;
+		private readonly CostumeSet _selectedCostume;
+		[SyncObject]
+		private readonly CostumeSet _currentCostume;
 		[AllowNull] public IDirtyable _owner;
 		public void BindOwner(IDirtyable owner) => _owner = owner;
 		public PlayerState()
 		{
-			_costume = new(this);
+			_selectedCostume = new(this);
+			_currentCostume = new(this);
 		}
 		public PlayerState(IDirtyable owner)
 		{
 			_owner = owner;
-			_costume = new(this);
+			_selectedCostume = new(this);
+			_currentCostume = new(this);
 		}
 		private BitmaskByte _dirtyReliable_0 = new();
 		private BitmaskByte _dirtyReliable_1 = new();
@@ -121,25 +123,14 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
-		public SkinSet SelectedSkin
+		public bool IsEliminated
 		{
-			get => _selectedSkin;
+			get => _isEliminated;
 			set
 			{
-				if (_selectedSkin == value) return;
-				_selectedSkin = value;
+				if (_isEliminated == value) return;
+				_isEliminated = value;
 				_dirtyReliable_0[3] = true;
-				MarkDirtyReliable();
-			}
-		}
-		public SkinSet CurrentSkin
-		{
-			get => _currentSkin;
-			set
-			{
-				if (_currentSkin == value) return;
-				_currentSkin = value;
-				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -150,7 +141,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isHost == value) return;
 				_isHost = value;
-				_dirtyReliable_0[5] = true;
+				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -161,7 +152,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isReady == value) return;
 				_isReady = value;
-				_dirtyReliable_0[6] = true;
+				_dirtyReliable_0[5] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -172,21 +163,24 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_isMapLoaded == value) return;
 				_isMapLoaded = value;
-				_dirtyReliable_0[7] = true;
+				_dirtyReliable_0[6] = true;
 				MarkDirtyReliable();
 			}
 		}
-		public PlayerCostume Costume => _costume;
+		public CostumeSet SelectedCostume => _selectedCostume;
+		public CostumeSet CurrentCostume => _currentCostume;
 		public void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
+			_selectedCostume.ClearDirtyReliable();
 			_dirtyReliable_1.Clear();
-			_costume.ClearDirtyReliable();
+			_currentCostume.ClearDirtyReliable();
 		}
 		public void ClearDirtyUnreliable() { }
 		public void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
+			_dirtyReliable_0[7] = _selectedCostume.IsDirtyReliable;
 			_dirtyReliable_0.Serialize(writer);
 			if (_dirtyReliable_0.AnyTrue())
 			{
@@ -204,32 +198,32 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_0[3])
 				{
-					_selectedSkin.Serialize(writer);
+					writer.Put(_isEliminated);
 				}
 				if (_dirtyReliable_0[4])
 				{
-					_currentSkin.Serialize(writer);
+					writer.Put(_isHost);
 				}
 				if (_dirtyReliable_0[5])
 				{
-					writer.Put(_isHost);
+					writer.Put(_isReady);
 				}
 				if (_dirtyReliable_0[6])
 				{
-					writer.Put(_isReady);
+					writer.Put(_isMapLoaded);
 				}
 				if (_dirtyReliable_0[7])
 				{
-					writer.Put(_isMapLoaded);
+					_selectedCostume.SerializeSyncReliable(player, writer);
 				}
 			}
-			_dirtyReliable_1[0] = _costume.IsDirtyReliable;
+			_dirtyReliable_1[0] = _currentCostume.IsDirtyReliable;
 			_dirtyReliable_1.Serialize(writer);
 			if (_dirtyReliable_1.AnyTrue())
 			{
 				if (_dirtyReliable_1[0])
 				{
-					_costume.SerializeSyncReliable(player, writer);
+					_currentCostume.SerializeSyncReliable(player, writer);
 				}
 			}
 		}
@@ -239,24 +233,24 @@ namespace CTS.Instance.SyncObjects
 			_userId.Serialize(writer);
 			_username.Serialize(writer);
 			writer.Put((byte)_faction);
-			_selectedSkin.Serialize(writer);
-			_currentSkin.Serialize(writer);
+			writer.Put(_isEliminated);
 			writer.Put(_isHost);
 			writer.Put(_isReady);
 			writer.Put(_isMapLoaded);
-			_costume.SerializeEveryProperty(writer);
+			_selectedCostume.SerializeEveryProperty(writer);
+			_currentCostume.SerializeEveryProperty(writer);
 		}
 		public void InitializeMasterProperties()
 		{
 			_userId = new();
 			_username = new();
 			_faction = (Faction)0;
-			_selectedSkin = new();
-			_currentSkin = new();
+			_isEliminated = false;
 			_isHost = false;
 			_isReady = false;
 			_isMapLoaded = false;
-			_costume.InitializeMasterProperties();
+			_selectedCostume.InitializeMasterProperties();
+			_currentCostume.InitializeMasterProperties();
 		}
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader) => true;
 		public bool TryDeserializeSyncUnreliable(NetworkPlayer player, IPacketReader reader) => true;

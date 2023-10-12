@@ -20,9 +20,8 @@ namespace CTS.Instance.Gameplay
 
 		// Session Info
 		public UserSession? Session { get; private set; }
-		private UserId _userId;
-		private NetStringShort _username;
 
+		private UserId _userId;
 		public UserId UserId
 		{ 
 			get => _userId;
@@ -34,6 +33,7 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
+		private NetStringShort _username;
 		public NetStringShort Username
 		{
 			get => _username;
@@ -81,6 +81,18 @@ namespace CTS.Instance.Gameplay
 			}
 		}
 
+		private bool _isEliminated = false;
+		public bool IsEliminated
+		{
+			get => _isEliminated;
+			set
+			{
+				_isEliminated = value;
+				if (PlayerState != null)
+					PlayerState.IsEliminated = _isEliminated;
+			}
+		}
+
 		private Faction _faction = Faction.System;
 		public Faction Faction
 		{
@@ -96,10 +108,11 @@ namespace CTS.Instance.Gameplay
 		// Gameplay
 		public CameraController? CameraController { get; private set; }
 		public PlayerCharacter? PlayerCharacter { get; private set; }
-		//public NetRigidBody? TargetRigidBody { get; private set; }
 		public Vector2 ViewPosition { get; set; }
 		public Vector2 HalfViewInSize { get; private set; }
 		public Vector2 HalfViewOutSize { get; private set; }
+		public SkinSet CurrentSkin { get; private set; }
+		public SkinSet SelectedSkin { get; private set; }
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;
@@ -126,31 +139,51 @@ namespace CTS.Instance.Gameplay
 
 		public void OnCreated(UserSession userSession)
 		{
+			Initialize();
+
 			// Setup Session
 			Session = userSession;
 			UserId = Session.UserId;
 			Username = Session.Username;
 
+			_log.Debug($"Player {Username} created!");
+		}
+
+		public void Initialize()
+		{
+			// Sessopm
+			Session = null;
+			UserId = new UserId(0);
+			Username = string.Empty;
+			PlayerState = null;
+
+			// State
 			IsHost = false;
 			IsReady = false;
 			IsMapLoaded = false;
+			IsEliminated = false;
+			Faction = Faction.System;
+
+			// Gameplay
+			CameraController = null;
+			PlayerCharacter = null;
+			ViewPosition = Vector2.Zero;
+			HalfViewInSize = Vector2.Zero;
+			HalfViewOutSize = Vector2.Zero;
 
 			// Visibility
 			CanSeeViewObject = false;
 			IsShowAll = false;
-
-			_log.Debug($"Player {Username} created!");
 		}
 
 		public void OnDestroyed()
 		{
-			UserId = new UserId(0);
-			Username = string.Empty;
 			if (Session != null && Session.CurrentState != UserSessionState.NoConnection)
 			{
 				Session.Disconnect(DisconnectReasonType.Unknown);
 			}
-			Session = null;
+
+			Initialize();
 			_log.Debug($"Player {Username} destroyed!");
 		}
 
@@ -203,14 +236,7 @@ namespace CTS.Instance.Gameplay
 			state.IsHost = IsHost;
 			state.IsReady = IsReady;
 			state.IsMapLoaded = IsMapLoaded;
-
-			state.Costume.Head = RandomHelper.NextInt(20);
-			state.Costume.Body = RandomHelper.NextInt(20);
-		}
-
-		public void ReleasePlayerState()
-		{
-			PlayerState = null;
+			state.IsEliminated = IsEliminated;
 		}
 
 		public void OptimizeViewSize()

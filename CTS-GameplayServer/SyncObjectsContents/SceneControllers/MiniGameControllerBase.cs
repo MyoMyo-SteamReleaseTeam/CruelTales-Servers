@@ -87,15 +87,18 @@ namespace CTS.Instance.SyncObjects
 		public override void OnUpdate(float deltaTime)
 		{
 			base.OnUpdate(deltaTime);
-			if (CurrentTime > 0)
-			{
-				CurrentTime -= deltaTime;
-			}
-			else if (GameplayState == GameplayState.Gameplay)
-			{
-				onGameEnd();
 
-				// TODO : Lock input
+			if (GameplayState.IsGameplay())
+			{
+				if (CurrentTime > 0)
+				{
+					CurrentTime -= deltaTime;
+				}
+				else
+				{
+					CurrentTime = 0;
+					onGameEnd();
+				}
 			}
 		}
 
@@ -141,12 +144,7 @@ namespace CTS.Instance.SyncObjects
 		public override void OnPlayerLeave(NetworkPlayer player)
 		{
 			MapVoteController.OnPlayerLeave(player);
-
-			if (_playerCharacterByPlayer.TryGetValue(player, out var pc))
-			{
-				pc.Destroy();
-				_playerCharacterByPlayer.TryRemove(player);
-			}
+			DestroyPlayer(player);
 		}
 
 		#region Game Flow
