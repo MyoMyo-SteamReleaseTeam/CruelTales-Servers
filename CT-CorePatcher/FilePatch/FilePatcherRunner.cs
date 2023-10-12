@@ -2,7 +2,7 @@
 {
 	public class FilePatcherRunner
 	{
-		public static bool Run(string sourcePath, string targetPath)
+		public static bool Run(string sourcePath, string targetPath, bool ignoreGuard)
 		{
 			PatcherConsole.PrintJobInfo("File Patcher");
 
@@ -60,7 +60,7 @@
 				return false;
 			}
 
-			return filePatcher.Excute();
+			return filePatcher.Excute(ignoreGuard);
 		}
 	}
 }

@@ -136,7 +136,7 @@ namespace CT.CorePatcher.FilePatch
 			return true;
 		}
 
-		public bool Excute()
+		public bool Excute(bool ignoreGuard)
 		{
 			if (!HasGuardExtension)
 			{
@@ -144,7 +144,7 @@ namespace CT.CorePatcher.FilePatch
 				return false;
 			}
 
-			if (!existGuardFile(TargetDirectory))
+			if (!ignoreGuard && !existGuardFile(TargetDirectory))
 			{
 				PatcherConsole.PrintError("가드 확장자를 가진 파일이 없습니다.");
 				return false;

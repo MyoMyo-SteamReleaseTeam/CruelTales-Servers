@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Versioning;
 using CT.Common.Tools.GetOpt;
 using CT.CorePatcher.FilePatch;
@@ -203,8 +201,10 @@ namespace CT.CorePatcher
 				// File patch
 				List<StringArgument> sourcePathList = new();
 				List<StringArgument> targetPathList = new();
+				StringArgument ignoreIndices = new();
 
 				OptionParser op = new OptionParser();
+				OptionParser.BindArgument(op, $"ignoreIndices", 2, ignoreIndices);
 				for (int i = 0; i < patchCount; i++)
 				{
 					sourcePathList.Add(new StringArgument());
@@ -218,6 +218,22 @@ namespace CT.CorePatcher
 					return false;
 				}
 
+				// Parse ignore
+				HashSet<int> guardIgnoreSet = new();
+				if (ignoreIndices.Argument != "-")
+				{
+					foreach (string indexStr in ignoreIndices.Argument.Split(",").Select((s) => s.Trim()))
+					{
+						if (!int.TryParse(indexStr, out int index))
+						{
+							PatcherConsole.PrintError($"Cannot parse gurad ignore index! \"{indexStr}\"");
+							return false;
+						}
+
+						guardIgnoreSet.Add(index);
+					}
+				}
+
 				Console.WriteLine($"Patch count : {patchCount}");
 
 				for (int i = 0; i < patchCount; i++)
@@ -228,7 +244,9 @@ namespace CT.CorePatcher
 					Console.WriteLine($"Patch from : {source}");
 					Console.WriteLine($"Patch to   : {target}");
 
-					if (!FilePatcherRunner.Run(source, target))
+					bool ignore = guardIgnoreSet.Contains(i);
+
+					if (!FilePatcherRunner.Run(source, target, ignore))
 					{
 						PatcherConsole.PrintError($"{nameof(FilePatcherRunner)} error!");
 						PatcherConsole.PrintError($"Project source : {source}");
