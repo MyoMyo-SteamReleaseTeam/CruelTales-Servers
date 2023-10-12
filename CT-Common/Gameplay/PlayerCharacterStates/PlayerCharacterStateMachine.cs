@@ -1,6 +1,4 @@
-﻿using System;
-using System.Buffers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 using CT.Common.DataType.Input;
 using CT.Common.Gameplay.Players;
@@ -15,7 +13,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		public PlayerCharacter_Run RunState { get; private set; } = new();
 		public PlayerCharacter_Walk WalkState { get; private set; } = new();
 		public PlayerCharacter_Push PushState { get; private set; } = new();
-		public PlayerCharacter_Pushed PushedState { get; private set; } = new();
+		public PlayerCharacter_Knockback KnockbackState { get; private set; } = new();
 
 		public BasePlayerCharacterState CurrentPlayerState
 		{
@@ -33,7 +31,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			RunState.Initialize(this, Reference);
 			WalkState.Initialize(this, Reference);
 			PushState.Initialize(this, Reference);
-			PushedState.Initialize(this, Reference);
+			KnockbackState.Initialize(this, Reference);
 			
 			ChangeState(IdleState);
 		}
@@ -64,17 +62,12 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			//Reference.UpdateProxyDirectionByMoveDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Idle, Reference.Player.ProxyDirection);
-			Reference.Player.Stop();
+			Reference.Player.Physics_Stop();
 		}
 
-		public override void OnExit()
-		{
-		}
+		public override void OnExit() { }
 
-		public override void OnStateUpdate(float deltaTime)
-		{
-
-		}
+		public override void OnStateUpdate(float deltaTime) { }
 
 		public override void OnInputEvent(InputData inputData)
 		{
@@ -103,18 +96,12 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			Reference.UpdateProxyDirectionByMoveDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Run, Reference.Player.ProxyDirection);
-			Reference.Player.Move(Reference.Player.MoveDirection, isWalk: false);
+			Reference.Player.Physics_Move(Reference.Player.MoveDirection, isWalk: false);
 		}
 
-		public override void OnExit()
-		{
-		}
+		public override void OnExit() { }
 
-
-		public override void OnStateUpdate(float deltaTime)
-		{
-
-		}
+		public override void OnStateUpdate(float deltaTime) { }
 
 		public override void OnInputEvent(InputData inputData)
 		{
@@ -145,7 +132,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 							Reference.Player.ProxyDirection);
 					}
 
-					Reference.Player.Move(Reference.Player.MoveDirection, isWalk: false);
+					Reference.Player.Physics_Move(Reference.Player.MoveDirection, isWalk: false);
 				}
 			}
 			else if (inputType == InputType.Action)
@@ -162,17 +149,12 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			Reference.UpdateProxyDirectionByMoveDirection();
 			Reference.UpdateAnimation(DokzaAnimationState.Walk, Reference.Player.ProxyDirection);
-			Reference.Player.Move(Reference.Player.MoveDirection, isWalk: true);
+			Reference.Player.Physics_Move(Reference.Player.MoveDirection, isWalk: true);
 		}
 
-		public override void OnExit()
-		{
-		}
+		public override void OnExit() { }
 
-		public override void OnStateUpdate(float deltaTime)
-		{
-
-		}
+		public override void OnStateUpdate(float deltaTime) { }
 
 		public override void OnInputEvent(InputData inputData)
 		{
@@ -198,7 +180,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 							Reference.Player.ProxyDirection);
 					}
 
-					Reference.Player.Move(Reference.Player.MoveDirection, isWalk: true);
+					Reference.Player.Physics_Move(Reference.Player.MoveDirection, isWalk: true);
 				}
 				else if (moveType == MovementType.Run)
 				{
@@ -215,25 +197,26 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 	
 	public class PlayerCharacter_Push : BasePlayerCharacterState
 	{
-		private float _pushPower = 12f;
-		private float _pushFriction = 2.0f;
-		private const float _pushLimitTime = 1f;
+		//private float _pushPower = 12f;
+		//private float _pushFriction = 2.0f;
+		//private const float _pushLimitTime = 1f;
 		private float _timer = 0f;
 		private bool _isWalk = false;
 		
 		public override void OnEnter()
 		{
 			_timer = 0f;
-			Reference.Player.Stop();
-			Reference.Player.Impluse(Reference.Player.ActionDirection, _pushPower, _pushFriction);
+			var player = Reference.Player;
+			player.Physics_Stop();
+			Reference.OnPush();
 			Reference.UpdateProxyDirectionByActionDirection();
 			Reference.UpdateProxyDirectionToFront();
-			Reference.UpdateAnimation(DokzaAnimationState.Push, Reference.Player.ProxyDirection);
+			Reference.UpdateAnimation(player.Status.ActionAnimation, player.ProxyDirection);
 		}
 
 		public override void OnExit()
 		{
-			Reference.Player.ResetImpluse();
+			Reference.Player.Physics_ResetImpluse();
 		}
 
 		public override void OnStateUpdate(float deltaTime)
@@ -241,7 +224,7 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			Reference.OnDuringAction();
 
 			_timer += deltaTime;
-			if (_timer < _pushLimitTime)
+			if (_timer < Reference.Player.Status.ActionDuration)
 				return;
 
 			if (Reference.Player.MoveDirection == Vector2.Zero)
@@ -278,11 +261,11 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		}
 	}
 	
-	public class PlayerCharacter_Pushed : BasePlayerCharacterState
+	public class PlayerCharacter_Knockback : BasePlayerCharacterState
 	{
-		private const float _pushedPower = 9f;
-		private const float _pushedFriction = 2.0f;
-		private const float _animationLength = 1f;
+		//private const float _pushedPower = 9f;
+		//private const float _pushedFriction = 2.0f;
+		//private const float _animationLength = 1f;
 		private float _timer = 0f;
 		private bool _isWalk = false;
 		
@@ -290,26 +273,23 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 		{
 			_timer = 0f;
 
-			Vector2 pushedDir = Reference.Player.ActionDirection;
-			Reference.Player.Impluse(pushedDir, _pushedPower, _pushedFriction);
+			Reference.OnKnockbacked();
 			Reference.UpdateProxyDirectionByActionDirection();
 			Reference.UpdateProxyDirectionToFront();
 
-			Reference.Player.Stop();
-			Reference.UpdateAnimation(DokzaAnimationState.Pushed, Reference.Player.ProxyDirection);
-
-			Reference.Player.OnPushed(pushedDir);
+			Reference.Player.Physics_Stop();
+			Reference.UpdateAnimation(DokzaAnimationState.Knockback, Reference.Player.ProxyDirection);
 		}
 
 		public override void OnExit()
 		{
-			Reference.Player.ResetImpluse();
+			Reference.Player.Physics_ResetImpluse();
 		}
 
 		public override void OnStateUpdate(float deltaTime)
 		{
 			_timer += deltaTime;
-			if (!(_timer >= _animationLength))
+			if (_timer < Reference.Player.Status.KnockbackDuration)
 				return;
 
 			if (Reference.Player.MoveDirection == Vector2.Zero)

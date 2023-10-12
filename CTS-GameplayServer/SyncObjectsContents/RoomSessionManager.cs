@@ -47,6 +47,7 @@ namespace CTS.Instance.SyncObjects
 			PlayerState state = PlayerStateTable.Add(player.UserId);
 			state.ClearDirtyReliable();
 			player.BindPlayerState(state);
+			ConnectedPlayers.Add(player.UserId);
 		}
 
 		public void ReleasePlayerState(NetworkPlayer player, bool shouldRemoveState)
@@ -55,6 +56,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				PlayerStateTable.Remove(player.UserId);
 			}
+			ConnectedPlayers.Remove(player.UserId);
 		}
 
 		public void SetPassword(int password)

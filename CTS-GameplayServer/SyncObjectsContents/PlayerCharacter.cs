@@ -7,6 +7,7 @@ using CT.Common.Gameplay;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
 using CTS.Instance.ClientShared;
+using CTS.Instance.ClientShared.Databases;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
@@ -22,16 +23,18 @@ namespace CTS.Instance.SyncObjects
 		public override VisibilityType Visibility => VisibilityType.ViewAndOwner;
 		public override VisibilityAuthority InitialVisibilityAuthority => VisibilityAuthority.All;
 
-		public float Speed = 14;
-
 		private CoroutineRunnerVoid _skinInitRunner;
 
+		// Referebce
 		[AllowNull] public NetworkPlayer NetworkPlayer { get; private set; }
-		public const float ActionRadius = 1;
+		public MiniGameControllerBase? MiniGameController;
 
 		// States
 		[AllowNull] protected PlayerCharacterModel _playerModel;
 		[AllowNull] public PlayerCharacterStateMachine StateMachine { get; private set; }
+
+		// Gameplay
+		public CharacterStatus Status { get; private set; } = new();
 
 		#region Getter Setter
 
@@ -78,6 +81,19 @@ namespace CTS.Instance.SyncObjects
 			ActionDirection = Vector2.Zero;
 			AnimationTime = 0;
 
+			// Gameplay
+			Status.SetBy(CharacterStatusDataDB.GetCharacterStatus(Type));
+
+			MiniGameController = GameplayController.SceneController as MiniGameControllerBase;
+			if (MiniGameController != null )
+			{
+				if (MiniGameController.GameplayState == GameplayState.Gameplay_FeverTime)
+				{
+					OnFeverTime();
+				}
+			}
+
+			// Set costume
 			if (RoomSessionManager.PlayerStateTable.TryGetValue(UserId, out var state))
 			{
 				state.CurrentCostume.SetBy(state.SelectedCostume);
@@ -103,7 +119,7 @@ namespace CTS.Instance.SyncObjects
 			//Server_TestPositionTickByTick(Position);
 		}
 
-		public void Move(Vector2 moveDirection, bool isWalk)
+		public void Physics_Move(Vector2 moveDirection, bool isWalk)
 		{
 			if (KaPhysics.NearlyEqual(moveDirection.Length(), 0))
 			{
@@ -111,79 +127,25 @@ namespace CTS.Instance.SyncObjects
 				return;
 			}
 
-			float speed = isWalk ? Speed * 0.5f : Speed;
+			float moveSpeed = Status.MoveSpeed;
+			float speed = isWalk ? moveSpeed * 0.5f : moveSpeed;
 			Vector2 velocity = Vector2.Normalize(moveDirection) * speed;
 			RigidBody.ChangeVelocity(velocity);
 		}
 
-		public void Impluse(Vector2 direction, float power, float forceFriction)
+		public void Physics_Impluse(Vector2 direction, float power, float forceFriction)
 		{
 			RigidBody.Impulse(direction, power, forceFriction);
 		}
 
-		public void Stop()
+		public void Physics_Stop()
 		{
 			RigidBody.ChangeVelocity(Vector2.Zero);
 		}
 
-		public void ResetImpluse()
+		public void Physics_ResetImpluse()
 		{
 			RigidBody.ResetImpluse();
-		}
-
-		public void OnDuringAction()
-		{
-			if (PhysicsWorld.Raycast(RigidBody.Position,
-									 ActionRadius, out var hits,
-									 PhysicsLayerMask.Player))
-			{
-				foreach (var id in hits)
-				{
-					if (Identity.Id == id )
-						continue;
-
-					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
-						continue;
-
-					OnActionCollide(netObj, out bool isInterrupt);
-
-					if (isInterrupt)
-						break;
-				}
-			}
-		}
-
-		/// <summary>망치 충돌 발생시 이벤트입니다.</summary>
-		/// <param name="netObj">충돌한 객체입니다.</param>
-		/// <param name="isBreak">충돌된 객체가 여러개인 경우 순회를 종료합니다.</param>
-		public virtual void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)
-		{
-			if (netObj is not PlayerCharacter other)
-			{
-				isBreak = false;
-				return;
-			}
-
-			var curState = other.StateMachine.CurrentState;
-			Vector2 direction = Vector2.Normalize(other.Position - Position);
-
-			if (curState == other.StateMachine.PushState)
-			{
-				other.OnReactionBy(direction);
-				this.OnReactionBy(-direction);
-			}
-			else if (curState != other.StateMachine.PushedState)
-			{
-				other.OnReactionBy(direction);
-			}
-
-			isBreak = true;
-		}
-
-		public void OnReactionBy(Vector2 direction)
-		{
-			ActionDirection = direction;
-			StateMachine.ChangeState(StateMachine.PushedState);
 		}
 		
 		public virtual void LoadDefaultPlayerSkin()
@@ -191,7 +153,7 @@ namespace CTS.Instance.SyncObjects
 			BroadcastOrderTest((int)UserId.Id, 0);
 		}
 		
-		public void OnPushed(Vector2 pushedDirection)
+		public void OnKnockbacked(Vector2 pushedDirection)
 		{
 			NetworkPlayer.CameraController?.Server_Shake();
 			DropItem(-pushedDirection);
@@ -221,6 +183,71 @@ namespace CTS.Instance.SyncObjects
 			item.RigidBody.Impulse(direction * 6.0f, 2.0f);
 			FieldItem = FieldItemType.None;
 		}
+
+		#region Events
+
+		/// <summary>액션을 진행중일 때 호출됩니다.</summary>
+		public void OnDuringAction()
+		{
+			if (PhysicsWorld.Raycast(RigidBody.Position,
+									 Status.ActionRadius, out var hits,
+									 PhysicsLayerMask.Player))
+			{
+				foreach (var id in hits)
+				{
+					if (Identity.Id == id)
+						continue;
+
+					if (!WorldManager.TryGetNetworkObject(new(id), out var netObj))
+						continue;
+
+					OnActionCollide(netObj, out bool isInterrupt);
+
+					if (isInterrupt)
+						break;
+				}
+			}
+		}
+
+		/// <summary>액션 충돌 발생시 이벤트입니다.</summary>
+		/// <param name="netObj">충돌한 객체입니다.</param>
+		/// <param name="isBreak">충돌된 객체가 여러개인 경우 순회를 종료합니다.</param>
+		public virtual void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)
+		{
+			if (netObj is not PlayerCharacter other)
+			{
+				isBreak = false;
+				return;
+			}
+
+			var curState = other.StateMachine.CurrentState;
+			Vector2 direction = Vector2.Normalize(other.Position - Position);
+
+			if (curState == other.StateMachine.PushState)
+			{
+				other.OnReactionBy(direction);
+				this.OnReactionBy(-direction);
+			}
+			else if (curState != other.StateMachine.KnockbackState)
+			{
+				other.OnReactionBy(direction);
+			}
+
+			isBreak = true;
+		}
+
+		/// <summary>액션을 당했을 때 호출됩니다.</summary>
+		/// <param name="direction">밀쳐진 방향입니다.</param>
+		public void OnReactionBy(Vector2 direction)
+		{
+			ActionDirection = direction;
+			StateMachine.ChangeState(StateMachine.KnockbackState);
+		}
+
+		/// <summary>피버타임이 되었을 때 호출됩니다.</summary>
+		public virtual void OnFeverTime() { }
+
+		#endregion
 
 		#region Sync
 

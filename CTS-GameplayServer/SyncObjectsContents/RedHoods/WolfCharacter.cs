@@ -1,4 +1,5 @@
-﻿using CTS.Instance.ClientShared;
+﻿using CT.Common.Gameplay.Players;
+using CTS.Instance.ClientShared;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
@@ -8,6 +9,7 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class WolfCharacter : PlayerCharacter
 	{
+
 		public override void OnCreated()
 		{
 			base.OnCreated();
@@ -17,6 +19,14 @@ namespace CTS.Instance.SyncObjects
 				curSkin.OverrideSet(SkinSetDataDB.WOLF_SKIN_SET);
 				state.CurrentCostume.SetBy(curSkin);
 			}
+		}
+
+		public override void OnFeverTime()
+		{
+			base.OnFeverTime();
+			Status.ActionDuration *= 0.5f;
+			Status.ActionRadius *= 1.5f;
+			Status.MoveSpeed *= 1.5f;
 		}
 
 		public override void OnActionCollide(MasterNetworkObject netObj, out bool isBreak)

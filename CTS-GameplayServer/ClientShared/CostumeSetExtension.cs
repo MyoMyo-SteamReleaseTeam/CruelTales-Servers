@@ -1,10 +1,11 @@
 ﻿using CT.Common.Gameplay;
 #if CT_SERVER
 using CTS.Instance.SyncObjects;
+using log4net;
 #elif CT_CLIENT
 using CTC.Networks.SyncObjects.SyncObjects;
+using CT.Logger;
 #endif
-
 
 namespace CTS.Instance.ClientShared
 {

@@ -169,9 +169,18 @@ namespace CT.Common.Gameplay.PlayerCharacterStates
 			UpdateProxyDirectionByMoveDirection();
 		}
 		
-		public void OnPushed(Vector2 pushedDirection)
+		public void OnPush()
 		{
-			Player.OnPushed(pushedDirection);
+			var status = Player.Status;
+			Player.Physics_Impluse(Player.ActionDirection, status.ActionPower, status.ActionFriction);
+		}
+
+		public void OnKnockbacked()
+		{
+			Vector2 knockbackDir = Player.ActionDirection;
+			var status = Player.Status;
+			Player.Physics_Impluse(knockbackDir, status.KnockbackPower, status.KnockbackFriction);
+			Player.OnKnockbacked(knockbackDir);
 		}
 
 		public void Update(float deltaTime)

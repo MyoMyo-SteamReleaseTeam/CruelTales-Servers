@@ -14,7 +14,7 @@ namespace CTS.Instance.Gameplay
 		/// <param name="other">대상자</param>
 		public static void OnPushAction(PlayerCharacter actor, PlayerCharacter other)
 		{
-			if (other.StateMachine.CurrentState != other.StateMachine.PushedState)
+			if (other.StateMachine.CurrentState != other.StateMachine.KnockbackState)
 			{
 				Vector2 direction = Vector2.Normalize(other.Position - actor.Position);
 				if (other.StateMachine.CurrentState == other.StateMachine.PushState)

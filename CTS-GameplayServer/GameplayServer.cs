@@ -6,6 +6,7 @@ using System.Threading;
 using CT.Common.Tools.Data;
 #endif
 using CT.Networks.Runtimes;
+using CTS.Instance.ClientShared.Databases;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Networks;
@@ -73,6 +74,7 @@ namespace CTS.Instance
 			LayerMaskHelper.Initialize();
 			if (!GameSceneMapDataDB.TryLoad()) return;
 			if (!MiniGameDataDB.TryLoad()) return;
+			if (!CharacterStatusDataDB.TryLoad()) return;
 
 			// Start server
 			_serverTimer = new TickTimer();
