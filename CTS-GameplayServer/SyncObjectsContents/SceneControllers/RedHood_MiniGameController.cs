@@ -2,6 +2,7 @@
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
+using CT.Common.Gameplay.RedHood;
 using CTS.Instance.Coroutines;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
@@ -48,6 +49,29 @@ namespace CTS.Instance.SyncObjects
 			{
 				NetworkPlayer player = players[i];
 				SpawnPlayerBy<RedHoodCharacter>(player);
+			}
+
+			// Create mission info by players
+			foreach (var player in GameplayController.GetAlivePlayers())
+			{
+				var missionInfo = WorldManager.CreateObject<RedHoodMissionInfo>();
+				missionInfo.SetOwner(player);
+			}
+
+			// Create mission interactors
+			foreach (var info in MapData.InteractorTable[InteractorType.Mission])
+			{
+				if (info.RedHoodMission == RedHoodMission.None)
+					continue;
+
+				var interactor = WorldManager.CreateObject<RedHoodMissionInteractor>(info.Position);
+				interactor.Initialize(info);
+				interactor.Mission = info.RedHoodMission;
+
+				foreach (var player in GameplayController.PlayerSet)
+				{
+					interactor.AddVisibleUser(player.UserId);
+				}
 			}
 		}
 

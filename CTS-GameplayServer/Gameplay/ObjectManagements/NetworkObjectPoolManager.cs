@@ -22,7 +22,6 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 				{ typeof(Interactor), new NetworkObjectPool<Interactor>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(Teleporter), new NetworkObjectPool<Teleporter>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(FieldItem), new NetworkObjectPool<FieldItem>(64, worldManager, visibilityManager, gameManager, physicsWorld) },
-				{ typeof(RedHoodMissionInteractor), new NetworkObjectPool<RedHoodMissionInteractor>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(DueoksiniTable), new NetworkObjectPool<DueoksiniTable>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(GameplayController), new NetworkObjectPool<GameplayController>(1, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(CustomLobby_SceneController), new NetworkObjectPool<CustomLobby_SceneController>(2, worldManager, visibilityManager, gameManager, physicsWorld) },
@@ -33,6 +32,8 @@ namespace CTS.Instance.Gameplay.ObjectManagements
 				{ typeof(NormalCharacter), new NetworkObjectPool<NormalCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(PlayerCharacter), new NetworkObjectPool<PlayerCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(RedHoodCharacter), new NetworkObjectPool<RedHoodCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(RedHoodMissionInfo), new NetworkObjectPool<RedHoodMissionInfo>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
+				{ typeof(RedHoodMissionInteractor), new NetworkObjectPool<RedHoodMissionInteractor>(16, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(WolfCharacter), new NetworkObjectPool<WolfCharacter>(1 * GlobalNetwork.SYSTEM_MAX_USER, worldManager, visibilityManager, gameManager, physicsWorld) },
 				{ typeof(TestCube), new NetworkObjectPool<TestCube>(120, worldManager, visibilityManager, gameManager, physicsWorld) },
 				

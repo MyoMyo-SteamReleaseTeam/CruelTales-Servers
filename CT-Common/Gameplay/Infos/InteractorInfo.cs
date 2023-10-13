@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using CT.Common.Gameplay.RedHood;
 using Newtonsoft.Json;
 
 namespace CT.Common.Gameplay.Infos
@@ -23,10 +24,10 @@ namespace CT.Common.Gameplay.Infos
 		#region Mission
 
 		[JsonIgnore]
-		public byte MissionNumber
+		public RedHoodMission RedHoodMission
 		{
-			get => ByteValue;
-			set => ByteValue = value;
+			get => (RedHoodMission)ByteValue;
+			set => ByteValue = (byte)value;
 		}
 
 		#endregion

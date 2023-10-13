@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
-using CT.Common.Gameplay.MiniGames;
+using CT.Common.Gameplay.Dueoksini;
 using CT.Networks;
 using CTS.Instance.Gameplay;
 

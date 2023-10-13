@@ -20,6 +20,7 @@ namespace CTS.Instance.SyncObjects
 
 		// References
 		public SceneControllerBase? SceneController { get; private set; }
+		public new RoomSessionManager RoomSessionManager => _roomSessionManager;
 
 		// Gameplay Collections
 		public readonly HashSet<NetworkPlayer> PlayerSet = new(GlobalNetwork.SYSTEM_MAX_USER);

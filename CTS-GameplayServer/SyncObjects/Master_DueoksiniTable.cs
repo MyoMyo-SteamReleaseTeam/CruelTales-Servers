@@ -23,10 +23,11 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Dueoksini;
 using CT.Common.Gameplay.Infos;
-using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CT.Common.Gameplay.RedHood;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Collections;
 using CT.Common.Tools.ConsoleHelper;
@@ -52,6 +53,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_itemCountByType = new(this);
 		}
+		protected BitmaskByte _dirtyReliable_1 = new();
 		public Faction Team
 		{
 			get => _team;
@@ -59,7 +61,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_team == value) return;
 				_team = value;
-				_dirtyReliable_0[6] = true;
+				_dirtyReliable_0[7] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -69,50 +71,77 @@ namespace CTS.Instance.SyncObjects
 			_isDirtyReliable = false;
 			_dirtyReliable_0.Clear();
 			Server_InteractResultICallstack.Clear();
+			_dirtyReliable_1.Clear();
 			_itemCountByType.ClearDirtyReliable();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0[7] = _itemCountByType.IsDirtyReliable;
-			_dirtyReliable_0.Serialize(writer);
-			if (_dirtyReliable_0[0])
+			int originSize = writer.Size;
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
+			if (_dirtyReliable_0.AnyTrue())
 			{
-				writer.Put((byte)_behaviourType);
-			}
-			if (_dirtyReliable_0[1])
-			{
-				_size.Serialize(writer);
-			}
-			if (_dirtyReliable_0[2])
-			{
-				writer.Put(_progressTime);
-			}
-			if (_dirtyReliable_0[3])
-			{
-				writer.Put(_cooltime);
-			}
-			if (_dirtyReliable_0[4])
-			{
-				writer.Put(_interactable);
-			}
-			if (_dirtyReliable_0[5])
-			{
-				byte count = (byte)Server_InteractResultICallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				if (_dirtyReliable_0[0])
 				{
-					var arg = Server_InteractResultICallstack[i];
-					writer.Put((byte)arg);
+					writer.Put((byte)_behaviourType);
+				}
+				if (_dirtyReliable_0[1])
+				{
+					_size.Serialize(writer);
+				}
+				if (_dirtyReliable_0[2])
+				{
+					_currentSubjectId.Serialize(writer);
+				}
+				if (_dirtyReliable_0[3])
+				{
+					writer.Put(_progressTime);
+				}
+				if (_dirtyReliable_0[4])
+				{
+					writer.Put(_cooltime);
+				}
+				if (_dirtyReliable_0[5])
+				{
+					writer.Put(_interactable);
+				}
+				if (_dirtyReliable_0[6])
+				{
+					int Server_InteractResultICount = Server_InteractResultICallstack.GetCallCount(player);
+					if (Server_InteractResultICount > 0)
+					{
+						var Server_InteractResultIcallList = Server_InteractResultICallstack.GetCallList(player);
+						writer.Put((byte)Server_InteractResultICount);
+						for (int i = 0; i < Server_InteractResultICount; i++)
+						{
+							var arg = Server_InteractResultIcallList[i];
+							writer.Put((byte)arg);
+						}
+					}
+					else
+					{
+						dirtyReliable_0[6] = false;
+					}
+				}
+				if (_dirtyReliable_0[7])
+				{
+					writer.Put((byte)_team);
 				}
 			}
-			if (_dirtyReliable_0[6])
+			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			_dirtyReliable_1[0] = _itemCountByType.IsDirtyReliable;
+			_dirtyReliable_1.Serialize(writer);
+			if (_dirtyReliable_1.AnyTrue())
 			{
-				writer.Put((byte)_team);
+				if (_dirtyReliable_1[0])
+				{
+					_itemCountByType.SerializeSyncReliable(writer);
+				}
 			}
-			if (_dirtyReliable_0[7])
+			if (writer.Size == originSize + 2)
 			{
-				_itemCountByType.SerializeSyncReliable(writer);
+				writer.SetSize(originSize);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -120,6 +149,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put((byte)_behaviourType);
 			_size.Serialize(writer);
+			_currentSubjectId.Serialize(writer);
 			writer.Put(_progressTime);
 			writer.Put(_cooltime);
 			writer.Put(_interactable);
@@ -130,6 +160,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_behaviourType = (InteractionBehaviourType)0;
 			_size = new();
+			_currentSubjectId = new();
 			_progressTime = 0;
 			_cooltime = 0;
 			_interactable = false;

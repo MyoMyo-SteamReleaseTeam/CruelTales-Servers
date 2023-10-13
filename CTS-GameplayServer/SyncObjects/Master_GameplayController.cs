@@ -23,10 +23,11 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Dueoksini;
 using CT.Common.Gameplay.Infos;
-using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CT.Common.Gameplay.RedHood;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Collections;
 using CT.Common.Tools.ConsoleHelper;
@@ -91,7 +92,6 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
-		public RoomSessionManager RoomSessionManager => _roomSessionManager;
 		public EffectController EffectController => _effectController;
 		public SoundController SoundController => _soundController;
 		public override void ClearDirtyReliable()

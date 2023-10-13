@@ -23,10 +23,11 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Dueoksini;
 using CT.Common.Gameplay.Infos;
-using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CT.Common.Gameplay.RedHood;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Collections;
 using CT.Common.Tools.ConsoleHelper;
@@ -49,13 +50,15 @@ namespace CTS.Instance.SyncObjects
 		[SyncVar]
 		protected InteractorSize _size = new();
 		[SyncVar]
+		protected NetworkIdentity _currentSubjectId = new();
+		[SyncVar]
 		protected float _progressTime;
 		[SyncVar]
 		protected float _cooltime;
 		[SyncVar]
 		protected bool _interactable;
-		[SyncRpc]
-		public partial void Server_InteractResult(InteractResultType result);
+		[SyncRpc(SyncType.ReliableTarget)]
+		public partial void Server_InteractResult(NetworkPlayer player, InteractResultType result);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public virtual partial void Client_TryInteract(NetworkPlayer player);
 		[SyncRpc(dir: SyncDirection.FromRemote)]
@@ -86,6 +89,17 @@ namespace CTS.Instance.SyncObjects
 				MarkDirtyReliable();
 			}
 		}
+		public NetworkIdentity CurrentSubjectId
+		{
+			get => _currentSubjectId;
+			set
+			{
+				if (_currentSubjectId == value) return;
+				_currentSubjectId = value;
+				_dirtyReliable_0[2] = true;
+				MarkDirtyReliable();
+			}
+		}
 		public float ProgressTime
 		{
 			get => _progressTime;
@@ -93,7 +107,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_progressTime == value) return;
 				_progressTime = value;
-				_dirtyReliable_0[2] = true;
+				_dirtyReliable_0[3] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -104,7 +118,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_cooltime == value) return;
 				_cooltime = value;
-				_dirtyReliable_0[3] = true;
+				_dirtyReliable_0[4] = true;
 				MarkDirtyReliable();
 			}
 		}
@@ -115,17 +129,17 @@ namespace CTS.Instance.SyncObjects
 			{
 				if (_interactable == value) return;
 				_interactable = value;
-				_dirtyReliable_0[4] = true;
+				_dirtyReliable_0[5] = true;
 				MarkDirtyReliable();
 			}
 		}
-		public partial void Server_InteractResult(InteractResultType result)
+		public partial void Server_InteractResult(NetworkPlayer player, InteractResultType result)
 		{
-			Server_InteractResultICallstack.Add(result);
-			_dirtyReliable_0[5] = true;
+			Server_InteractResultICallstack.Add(player, result);
+			_dirtyReliable_0[6] = true;
 			MarkDirtyReliable();
 		}
-		protected List<InteractResultType> Server_InteractResultICallstack = new(4);
+		protected TargetCallstack<NetworkPlayer, InteractResultType> Server_InteractResultICallstack = new(8);
 		public override void ClearDirtyReliable()
 		{
 			_isDirtyReliable = false;
@@ -135,7 +149,8 @@ namespace CTS.Instance.SyncObjects
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				writer.Put((byte)_behaviourType);
@@ -146,25 +161,45 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_progressTime);
+				_currentSubjectId.Serialize(writer);
 			}
 			if (_dirtyReliable_0[3])
 			{
-				writer.Put(_cooltime);
+				writer.Put(_progressTime);
 			}
 			if (_dirtyReliable_0[4])
 			{
-				writer.Put(_interactable);
+				writer.Put(_cooltime);
 			}
 			if (_dirtyReliable_0[5])
 			{
-				byte count = (byte)Server_InteractResultICallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				writer.Put(_interactable);
+			}
+			if (_dirtyReliable_0[6])
+			{
+				int Server_InteractResultICount = Server_InteractResultICallstack.GetCallCount(player);
+				if (Server_InteractResultICount > 0)
 				{
-					var arg = Server_InteractResultICallstack[i];
-					writer.Put((byte)arg);
+					var Server_InteractResultIcallList = Server_InteractResultICallstack.GetCallList(player);
+					writer.Put((byte)Server_InteractResultICount);
+					for (int i = 0; i < Server_InteractResultICount; i++)
+					{
+						var arg = Server_InteractResultIcallList[i];
+						writer.Put((byte)arg);
+					}
 				}
+				else
+				{
+					dirtyReliable_0[6] = false;
+				}
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -172,6 +207,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put((byte)_behaviourType);
 			_size.Serialize(writer);
+			_currentSubjectId.Serialize(writer);
 			writer.Put(_progressTime);
 			writer.Put(_cooltime);
 			writer.Put(_interactable);
@@ -180,6 +216,7 @@ namespace CTS.Instance.SyncObjects
 		{
 			_behaviourType = (InteractionBehaviourType)0;
 			_size = new();
+			_currentSubjectId = new();
 			_progressTime = 0;
 			_cooltime = 0;
 			_interactable = false;

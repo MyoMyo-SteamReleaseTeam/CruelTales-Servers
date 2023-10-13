@@ -246,6 +246,16 @@ namespace CTS.Instance.Synchronizations
 			return Owner == networkPlayer.UserId;
 		}
 
+		public void SetOwner(NetworkPlayer networkPlayer)
+		{
+			Owner = networkPlayer.UserId;
+		}
+
+		public void ReleaseOwner()
+		{
+			Owner = new UserId(0);
+		}
+
 		public void AddVisibleUser(UserId userId)
 		{
 			_visibleUserSet.Add(userId);

@@ -1,8 +1,7 @@
 ﻿using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
-using CT.Common.Gameplay;
 
-namespace CT.Common.Gameplay.MiniGames
+namespace CT.Common.Gameplay.Dueoksini
 {
 	public struct DueoksiniItemInfo
 	{
@@ -16,17 +15,17 @@ namespace CT.Common.Gameplay.MiniGames
 	{
 		private readonly static DueoksiniItemInfo[] _itemInfos = new DueoksiniItemInfo[]
 		{
-			new() { ItemType = FieldItemType.Dueoksini_Rice,				TableCount = 4, SpwanCount = 8,	Score = 2 },
-			new() { ItemType = FieldItemType.Dueoksini_Kimchi,				TableCount = 4, SpwanCount = 8,	Score = 2 },
-			new() { ItemType = FieldItemType.Dueoksini_TaroSoup,			TableCount = 4, SpwanCount = 8,	Score = 3 },
-			new() { ItemType = FieldItemType.Dueoksini_Japchae,				TableCount = 2, SpwanCount = 4,	Score = 4 },
-			new() { ItemType = FieldItemType.Dueoksini_Jeon,				TableCount = 2, SpwanCount = 4,	Score = 4 },
-			new() { ItemType = FieldItemType.Dueoksini_Yukjeon,				TableCount = 2, SpwanCount = 4,	Score = 5 },
-			new() { ItemType = FieldItemType.Dueoksini_RawMeat,				TableCount = 2, SpwanCount = 4,	Score = 5 },
-			new() { ItemType = FieldItemType.Dueoksini_SteamedSeaBream,		TableCount = 1, SpwanCount = 2,	Score = 6 },
-			new() { ItemType = FieldItemType.Dueoksini_Galbijjim,			TableCount = 1, SpwanCount = 2,	Score = 7 },
-			new() { ItemType = FieldItemType.Dueoksini_Gujeolpan,			TableCount = 1, SpwanCount = 2,	Score = 7 },
-			new() { ItemType = FieldItemType.Dueoksini_Sinseonro,			TableCount = 1, SpwanCount = 1,	Score = 10 },
+			new() { ItemType = FieldItemType.Dueoksini_Rice,                TableCount = 4, SpwanCount = 8, Score = 2 },
+			new() { ItemType = FieldItemType.Dueoksini_Kimchi,              TableCount = 4, SpwanCount = 8, Score = 2 },
+			new() { ItemType = FieldItemType.Dueoksini_TaroSoup,            TableCount = 4, SpwanCount = 8, Score = 3 },
+			new() { ItemType = FieldItemType.Dueoksini_Japchae,             TableCount = 2, SpwanCount = 4, Score = 4 },
+			new() { ItemType = FieldItemType.Dueoksini_Jeon,                TableCount = 2, SpwanCount = 4, Score = 4 },
+			new() { ItemType = FieldItemType.Dueoksini_Yukjeon,             TableCount = 2, SpwanCount = 4, Score = 5 },
+			new() { ItemType = FieldItemType.Dueoksini_RawMeat,             TableCount = 2, SpwanCount = 4, Score = 5 },
+			new() { ItemType = FieldItemType.Dueoksini_SteamedSeaBream,     TableCount = 1, SpwanCount = 2, Score = 6 },
+			new() { ItemType = FieldItemType.Dueoksini_Galbijjim,           TableCount = 1, SpwanCount = 2, Score = 7 },
+			new() { ItemType = FieldItemType.Dueoksini_Gujeolpan,           TableCount = 1, SpwanCount = 2, Score = 7 },
+			new() { ItemType = FieldItemType.Dueoksini_Sinseonro,           TableCount = 1, SpwanCount = 1, Score = 10 },
 		};
 
 		public static int _totalSpwanItemCount = 0;

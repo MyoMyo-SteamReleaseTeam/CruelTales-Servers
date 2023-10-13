@@ -23,14 +23,14 @@ namespace CTS.Instance.Data
 			});
 			_miniGameDataByMode.Add(GameModeType.RedHood, new()
 			{
-				GameTime = 20,
+				GameTime = 500,
 				FeverTimeRatioRange = new Vector2(0.3f, 0.5f),
 				ExecutionCutScene = ExecutionCutSceneType.RedHood,
 				CompetitionType = CompetitionType.Individual,
 			});
 			_miniGameDataByMode.Add(GameModeType.Dueoksini, new()
 			{
-				GameTime = 30,
+				GameTime = 500,
 				FeverTimeRatioRange = new Vector2(0.15f, 0.3f),
 				ExecutionCutScene = ExecutionCutSceneType.Dueoksini,
 				CompetitionType = CompetitionType.Team,

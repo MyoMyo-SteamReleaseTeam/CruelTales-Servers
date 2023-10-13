@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CT.Common.DataType.Primitives;
 using CT.Common.Gameplay;
-using CT.Common.Gameplay.MiniGames;
+using CT.Common.Gameplay.Dueoksini;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Synchronizations;
 
@@ -53,7 +53,7 @@ namespace CTS.Instance.SyncObjects
 				int currentCount = ItemCountByType[typeKey];
 				if (currentCount >= itemInfo.TableCount)
 				{
-					Server_InteractResult(InteractResultType.Failed_ItemLimit);
+					Server_InteractResult(player, InteractResultType.Failed_ItemLimit);
 					return;
 				}
 

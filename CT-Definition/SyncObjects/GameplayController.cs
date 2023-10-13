@@ -16,7 +16,7 @@ namespace CT.Definitions.SyncObjects
 		public GameSystemState GameSystemState;
 
 		[SyncObject(dir: SyncDirection.Bidirection)]
-		public RoomSessionManager RoomSessionManager = new();
+		private RoomSessionManager RoomSessionManager = new();
 
 		[SyncObject]
 		public EffectController EffectController = new();

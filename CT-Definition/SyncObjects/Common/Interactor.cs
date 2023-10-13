@@ -17,6 +17,9 @@ namespace CT.Definitions.SyncObjects
 		public InteractorSize Size;
 
 		[SyncVar]
+		public NetworkIdentity CurrentSubjectId;
+
+		[SyncVar]
 		public float ProgressTime;
 
 		[SyncVar]
@@ -31,7 +34,7 @@ namespace CT.Definitions.SyncObjects
 		[SyncRpc(dir: SyncDirection.FromRemote)]
 		public void Client_TryCancel() { }
 
-		[SyncRpc]
+		[SyncRpc(SyncType.ReliableTarget)]
 		public void Server_InteractResult(InteractResultType result) { }
 	}
 

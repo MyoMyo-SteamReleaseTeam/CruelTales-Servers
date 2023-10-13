@@ -280,8 +280,8 @@ namespace CTS.Instance.Gameplay
 				foreach (var netObj in viewTable.TraceObjects.Values)
 				{
 					Vector2 objPos = netObj.RigidBody.Position;
-					if ((objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
-						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y ||
+					if (((objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
+						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y) ||
 						!netObj.IsValidVisibilityAuthority(player)) && 
 						!shouldForceShow(player, netObj))
 					{
@@ -353,11 +353,17 @@ namespace CTS.Instance.Gameplay
 
 			bool shouldForceShow(NetworkPlayer player, MasterNetworkObject netObj)
 			{
-				if (player.IsShowAll)
-					return true;
+				VisibilityType visibilityType = netObj.Visibility;
 
-				if (netObj.Visibility == VisibilityType.ViewAndOwner)
+				if (player.IsShowAll)
+				{
+					return netObj.VisibilityAuthority == VisibilityAuthority.All;
+				}
+
+				if (visibilityType == VisibilityType.ViewAndOwner)
+				{
 					return player.UserId == netObj.Owner;
+				}
 
 				return false;
 			}

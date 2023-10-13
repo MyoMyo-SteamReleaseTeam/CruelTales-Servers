@@ -3,6 +3,25 @@ using CT.Common.Serialization;
 
 namespace CT.Common.DataType.Primitives
 {
+	public struct NetBool : IPacketSerializable, IEquatable<NetBool>
+	{
+		public bool Value;
+		public const int SERIALIZE_SIZE = 1;
+		public int SerializeSize => SERIALIZE_SIZE;
+		public static implicit operator bool(NetBool value) => value.Value;
+		public static implicit operator NetBool(bool value) => new NetBool(value);
+#if NET
+		public NetBool() => Value = false;
+#endif
+		public NetBool(bool value) => Value = value;
+		public void Serialize(IPacketWriter writer) => writer.Put(Value);
+		public bool TryDeserialize(IPacketReader reader) => reader.TryReadBool(out bool Value);
+		public int CompareTo(bool other) => Value.CompareTo(other);
+		public bool Equals(NetBool other) => Value == other.Value;
+		public void Ignore(IPacketReader reader) => reader.Ignore(SERIALIZE_SIZE);
+		public static void IgnoreStatic(IPacketReader reader) => reader.Ignore(SERIALIZE_SIZE);
+	}
+
 	public struct NetByte : IPacketSerializable, IEquatable<NetByte>
 	{
 		public byte Value;

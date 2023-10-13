@@ -56,7 +56,7 @@ namespace CTS.Instance.SyncObjects
 
 		public void BindNetworkPlayer(NetworkPlayer player)
 		{
-			Owner = player.UserId;
+			SetOwner(player);
 			NetworkPlayer = player;
 		}
 
@@ -65,7 +65,7 @@ namespace CTS.Instance.SyncObjects
 			if (NetworkPlayer != player)
 				return;
 
-			Owner = new UserId(0);
+			ReleaseOwner();
 			NetworkPlayer = null;
 		}
 

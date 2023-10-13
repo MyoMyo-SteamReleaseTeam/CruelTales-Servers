@@ -23,10 +23,11 @@ using CT.Common.Tools;
 using CT.Common.DataType.Input;
 using CT.Common.DataType.Primitives;
 using CT.Common.DataType.Synchronizations;
+using CT.Common.Gameplay.Dueoksini;
 using CT.Common.Gameplay.Infos;
-using CT.Common.Gameplay.MiniGames;
 using CT.Common.Gameplay.PlayerCharacterStates;
 using CT.Common.Gameplay.Players;
+using CT.Common.Gameplay.RedHood;
 using CT.Common.Tools.CodeGen;
 using CT.Common.Tools.Collections;
 using CT.Common.Tools.ConsoleHelper;
@@ -44,8 +45,21 @@ namespace CTS.Instance.SyncObjects
 	public partial class RedHoodMissionInteractor
 	{
 		public override NetworkObjectType Type => NetworkObjectType.RedHoodMissionInteractor;
+		[SyncVar]
+		protected RedHoodMission _mission = new();
 		public RedHoodMissionInteractor()
 		{
+		}
+		public RedHoodMission Mission
+		{
+			get => _mission;
+			set
+			{
+				if (_mission == value) return;
+				_mission = value;
+				_dirtyReliable_0[7] = true;
+				MarkDirtyReliable();
+			}
 		}
 		public override void ClearDirtyReliable()
 		{
@@ -56,7 +70,8 @@ namespace CTS.Instance.SyncObjects
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			_dirtyReliable_0.Serialize(writer);
+			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 			if (_dirtyReliable_0[0])
 			{
 				writer.Put((byte)_behaviourType);
@@ -67,25 +82,49 @@ namespace CTS.Instance.SyncObjects
 			}
 			if (_dirtyReliable_0[2])
 			{
-				writer.Put(_progressTime);
+				_currentSubjectId.Serialize(writer);
 			}
 			if (_dirtyReliable_0[3])
 			{
-				writer.Put(_cooltime);
+				writer.Put(_progressTime);
 			}
 			if (_dirtyReliable_0[4])
 			{
-				writer.Put(_interactable);
+				writer.Put(_cooltime);
 			}
 			if (_dirtyReliable_0[5])
 			{
-				byte count = (byte)Server_InteractResultICallstack.Count;
-				writer.Put(count);
-				for (int i = 0; i < count; i++)
+				writer.Put(_interactable);
+			}
+			if (_dirtyReliable_0[6])
+			{
+				int Server_InteractResultICount = Server_InteractResultICallstack.GetCallCount(player);
+				if (Server_InteractResultICount > 0)
 				{
-					var arg = Server_InteractResultICallstack[i];
-					writer.Put((byte)arg);
+					var Server_InteractResultIcallList = Server_InteractResultICallstack.GetCallList(player);
+					writer.Put((byte)Server_InteractResultICount);
+					for (int i = 0; i < Server_InteractResultICount; i++)
+					{
+						var arg = Server_InteractResultIcallList[i];
+						writer.Put((byte)arg);
+					}
 				}
+				else
+				{
+					dirtyReliable_0[6] = false;
+				}
+			}
+			if (_dirtyReliable_0[7])
+			{
+				writer.Put((byte)_mission);
+			}
+			if (dirtyReliable_0.AnyTrue())
+			{
+				writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+			}
+			else
+			{
+				writer.SetSize(dirtyReliable_0_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }
@@ -93,17 +132,21 @@ namespace CTS.Instance.SyncObjects
 		{
 			writer.Put((byte)_behaviourType);
 			_size.Serialize(writer);
+			_currentSubjectId.Serialize(writer);
 			writer.Put(_progressTime);
 			writer.Put(_cooltime);
 			writer.Put(_interactable);
+			writer.Put((byte)_mission);
 		}
 		public override void InitializeMasterProperties()
 		{
 			_behaviourType = (InteractionBehaviourType)0;
 			_size = new();
+			_currentSubjectId = new();
 			_progressTime = 0;
 			_cooltime = 0;
 			_interactable = false;
+			_mission = (RedHoodMission)0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{

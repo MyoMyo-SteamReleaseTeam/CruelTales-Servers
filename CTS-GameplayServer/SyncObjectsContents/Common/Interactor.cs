@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using CT.Common.DataType;
 using CT.Common.Gameplay;
 using CT.Common.Gameplay.Infos;
@@ -23,12 +24,20 @@ namespace CTS.Instance.SyncObjects
 
 		[AllowNull] private HashSet<UserId> _cooltimePlayers;
 		[AllowNull] private Action<Arg> _onCooltimeEnd;
+		[AllowNull] private Action _onProgressEnd;
 
+		// Progress
+		public PlayerCharacter? CurrentSubjectCharacter { get; private set; }
+		public Vector2 CurrentSubjectPosition { get; private set; }
+		private CoroutineIdentity CurrentProgressCoroutineId;
+
+		// Cooltime
 		public bool HasCooltime => Cooltime > 0;
 
 		public override void Constructor()
 		{
 			_onCooltimeEnd = onCooltimeEnd;
+			_onProgressEnd = onProgressEnd;
 			_cooltimePlayers = new HashSet<UserId>(GlobalNetwork.SYSTEM_MAX_USER);
 		}
 
@@ -40,15 +49,15 @@ namespace CTS.Instance.SyncObjects
 			Cooltime = info.Cooltime;
 		}
 
-		public virtual void OnInteracted(NetworkPlayer player, PlayerCharacter playerCharacter) {}
+		public virtual void OnInteracted(NetworkPlayer player, PlayerCharacter playerCharacter) { }
 
 		public override void OnUpdate(float deltaTime)
 		{
+			if (Interactable == false)
+				return;
+
 			if (BehaviourType == InteractionBehaviourType.Touch)
 			{
-				if (Interactable == false)
-					return;
-
 				if (!tryGetHits(out var hits))
 					return;
 
@@ -63,6 +72,14 @@ namespace CTS.Instance.SyncObjects
 					OnInteracted(player.NetworkPlayer, player);
 				}
 			}
+			else if (BehaviourType == InteractionBehaviourType.Progress &&
+					 CurrentSubjectCharacter != null)
+			{
+				if (CurrentSubjectPosition != CurrentSubjectCharacter.Position)
+				{
+					onProgressCanceled();
+				}
+			}
 		}
 
 		public virtual partial void Client_TryInteract(NetworkPlayer player)
@@ -74,7 +91,7 @@ namespace CTS.Instance.SyncObjects
 			{
 				_log.Warn($"Authentication failed! Wrong interaction request! Player: {player}");
 				Anticheat.CheatDetected(player);
-				Server_InteractResult(InteractResultType.None);
+				Server_InteractResult(player, InteractResultType.None);
 				return;
 			}
 
@@ -94,7 +111,7 @@ namespace CTS.Instance.SyncObjects
 			// Check collide
 			if (!isPlayerCollided(player, out var playerCharacter))
 			{
-				Server_InteractResult(InteractResultType.Failed_WrongPosition);
+				Server_InteractResult(player, InteractResultType.Failed_WrongPosition);
 				return;
 			}
 
@@ -102,15 +119,27 @@ namespace CTS.Instance.SyncObjects
 			{
 				case InteractionBehaviourType.Touch:
 					// You cannot interact through touch behavior.
-					Server_InteractResult(InteractResultType.Failed_WrongRequest);
+					Server_InteractResult(player, InteractResultType.Failed_WrongRequest);
 					return;
 
 				case InteractionBehaviourType.Tigger:
 					OnInteracted(player, playerCharacter);
-					Server_InteractResult(InteractResultType.Success);
+					Server_InteractResult(player, InteractResultType.Success);
 					break;
 
 				case InteractionBehaviourType.Progress:
+					if (CurrentSubjectCharacter != null)
+					{
+						Server_InteractResult(player, InteractResultType.Failed_SomeoneIsInteracting);
+					}
+					else
+					{
+						CurrentSubjectCharacter = playerCharacter;
+						CurrentSubjectId = CurrentSubjectCharacter.Identity;
+						CurrentSubjectPosition = CurrentSubjectCharacter.Position;
+						Server_InteractResult(player, InteractResultType.Success_Start);
+						CurrentProgressCoroutineId = StartCoroutine(_onProgressEnd, ProgressTime);
+					}
 					break;
 
 				case InteractionBehaviourType.Toggle:
@@ -118,7 +147,7 @@ namespace CTS.Instance.SyncObjects
 
 				case InteractionBehaviourType.None:
 				default:
-					Server_InteractResult(InteractResultType.None);
+					Server_InteractResult(player, InteractResultType.None);
 					return;
 			}
 
@@ -132,7 +161,14 @@ namespace CTS.Instance.SyncObjects
 
 		public virtual partial void Client_TryCancel(NetworkPlayer player)
 		{
-			Server_InteractResult(InteractResultType.Failed_Canceled);
+			if (BehaviourType == InteractionBehaviourType.Progress)
+			{
+				onProgressCanceled();
+			}
+			else
+			{
+				Server_InteractResult(player, InteractResultType.Failed_Canceled);
+			}
 		}
 
 		private bool isPlayerCollided(NetworkPlayer player,
@@ -228,6 +264,29 @@ namespace CTS.Instance.SyncObjects
 		public bool HasPlayerCooltime(NetworkPlayer player)
 		{
 			return _cooltimePlayers.Contains(player.UserId);
+		}
+
+		private void onProgressEnd()
+		{
+			if (CurrentSubjectCharacter != null)
+			{
+				NetworkPlayer subjectPlayer = CurrentSubjectCharacter.NetworkPlayer;
+				OnInteracted(subjectPlayer, CurrentSubjectCharacter);
+				Server_InteractResult(subjectPlayer, InteractResultType.Success_Finished);
+			}
+		}
+
+		private void onProgressCanceled()
+		{
+			CancelCoroutine(CurrentProgressCoroutineId);
+			if (CurrentSubjectCharacter != null)
+			{
+				Server_InteractResult(CurrentSubjectCharacter.NetworkPlayer,
+									  InteractResultType.Failed_Canceled);
+			}
+			CurrentSubjectCharacter = null;
+			CurrentSubjectId = new NetworkIdentity(0);
+			CurrentSubjectPosition = Vector2.Zero;
 		}
 
 		private void onCooltimeStart(NetworkPlayer player)

@@ -28,7 +28,7 @@ namespace CTS.Instance.SyncObjects
 		public const float RESULT_SHOW_TIME = 3.0f;
 		// TODO : Need to set cut scene duration from DB
 		public const float EXECUTION_CUT_SCENE_TIME = 3.0f;
-		public const float MAP_VOTE_TIME = 3.0f;
+		public const float MAP_VOTE_TIME = 7.0f;
 		public const float NEXT_MAP_SHOW_TIME = 3.0f;
 #endif
 
@@ -79,7 +79,7 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			MiniGameData = MiniGameDataDB.GetMiniGameData(GameSceneIdentity);
-			GameTime = MiniGameData.GameTime;
+			GameTime = MiniGameData.GameTime + 0.9f;
 			CurrentTime = GameTime;
 			float feverTimeRatio = RandomHelper.Range(MiniGameData.FeverTimeRatioRange);
 			FeverTime = GameTime * feverTimeRatio;
