@@ -59,24 +59,30 @@ namespace CTS.Instance.SyncObjects
 			_dirtyReliable_1.Clear();
 			Server_GameStartCountdownffCallstack.Clear();
 			Server_GameStartfCallstack.Clear();
+			Server_FeverTimeStartCallstackCount = 0;
 			Server_GameEndfCallstack.Clear();
 			Server_ShowResultfCallstack.Clear();
 			Server_ShowExecutionEfCallstack.Clear();
 			Server_StartVoteMapfCallstack.Clear();
 			Server_ShowVotedNextMapGfCallstack.Clear();
+			_dirtyReliable_2.Clear();
 			Server_SyncTimerfCallstack.Clear();
 		}
 		public override void ClearDirtyUnreliable() { }
 		public override void SerializeSyncReliable(NetworkPlayer player, IPacketWriter writer)
 		{
-			int originSize = writer.Size;
+			BitmaskByte masterDirty = new BitmaskByte();
 			_dirtyReliable_0[5] = _eliminatedPlayers.IsDirtyReliable;
 			_dirtyReliable_0[6] = _mapVoteController.IsDirtyReliable;
 			_dirtyReliable_0[7] = _teamScoreByFaction.IsDirtyReliable;
-			BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
-			int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
-			if (_dirtyReliable_0.AnyTrue())
+			masterDirty[0] = _dirtyReliable_0.AnyTrue();
+			masterDirty[1] = _dirtyReliable_1.AnyTrue();
+			masterDirty[2] = _dirtyReliable_2.AnyTrue();
+			int masterDirty_pos = writer.OffsetSize(sizeof(byte));
+			if (masterDirty[0])
 			{
+				BitmaskByte dirtyReliable_0 = _dirtyReliable_0;
+				int dirtyReliable_0_pos = writer.OffsetSize(sizeof(byte));
 				if (_dirtyReliable_0[0])
 				{
 					_gameSceneIdentity.Serialize(writer);
@@ -129,11 +135,19 @@ namespace CTS.Instance.SyncObjects
 				{
 					_teamScoreByFaction.SerializeSyncReliable(writer);
 				}
+				if (dirtyReliable_0.AnyTrue())
+				{
+					writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
+				}
+				else
+				{
+					writer.SetSize(dirtyReliable_0_pos);
+					masterDirty[0] = false;
+				}
 			}
-			writer.PutTo(dirtyReliable_0, dirtyReliable_0_pos);
-			_dirtyReliable_1.Serialize(writer);
-			if (_dirtyReliable_1.AnyTrue())
+			if (masterDirty[1])
 			{
+				_dirtyReliable_1.Serialize(writer);
 				if (_dirtyReliable_1[0])
 				{
 					byte count = (byte)Server_GameStartCountdownffCallstack.Count;
@@ -157,6 +171,10 @@ namespace CTS.Instance.SyncObjects
 				}
 				if (_dirtyReliable_1[2])
 				{
+					writer.Put((byte)Server_FeverTimeStartCallstackCount);
+				}
+				if (_dirtyReliable_1[3])
+				{
 					byte count = (byte)Server_GameEndfCallstack.Count;
 					writer.Put(count);
 					for (int i = 0; i < count; i++)
@@ -165,7 +183,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[3])
+				if (_dirtyReliable_1[4])
 				{
 					byte count = (byte)Server_ShowResultfCallstack.Count;
 					writer.Put(count);
@@ -175,7 +193,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[4])
+				if (_dirtyReliable_1[5])
 				{
 					byte count = (byte)Server_ShowExecutionEfCallstack.Count;
 					writer.Put(count);
@@ -186,7 +204,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.playTime);
 					}
 				}
-				if (_dirtyReliable_1[5])
+				if (_dirtyReliable_1[6])
 				{
 					byte count = (byte)Server_StartVoteMapfCallstack.Count;
 					writer.Put(count);
@@ -196,7 +214,7 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg);
 					}
 				}
-				if (_dirtyReliable_1[6])
+				if (_dirtyReliable_1[7])
 				{
 					byte count = (byte)Server_ShowVotedNextMapGfCallstack.Count;
 					writer.Put(count);
@@ -207,7 +225,11 @@ namespace CTS.Instance.SyncObjects
 						writer.Put(arg.showTime);
 					}
 				}
-				if (_dirtyReliable_1[7])
+			}
+			if (masterDirty[2])
+			{
+				_dirtyReliable_2.Serialize(writer);
+				if (_dirtyReliable_2[0])
 				{
 					byte count = (byte)Server_SyncTimerfCallstack.Count;
 					writer.Put(count);
@@ -218,9 +240,13 @@ namespace CTS.Instance.SyncObjects
 					}
 				}
 			}
-			if (writer.Size == originSize + 2)
+			if (masterDirty.AnyTrue())
 			{
-				writer.SetSize(originSize);
+				writer.PutTo(masterDirty, masterDirty_pos);
+			}
+			else
+			{
+				writer.SetSize(masterDirty_pos);
 			}
 		}
 		public override void SerializeSyncUnreliable(NetworkPlayer player, IPacketWriter writer) { }

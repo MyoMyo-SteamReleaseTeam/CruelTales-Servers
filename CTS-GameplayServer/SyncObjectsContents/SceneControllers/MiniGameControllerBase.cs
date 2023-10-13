@@ -37,6 +37,7 @@ namespace CTS.Instance.SyncObjects
 			get => _currentTime;
 			set => _currentTime = value;
 		}
+		public float FeverTime { get; private set; }
 
 		public MiniGameData MiniGameData { get; private set; }
 
@@ -80,6 +81,8 @@ namespace CTS.Instance.SyncObjects
 			MiniGameData = MiniGameDataDB.GetMiniGameData(GameSceneIdentity);
 			GameTime = MiniGameData.GameTime;
 			CurrentTime = GameTime;
+			float feverTimeRatio = RandomHelper.Range(MiniGameData.FeverTimeRatioRange);
+			FeverTime = GameTime * feverTimeRatio;
 
 			Server_TryLoadSceneAll(GameSceneIdentity);
 		}
@@ -93,6 +96,15 @@ namespace CTS.Instance.SyncObjects
 				if (CurrentTime > 0)
 				{
 					CurrentTime -= deltaTime;
+					if (GameplayState != GameplayState.Gameplay_FeverTime && CurrentTime <= FeverTime)
+					{
+						GameplayState = GameplayState.Gameplay_FeverTime;
+						Server_FeverTimeStart();
+						foreach (var pc in _playerCharacterByPlayer.ForwardValues)
+						{
+							pc.OnFeverTime();
+						}
+					}
 				}
 				else
 				{

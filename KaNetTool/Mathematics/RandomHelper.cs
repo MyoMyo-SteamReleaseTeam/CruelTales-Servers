@@ -72,6 +72,12 @@ public static class RandomHelper
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static float Range(Vector2 range)
+	{
+		return NextSingle(range.X, range.Y);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vector2 NextVector2()
 	{
 		return new Vector2(_random.NextSingle(),

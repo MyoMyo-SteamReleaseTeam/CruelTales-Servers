@@ -36,6 +36,9 @@ namespace CT.Definitions.SyncObjects
 		public void Server_GameStart(float timeLeft) { }
 
 		[SyncRpc]
+		public void Server_FeverTimeStart() { }
+
+		[SyncRpc]
 		public void Server_GameEnd(float freezeTime) { }
 
 		[SyncRpc]

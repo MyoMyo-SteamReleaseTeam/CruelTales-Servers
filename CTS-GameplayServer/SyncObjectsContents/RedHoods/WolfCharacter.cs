@@ -1,5 +1,4 @@
-﻿using CT.Common.Gameplay.Players;
-using CTS.Instance.ClientShared;
+﻿using CTS.Instance.ClientShared;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
 using CTS.Instance.Gameplay.Events;
@@ -9,7 +8,6 @@ namespace CTS.Instance.SyncObjects
 {
 	public partial class WolfCharacter : PlayerCharacter
 	{
-
 		public override void OnCreated()
 		{
 			base.OnCreated();

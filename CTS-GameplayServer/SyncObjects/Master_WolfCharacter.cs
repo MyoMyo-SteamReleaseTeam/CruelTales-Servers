@@ -44,21 +44,8 @@ namespace CTS.Instance.SyncObjects
 	public partial class WolfCharacter
 	{
 		public override NetworkObjectType Type => NetworkObjectType.WolfCharacter;
-		[SyncVar]
-		protected int _wolfSpeed;
 		public WolfCharacter()
 		{
-		}
-		public int WolfSpeed
-		{
-			get => _wolfSpeed;
-			set
-			{
-				if (_wolfSpeed == value) return;
-				_wolfSpeed = value;
-				_dirtyReliable_1[1] = true;
-				MarkDirtyReliable();
-			}
 		}
 		public override void ClearDirtyReliable()
 		{
@@ -167,10 +154,6 @@ namespace CTS.Instance.SyncObjects
 						arg.Serialize(writer);
 					}
 				}
-				if (_dirtyReliable_1[1])
-				{
-					writer.Put(_wolfSpeed);
-				}
 			}
 			if (writer.Size == originSize + 2)
 			{
@@ -186,7 +169,6 @@ namespace CTS.Instance.SyncObjects
 			writer.Put((byte)_animationState);
 			writer.Put((byte)_proxyDirection);
 			writer.Put(_animationTime);
-			writer.Put(_wolfSpeed);
 		}
 		public override void InitializeMasterProperties()
 		{
@@ -196,7 +178,6 @@ namespace CTS.Instance.SyncObjects
 			_animationState = (DokzaAnimationState)0;
 			_proxyDirection = (ProxyDirection)0;
 			_animationTime = 0;
-			_wolfSpeed = 0;
 		}
 		public override bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
 		{
