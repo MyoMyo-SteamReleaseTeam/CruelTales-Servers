@@ -502,6 +502,11 @@ namespace CTS.Instance.Gameplay
 			// Serialize leave data
 			if (visibleTable.LeaveObjects.Count != 0)
 			{
+				// Send sync data just before destruction
+				SerializeReliableData(player, _reliableBuffer,
+									  visibleTable.LeaveObjects,
+									  PacketType.SC_Sync_MasterReliable);
+
 				SerializeDestructionData(_reliableBuffer,
 										 visibleTable.LeaveObjects,
 										 PacketType.SC_Sync_MasterLeave);
@@ -510,6 +515,11 @@ namespace CTS.Instance.Gameplay
 			// Serialize Desapwn data
 			if (visibleTable.DespawnObjects.Count != 0)
 			{
+				// Send sync data just before destruction
+				SerializeReliableData(player, _reliableBuffer,
+									  visibleTable.DespawnObjects,
+									  PacketType.SC_Sync_MasterReliable);
+
 				SerializeDestructionData(_reliableBuffer,
 										 visibleTable.DespawnObjects,
 										 PacketType.SC_Sync_MasterDespawn);
@@ -518,6 +528,11 @@ namespace CTS.Instance.Gameplay
 			// Serialize Global Desapwn data
 			if (visibleTable.GlobalDespawnObjects.Count != 0)
 			{
+				// Send sync data just before destruction
+				SerializeReliableData(player, _reliableBuffer,
+									  visibleTable.GlobalDespawnObjects,
+									  PacketType.SC_Sync_MasterReliable);
+
 				SerializeDestructionData(_reliableBuffer,
 										 visibleTable.GlobalDespawnObjects,
 										 PacketType.SC_Sync_MasterDespawn);
