@@ -144,6 +144,10 @@ namespace CTS.Instance.SyncObjects
 					break;
 
 				case InteractionBehaviourType.Progress:
+					// If you interact multiple time
+					if (CurrentSubjectCharacter == playerCharacter)
+						return;
+
 					if (CurrentSubjectCharacter != null)
 					{
 						Server_InteractResult(player, InteractResultType.Failed_SomeoneIsInteracting);
