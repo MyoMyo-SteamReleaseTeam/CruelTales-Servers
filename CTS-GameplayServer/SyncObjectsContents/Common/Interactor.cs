@@ -75,7 +75,8 @@ namespace CTS.Instance.SyncObjects
 			else if (BehaviourType == InteractionBehaviourType.Progress &&
 					 CurrentSubjectCharacter != null)
 			{
-				if (CurrentSubjectPosition != CurrentSubjectCharacter.Position)
+				if (CurrentSubjectPosition != CurrentSubjectCharacter.Position ||
+					!IsValidVisibilityAuthority(CurrentSubjectCharacter.NetworkPlayer))
 				{
 					onProgressCanceled();
 				}
@@ -92,6 +93,13 @@ namespace CTS.Instance.SyncObjects
 				_log.Warn($"Authentication failed! Wrong interaction request! Player: {player}");
 				Anticheat.CheatDetected(player);
 				Server_InteractResult(player, InteractResultType.None);
+				return;
+			}
+
+			// Check it's visible
+			if (!IsValidVisibilityAuthority(player))
+			{
+				Server_InteractResult(player, InteractResultType.Failed_WrongRequest);
 				return;
 			}
 
@@ -279,8 +287,8 @@ namespace CTS.Instance.SyncObjects
 			if (CurrentSubjectCharacter != null)
 			{
 				NetworkPlayer subjectPlayer = CurrentSubjectCharacter.NetworkPlayer;
-				OnInteracted(subjectPlayer, CurrentSubjectCharacter);
 				Server_InteractResult(subjectPlayer, InteractResultType.Success_Finished);
+				OnInteracted(subjectPlayer, CurrentSubjectCharacter);
 			}
 		}
 
