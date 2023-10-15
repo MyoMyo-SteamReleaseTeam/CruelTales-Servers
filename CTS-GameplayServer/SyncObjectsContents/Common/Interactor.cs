@@ -115,6 +115,14 @@ namespace CTS.Instance.SyncObjects
 				return;
 			}
 
+			// Ex)	When the player character is a wolf,
+			//		they cannot interact with the RedHoodMissionInteractor.
+			if (!CanInteract(player, playerCharacter))
+			{
+				Server_InteractResult(player, InteractResultType.Failed_WrongRequest);
+				return;
+			}
+
 			switch (BehaviourType)
 			{
 				case InteractionBehaviourType.Touch:
@@ -300,5 +308,6 @@ namespace CTS.Instance.SyncObjects
 			_cooltimePlayers.Remove(userId);
 		}
 
+		public virtual bool CanInteract(NetworkPlayer player, PlayerCharacter playerCharacter) => true;
 	}
 }

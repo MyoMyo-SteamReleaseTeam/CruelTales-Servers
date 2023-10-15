@@ -18,5 +18,10 @@ namespace CTS.Instance.SyncObjects
 			base.OnCreated();
 			Interactable = true;
 		}
+
+		public override bool CanInteract(NetworkPlayer player, PlayerCharacter playerCharacter)
+		{
+			return playerCharacter is not WolfCharacter;
+		}
 	}
 }
