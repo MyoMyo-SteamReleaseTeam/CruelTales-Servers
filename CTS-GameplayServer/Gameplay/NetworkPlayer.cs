@@ -15,7 +15,7 @@ namespace CTS.Instance.Gameplay
 		// Referenece
 		public GameplayManager GameManager { get; private set; }
 		public WorldManager WorldManager { get; private set; }
-		public PlayerState? PlayerState { get; private set; }
+		private PlayerState? _playerState;
 		public InstanceInitializeOption Option { get; private set; }
 
 		// Session Info
@@ -28,8 +28,8 @@ namespace CTS.Instance.Gameplay
 			private set
 			{
 				_userId = value;
-				if (PlayerState != null)
-					PlayerState.UserId = _userId;
+				if (_playerState != null)
+					_playerState.UserId = _userId;
 			}
 		}
 
@@ -40,8 +40,8 @@ namespace CTS.Instance.Gameplay
 			private set
 			{
 				_username = value;
-				if (PlayerState != null)
-					PlayerState.Username = _username;
+				if (_playerState != null)
+					_playerState.Username = _username;
 			}
 		}
 
@@ -52,8 +52,8 @@ namespace CTS.Instance.Gameplay
 			set
 			{
 				_isHost = value;
-				if (PlayerState != null)
-					PlayerState.IsHost = _isHost;
+				if (_playerState != null)
+					_playerState.IsHost = _isHost;
 			}
 		}
 
@@ -64,8 +64,8 @@ namespace CTS.Instance.Gameplay
 			set
 			{
 				_isReady = value;
-				if (PlayerState != null)
-					PlayerState.IsReady= _isReady;
+				if (_playerState != null)
+					_playerState.IsReady= _isReady;
 			}
 		}
 
@@ -76,8 +76,8 @@ namespace CTS.Instance.Gameplay
 			set
 			{
 				_isMapLoaded = value;
-				if (PlayerState != null)
-					PlayerState.IsMapLoaded = _isMapLoaded;
+				if (_playerState != null)
+					_playerState.IsMapLoaded = _isMapLoaded;
 			}
 		}
 
@@ -88,8 +88,8 @@ namespace CTS.Instance.Gameplay
 			set
 			{
 				_isEliminated = value;
-				if (PlayerState != null)
-					PlayerState.IsEliminated = _isEliminated;
+				if (_playerState != null)
+					_playerState.IsEliminated = _isEliminated;
 			}
 		}
 
@@ -100,8 +100,8 @@ namespace CTS.Instance.Gameplay
 			set
 			{
 				_faction = value;
-				if (PlayerState != null)
-					PlayerState.Faction = _faction;
+				if (_playerState != null)
+					_playerState.Faction = _faction;
 			}
 		}
 
@@ -157,7 +157,7 @@ namespace CTS.Instance.Gameplay
 			Session = null;
 			UserId = new UserId(0);
 			Username = string.Empty;
-			PlayerState = null;
+			_playerState = null;
 
 			// State
 			IsHost = false;
@@ -232,7 +232,7 @@ namespace CTS.Instance.Gameplay
 
 		public void BindPlayerState(PlayerState state)
 		{
-			PlayerState = state;
+			_playerState = state;
 			state.UserId = UserId;
 			state.Username = new(Username);
 

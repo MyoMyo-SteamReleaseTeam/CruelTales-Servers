@@ -28,8 +28,11 @@ namespace CTS.Instance.SyncObjects
 		{
 			base.OnCreated();
 
+			GameplayController.GetPlayers(out var alivePlayers, out var eliminatedPlayers);
+			alivePlayers.Shuffle();
+
 			// Calculate wolf count
-			var players = GameplayController.GetShuffledAlivePlayers();
+			var players = alivePlayers;
 			int playerCount = players.Count;
 			int wolfCount = (playerCount > 2) ? (int)(playerCount / WOLF_RATIO) : 1;
 			if (wolfCount > playerCount)
@@ -52,7 +55,7 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			// Create mission info by players
-			foreach (var player in GameplayController.GetAlivePlayers())
+			foreach (var player in alivePlayers)
 			{
 				var missionInfo = WorldManager.CreateObject<RedHoodMissionInfo>();
 				missionInfo.SetOwner(player);
@@ -81,7 +84,7 @@ namespace CTS.Instance.SyncObjects
 			var eliminatedPlayers = GetPlayerSetBy(NetworkObjectType.WolfCharacter);
 			foreach (var ep in eliminatedPlayers)
 			{
-				EliminatedPlayers.Add(ep.UserId);
+				OnPlayerEliminated(ep);
 			}
 		}
 
@@ -109,7 +112,6 @@ namespace CTS.Instance.SyncObjects
 		public override void OnPlayerLeave(NetworkPlayer player)
 		{
 			base.OnPlayerLeave(player);
-
 		}
 
 		private void onChangeRole(Arg centerPosArg, Arg wasWolfRightArg,

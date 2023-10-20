@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using CT.Common.Gameplay;
 using CTS.Instance.Data;
 using CTS.Instance.Gameplay;
@@ -159,6 +160,12 @@ namespace CTS.Instance.SyncObjects
 			DestroyPlayer(player);
 		}
 
+		public void OnPlayerEliminated(NetworkPlayer player)
+		{
+			player.IsEliminated = true;
+			EliminatedPlayers.Add(player.UserId);
+		}
+
 		#region Game Flow
 
 		private void gameStart()
@@ -200,7 +207,7 @@ namespace CTS.Instance.SyncObjects
 
 		private void onShowExecution()
 		{
-			GameplayState = GameplayState.Execute;
+			GameplayState = GameplayState.Execution;
 			Server_ShowExecution(MiniGameData.ExecutionCutScene, EXECUTION_CUT_SCENE_TIME);
 			StartCoroutine(_onStartVoteMap, EXECUTION_CUT_SCENE_TIME);
 		}

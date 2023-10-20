@@ -23,7 +23,7 @@
 		Result,
 
 		/// <summary>탈락자 결과를 보는 중입니다.</summary>
-		Execute,
+		Execution,
 
 		/// <summary>맵 투표중입니다.</summary>
 		VoteMap,

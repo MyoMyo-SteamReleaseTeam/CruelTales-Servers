@@ -32,7 +32,8 @@ namespace CTS.Instance.SyncObjects
 		private bool _isCurrentlyLoading = false;
 
 		// Returns
-		private readonly List<NetworkPlayer> _returnNetworkPlayerList = new(GlobalNetwork.SYSTEM_MAX_USER);
+		private readonly List<NetworkPlayer> _returnNetworkPlayerList_0 = new(GlobalNetwork.SYSTEM_MAX_USER);
+		private readonly List<NetworkPlayer> _returnNetworkPlayerList_1 = new(GlobalNetwork.SYSTEM_MAX_USER);
 
 		public override void Constructor()
 		{
@@ -184,23 +185,28 @@ namespace CTS.Instance.SyncObjects
 			_isCurrentlyLoading = false;
 		}
 
-		public List<NetworkPlayer> GetAlivePlayers()
+		/// <summary>탈락한 플레이어와 살아있는 플레이어의 목록을 얻습니다./</summary>
+		/// <returns></returns>
+		public void GetPlayers(out List<NetworkPlayer> alivePlayers,
+							   out List<NetworkPlayer> eliminatedPlayers)
 		{
-			_returnNetworkPlayerList.Clear();
+			_returnNetworkPlayerList_0.Clear();
+			_returnNetworkPlayerList_1.Clear();
+
+			alivePlayers = _returnNetworkPlayerList_0;
+			eliminatedPlayers = _returnNetworkPlayerList_1;
+
 			foreach (NetworkPlayer player in PlayerSet)
 			{
 				if (player.IsEliminated)
-					continue;
-				_returnNetworkPlayerList.Add(player);
+				{
+					eliminatedPlayers.Add(player);
+				}
+				else
+				{
+					alivePlayers.Add(player);
+				}
 			}
-			return _returnNetworkPlayerList;
-		}
-
-		public List<NetworkPlayer> GetShuffledAlivePlayers()
-		{
-			var result = GetAlivePlayers();
-			result.Shuffle();
-			return result;
 		}
 	}
 }
