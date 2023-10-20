@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using CT.Common.DataType;
 using CT.Common.Tools;
@@ -178,6 +179,12 @@ namespace CTS.Instance.Gameplay
 
 			// TODO : 구문 최적화 필요
 			// Check visibility by player
+
+			bool isBound = false;
+			bool shouldForceShowing = false;
+			bool shouldHiding = false;
+			bool isValid = false;
+
 			foreach (var kv in _playerVisibleBySession)
 			{
 				NetworkPlayer player = kv.Key;
@@ -207,15 +214,13 @@ namespace CTS.Instance.Gameplay
 					}
 
 					Vector2 objPos = spawnObject.RigidBody.Position;
-					if ((objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-						objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y) ||
-						shouldForceShow(player, spawnObject))
+					isBound = isInbound(objPos, inboundLB, inboundRT);
+					shouldForceShowing = shouldForceShow(player, spawnObject);
+					isValid = spawnObject.IsValidVisibilityAuthority(player);
+					if ((isBound || shouldForceShowing) && isValid)
 					{
-						if (spawnObject.IsValidVisibilityAuthority(player))
-						{
-							bool isAdded = viewTable.SpawnObjects.TryAdd(spawnObject.Identity, spawnObject);
-							Debug.Assert(isAdded);
-						}
+						bool isAdded = viewTable.SpawnObjects.TryAdd(spawnObject.Identity, spawnObject);
+						Debug.Assert(isAdded);
 					}
 				}
 
@@ -225,23 +230,23 @@ namespace CTS.Instance.Gameplay
 					for (int cx = inboundCellLB.X; cx <= inboundCellRT.X; cx++)
 					{
 						var curCell = getCell(cx, cz);
-						foreach (var netObj in curCell.Values)
+						foreach (var enterObj in curCell.Values)
 						{
-							Vector2 objPos = netObj.RigidBody.Position;
-							if ((objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
-								objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y) ||
-								shouldForceShow(player, netObj))
+							Vector2 objPos = enterObj.RigidBody.Position;
+							isBound = isInbound(objPos, inboundLB, inboundRT);
+							shouldForceShowing = shouldForceShow(player, enterObj);
+							if (isBound || shouldForceShowing)
 							{
-								if (viewTable.TraceObjects.ContainsKey(netObj.Identity))
+								if (viewTable.TraceObjects.ContainsKey(enterObj.Identity))
 								{
 									continue;
 								}
 
-								Debug.Assert(!viewTable.SpawnObjects.ContainsKey(netObj.Identity));
+								Debug.Assert(!viewTable.SpawnObjects.ContainsKey(enterObj.Identity));
 
-								if (netObj.IsValidVisibilityAuthority(player))
+								if (enterObj.IsValidVisibilityAuthority(player))
 								{
-									bool isAdded = viewTable.EnterObjects.TryAdd(netObj.Identity, netObj);
+									bool isAdded = viewTable.EnterObjects.TryAdd(enterObj.Identity, enterObj);
 									//Debug.Assert(isAdded);
 								}
 							}
@@ -280,10 +285,9 @@ namespace CTS.Instance.Gameplay
 				foreach (var netObj in viewTable.TraceObjects.Values)
 				{
 					Vector2 objPos = netObj.RigidBody.Position;
-					if (((objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
-						objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y) ||
-						!netObj.IsValidVisibilityAuthority(player)) && 
-						!shouldForceShow(player, netObj))
+					shouldHiding = isOutbound(objPos, outboundLB, outboundRT) &&
+								   !shouldForceShow(player, netObj);
+					if (shouldHiding || !netObj.IsValidVisibilityAuthority(player))
 					{
 						bool isAdded = _outObjectSet.TryAdd(netObj.Identity, netObj);
 						Debug.Assert(isAdded);
@@ -351,21 +355,37 @@ namespace CTS.Instance.Gameplay
 				visibleTable.TransitionVisibilityCycle();
 			}
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			/// 강제로 보여주어야 하는 객체인지 여부입니다.
+			/// Authority는 검사하지 않습니다.
 			bool shouldForceShow(NetworkPlayer player, MasterNetworkObject netObj)
 			{
 				VisibilityType visibilityType = netObj.Visibility;
 
-				if (player.IsShowAll)
-				{
-					return netObj.VisibilityAuthority == VisibilityAuthority.All;
-				}
-
 				if (visibilityType == VisibilityType.ViewAndOwner)
 				{
-					return player.UserId == netObj.Owner;
+					if (player.UserId == netObj.Owner)
+						return true;
 				}
 
+				if (player.IgnoreViewDistance)
+					return true;
+
 				return false;
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			bool isInbound(Vector2 objPos, Vector2 inboundLB, Vector2 inboundRT)
+			{
+				return objPos.X >= inboundLB.X && objPos.X <= inboundRT.X &&
+					   objPos.Y >= inboundLB.Y && objPos.Y <= inboundRT.Y;
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			bool isOutbound(Vector2 objPos, Vector2 outboundLB, Vector2 outboundRT)
+			{
+				return objPos.X < outboundLB.X || objPos.X > outboundRT.X ||
+					   objPos.Y < outboundLB.Y || objPos.Y > outboundRT.Y;
 			}
 		}
 

@@ -216,11 +216,8 @@ namespace CTS.Instance.Synchronizations
 
 		public bool IsValidVisibilityAuthority(NetworkPlayer networkPlayer)
 		{
-			if (Visibility.IsViewType() &&
-				!networkPlayer.CanSeeViewObject)
-			{
+			if (Visibility.IsViewType() && !networkPlayer.CanSeeViewObject)
 				return false;
-			}
 
 			switch (VisibilityAuthority)
 			{

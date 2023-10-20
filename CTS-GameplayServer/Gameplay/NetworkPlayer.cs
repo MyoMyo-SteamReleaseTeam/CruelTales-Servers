@@ -116,7 +116,9 @@ namespace CTS.Instance.Gameplay
 
 		// Visibility
 		public bool CanSeeViewObject { get; set; } = false;
-		public bool IsShowAll { get; private set; }
+
+		/// <summary>시야 범위를 벗어나도 볼 수 있습니다.</summary>
+		public bool IgnoreViewDistance { get; private set; }
 
 #if DEBUG
 #pragma warning disable CS8618
@@ -173,7 +175,7 @@ namespace CTS.Instance.Gameplay
 
 			// Visibility
 			CanSeeViewObject = false;
-			IsShowAll = false;
+			IgnoreViewDistance = false;
 		}
 
 		public void OnDestroyed()
@@ -207,14 +209,15 @@ namespace CTS.Instance.Gameplay
 		public void BindCharacter(PlayerCharacter character)
 		{
 			PlayerCharacter = character;
+			OptimizeViewSize();
 
 			if (character is WolfCharacter)
 			{
-				IsShowAll = true;
+				IgnoreViewDistance = true;
 			}
 			else
 			{
-				IsShowAll = false;
+				IgnoreViewDistance = false;
 			}
 		}
 
