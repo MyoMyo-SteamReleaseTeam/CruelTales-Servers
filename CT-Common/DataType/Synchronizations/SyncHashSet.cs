@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using CT.Common.Exceptions;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -30,7 +31,7 @@ namespace CT.Common.DataType.Synchronizations
 		public int Count => _set.Count;
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
-		private bool _isInitialSynchronized = false;
+		private int _duplicatedEventCount;
 
 		//[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
 		public SyncHashSet(int capacity = 8, int operationCapacity = 4)
@@ -138,6 +139,7 @@ namespace CT.Common.DataType.Synchronizations
 			{
 				item.Serialize(writer);
 			}
+			writer.Put((byte)_syncOperations.Count);
 		}
 
 		public void SerializeSyncReliable(IPacketWriter writer)
@@ -171,7 +173,6 @@ namespace CT.Common.DataType.Synchronizations
 
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			_isInitialSynchronized = true;
 			byte count = reader.ReadByte();
 			for (int i = 0; i < count; i++)
 			{
@@ -182,26 +183,27 @@ namespace CT.Common.DataType.Synchronizations
 				}
 				_set.Add(item);
 			}
+			_duplicatedEventCount = reader.ReadByte();
 			return true;
 		}
 
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
 		{
-			/*
-			 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-			 * 중복 호출이 일어날 수 있음.
-			 * 이미 반영된 이벤트이기 때문에 무시한다.
-			 */
-			if (_isInitialSynchronized)
-			{
-				IgnoreSyncReliable(reader);
-				_isInitialSynchronized = false;
-				return true;
-			}
-
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
 			{
+				/*
+				 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+				 * 중복 호출이 일어날 수 있음.
+				 * 이미 반영된 이벤트이기 때문에 무시한다.
+				 */
+				if (_duplicatedEventCount > 0)
+				{
+					_duplicatedEventCount--;
+					ignoreOperation(reader);
+					continue;
+				}
+
 				var operation = (CollectionSyncType)reader.ReadByte();
 				switch (operation)
 				{
@@ -236,14 +238,12 @@ namespace CT.Common.DataType.Synchronizations
 		{
 			_set.Clear();
 			_syncOperations.Clear();
-			_isInitialSynchronized = false;
 		}
 
 		public void InitializeRemoteProperties()
 		{
 			_set.Clear();
 			_syncOperations.Clear();
-			_isInitialSynchronized = false;
 		}
 
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
@@ -278,10 +278,36 @@ namespace CT.Common.DataType.Synchronizations
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void IgnoreSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void ignoreOperation(IPacketReader reader)
+		{
+			var operation = (CollectionSyncType)reader.ReadByte();
+			switch (operation)
+			{
+				case CollectionSyncType.Clear:
+					break;
+
+				case CollectionSyncType.Add:
+					ignoreElement(reader);
+					break;
+
+				case CollectionSyncType.Remove:
+					ignoreElement(reader);
+					break;
+
+				default:
+					Debug.Assert(false);
+					break;
+			}
+		}
+
+		private static T _ignoreInstance = new();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static void ignoreElement(IPacketReader reader)
 		{
-			T temp = new();
-			temp.Ignore(reader);
+			_ignoreInstance.Ignore(reader);
 		}
 	}
 }
