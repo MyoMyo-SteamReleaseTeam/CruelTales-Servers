@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using CT.Common.Exceptions;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
@@ -37,6 +38,7 @@ namespace CT.Common.DataType.Synchronizations
 		public int Count => _dictionary.Count;
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
+		private int _duplicatedEventCount;
 
 		//[Obsolete("Owner를 등록할 수 있는 생성자를 사용하세요.")]
 		public SyncDictionary(int capacity = 8, int operationCapacity = 4)
@@ -222,6 +224,9 @@ namespace CT.Common.DataType.Synchronizations
 				key.Serialize(writer);
 				_dictionary[key].Serialize(writer);
 			}
+
+			// Write duplicated event count
+			writer.Put((byte)_syncOperations.Count);
 		}
 
 		public void SerializeSyncReliable(IPacketWriter writer)
@@ -273,6 +278,7 @@ namespace CT.Common.DataType.Synchronizations
 				if (!value.TryDeserialize(reader)) return false;
 				_dictionary.Add(key, value);
 			}
+			_duplicatedEventCount = reader.ReadByte();
 			return true;
 		}
 
@@ -281,20 +287,24 @@ namespace CT.Common.DataType.Synchronizations
 			byte operationCount = reader.ReadByte();
 			for (int i = 0; i < operationCount; i++)
 			{
+				/*
+				 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
+				 * 중복 호출이 일어날 수 있음.
+				 * 이미 반영된 이벤트이기 때문에 무시한다.
+				 */
+				if (_duplicatedEventCount > 0)
+				{
+					_duplicatedEventCount--;
+					ignoreOperation(reader);
+					continue;
+				}
+
 				var operation = (CollectionSyncType)reader.ReadByte();
 				switch (operation)
 				{
 					case CollectionSyncType.Clear:
-						/*
-						 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-						 * 중복 호출이 일어날 수 있음.
-						 * 이미 반영된 이벤트이기 때문에 무시한다.
-						 */
-						if (_dictionary.Count != 0)
-						{
-							_dictionary.Clear();
-							OnCleared?.Invoke();
-						}
+						_dictionary.Clear();
+						OnCleared?.Invoke();
 						break;
 
 					case CollectionSyncType.Add:
@@ -303,15 +313,8 @@ namespace CT.Common.DataType.Synchronizations
 							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
-							/*
-							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-							 * 중복 호출이 일어날 수 있음.
-							 * 이미 반영된 이벤트이기 때문에 무시한다.
-							 */
-							if (!_dictionary.TryAdd(key, value))
-							{
-								OnAdded?.Invoke(key, value);
-							}
+							_dictionary.Add(key, value);
+							OnAdded?.Invoke(key, value);
 						}
 						break;
 
@@ -319,16 +322,8 @@ namespace CT.Common.DataType.Synchronizations
 						{
 							TKey key = new();
 							if (!key.TryDeserialize(reader)) return false;
-							/*
-							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-							 * 중복 호출이 일어날 수 있음.
-							 * 이미 반영된 이벤트이기 때문에 무시한다.
-							 */
-							if (_dictionary.ContainsKey(key))
-							{
-								_dictionary.Remove(key);
-								OnRemoved?.Invoke(key);
-							}
+							_dictionary.Remove(key);
+							OnRemoved?.Invoke(key);
 						}
 						break;
 
@@ -338,16 +333,8 @@ namespace CT.Common.DataType.Synchronizations
 							TValue value = new();
 							if (!key.TryDeserialize(reader)) return false;
 							if (!value.TryDeserialize(reader)) return false;
-							/*
-							 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-							 * 중복 호출이 일어날 수 있음.
-							 * 이미 반영된 이벤트이기 때문에 무시한다.
-							 */
-							if (_dictionary.ContainsKey(key))
-							{
-								_dictionary[key] = value;
-								OnChanged?.Invoke(key, _dictionary[key]);
-							}
+							_dictionary[key] = value;
+							OnChanged?.Invoke(key, _dictionary[key]);
 						}
 						break;
 
@@ -371,5 +358,49 @@ namespace CT.Common.DataType.Synchronizations
 		public void SerializeSyncUnreliable(IPacketWriter writer) => throw new WrongSyncType(SyncType.Unreliable);
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
 		public void IgnoreSyncUnreliable(IPacketReader reader) => throw new WrongSyncType(SyncType.Unreliable);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void ignoreOperation(IPacketReader reader)
+		{
+			var operation = (CollectionSyncType)reader.ReadByte();
+			switch (operation)
+			{
+				case CollectionSyncType.Clear:
+					break;
+
+				case CollectionSyncType.Add:
+					ignoreKeyElement(reader);
+					ignoreValueElement(reader);
+					break;
+
+				case CollectionSyncType.Remove:
+					ignoreKeyElement(reader);
+					break;
+
+				case CollectionSyncType.Change:
+					ignoreKeyElement(reader);
+					ignoreValueElement(reader);
+					break;
+
+				default:
+					Debug.Assert(false);
+					break;
+			}
+		}
+
+		private static TKey _ignoreKeyInstance = new();
+		private static TValue _ignoreValueInstance = new();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void ignoreKeyElement(IPacketReader reader)
+		{
+			_ignoreKeyInstance.Ignore(reader);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void ignoreValueElement(IPacketReader reader)
+		{
+			_ignoreValueInstance.Ignore(reader);
+		}
 	}
 }

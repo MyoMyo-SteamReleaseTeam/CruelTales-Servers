@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using CT.Common.Exceptions;
 using CT.Common.Serialization;
 using CT.Common.Synchronizations;
 using CT.Common.Tools.Collections;
-using System;
-using System.Diagnostics.CodeAnalysis;
+
 
 #if CT_SERVER
 using CTS.Instance.Gameplay;
 using CT.Common.DataType.Synchronizations;
 #endif
-
 #if CT_SERVER
 namespace CTS.Instance.Synchronizations
 #elif CT_CLIENT
@@ -56,9 +57,11 @@ namespace CT.Common.DataType.Synchronizations
 
 		private bool _isDirtyReliable;
 		public bool IsDirtyReliable => _isDirtyReliable;
+#if CT_CLIENT
+		private int _duplicatedEventCount;
+#endif
 
 #if CT_CLIENT
-		private bool _isInitialSynchronized = false;
 		private static T _ignoreInstance = new T();
 #endif
 
@@ -199,17 +202,11 @@ namespace CT.Common.DataType.Synchronizations
 		public void InitializeMasterProperties()
 		{
 			Count = 0;
-#if CT_CLIENT
-			_isInitialSynchronized = false;
-#endif
 		}
 
 		public void InitializeRemoteProperties()
 		{
 			Count = 0;
-#if CT_CLIENT
-			_isInitialSynchronized = false;
-#endif
 		}
 
 		public void ClearDirtyReliable()
@@ -240,13 +237,13 @@ namespace CT.Common.DataType.Synchronizations
 			{
 				_list[i].SerializeEveryProperty(writer);
 			}
+			writer.Put((byte)_syncOperations.Count);
 		}
 #endif
 
 #if CT_CLIENT
 		public bool TryDeserializeEveryProperty(IPacketReader reader)
 		{
-			_isInitialSynchronized = true;
 			Count = reader.ReadByte();
 			for (int i = 0; i < Count; i++)
 			{
@@ -255,6 +252,7 @@ namespace CT.Common.DataType.Synchronizations
 					return false;
 				}
 			}
+			_duplicatedEventCount = reader.ReadByte();
 			return true;
 		}
 #endif
@@ -368,23 +366,10 @@ namespace CT.Common.DataType.Synchronizations
 
 #if CT_SERVER
 		public bool TryDeserializeSyncReliable(NetworkPlayer player, IPacketReader reader)
-		{
 #elif CT_CLIENT
 		public bool TryDeserializeSyncReliable(IPacketReader reader)
-		{
-			/*
-			 * 최초 1회 동기화시 변경된 데이터도 똑같이 수신된다면
-			 * 중복 호출이 일어날 수 있음.
-			 * 이미 반영된 이벤트이기 때문에 무시한다.
-			 */
-			if (_isInitialSynchronized)
-			{
-				IgnoreSyncStaticReliable(reader);
-				_isInitialSynchronized = false;
-				return true;
-			}
 #endif
-
+		{
 			if (!reader.TryReadBitmaskByte(out BitmaskByte masterDirty)) return false;
 
 			// Serialize if there is even a single operation
@@ -397,6 +382,13 @@ namespace CT.Common.DataType.Synchronizations
 				if (!reader.TryReadByte(out byte operationCount)) return false;
 				for (int i = 0; i < operationCount; i++)
 				{
+					if (_duplicatedEventCount > 0)
+					{
+						_duplicatedEventCount--;
+						ignoreOperation(reader);
+						continue;
+					}
+
 					if (!reader.TryReadByte(out byte operationValue)) return false;
 					var operation = (CollectionSyncType)operationValue;
 					switch (operation)
@@ -407,6 +399,10 @@ namespace CT.Common.DataType.Synchronizations
 							break;
 
 						case CollectionSyncType.Add:
+							_list[Count].InitializeMasterProperties();
+							_list[Count].InitializeRemoteProperties();
+							_list[Count].ClearDirtyReliable();
+							_list[Count].ClearDirtyUnreliable();
 							if (!_list[Count].TryDeserializeEveryProperty(reader))
 							{
 								return false;
@@ -513,5 +509,36 @@ namespace CT.Common.DataType.Synchronizations
 		public static void IgnoreSyncStaticUnreliable(IPacketReader reader) => throw new NotImplementedException();
 		public void IgnoreSyncReliable(IPacketReader reader) => IgnoreSyncStaticReliable(reader);
 		public void IgnoreSyncUnreliable(IPacketReader reader) => IgnoreSyncStaticUnreliable(reader);
+
+#if CT_CLIENT
+		private void ignoreOperation(IPacketReader reader)
+		{
+			var operation = (CollectionSyncType)reader.ReadByte();
+			switch (operation)
+			{
+				case CollectionSyncType.Clear:
+					break;
+
+				case CollectionSyncType.Add:
+					ignoreEntireValueProperties(reader);
+					break;
+
+				case CollectionSyncType.Remove:
+					reader.Ignore(sizeof(byte));
+					break;
+
+				default:
+					Debug.Assert(false);
+					break;
+			}
+		}
+
+		private static T _ignoreValueInstance = new();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void ignoreEntireValueProperties(IPacketReader reader)
+		{
+			_ignoreValueInstance.TryDeserializeEveryProperty(reader);
+		}
+#endif
 	}
 }
