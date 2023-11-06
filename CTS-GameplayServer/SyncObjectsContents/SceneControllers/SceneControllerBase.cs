@@ -100,7 +100,7 @@ namespace CTS.Instance.SyncObjects
 			return _playerCharacterByPlayer.TryGetValue(player, out playerCharacter);
 		}
 
-		public void SpawnPlayersByTeam<T>(Action<T, Faction>? onCreated, params Faction[] factions)
+		public void SpawnPlayersByTeam<T>(Action<NetworkPlayer, T>? onCreated, params Faction[] factions)
 			where T : PlayerCharacter, new()
 		{
 			GameplayController.GetPlayers(out var alivePlayers, out var eliminatedPlayers);
@@ -121,13 +121,13 @@ namespace CTS.Instance.SyncObjects
 				}
 				Faction curFaction = factions[factionIndex];
 				player.Faction = curFaction;
-				var character = SpawnPlayerBy<T>(player, curFaction);
-				onCreated?.Invoke(character, curFaction);
+				var character = SpawnPlayerBy<T>(player, onCreated, curFaction);
+				onCreated?.Invoke(player, character);
 				spawnIndex++;
 			}
 		}
 
-		public T SpawnPlayerBy<T>(NetworkPlayer player, Faction faction = Faction.None)
+		public T SpawnPlayerBy<T>(NetworkPlayer player, Action<NetworkPlayer, T>? onCreated, Faction faction = Faction.None)
 			where T : PlayerCharacter, new()
 		{
 			Vector2 spawnPos = getNextSpawnPositionBy(faction);
@@ -143,6 +143,7 @@ namespace CTS.Instance.SyncObjects
 			}
 
 			Debug.Assert(character != null);
+			onCreated?.Invoke(player, character);
 			return character;
 
 			Vector2 getNextSpawnPositionBy(Faction faction)

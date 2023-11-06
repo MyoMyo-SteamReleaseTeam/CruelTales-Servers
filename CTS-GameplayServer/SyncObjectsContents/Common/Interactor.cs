@@ -91,7 +91,7 @@ namespace CTS.Instance.SyncObjects
 			if (!checkValidationRequest(player))
 			{
 				_log.Warn($"Authentication failed! Wrong interaction request! Player: {player}");
-				Anticheat.CheatDetected(player);
+				Anticheat.CheatDetected(player, AntiCheatType.IgnoreVisibility);
 				Server_InteractResult(player, InteractResultType.None);
 				return;
 			}

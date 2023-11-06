@@ -88,11 +88,18 @@ namespace CTS.Instance
 		}
 	}
 
+	public enum AntiCheatType
+	{
+		None = 0,
+		IgnoreVisibility,
+		PlayersDataIsNotExist,
+	}
+
 	public static class Anticheat
 	{
-		public static void CheatDetected(NetworkPlayer player)
+		public static void CheatDetected(NetworkPlayer player, AntiCheatType antiCheatType)
 		{
-
+			Console.WriteLine($"[AC] Player : {player} | {antiCheatType}");
 		}
 	}
 }

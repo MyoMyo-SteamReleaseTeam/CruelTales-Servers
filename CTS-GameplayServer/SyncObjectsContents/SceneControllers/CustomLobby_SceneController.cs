@@ -71,7 +71,7 @@ namespace CTS.Instance.SyncObjects
 			base.OnPlayerEnter(player);
 
 			Server_TryLoadScene(player, GameSceneIdentity);
-			SpawnPlayerBy<PlayerCharacter>(player);
+			SpawnPlayerBy<PlayerCharacter>(player, onCreated: null);
 
 			if (GameplayController.GameSystemState == GameSystemState.GameStartCountdown)
 			{
